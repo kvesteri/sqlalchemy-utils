@@ -1,0 +1,5 @@
+-r requirements.txt
+pytest==2.2.3
+Pygments==1.2
+Jinja2==2.3
+docutils>=0.10
