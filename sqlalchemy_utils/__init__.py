@@ -1,4 +1,3 @@
-from flask import request
 from sqlalchemy.orm.mapper import Mapper
 from sqlalchemy.orm.query import _ColumnEntity
 from sqlalchemy.sql.expression import desc, asc
@@ -25,7 +24,6 @@ def sort_query(query, sort):
         if isinstance(entity, _ColumnEntity) and entity._label_name:
             labels.append(entity._label_name)
 
-    sort = request.args.get('sort', sort)
     if not sort:
         return query
 
