@@ -115,6 +115,12 @@ def escape_like(string, escape_char='*'):
     """
     Escapes the string paremeter used in SQL LIKE expressions
 
+        >>> from sqlalchemy_utils import escape_like
+        >>> query = session.query(User).filter(
+        ...     User.name.ilike(escape_like('John'))
+        ... )
+
+
     :param string: a string to escape
     :param escape_char: escape character
     """
