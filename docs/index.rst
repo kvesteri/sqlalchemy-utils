@@ -12,8 +12,8 @@ API Documentation
 -----------------
 
 .. module:: sqlalchemy_utils
-.. autofunc:: sort_query
-.. autofunc:: escape_like
+.. autofunction:: sort_query
+.. autofunction:: escape_like
 
 .. include:: ../CHANGES.rst
 
