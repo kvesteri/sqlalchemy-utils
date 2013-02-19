@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-Various utility functions that I use alongside SQLAlchemy.
+Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
 0.1.0 (12.1.2013)
