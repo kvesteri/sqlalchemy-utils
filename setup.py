@@ -1,8 +1,8 @@
 """
-SQLAlchemy-Searchable
----------------------
+SQLAlchemy-Utils
+----------------
 
-Various utility functions I use with SQLAlchemy.
+Various utility functions for SQLAlchemy.
 """
 
 from setuptools import setup, Command
@@ -30,7 +30,7 @@ setup(
     author='Konsta Vesterinen',
     author_email='konsta@fastmonkeys.com',
     description=(
-        'Various utility functions I use with SQLAlchemy.'
+        'Various utility functions for SQLAlchemy.'
     ),
     long_description=__doc__,
     packages=['sqlalchemy_utils'],

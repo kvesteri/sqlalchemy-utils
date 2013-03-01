@@ -5,9 +5,10 @@ from sqlalchemy.sql.expression import desc, asc
 
 def sort_query(query, sort):
     """
-    Applies an sql ORDER BY for given query
+    Applies an sql ORDER BY for given query. This function can be easily used
+    with user-defined sorting.
 
-    The following examples use the following model definition:
+    The examples use the following model definition:
 
         >>> import sqlalchemy as sa
         >>> from sqlalchemy import create_engine
@@ -99,9 +100,10 @@ def sort_query(query, sort):
         return query.order_by(func(sort))
 
     for entity in entities:
-        if component and entity.__table__.name != component:
+        table = entity.__table__
+        if component and table.name != component:
             continue
-        if sort in entity.__table__.columns:
+        if sort in table.columns:
             try:
                 attr = getattr(entity, sort)
                 query = query.order_by(func(attr))
