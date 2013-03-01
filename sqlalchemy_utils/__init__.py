@@ -1,5 +1,7 @@
+from sqlalchemy.orm import defer
 from sqlalchemy.orm.mapper import Mapper
 from sqlalchemy.orm.query import _ColumnEntity
+from sqlalchemy.orm.properties import ColumnProperty
 from sqlalchemy.sql.expression import desc, asc
 
 
@@ -110,6 +112,27 @@ def sort_query(query, sort):
             except AttributeError:
                 pass
             break
+    return query
+
+
+def defer_except(query, columns):
+    """
+    Deferred loads all columns in given query, except the ones given.
+
+        >>> from sqlalchemy_utils import defer_except
+        >>> query = session.query(User)
+        >>> query = defer_except(User, [User.id, User.name])
+
+    :param columns: columns not to deferred load
+    """
+    model = query._entities[0].entity_zero.class_
+    fields = set(model._sa_class_manager.values())
+    for field in fields:
+        property_ = field.property
+        if isinstance(property_, ColumnProperty):
+            column = property_.columns[0]
+            if column.name not in columns:
+                query = query.options(defer(property_.key))
     return query
 
 

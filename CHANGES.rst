@@ -4,7 +4,13 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
-0.1.0 (12.1.2013)
-^^^^^^^^^^^^^^^^^
+0.2.0 (2013-03-01)
+^^^^^^^^^^^^^^^^^^
+
+- Added new function defer_except()
+
+
+0.1.0 (2013-01-12)
+^^^^^^^^^^^^^^^^^^
 
 - Initial public release
