@@ -6,12 +6,16 @@
 SQLAlchemy-Utils
 ================
 
+SQLAlchemy-Utils provides various utility classes and functions for SQLAlchemy.
+
 
 
 API Documentation
 -----------------
 
 .. module:: sqlalchemy_utils
+.. autoclass:: SmartList
+    :members:
 .. autofunction:: sort_query
 .. autofunction:: escape_like
 
