@@ -1,11 +1,10 @@
-from pytest import raises
 import sqlalchemy as sa
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-from sqlalchemy_utils import escape_like, sort_query, SmartList
+from sqlalchemy_utils import escape_like, sort_query, InstrumentedList
 
 
 engine = create_engine(
@@ -34,27 +33,22 @@ class Article(Base):
         primaryjoin=category_id == Category.id,
         backref=sa.orm.backref(
             'articles',
-            collection_class=SmartList
+            collection_class=InstrumentedList
         )
     )
 
 
-class TestSmartList(object):
-    def test_has_raises_error_for_unknown_attribute(self):
-        category = Category()
-        with raises(AttributeError):
-            category.articles.has('unknown_column')
-
-    def test_has_returns_true_if_member_has_attr_defined(self):
+class TestInstrumentedList(object):
+    def test_any_returns_true_if_member_has_attr_defined(self):
         category = Category()
         category.articles.append(Article())
         category.articles.append(Article(name=u'some name'))
-        assert category.articles.has('name')
+        assert category.articles.any('name')
 
-    def test_has_returns_false_if_no_member_has_attr_defined(self):
+    def test_any_returns_false_if_no_member_has_attr_defined(self):
         category = Category()
         category.articles.append(Article())
-        assert not category.articles.has('name')
+        assert not category.articles.any('name')
 
 
 class TestEscapeLike(object):

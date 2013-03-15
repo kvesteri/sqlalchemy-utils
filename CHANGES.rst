@@ -5,6 +5,13 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
 
+0.4.0 (2013-03-01)
+^^^^^^^^^^^^^^^^^^
+
+- Renamed SmartList to InstrumentedList
+- Added instrumented_list decorator
+
+
 0.3.0 (2013-03-01)
 ^^^^^^^^^^^^^^^^^^
 

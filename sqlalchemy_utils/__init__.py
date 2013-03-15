@@ -1,39 +1,28 @@
+from functools import wraps
 from sqlalchemy.orm import defer
-from sqlalchemy.orm.collections import InstrumentedList
+from sqlalchemy.orm.collections import InstrumentedList as _InstrumentedList
 from sqlalchemy.orm.mapper import Mapper
 from sqlalchemy.orm.query import _ColumnEntity
 from sqlalchemy.orm.properties import ColumnProperty
 from sqlalchemy.sql.expression import desc, asc
 
 
-class SmartList(InstrumentedList):
-    def has(self, attr):
-        """
-        Returns True if any member of this collection has given attribute
-        defined.
+class InstrumentedList(_InstrumentedList):
+    """Enhanced version of SQLAlchemy InstrumentedList. Provides some
+    additional functionality."""
 
-        Example syntax:
+    def any(self, attr):
+        return any(getattr(item, attr) for item in self)
 
-            >>> Category.articles.has('name')
+    def all(self, attr):
+        return all(getattr(item, attr) for item in self)
 
-        :param attr: collection member attribute name
-        """
-        adapter = self._sa_adapter
-        owner_class = adapter.owner_state.class_
-        relation = getattr(owner_class, adapter._key).property
-        relation_class = relation.mapper.class_
 
-        if not hasattr(relation_class, attr):
-            raise AttributeError(
-                'Class %s does not have attribute named %s' %
-                (relation_class.__name__, attr)
-            )
-
-        for record in self:
-            if getattr(record, attr):
-                return True
-
-        return False
+def instrumented_list(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        return InstrumentedList([item for item in f(*args, **kwargs)])
+    return wrapper
 
 
 def sort_query(query, sort):
