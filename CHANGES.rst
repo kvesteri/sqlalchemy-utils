@@ -5,6 +5,12 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
 
+0.5.0 (2013-03-20)
+^^^^^^^^^^^^^^^^^^
+
+- Added PhoneNumberType type decorator
+
+
 0.4.0 (2013-03-01)
 ^^^^^^^^^^^^^^^^^^
 
