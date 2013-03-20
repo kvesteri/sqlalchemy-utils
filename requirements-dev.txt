@@ -3,3 +3,4 @@ pytest==2.2.3
 Pygments==1.2
 Jinja2==2.3
 docutils>=0.10
+phonenumbers>=5.4b1
