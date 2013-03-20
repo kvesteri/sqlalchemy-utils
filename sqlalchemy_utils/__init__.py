@@ -1,3 +1,4 @@
+import phonenumbers
 from functools import wraps
 from sqlalchemy.orm import defer
 from sqlalchemy.orm.collections import InstrumentedList as _InstrumentedList
@@ -5,6 +6,37 @@ from sqlalchemy.orm.mapper import Mapper
 from sqlalchemy.orm.query import _ColumnEntity
 from sqlalchemy.orm.properties import ColumnProperty
 from sqlalchemy.sql.expression import desc, asc
+from sqlalchemy import types
+
+
+class PhoneNumberType(types.TypeDecorator):
+    """
+    Changes PhoneNumber objects to a string representation on the way in and
+    changes them back to PhoneNumber objects on the way out. If E164 is used
+    as storing format, no country code is needed for parsing the database
+    value to PhoneNumber object.
+    """
+    STORE_FORMAT = phonenumbers.PhoneNumberFormat.E164
+    impl = types.Unicode(20)
+
+    def __init__(self, country_code='US', max_length=20, *args, **kwargs):
+        super(PhoneNumberType, self).__init__(*args, **kwargs)
+        self.country_code = country_code
+        self.impl = types.Unicode(max_length)
+
+    def process_bind_param(self, value, dialect):
+        return phonenumbers.format_number(
+            value,
+            self.STORE_FORMAT
+        )
+
+    def process_result_value(self, value, dialect):
+        if self.STORE_FORMAT == phonenumbers.PhoneNumberFormat.E164:
+            return phonenumbers.parse(value)
+        return phonenumbers.parse(
+            value,
+            self.country_code
+        )
 
 
 class InstrumentedList(_InstrumentedList):
