@@ -137,7 +137,7 @@ class NumberRange(object):
             if value[0] == '(':
                 min_value += 1
 
-            if value[1] == ')':
+            if value[-1] == ')':
                 max_value -= 1
 
             return cls(min_value, max_value)

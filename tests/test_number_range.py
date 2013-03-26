@@ -1,5 +1,5 @@
 import sqlalchemy as sa
-from pytest import raises
+from pytest import raises, mark
 from sqlalchemy_utils import NumberRangeType, NumberRange, NumberRangeException
 from tests import DatabaseTestCase
 
@@ -44,3 +44,8 @@ class TestNumberRange(object):
         number_range = NumberRange.from_str('1')
         assert number_range.min_value == 1
         assert number_range.max_value == 1
+
+    def test_from_normalized_str(self):
+        assert str(NumberRange.from_normalized_str('[1,2]')) == '[1, 2]'
+        assert str(NumberRange.from_normalized_str('[1,3)')) == '[1, 2]'
+        assert str(NumberRange.from_normalized_str('(1,3)')) == '[2, 2]'

@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.7.4 (2013-03-26)
+^^^^^^^^^^^^^^^^^^
+
+- Fixed NumberRange upper bound parsing
+
+
 0.7.3 (2013-03-26)
 ^^^^^^^^^^^^^^^^^^
 
