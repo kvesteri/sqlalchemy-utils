@@ -1,0 +1,47 @@
+import sqlalchemy as sa
+from sqlalchemy_utils import escape_like, sort_query
+from tests import TestCase
+
+
+class TestEscapeLike(TestCase):
+    def test_escapes_wildcards(self):
+        assert escape_like('_*%') == '*_***%'
+
+
+class TestSortQuery(TestCase):
+    def test_without_sort_param_returns_the_query_object_untouched(self):
+        query = self.session.query(self.Article)
+        sorted_query = sort_query(query, '')
+        assert query == sorted_query
+
+    def test_sort_by_column_ascending(self):
+        query = sort_query(self.session.query(self.Article), 'name')
+        assert 'ORDER BY article.name ASC' in str(query)
+
+    def test_sort_by_column_descending(self):
+        query = sort_query(self.session.query(self.Article), '-name')
+        assert 'ORDER BY article.name DESC' in str(query)
+
+    def test_skips_unknown_columns(self):
+        query = self.session.query(self.Article)
+        sorted_query = sort_query(query, '-unknown')
+        assert query == sorted_query
+
+    def test_sort_by_calculated_value_ascending(self):
+        query = self.session.query(
+            self.Category, sa.func.count(self.Article.id).label('articles')
+        )
+        query = sort_query(query, 'articles')
+        assert 'ORDER BY articles ASC' in str(query)
+
+    def test_sort_by_calculated_value_descending(self):
+        query = self.session.query(
+            self.Category, sa.func.count(self.Article.id).label('articles')
+        )
+        query = sort_query(query, '-articles')
+        assert 'ORDER BY articles DESC' in str(query)
+
+    def test_sort_by_joined_table_column(self):
+        query = self.session.query(self.Article).join(self.Article.category)
+        sorted_query = sort_query(query, 'category-name')
+        assert 'category.name ASC' in str(sorted_query)
