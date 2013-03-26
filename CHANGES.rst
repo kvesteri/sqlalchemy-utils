@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.7.3 (2013-03-26)
+^^^^^^^^^^^^^^^^^^
+
+- Enabled PhoneNumberType None value storing
+
+
 0.7.2 (2013-03-26)
 ^^^^^^^^^^^^^^^^^^
 
