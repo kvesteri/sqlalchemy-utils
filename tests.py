@@ -1,4 +1,3 @@
-import phonenumbers
 import sqlalchemy as sa
 
 from sqlalchemy import create_engine
@@ -9,6 +8,7 @@ from sqlalchemy_utils import (
     escape_like,
     sort_query,
     InstrumentedList,
+    PhoneNumber,
     PhoneNumberType,
     merge
 )
@@ -120,10 +120,48 @@ class TestSortQuery(TestCase):
         assert 'category.name ASC' in str(sorted_query)
 
 
+class TestPhoneNumber(object):
+    def setup_method(self, method):
+        self.valid_phone_numbers = [
+            '040 1234567',
+            '+358 401234567',
+            '09 2501234',
+            '+358 92501234',
+            '0800 939393',
+            '09 4243 0456',
+            '0600 900 500'
+        ]
+        self.invalid_phone_numbers = [
+            'abc',
+            '+040 1234567',
+            '0111234567',
+            '358'
+        ]
+
+    def test_valid_phone_numbers(self):
+        for raw_number in self.valid_phone_numbers:
+            phone_number = PhoneNumber(raw_number, 'FI')
+            assert phone_number.is_valid_number()
+
+    def test_invalid_phone_numbers(self):
+        for raw_number in self.invalid_phone_numbers:
+            try:
+                phone_number = PhoneNumber(raw_number, 'FI')
+                assert not phone_number.is_valid_number()
+            except:
+                pass
+
+    def test_phone_number_attributes(self):
+        phone_number = PhoneNumber('+358401234567')
+        assert phone_number.e164 == u'+358401234567'
+        assert phone_number.international == u'+358 40 1234567'
+        assert phone_number.national == u'040 1234567'
+
+
 class TestPhoneNumberType(TestCase):
     def setup_method(self, method):
         super(TestPhoneNumberType, self).setup_method(method)
-        self.phone_number = phonenumbers.parse(
+        self.phone_number = PhoneNumber(
             '040 1234567',
             'FI'
         )

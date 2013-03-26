@@ -11,6 +11,52 @@ from sqlalchemy.sql.expression import desc, asc
 from sqlalchemy import types
 
 
+class PhoneNumber(phonenumbers.phonenumber.PhoneNumber):
+    '''
+    Extends a PhoneNumber class from `Python phonenumbers library`_. Adds
+    different phone number formats to attributes, so they can be easily used
+    in templates. Phone number validation method is also implemented.
+
+    Takes the raw phone number and country code as params and parses them
+    into a PhoneNumber object.
+
+    .. _Python phonenumbers library:
+       https://github.com/daviddrysdale/python-phonenumbers
+
+    :param raw_number:
+        String representation of the phone number.
+    :param country_code:
+        Country code of the phone number.
+    '''
+    def __init__(self, raw_number, country_code=None):
+        self._phone_number = phonenumbers.parse(raw_number, country_code)
+        super(PhoneNumber, self).__init__(
+            country_code=self._phone_number.country_code,
+            national_number=self._phone_number.national_number,
+            extension=self._phone_number.extension,
+            italian_leading_zero=self._phone_number.italian_leading_zero,
+            raw_input=self._phone_number.raw_input,
+            country_code_source=self._phone_number.country_code_source,
+            preferred_domestic_carrier_code=
+            self._phone_number.preferred_domestic_carrier_code
+        )
+        self.national = phonenumbers.format_number(
+            self._phone_number,
+            phonenumbers.PhoneNumberFormat.NATIONAL
+        )
+        self.international = phonenumbers.format_number(
+            self._phone_number,
+            phonenumbers.PhoneNumberFormat.INTERNATIONAL
+        )
+        self.e164 = phonenumbers.format_number(
+            self._phone_number,
+            phonenumbers.PhoneNumberFormat.E164
+        )
+
+    def is_valid_number(self):
+        return phonenumbers.is_valid_number(self._phone_number)
+
+
 class PhoneNumberType(types.TypeDecorator):
     """
     Changes PhoneNumber objects to a string representation on the way in and
@@ -18,7 +64,7 @@ class PhoneNumberType(types.TypeDecorator):
     as storing format, no country code is needed for parsing the database
     value to PhoneNumber object.
     """
-    STORE_FORMAT = phonenumbers.PhoneNumberFormat.E164
+    STORE_FORMAT = 'e164'
     impl = types.Unicode(20)
 
     def __init__(self, country_code='US', max_length=20, *args, **kwargs):
@@ -27,18 +73,10 @@ class PhoneNumberType(types.TypeDecorator):
         self.impl = types.Unicode(max_length)
 
     def process_bind_param(self, value, dialect):
-        return phonenumbers.format_number(
-            value,
-            self.STORE_FORMAT
-        )
+        return getattr(value, self.STORE_FORMAT)
 
     def process_result_value(self, value, dialect):
-        if self.STORE_FORMAT == phonenumbers.PhoneNumberFormat.E164:
-            return phonenumbers.parse(value)
-        return phonenumbers.parse(
-            value,
-            self.country_code
-        )
+        return PhoneNumber(value, self.country_code)
 
 
 class InstrumentedList(_InstrumentedList):
