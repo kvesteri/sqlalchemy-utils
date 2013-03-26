@@ -96,6 +96,10 @@ class NumberRangeType(types.TypeDecorator):
 
 
 class NumberRangeException(Exception):
+    pass
+
+
+class RangeBoundsException(NumberRangeException):
     def __init__(self, min_value, max_value):
         self.message = 'Min value %d is bigger than max value %d.' % (
             min_value,
@@ -106,7 +110,7 @@ class NumberRangeException(Exception):
 class NumberRange(object):
     def __init__(self, min_value, max_value):
         if min_value > max_value:
-            raise NumberRangeException(min_value, max_value)
+            raise RangeBoundsException(min_value, max_value)
         self.min_value = min_value
         self.max_value = max_value
 
@@ -131,9 +135,12 @@ class NumberRange(object):
         """
         if value is not None:
             values = value[1:-1].split(',')
-            min_value, max_value = map(
-                lambda a: int(a.strip()), values
-            )
+            try:
+                min_value, max_value = map(
+                    lambda a: int(a.strip()), values
+                )
+            except ValueError, e:
+                raise NumberRangeException(e.message)
 
             if value[0] == '(':
                 min_value += 1
@@ -150,9 +157,12 @@ class NumberRange(object):
             if len(values) == 1:
                 min_value = max_value = int(value.strip())
             else:
-                min_value, max_value = map(
-                    lambda a: int(a.strip()), values
-                )
+                try:
+                    min_value, max_value = map(
+                        lambda a: int(a.strip()), values
+                    )
+                except ValueError, e:
+                    raise NumberRangeException(e.message)
             return cls(min_value, max_value)
 
     @property

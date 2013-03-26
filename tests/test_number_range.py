@@ -46,6 +46,10 @@ class TestNumberRange(object):
         assert number_range.min_value == 1
         assert number_range.max_value == 1
 
+    def test_from_str_exception_handling(self):
+        with raises(NumberRangeException):
+            NumberRange.from_str('1 - ')
+
     def test_from_normalized_str(self):
         assert str(NumberRange.from_normalized_str('[1,2]')) == '1 - 2'
         assert str(NumberRange.from_normalized_str('[1,3)')) == '1 - 2'
