@@ -1,5 +1,6 @@
 import sqlalchemy as sa
-from sqlalchemy_utils import NumberRangeType, NumberRange
+from pytest import raises
+from sqlalchemy_utils import NumberRangeType, NumberRange, NumberRangeException
 from tests import DatabaseTestCase
 
 
@@ -34,3 +35,7 @@ class TestNumberRange(object):
 
     def test_str_representation(self):
         assert str(NumberRange(1, 3)) == '[1, 3]'
+
+    def test_raises_exception_for_badly_constructed_range(self):
+        with raises(NumberRangeException):
+            NumberRange(3, 2)

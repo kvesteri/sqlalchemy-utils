@@ -6,6 +6,7 @@ from .types import (
     PhoneNumber,
     PhoneNumberType,
     NumberRange,
+    NumberRangeException,
     NumberRangeRawType,
     NumberRangeType
 )
@@ -20,6 +21,7 @@ __all__ = (
     InstrumentedList,
     Merger,
     NumberRange,
+    NumberRangeException,
     NumberRangeRawType,
     NumberRangeType,
     PhoneNumber,

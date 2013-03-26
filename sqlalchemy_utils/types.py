@@ -90,8 +90,18 @@ class NumberRangeType(types.TypeDecorator):
         return NumberRange.from_normalized_str(value)
 
 
+class NumberRangeException(Exception):
+    def __init__(self, min_value, max_value):
+        self.message = 'Min value %d is bigger than max value %d.' % (
+            min_value,
+            max_value
+        )
+
+
 class NumberRange(object):
     def __init__(self, min_value, max_value):
+        if min_value > max_value:
+            raise NumberRangeException(min_value, max_value)
         self.min_value = min_value
         self.max_value = max_value
 
