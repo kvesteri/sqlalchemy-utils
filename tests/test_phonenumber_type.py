@@ -63,3 +63,18 @@ class TestPhoneNumberType(TestCase):
             {'param': self.user.id}
         )
         assert result.first()[0] == u'+358401234567'
+
+    def test_phone_number_is_none(self):
+        phone_number = None
+        user = self.User()
+        user.name = u'Someone'
+        user.phone_number = phone_number
+        self.session.add(user)
+        self.session.commit()
+        queried_user = self.session.query(self.User)[1]
+        assert queried_user.phone_number is None
+        result = self.session.execute(
+            'SELECT phone_number FROM "user" WHERE id=:param',
+            {'param': user.id}
+        )
+        assert result.first()[0] is None

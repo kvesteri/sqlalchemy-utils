@@ -66,10 +66,14 @@ class PhoneNumberType(types.TypeDecorator):
         self.impl = types.Unicode(max_length)
 
     def process_bind_param(self, value, dialect):
-        return getattr(value, self.STORE_FORMAT)
+        if value:
+            return getattr(value, self.STORE_FORMAT)
+        return value
 
     def process_result_value(self, value, dialect):
-        return PhoneNumber(value, self.country_code)
+        if value:
+            return PhoneNumber(value, self.country_code)
+        return value
 
 
 class NumberRangeRawType(types.UserDefinedType):
