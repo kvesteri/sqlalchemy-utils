@@ -84,7 +84,7 @@ class NumberRangeType(types.TypeDecorator):
     impl = NumberRangeRawType
 
     def process_bind_param(self, value, dialect):
-        return value
+        return str(value)
 
     def process_result_value(self, value, dialect):
         return NumberRange.from_normalized_str(value)
@@ -97,6 +97,23 @@ class NumberRange(object):
 
     @classmethod
     def from_normalized_str(cls, value):
+        """
+        Returns new NumberRange object from normalized number range format.
+
+        Example ::
+
+            range = NumberRange.from_normalized_str('[23, 45]')
+            range.min_value = 23
+            range.max_value = 45
+
+            range = NumberRange.from_normalized_str('(23, 45]')
+            range.min_value = 24
+            range.max_value = 45
+
+            range = NumberRange.from_normalized_str('(23, 45)')
+            range.min_value = 24
+            range.max_value = 44
+        """
         if value is not None:
             values = value[1:-1].split(',')
             min_value, max_value = map(
@@ -119,6 +136,15 @@ class NumberRange(object):
                 lambda a: int(a.strip()), values
             )
             return cls(min_value, max_value)
+
+    def __eq__(self, other):
+        try:
+            return (
+                self.min_value == other.min_value and
+                self.max_value == other.max_value
+            )
+        except AttributeError:
+            return NotImplemented
 
     def __repr__(self):
         return 'NumberRange(%r, %r)' % (self.min_value, self.max_value)
