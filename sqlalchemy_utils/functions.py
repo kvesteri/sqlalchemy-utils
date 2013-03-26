@@ -1,3 +1,4 @@
+from sqlalchemy.orm import defer
 from sqlalchemy.orm.mapper import Mapper
 from sqlalchemy.orm.query import _ColumnEntity
 from sqlalchemy.orm.properties import ColumnProperty

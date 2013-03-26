@@ -34,7 +34,8 @@ class TestNumberRange(object):
         assert NumberRange(1, 3) == NumberRange(1, 3)
 
     def test_str_representation(self):
-        assert str(NumberRange(1, 3)) == '[1, 3]'
+        assert str(NumberRange(1, 3)) == '1 - 3'
+        assert str(NumberRange(1, 1)) == '1'
 
     def test_raises_exception_for_badly_constructed_range(self):
         with raises(NumberRangeException):
@@ -46,6 +47,6 @@ class TestNumberRange(object):
         assert number_range.max_value == 1
 
     def test_from_normalized_str(self):
-        assert str(NumberRange.from_normalized_str('[1,2]')) == '[1, 2]'
-        assert str(NumberRange.from_normalized_str('[1,3)')) == '[1, 2]'
-        assert str(NumberRange.from_normalized_str('(1,3)')) == '[2, 2]'
+        assert str(NumberRange.from_normalized_str('[1,2]')) == '1 - 2'
+        assert str(NumberRange.from_normalized_str('[1,3)')) == '1 - 2'
+        assert str(NumberRange.from_normalized_str('(1,3)')) == '2'

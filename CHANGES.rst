@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.7.5 (2013-03-26)
+^^^^^^^^^^^^^^^^^^
+
+- Fixed defer_except
+- Better string representations for NumberRange
+
+
 0.7.4 (2013-03-26)
 ^^^^^^^^^^^^^^^^^^
 

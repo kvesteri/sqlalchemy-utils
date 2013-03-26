@@ -88,7 +88,8 @@ class NumberRangeType(types.TypeDecorator):
     impl = NumberRangeRawType
 
     def process_bind_param(self, value, dialect):
-        return str(value)
+        if value:
+            return value.normalized
 
     def process_result_value(self, value, dialect):
         return NumberRange.from_normalized_str(value)
@@ -154,6 +155,10 @@ class NumberRange(object):
                 )
             return cls(min_value, max_value)
 
+    @property
+    def normalized(self):
+        return '[%s, %s]' % (self.min_value, self.max_value)
+
     def __eq__(self, other):
         try:
             return (
@@ -167,7 +172,9 @@ class NumberRange(object):
         return 'NumberRange(%r, %r)' % (self.min_value, self.max_value)
 
     def __str__(self):
-        return '[%s, %s]' % (self.min_value, self.max_value)
+        if self.min_value != self.max_value:
+            return '%s - %s' % (self.min_value, self.max_value)
+        return str(self.min_value)
 
     def __add__(self, other):
         try:
