@@ -142,9 +142,12 @@ class NumberRange(object):
     def from_str(cls, value):
         if value is not None:
             values = value.split('-')
-            min_value, max_value = map(
-                lambda a: int(a.strip()), values
-            )
+            if len(values) == 1:
+                min_value = max_value = int(value.strip())
+            else:
+                min_value, max_value = map(
+                    lambda a: int(a.strip()), values
+                )
             return cls(min_value, max_value)
 
     def __eq__(self, other):

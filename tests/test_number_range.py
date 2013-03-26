@@ -39,3 +39,8 @@ class TestNumberRange(object):
     def test_raises_exception_for_badly_constructed_range(self):
         with raises(NumberRangeException):
             NumberRange(3, 2)
+
+    def test_from_str_supports_single_integers(self):
+        number_range = NumberRange.from_str('1')
+        assert number_range.min_value == 1
+        assert number_range.max_value == 1
