@@ -4,6 +4,11 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.6.0 (2013-03-26)
+^^^^^^^^^^^^^^^^^^
+
+- Extended PhoneNumber class from python-phonenumbers library
+
 
 0.5.0 (2013-03-20)
 ^^^^^^^^^^^^^^^^^^
