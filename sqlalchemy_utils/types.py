@@ -49,6 +49,12 @@ class PhoneNumber(phonenumbers.phonenumber.PhoneNumber):
     def is_valid_number(self):
         return phonenumbers.is_valid_number(self._phone_number)
 
+    def __unicode__(self):
+        return self.national
+
+    def __str__(self):
+        return unicode(self).encode('utf-8')
+
 
 class PhoneNumberType(types.TypeDecorator):
     """

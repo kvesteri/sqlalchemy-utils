@@ -39,6 +39,11 @@ class TestPhoneNumber(object):
         assert phone_number.international == u'+358 40 1234567'
         assert phone_number.national == u'040 1234567'
 
+    def test_phone_number_str_repr(self):
+        phone_number = PhoneNumber('+358401234567')
+        assert phone_number.__unicode__() == phone_number.national
+        assert phone_number.__str__() == phone_number.national.encode('utf-8')
+
 
 class TestPhoneNumberType(TestCase):
     def setup_method(self, method):
