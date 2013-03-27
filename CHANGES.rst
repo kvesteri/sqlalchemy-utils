@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.7.7 (2013-03-27)
+^^^^^^^^^^^^^^^^^^
+
+- Changed PhoneNumber string representation to the national phone number format
+
+
 0.7.6 (2013-03-26)
 ^^^^^^^^^^^^^^^^^^
 
