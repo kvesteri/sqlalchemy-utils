@@ -8,7 +8,9 @@ from .types import (
     NumberRange,
     NumberRangeException,
     NumberRangeRawType,
-    NumberRangeType
+    NumberRangeType,
+    ScalarList,
+    ScalarListException,
 )
 
 
@@ -26,4 +28,6 @@ __all__ = (
     NumberRangeType,
     PhoneNumber,
     PhoneNumberType,
+    ScalarList,
+    ScalarListException,
 )

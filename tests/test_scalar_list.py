@@ -1,0 +1,61 @@
+import sqlalchemy as sa
+from sqlalchemy_utils import ScalarList
+from pytest import raises
+from tests import DatabaseTestCase
+
+
+class TestScalarIntegerList(DatabaseTestCase):
+    def create_models(self):
+        class User(self.Base):
+            __tablename__ = 'user'
+            id = sa.Column(sa.Integer, primary_key=True)
+            some_list = sa.Column(ScalarList(int))
+
+            def __repr__(self):
+                return 'User(%r)' % self.id
+
+        self.User = User
+
+    def test_save_integer_list(self):
+        user = self.User(
+            some_list=[1, 2, 3, 4]
+        )
+
+        self.session.add(user)
+        self.session.commit()
+
+        user = self.session.query(self.User).first()
+        assert user.some_list == [1, 2, 3, 4]
+
+
+class TestScalarUnicodeList(DatabaseTestCase):
+    def create_models(self):
+        class User(self.Base):
+            __tablename__ = 'user'
+            id = sa.Column(sa.Integer, primary_key=True)
+            some_list = sa.Column(ScalarList(unicode))
+
+            def __repr__(self):
+                return 'User(%r)' % self.id
+
+        self.User = User
+
+    def test_throws_exception_if_using_separator_in_list_values(self):
+        user = self.User(
+            some_list=[u',']
+        )
+
+        self.session.add(user)
+        with raises(sa.exc.StatementError):
+            self.session.commit()
+
+    def test_save_unicode_list(self):
+        user = self.User(
+            some_list=[u'1', u'2', u'3', u'4']
+        )
+
+        self.session.add(user)
+        self.session.commit()
+
+        user = self.session.query(self.User).first()
+        assert user.some_list == [u'1', u'2', u'3', u'4']

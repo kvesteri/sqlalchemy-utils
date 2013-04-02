@@ -1,5 +1,5 @@
 import sqlalchemy as sa
-from pytest import raises, mark
+from pytest import raises
 from sqlalchemy_utils import NumberRangeType, NumberRange, NumberRangeException
 from tests import DatabaseTestCase
 

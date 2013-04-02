@@ -1,5 +1,6 @@
 import phonenumbers
 from functools import wraps
+import sqlalchemy as sa
 from sqlalchemy.orm.collections import InstrumentedList as _InstrumentedList
 from sqlalchemy import types
 
@@ -82,6 +83,42 @@ class PhoneNumberType(types.TypeDecorator):
         return value
 
 
+class ScalarListException(Exception):
+    pass
+
+
+class ScalarList(types.TypeDecorator):
+    impl = sa.UnicodeText()
+
+    def __init__(self, coerce_func=unicode, separator=u','):
+        self.separator = unicode(separator)
+        self.coerce_func = coerce_func
+
+    def process_bind_param(self, value, dialect):
+        # Convert list of values to unicode separator-separated list
+        # Example: [1, 2, 3, 4] -> u'1, 2, 3, 4'
+        if value:
+            print value
+            if any(self.separator in unicode(item) for item in value):
+                raise ScalarListException(
+                    "List values can't contain string '%s' (its being used as "
+                    "separator. If you wish for scalar list values to contain "
+                    "these strings, use a different separator string."
+                )
+            return self.separator.join(
+                map(unicode, value)
+            )
+        return value
+
+    def process_result_value(self, value, dialect):
+        if value:
+            # coerce each value
+            return map(
+                self.coerce_func, value.split(self.separator)
+            )
+        return value
+
+
 class NumberRangeRawType(types.UserDefinedType):
     """
     Raw number range type, only supports PostgreSQL for now.
@@ -96,9 +133,12 @@ class NumberRangeType(types.TypeDecorator):
     def process_bind_param(self, value, dialect):
         if value:
             return value.normalized
+        return value
 
     def process_result_value(self, value, dialect):
-        return NumberRange.from_normalized_str(value)
+        if value:
+            return NumberRange.from_normalized_str(value)
+        return value
 
 
 class NumberRangeException(Exception):
