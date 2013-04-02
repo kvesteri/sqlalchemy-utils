@@ -39,7 +39,8 @@ setup(
     platforms='any',
     install_requires=[
         'SQLAlchemy>=0.7.8',
-        'psycopg2>=2.4.6'
+        'psycopg2>=2.4.6',
+        'phonenumbers>=5.4b1'
     ],
     cmdclass={'test': PyTest},
     classifiers=[
