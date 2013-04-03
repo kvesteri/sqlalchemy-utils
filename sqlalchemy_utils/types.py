@@ -98,7 +98,6 @@ class ScalarList(types.TypeDecorator):
         # Convert list of values to unicode separator-separated list
         # Example: [1, 2, 3, 4] -> u'1, 2, 3, 4'
         if value:
-            print value
             if any(self.separator in unicode(item) for item in value):
                 raise ScalarListException(
                     "List values can't contain string '%s' (its being used as "

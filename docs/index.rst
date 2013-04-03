@@ -51,6 +51,49 @@ You can easily set up integer lists too:
     session.commit()
 
 
+NumberRange
+-----------
+
+NumberRangeType provides way for saving range of numbers into database.
+
+Example ::
+
+
+    from sqlalchemy_utils import NumberRangeType, NumberRange
+
+
+    class Event(Base):
+        __tablename__ = 'user'
+        id = db.Column(db.Integer, autoincrement=True)
+        name = db.Column(db.Unicode(255))
+        estimated_number_of_persons = db.Column(NumberRangeType)
+
+
+    party = Event(name=u'party')
+
+    # we estimate the party to contain minium of 10 persons and at max
+    # 100 persons
+    party.estimated_number_of_persons = NumberRange(10, 100)
+
+    print party.estimated_number_of_persons
+    # '10-100'
+
+
+NumberRange supports some arithmetic operators:
+::
+
+
+    meeting = Event(name=u'meeting')
+
+    meeting.estimated_number_of_persons = NumberRange(20, 40)
+
+    total = (
+        meeting.estimated_number_of_persons +
+        party.estimated_number_of_persons
+    )
+    print total
+    # '30-140'
+
 
 API Documentation
 -----------------

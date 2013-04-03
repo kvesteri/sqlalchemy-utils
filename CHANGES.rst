@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.8.1 (2013-04-02)
+^^^^^^^^^^^^^^^^^^
+
+- Removed unnecessary print statement form ScalarList
+- Documentation for ScalarList and NumberRange
+
+
 0.8.0 (2013-04-02)
 ^^^^^^^^^^^^^^^^^^
 
