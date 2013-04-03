@@ -59,3 +59,14 @@ class TestScalarUnicodeList(DatabaseTestCase):
 
         user = self.session.query(self.User).first()
         assert user.some_list == [u'1', u'2', u'3', u'4']
+
+    def test_save_and_retrieve_empty_list(self):
+        user = self.User(
+            some_list=[]
+        )
+
+        self.session.add(user)
+        self.session.commit()
+
+        user = self.session.query(self.User).first()
+        assert user.some_list == []

@@ -97,7 +97,7 @@ class ScalarList(types.TypeDecorator):
     def process_bind_param(self, value, dialect):
         # Convert list of values to unicode separator-separated list
         # Example: [1, 2, 3, 4] -> u'1, 2, 3, 4'
-        if value:
+        if value is not None:
             if any(self.separator in unicode(item) for item in value):
                 raise ScalarListException(
                     "List values can't contain string '%s' (its being used as "
@@ -107,15 +107,15 @@ class ScalarList(types.TypeDecorator):
             return self.separator.join(
                 map(unicode, value)
             )
-        return value
 
     def process_result_value(self, value, dialect):
-        if value:
+        if value is not None:
+            if value == u'':
+                return []
             # coerce each value
             return map(
                 self.coerce_func, value.split(self.separator)
             )
-        return value
 
 
 class NumberRangeRawType(types.UserDefinedType):
