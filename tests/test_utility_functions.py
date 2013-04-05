@@ -48,6 +48,22 @@ class TestSortQuery(TestCase):
         query = sort_query(query, '-articles')
         assert 'ORDER BY articles DESC' in str(query)
 
+    def test_sort_by_subqueried_scalar(self):
+        article_count = (
+            sa.sql.select(
+                [sa.func.count(self.Article.id)],
+                from_obj=[self.Article.__table__]
+            )
+            .where(self.Article.category_id == self.Category.id)
+            .correlate(self.Category.__table__)
+        )
+
+        query = self.session.query(
+            self.Category, article_count.label('articles')
+        )
+        query = sort_query(query, '-articles')
+        assert 'ORDER BY articles DESC' in str(query)
+
     def test_sort_by_joined_table_column(self):
         query = self.session.query(self.Article).join(self.Article.category)
         sorted_query = sort_query(query, 'category-name')

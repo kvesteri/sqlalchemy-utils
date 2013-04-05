@@ -70,19 +70,24 @@ def sort_query(query, sort):
     :param errors: whether or not to raise exceptions if unknown sort column
                    is passed
     """
-    entities = [entity.entity_zero.class_ for entity in query._entities]
+    entities = []
+    labels = []
+    for entity in query._entities:
+        # get all label names for queries such as:
+        # db.session.query(
+        #       Category,
+        #       db.func.count(Article.id).label('articles')
+        # )
+        if isinstance(entity, _ColumnEntity) and entity._label_name:
+            labels.append(entity._label_name)
+        else:
+            entities.append(entity.entity_zero.class_)
+
     for mapper in query._join_entities:
         if isinstance(mapper, Mapper):
             entities.append(mapper.class_)
         else:
             entities.append(mapper)
-
-    # get all label names for queries such as:
-    # db.session.query(Category, db.func.count(Article.id).label('articles'))
-    labels = []
-    for entity in query._entities:
-        if isinstance(entity, _ColumnEntity) and entity._label_name:
-            labels.append(entity._label_name)
 
     if not sort:
         return query

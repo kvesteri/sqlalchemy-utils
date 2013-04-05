@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.8.3 (2013-04-03)
+^^^^^^^^^^^^^^^^^^
+
+- sort_query now supports labeled and subqueried scalars
+
+
 0.8.2 (2013-04-03)
 ^^^^^^^^^^^^^^^^^^
 
