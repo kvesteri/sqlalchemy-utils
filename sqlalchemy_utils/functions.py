@@ -2,6 +2,7 @@ from sqlalchemy.orm import defer
 from sqlalchemy.orm.mapper import Mapper
 from sqlalchemy.orm.query import _ColumnEntity
 from sqlalchemy.orm.properties import ColumnProperty
+from sqlalchemy.orm.util import AliasedInsp
 from sqlalchemy.sql.expression import desc, asc
 
 
@@ -107,16 +108,26 @@ def sort_query(query, sort):
         return query.order_by(func(sort))
 
     for entity in entities:
-        table = entity.__table__
-        if component and table.name != component:
-            continue
-        if sort in table.columns:
-            try:
-                attr = getattr(entity, sort)
+        if isinstance(entity, AliasedInsp):
+            if component and entity.name != component:
+                continue
+
+            selectable = entity.selectable
+
+            if sort in selectable.c:
+                attr = selectable.c[sort]
                 query = query.order_by(func(attr))
-            except AttributeError:
-                pass
-            break
+        else:
+            table = entity.__table__
+            if component and table.name != component:
+                continue
+            if sort in table.columns:
+                try:
+                    attr = getattr(entity, sort)
+                    query = query.order_by(func(attr))
+                except AttributeError:
+                    pass
+                break
     return query
 
 

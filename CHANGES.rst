@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.8.4 (2013-04-08)
+^^^^^^^^^^^^^^^^^^
+
+- Added sort by aliased and joined entity
+
+
 0.8.3 (2013-04-03)
 ^^^^^^^^^^^^^^^^^^
 

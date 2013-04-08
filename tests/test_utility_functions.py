@@ -64,6 +64,16 @@ class TestSortQuery(TestCase):
         query = sort_query(query, '-articles')
         assert 'ORDER BY articles DESC' in str(query)
 
+    def test_sort_by_aliased_joined_entity(self):
+        alias = sa.orm.aliased(self.Category, name='categories')
+        query = self.session.query(
+            self.Article
+        ).join(
+            alias, self.Article.category
+        )
+        query = sort_query(query, '-categories-name')
+        assert 'ORDER BY categories.name DESC' in str(query)
+
     def test_sort_by_joined_table_column(self):
         query = self.session.query(self.Article).join(self.Article.category)
         sorted_query = sort_query(query, 'category-name')

@@ -130,7 +130,7 @@ class NumberRangeType(types.TypeDecorator):
     impl = NumberRangeRawType
 
     def process_bind_param(self, value, dialect):
-        if value:
+        if value is not None:
             return value.normalized
         return value
 
