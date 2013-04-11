@@ -3,6 +3,7 @@ from functools import wraps
 import sqlalchemy as sa
 from sqlalchemy.orm.collections import InstrumentedList as _InstrumentedList
 from sqlalchemy import types
+from .operators import CaseInsensitiveComparator
 
 
 class PhoneNumber(phonenumbers.phonenumber.PhoneNumber):
@@ -116,6 +117,16 @@ class ScalarList(types.TypeDecorator):
             return map(
                 self.coerce_func, value.split(self.separator)
             )
+
+
+class Email(sa.types.TypeDecorator):
+    impl = sa.Unicode(255)
+    comparator_factory = CaseInsensitiveComparator
+
+    def process_bind_param(self, value, dialect):
+        if value is not None:
+            return value.lower()
+        return value
 
 
 class NumberRangeRawType(types.UserDefinedType):

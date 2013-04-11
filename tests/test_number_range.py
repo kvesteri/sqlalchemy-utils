@@ -28,6 +28,21 @@ class TestNumberRangeType(DatabaseTestCase):
         assert building.persons_at_night.min_value == 1
         assert building.persons_at_night.max_value == 3
 
+    def test_nullify_number_range(self):
+        building = self.Building(
+            persons_at_night=NumberRange(1, 3)
+        )
+
+        self.session.add(building)
+        self.session.commit()
+
+        building = self.session.query(self.Building).first()
+        building.persons_at_night = None
+        self.session.commit()
+
+        building = self.session.query(self.Building).first()
+        assert building.persons_at_night is None
+
 
 class TestNumberRange(object):
     def test_equality_operator(self):
