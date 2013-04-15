@@ -1,7 +1,7 @@
 from .functions import sort_query, defer_except, escape_like
 from .merge import merge, Merger
 from .types import (
-    Email,
+    EmailType,
     instrumented_list,
     InstrumentedList,
     PhoneNumber,
@@ -10,7 +10,7 @@ from .types import (
     NumberRangeException,
     NumberRangeRawType,
     NumberRangeType,
-    ScalarList,
+    ScalarListType,
     ScalarListException,
 )
 
@@ -21,7 +21,7 @@ __all__ = (
     escape_like,
     instrumented_list,
     merge,
-    Email,
+    EmailType,
     InstrumentedList,
     Merger,
     NumberRange,
@@ -30,6 +30,6 @@ __all__ = (
     NumberRangeType,
     PhoneNumber,
     PhoneNumberType,
-    ScalarList,
+    ScalarListType,
     ScalarListException,
 )

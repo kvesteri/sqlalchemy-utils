@@ -69,3 +69,9 @@ class TestNumberRange(object):
         assert str(NumberRange.from_normalized_str('[1,2]')) == '1 - 2'
         assert str(NumberRange.from_normalized_str('[1,3)')) == '1 - 2'
         assert str(NumberRange.from_normalized_str('(1,3)')) == '2'
+
+    def test_add_operator(self):
+        assert NumberRange(1, 2) + NumberRange(1, 2) == NumberRange(2, 4)
+
+    def test_sub_operator(self):
+        assert NumberRange(1, 3) - NumberRange(1, 2) == NumberRange(0, 1)

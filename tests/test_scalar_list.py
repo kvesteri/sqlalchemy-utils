@@ -1,5 +1,5 @@
 import sqlalchemy as sa
-from sqlalchemy_utils import ScalarList
+from sqlalchemy_utils import ScalarListType
 from pytest import raises
 from tests import DatabaseTestCase
 
@@ -9,7 +9,7 @@ class TestScalarIntegerList(DatabaseTestCase):
         class User(self.Base):
             __tablename__ = 'user'
             id = sa.Column(sa.Integer, primary_key=True)
-            some_list = sa.Column(ScalarList(int))
+            some_list = sa.Column(ScalarListType(int))
 
             def __repr__(self):
                 return 'User(%r)' % self.id
@@ -33,7 +33,7 @@ class TestScalarUnicodeList(DatabaseTestCase):
         class User(self.Base):
             __tablename__ = 'user'
             id = sa.Column(sa.Integer, primary_key=True)
-            some_list = sa.Column(ScalarList(unicode))
+            some_list = sa.Column(ScalarListType(unicode))
 
             def __repr__(self):
                 return 'User(%r)' % self.id

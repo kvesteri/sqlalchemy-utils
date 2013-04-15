@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.9.1 (2013-04-15)
+^^^^^^^^^^^^^^^^^^
+
+- Renamed Email to EmailType and ScalarList to ScalarListType (unified type class naming convention)
+
+
 0.9.0 (2013-04-11)
 ^^^^^^^^^^^^^^^^^^
 

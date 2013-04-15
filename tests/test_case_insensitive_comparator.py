@@ -1,5 +1,5 @@
 import sqlalchemy as sa
-from sqlalchemy_utils import Email
+from sqlalchemy_utils import EmailType
 from tests import DatabaseTestCase
 
 
@@ -8,7 +8,7 @@ class TestCaseInsensitiveComparator(DatabaseTestCase):
         class User(self.Base):
             __tablename__ = 'user'
             id = sa.Column(sa.Integer, primary_key=True)
-            email = sa.Column(Email)
+            email = sa.Column(EmailType)
 
             def __repr__(self):
                 return 'Building(%r)' % self.id

@@ -88,7 +88,7 @@ class ScalarListException(Exception):
     pass
 
 
-class ScalarList(types.TypeDecorator):
+class ScalarListType(types.TypeDecorator):
     impl = sa.UnicodeText()
 
     def __init__(self, coerce_func=unicode, separator=u','):
@@ -119,7 +119,7 @@ class ScalarList(types.TypeDecorator):
             )
 
 
-class Email(sa.types.TypeDecorator):
+class EmailType(sa.types.TypeDecorator):
     impl = sa.Unicode(255)
     comparator_factory = CaseInsensitiveComparator
 
