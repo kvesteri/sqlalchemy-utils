@@ -8,23 +8,23 @@ SQLAlchemy-Utils
 
 SQLAlchemy-Utils provides various utility classes and functions for SQLAlchemy.
 
-ScalarList
-----------
+ScalarListType
+--------------
 
-ScalarList type provides convenient way for saving multiple scalar values in one
-column. ScalarList works like list on python side and saves the result as comma-separated list
+ScalarListType type provides convenient way for saving multiple scalar values in one
+column. ScalarListType works like list on python side and saves the result as comma-separated list
 in the database (custom separators can also be used).
 
 Example ::
 
 
-    from sqlalchemy_utils import ScalarList
+    from sqlalchemy_utils import ScalarListType
 
 
     class User(Base):
         __tablename__ = 'user'
         id = db.Column(db.Integer, autoincrement=True)
-        hobbies = db.Column(ScalarList())
+        hobbies = db.Column(ScalarListType())
 
 
     user = User()
@@ -37,13 +37,13 @@ You can easily set up integer lists too:
 ::
 
 
-    from sqlalchemy_utils import ScalarList
+    from sqlalchemy_utils import ScalarListType
 
 
     class Player(Base):
         __tablename__ = 'player'
         id = db.Column(db.Integer, autoincrement=True)
-        points = db.Column(ScalarList(int))
+        points = db.Column(ScalarListType(int))
 
 
     player = Player()
@@ -51,8 +51,46 @@ You can easily set up integer lists too:
     session.commit()
 
 
-NumberRange
------------
+ColorType
+---------
+
+ColorType provides a way for saving Color (from colour package) objects into database.
+ColorType saves Color objects as strings on the way in and converts them back to objects when querying the database.
+
+::
+
+
+    from colour import Color
+    from sqlalchemy_utils import ColorType
+
+
+    class Document(Base):
+        __tablename__ = 'player'
+        id = db.Column(db.Integer, autoincrement=True)
+        name = db.Column(db.Unicode(50))
+        background_color = db.Column(ColorType)
+
+
+    document = Document()
+    document.background_color = Color('#F5F5F5')
+    session.commit()
+
+
+Querying the database returns Color objects:
+
+::
+
+    document = session.query(Document).first()
+
+    document.background_color.hex
+    # '#f5f5f5'
+
+
+For more information about colour package and Color object, see https://github.com/vaab/colour
+
+
+NumberRangeType
+---------------
 
 NumberRangeType provides way for saving range of numbers into database.
 

@@ -24,7 +24,7 @@ class PyTest(Command):
 
 setup(
     name='SQLAlchemy-Utils',
-    version='0.9.1',
+    version='0.10.0',
     url='https://github.com/kvesteri/sqlalchemy-utils',
     license='BSD',
     author='Konsta Vesterinen',
@@ -40,7 +40,8 @@ setup(
     install_requires=[
         'SQLAlchemy>=0.7.8',
         'psycopg2>=2.4.6',
-        'phonenumbers>=5.4b1'
+        'phonenumbers>=5.4b1',
+        'colour==0.0.2'
     ],
     cmdclass={'test': PyTest},
     classifiers=[

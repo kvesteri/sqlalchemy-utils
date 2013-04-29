@@ -1,4 +1,5 @@
 import phonenumbers
+from colour import Color
 from functools import wraps
 import sqlalchemy as sa
 from sqlalchemy.orm.collections import InstrumentedList as _InstrumentedList
@@ -81,6 +82,29 @@ class PhoneNumberType(types.TypeDecorator):
     def process_result_value(self, value, dialect):
         if value:
             return PhoneNumber(value, self.country_code)
+        return value
+
+
+class ColorType(types.TypeDecorator):
+    """
+    Changes Color objects to a string representation on the way in and
+    changes them back to Color objects on the way out.
+    """
+    STORE_FORMAT = 'hex'
+    impl = types.Unicode(20)
+
+    def __init__(self, max_length=20, *args, **kwargs):
+        super(ColorType, self).__init__(*args, **kwargs)
+        self.impl = types.Unicode(max_length)
+
+    def process_bind_param(self, value, dialect):
+        if value:
+            return getattr(value, self.STORE_FORMAT)
+        return value
+
+    def process_result_value(self, value, dialect):
+        if value:
+            return Color(value)
         return value
 
 

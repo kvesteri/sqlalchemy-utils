@@ -11,7 +11,7 @@ class TestEmailType(DatabaseTestCase):
             email = sa.Column(EmailType)
 
             def __repr__(self):
-                return 'Building(%r)' % self.id
+                return 'User(%r)' % self.id
 
         self.User = User
 

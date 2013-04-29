@@ -1,6 +1,7 @@
 from .functions import sort_query, defer_except, escape_like
 from .merge import merge, Merger
 from .types import (
+    ColorType,
     EmailType,
     instrumented_list,
     InstrumentedList,
@@ -21,6 +22,7 @@ __all__ = (
     escape_like,
     instrumented_list,
     merge,
+    ColorType,
     EmailType,
     InstrumentedList,
     Merger,

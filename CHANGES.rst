@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.10.0 (2013-04-29)
+^^^^^^^^^^^^^^^^^^^
+
+- Added ColorType
+
+
 0.9.1 (2013-04-15)
 ^^^^^^^^^^^^^^^^^^
 
