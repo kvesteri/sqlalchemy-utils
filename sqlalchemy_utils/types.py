@@ -84,6 +84,11 @@ class PhoneNumberType(types.TypeDecorator):
             return PhoneNumber(value, self.country_code)
         return value
 
+    def coercion_listener(self, target, value, oldvalue, initiator):
+        if value is not None and not isinstance(value, PhoneNumber):
+            value = PhoneNumber(value, country_code=self.country_code)
+        return value
+
 
 class ColorType(types.TypeDecorator):
     """
@@ -105,6 +110,11 @@ class ColorType(types.TypeDecorator):
     def process_result_value(self, value, dialect):
         if value:
             return Color(value)
+        return value
+
+    def coercion_listener(self, target, value, oldvalue, initiator):
+        if value is not None and not isinstance(value, Color):
+            value = Color(value)
         return value
 
 
@@ -172,6 +182,14 @@ class NumberRangeType(types.TypeDecorator):
     def process_result_value(self, value, dialect):
         if value:
             return NumberRange.from_normalized_str(value)
+        return value
+
+    def coercion_listener(self, target, value, oldvalue, initiator):
+        if value is not None and not isinstance(value, NumberRange):
+            if isinstance(value, basestring):
+                value = NumberRange.from_normalized_str(value)
+            else:
+                raise TypeError
         return value
 
 

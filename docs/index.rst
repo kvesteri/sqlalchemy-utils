@@ -6,7 +6,45 @@
 SQLAlchemy-Utils
 ================
 
-SQLAlchemy-Utils provides various utility classes and functions for SQLAlchemy.
+SQLAlchemy-Utils provides custom data types and various utility functions for SQLAlchemy.
+
+Using automatic data coercion
+-----------------------------
+
+SQLAlchemy-Utils provides various new data types for SQLAlchemy and in order to gain full
+advantage of these datatypes you should use coercion_listener. Setting up the listener is easy:
+
+::
+
+    import sqlalchemy as sa
+    from sqlalchemy_utils import coercion_listener
+
+
+    sa.event.listen(sa.orm.mapper, 'mapper_configured', coercion_listener)
+
+
+The listener automatically detects SQLAlchemy-Utils compatible data types and coerces all attributes
+using these types to appropriate objects.
+
+
+Example
+::
+    from colour import Color
+    from sqlalchemy_utils import ColorType
+
+
+    class Document(Base):
+        __tablename__ = 'player'
+        id = db.Column(db.Integer, autoincrement=True)
+        name = db.Column(db.Unicode(50))
+        background_color = db.Column(ColorType)
+
+
+    document = Document()
+    document.background_color = 'F5F5F5'
+    document.background_color  # Color object
+    session.commit()
+
 
 ScalarListType
 --------------

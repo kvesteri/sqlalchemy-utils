@@ -1,4 +1,5 @@
 from .functions import sort_query, defer_except, escape_like
+from .listeners import coercion_listener
 from .merge import merge, Merger
 from .types import (
     ColorType,
@@ -17,6 +18,7 @@ from .types import (
 
 
 __all__ = (
+    coercion_listener,
     sort_query,
     defer_except,
     escape_like,

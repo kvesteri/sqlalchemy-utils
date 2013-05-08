@@ -2,7 +2,7 @@
 SQLAlchemy-Utils
 ----------------
 
-Various utility functions for SQLAlchemy.
+Various utility functions and custom data types for SQLAlchemy.
 """
 
 from setuptools import setup, Command
@@ -24,7 +24,7 @@ class PyTest(Command):
 
 setup(
     name='SQLAlchemy-Utils',
-    version='0.10.0',
+    version='0.11.0',
     url='https://github.com/kvesteri/sqlalchemy-utils',
     license='BSD',
     author='Konsta Vesterinen',
@@ -39,7 +39,6 @@ setup(
     platforms='any',
     install_requires=[
         'SQLAlchemy>=0.7.8',
-        'psycopg2>=2.4.6',
         'phonenumbers>=5.4b1',
         'colour==0.0.2'
     ],
