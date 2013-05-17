@@ -1,6 +1,7 @@
 from .functions import sort_query, defer_except, escape_like
 from .listeners import coercion_listener
 from .merge import merge, Merger
+from .proxy_dict import ProxyDict
 from .types import (
     ColorType,
     EmailType,
@@ -34,6 +35,7 @@ __all__ = (
     NumberRangeType,
     PhoneNumber,
     PhoneNumberType,
+    ProxyDict,
     ScalarListType,
     ScalarListException,
 )

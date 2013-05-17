@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.12.0 (2013-05-08)
+^^^^^^^^^^^^^^^^^^^
+
+- Added ProxyDict
+
+
 0.11.0 (2013-05-08)
 ^^^^^^^^^^^^^^^^^^^
 
