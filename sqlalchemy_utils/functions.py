@@ -174,3 +174,30 @@ def escape_like(string, escape_char='*'):
         .replace('%', escape_char + '%')
         .replace('_', escape_char + '_')
     )
+
+
+def remove_property(class_, name):
+    """
+    **Experimental function**
+
+    Remove property from declarative class
+    """
+    mapper = class_.mapper
+    table = class_.__table__
+    columns = class_.mapper.c
+    column = columns[name]
+    del columns._data[name]
+    del mapper.columns[name]
+    columns._all_cols.remove(column)
+    mapper._cols_by_table[table].remove(column)
+    mapper.class_manager.uninstrument_attribute(name)
+    del mapper._props[name]
+
+
+def primary_keys(class_):
+    """
+    Returns all primary keys for given declarative class.
+    """
+    for column in class_.__table__.c:
+        if column.primary_key:
+            yield column

@@ -4,7 +4,14 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
-0.12.0 (2013-05-08)
+0.12.1 (2013-05-18)
+^^^^^^^^^^^^^^^^^^^
+
+- Added utility functions remove_property and primary_keys
+
+
+
+0.12.0 (2013-05-17)
 ^^^^^^^^^^^^^^^^^^^
 
 - Added ProxyDict
