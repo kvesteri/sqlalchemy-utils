@@ -1,7 +1,7 @@
-from .functions import sort_query, defer_except, escape_like
+from .functions import sort_query, defer_except, escape_like, primary_keys
 from .listeners import coercion_listener
 from .merge import merge, Merger
-from .proxy_dict import ProxyDict
+from .proxy_dict import ProxyDict, proxy_dict
 from .types import (
     ColorType,
     EmailType,
@@ -25,6 +25,8 @@ __all__ = (
     escape_like,
     instrumented_list,
     merge,
+    primary_keys,
+    proxy_dict,
     ColorType,
     EmailType,
     InstrumentedList,

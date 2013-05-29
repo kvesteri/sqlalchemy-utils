@@ -2,11 +2,11 @@ import sqlalchemy as sa
 
 
 class ProxyDict(object):
-    def __init__(self, parent, collection_name, child_class, key_name):
+    def __init__(self, parent, collection_name, mapping_attr):
         self.parent = parent
         self.collection_name = collection_name
-        self.child_class = child_class
-        self.key_name = key_name
+        self.child_class = mapping_attr.class_
+        self.key_name = mapping_attr.key
         self.cache = {}
 
     @property
@@ -26,20 +26,22 @@ class ProxyDict(object):
     def fetch(self, key):
         return self.collection.filter_by(**{self.key_name: key}).first()
 
+    def create_new_instance(self, key):
+        value = self.child_class(**{self.key_name: key})
+        self.collection.append(value)
+        return value
+
     def __getitem__(self, key):
         if key in self.cache:
             return self.cache[key]
 
         session = sa.orm.object_session(self.parent)
         if not session or not sa.orm.util.has_identity(self.parent):
-            value = self.child_class(**{self.key_name: key})
-            self.collection.append(value)
+            value = self.create_new_instance(key)
         else:
             value = self.fetch(key)
             if not value:
-                value = self.child_class(**{self.key_name: key})
-                self.collection.append(value)
-
+                value = self.create_new_instance(key)
         self.cache[key] = value
         return value
 
@@ -51,3 +53,24 @@ class ProxyDict(object):
             pass
         self.collection.append(value)
         self.cache[key] = value
+
+
+def proxy_dict(parent, collection_name, mapping_attr):
+    try:
+        parent._proxy_dicts
+    except AttributeError:
+        def expire_proxy_dicts(target, context):
+            target._proxy_dicts = {}
+
+        sa.event.listen(parent.__class__, 'expire', expire_proxy_dicts)
+        parent._proxy_dicts = {}
+
+    try:
+        return parent._proxy_dicts[collection_name]
+    except KeyError:
+        parent._proxy_dicts[collection_name] = ProxyDict(
+            parent,
+            collection_name,
+            mapping_attr
+        )
+    return parent._proxy_dicts[collection_name]

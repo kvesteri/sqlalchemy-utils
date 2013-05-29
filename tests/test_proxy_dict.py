@@ -1,6 +1,6 @@
 from flexmock import flexmock
 import sqlalchemy as sa
-from sqlalchemy_utils import ProxyDict
+from sqlalchemy_utils import ProxyDict, proxy_dict
 from tests import TestCase
 
 
@@ -21,16 +21,11 @@ class TestProxyDict(TestCase):
 
             @property
             def translations(self):
-                try:
-                    return self.proxied_translations
-                except AttributeError:
-                    self.proxied_translations = ProxyDict(
-                        self,
-                        '_translations',
-                        ArticleTranslation,
-                        'locale'
-                    )
-                return self.proxied_translations
+                return proxy_dict(
+                    self,
+                    '_translations',
+                    ArticleTranslation.locale
+                )
 
         class ArticleTranslation(self.Base):
             __tablename__ = 'article_translation'
@@ -82,4 +77,17 @@ class TestProxyDict(TestCase):
             locale='en',
             name=u'something'
         )
+        article.translations['en']
+
+    def test_committing_session_empties_proxy_dict_cache(self):
+        article = self.Article()
+        (
+            flexmock(ProxyDict)
+            .should_receive('fetch')
+            .twice()
+        )
+        self.session.add(article)
+        self.session.commit()
+        article.translations['en']
+        self.session.commit()
         article.translations['en']

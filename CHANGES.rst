@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.12.2 (2013-05-29)
+^^^^^^^^^^^^^^^^^^^
+
+- Added automatic expiration of proxy dicts
+
+
+
 0.12.1 (2013-05-18)
 ^^^^^^^^^^^^^^^^^^^
 
