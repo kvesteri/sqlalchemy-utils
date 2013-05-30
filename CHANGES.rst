@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.12.3 (2013-05-30)
+^^^^^^^^^^^^^^^^^^^
+
+- Proxy dict expiration listener from function scope to global scope
+
+
 0.12.2 (2013-05-29)
 ^^^^^^^^^^^^^^^^^^^
 

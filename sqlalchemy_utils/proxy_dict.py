@@ -59,10 +59,6 @@ def proxy_dict(parent, collection_name, mapping_attr):
     try:
         parent._proxy_dicts
     except AttributeError:
-        def expire_proxy_dicts(target, context):
-            target._proxy_dicts = {}
-
-        sa.event.listen(parent.__class__, 'expire', expire_proxy_dicts)
         parent._proxy_dicts = {}
 
     try:
@@ -74,3 +70,11 @@ def proxy_dict(parent, collection_name, mapping_attr):
             mapping_attr
         )
     return parent._proxy_dicts[collection_name]
+
+
+def expire_proxy_dicts(target, context):
+    if hasattr(target, '_proxy_dicts'):
+        target._proxy_dicts = {}
+
+
+sa.event.listen(sa.orm.mapper, 'expire', expire_proxy_dicts)
