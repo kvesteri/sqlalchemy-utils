@@ -19,31 +19,33 @@ class ProxyDict(object):
 
     def __contains__(self, key):
         try:
-            return key in self.cache or self[key]
+            return key in self.cache or self.fetch(key) is not None
         except KeyError:
             return False
 
+    def has_key(self, key):
+        return self.__contains__(key)
+
     def fetch(self, key):
-        return self.collection.filter_by(**{self.key_name: key}).first()
+        session = sa.orm.object_session(self.parent)
+        if session and sa.orm.util.has_identity(self.parent):
+            return self.collection.filter_by(**{self.key_name: key}).first()
 
     def create_new_instance(self, key):
         value = self.child_class(**{self.key_name: key})
         self.collection.append(value)
+        self.cache[key] = value
         return value
 
     def __getitem__(self, key):
         if key in self.cache:
             return self.cache[key]
 
-        session = sa.orm.object_session(self.parent)
-        if not session or not sa.orm.util.has_identity(self.parent):
-            value = self.create_new_instance(key)
-        else:
-            value = self.fetch(key)
-            if not value:
-                value = self.create_new_instance(key)
-        self.cache[key] = value
-        return value
+        value = self.fetch(key)
+        if value:
+            return value
+
+        return self.create_new_instance(key)
 
     def __setitem__(self, key, value):
         try:

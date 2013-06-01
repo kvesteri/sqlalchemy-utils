@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.12.4 (2013-06-01)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed ProxyDict contains method
+
+
 0.12.3 (2013-05-30)
 ^^^^^^^^^^^^^^^^^^^
 

@@ -79,6 +79,12 @@ class TestProxyDict(TestCase):
         )
         article.translations['en']
 
+    def test_contains(self):
+        article = self.Article()
+        assert 'en' not in article.translations
+        # does not auto-append new translation
+        assert 'en' not in article.translations
+
     def test_committing_session_empties_proxy_dict_cache(self):
         article = self.Article()
         (
