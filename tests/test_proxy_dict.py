@@ -79,6 +79,25 @@ class TestProxyDict(TestCase):
         )
         article.translations['en']
 
+    def test_contains_efficiency(self):
+        article = self.Article()
+        self.session.add(article)
+        self.session.commit()
+        article.id
+        query_count = self.connection.query_count
+        'en' in article.translations
+        'en' in article.translations
+        'en' in article.translations
+        assert self.connection.query_count == query_count + 1
+
+    def test_getitem_with_none_value_in_cache(self):
+        article = self.Article()
+        self.session.add(article)
+        self.session.commit()
+        article.id
+        'en' in article.translations
+        assert article.translations['en']
+
     def test_contains(self):
         article = self.Article()
         assert 'en' not in article.translations

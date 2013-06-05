@@ -18,10 +18,9 @@ class ProxyDict(object):
         return [x[0] for x in self.collection.values(descriptor)]
 
     def __contains__(self, key):
-        try:
-            return key in self.cache or self.fetch(key) is not None
-        except KeyError:
-            return False
+        if key in self.cache:
+            return self.cache[key] is not None
+        return self.fetch(key) is not None
 
     def has_key(self, key):
         return self.__contains__(key)
@@ -29,7 +28,9 @@ class ProxyDict(object):
     def fetch(self, key):
         session = sa.orm.object_session(self.parent)
         if session and sa.orm.util.has_identity(self.parent):
-            return self.collection.filter_by(**{self.key_name: key}).first()
+            obj = self.collection.filter_by(**{self.key_name: key}).first()
+            self.cache[key] = obj
+            return obj
 
     def create_new_instance(self, key):
         value = self.child_class(**{self.key_name: key})
@@ -39,11 +40,12 @@ class ProxyDict(object):
 
     def __getitem__(self, key):
         if key in self.cache:
-            return self.cache[key]
-
-        value = self.fetch(key)
-        if value:
-            return value
+            if self.cache[key] is not None:
+                return self.cache[key]
+        else:
+            value = self.fetch(key)
+            if value:
+                return value
 
         return self.create_new_instance(key)
 

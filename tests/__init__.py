@@ -5,13 +5,17 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy_utils import (
-    escape_like,
-    sort_query,
     InstrumentedList,
-    PhoneNumber,
     PhoneNumberType,
-    merge
 )
+
+
+@sa.event.listens_for(sa.engine.Engine, 'before_cursor_execute')
+def count_sql_calls(conn, cursor, statement, parameters, context, executemany):
+    try:
+        conn.query_count += 1
+    except AttributeError:
+        conn.query_count = 0
 
 
 class TestCase(object):
@@ -19,17 +23,19 @@ class TestCase(object):
         self.engine = create_engine(
             'postgres://postgres@localhost/sqlalchemy_utils_test'
         )
+        self.connection = self.engine.connect()
         self.Base = declarative_base()
 
         self.create_models()
-        self.Base.metadata.create_all(self.engine)
+        self.Base.metadata.create_all(self.connection)
 
-        Session = sessionmaker(bind=self.engine)
+        Session = sessionmaker(bind=self.connection)
         self.session = Session()
 
     def teardown_method(self, method):
         self.session.close_all()
-        self.Base.metadata.drop_all(self.engine)
+        self.Base.metadata.drop_all(self.connection)
+        self.connection.close()
         self.engine.dispose()
 
     def create_models(self):

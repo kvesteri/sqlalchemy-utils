@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.12.5 (2013-06-05)
+^^^^^^^^^^^^^^^^^^^
+
+- ProxyDict now contains None values in cache - more efficient contains method.
+
+
 0.12.4 (2013-06-01)
 ^^^^^^^^^^^^^^^^^^^
 
