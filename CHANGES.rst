@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.13.0 (2013-06-05)
+^^^^^^^^^^^^^^^^^^^
+
+- Added table_name utility function.
+
+
 0.12.5 (2013-06-05)
 ^^^^^^^^^^^^^^^^^^^
 

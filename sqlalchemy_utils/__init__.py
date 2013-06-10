@@ -1,4 +1,6 @@
-from .functions import sort_query, defer_except, escape_like, primary_keys
+from .functions import (
+    sort_query, defer_except, escape_like, primary_keys, table_name
+)
 from .listeners import coercion_listener
 from .merge import merge, Merger
 from .proxy_dict import ProxyDict, proxy_dict
@@ -27,6 +29,7 @@ __all__ = (
     merge,
     primary_keys,
     proxy_dict,
+    table_name,
     ColorType,
     EmailType,
     InstrumentedList,

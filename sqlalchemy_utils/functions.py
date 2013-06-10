@@ -201,3 +201,13 @@ def primary_keys(class_):
     for column in class_.__table__.c:
         if column.primary_key:
             yield column
+
+
+def table_name(class_):
+    """
+    Return table name of given declarative class.
+    """
+    try:
+        return class_.__tablename__
+    except AttributeError:
+        return class_.__table__.name
