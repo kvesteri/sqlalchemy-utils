@@ -6,7 +6,78 @@ from sqlalchemy.orm.util import AliasedInsp
 from sqlalchemy.sql.expression import desc, asc
 
 
-def sort_query(query, sort):
+class QuerySorter(object):
+    entities = []
+    labels = []
+
+    def inspect_labels_and_entities(self):
+        for entity in self.query._entities:
+            # get all label names for queries such as:
+            # db.session.query(
+            #       Category,
+            #       db.func.count(Article.id).label('articles')
+            # )
+            if isinstance(entity, _ColumnEntity) and entity._label_name:
+                self.labels.append(entity._label_name)
+            else:
+                self.entities.append(entity.entity_zero.class_)
+
+        for mapper in self.query._join_entities:
+            if isinstance(mapper, Mapper):
+                self.entities.append(mapper.class_)
+            else:
+                self.entities.append(mapper)
+
+    def assign_order_by(self, sort):
+        if not sort:
+            return self.query
+
+        if sort[0] == '-':
+            func = desc
+            sort = sort[1:]
+        else:
+            func = asc
+
+        component = None
+        parts = sort.split('-')
+        if len(parts) > 1:
+            component = parts[0]
+            sort = parts[1]
+        if sort in self.labels:
+            return self.query.order_by(func(sort))
+
+        for entity in self.entities:
+            if isinstance(entity, AliasedInsp):
+                if component and entity.name != component:
+                    continue
+
+                selectable = entity.selectable
+
+                if sort in selectable.c:
+                    attr = selectable.c[sort]
+                    return self.query.order_by(func(attr))
+            else:
+                table = entity.__table__
+                if component and table.name != component:
+                    continue
+                if sort in table.columns:
+                    try:
+                        attr = getattr(entity, sort)
+                        return self.query.order_by(func(attr))
+                    except AttributeError:
+                        pass
+                    break
+        return self.query
+
+    def __call__(self, query, *args):
+        self.query = query
+        self.inspect_labels_and_entities()
+        for sort in args:
+            self.query = self.assign_order_by(sort)
+        return self.query
+
+
+def sort_query(query, *args):
     """
     Applies an sql ORDER BY for given query. This function can be easily used
     with user-defined sorting.
@@ -71,64 +142,8 @@ def sort_query(query, sort):
     :param errors: whether or not to raise exceptions if unknown sort column
                    is passed
     """
-    entities = []
-    labels = []
-    for entity in query._entities:
-        # get all label names for queries such as:
-        # db.session.query(
-        #       Category,
-        #       db.func.count(Article.id).label('articles')
-        # )
-        if isinstance(entity, _ColumnEntity) and entity._label_name:
-            labels.append(entity._label_name)
-        else:
-            entities.append(entity.entity_zero.class_)
 
-    for mapper in query._join_entities:
-        if isinstance(mapper, Mapper):
-            entities.append(mapper.class_)
-        else:
-            entities.append(mapper)
-
-    if not sort:
-        return query
-
-    if sort[0] == '-':
-        func = desc
-        sort = sort[1:]
-    else:
-        func = asc
-
-    component = None
-    parts = sort.split('-')
-    if len(parts) > 1:
-        component = parts[0]
-        sort = parts[1]
-    if sort in labels:
-        return query.order_by(func(sort))
-
-    for entity in entities:
-        if isinstance(entity, AliasedInsp):
-            if component and entity.name != component:
-                continue
-
-            selectable = entity.selectable
-
-            if sort in selectable.c:
-                attr = selectable.c[sort]
-                query = query.order_by(func(attr))
-        else:
-            table = entity.__table__
-            if component and table.name != component:
-                continue
-            if sort in table.columns:
-                try:
-                    attr = getattr(entity, sort)
-                    query = query.order_by(func(attr))
-                except AttributeError:
-                    pass
-                break
-    return query
+    return QuerySorter()(query, *args)
 
 
 def defer_except(query, columns):

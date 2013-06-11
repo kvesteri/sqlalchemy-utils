@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.13.1 (2013-06-11)
+^^^^^^^^^^^^^^^^^^^
+
+- Made sort_query function support multicolumn sorting.
+
+
 0.13.0 (2013-06-05)
 ^^^^^^^^^^^^^^^^^^^
 
