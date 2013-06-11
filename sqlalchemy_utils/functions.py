@@ -7,8 +7,9 @@ from sqlalchemy.sql.expression import desc, asc
 
 
 class QuerySorter(object):
-    entities = []
-    labels = []
+    def __init__(self):
+        self.entities = []
+        self.labels = []
 
     def inspect_labels_and_entities(self):
         for entity in self.query._entities:
