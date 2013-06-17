@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.13.3 (2013-06-11)
+^^^^^^^^^^^^^^^^^^^
+
+- Initial support for psycopg 2.5 NumericRange objects
+
+
 0.13.2 (2013-06-11)
 ^^^^^^^^^^^^^^^^^^^
 
