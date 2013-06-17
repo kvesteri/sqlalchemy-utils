@@ -1,9 +1,9 @@
 import sqlalchemy as sa
 from sqlalchemy_utils import EmailType
-from tests import DatabaseTestCase
+from tests import TestCase
 
 
-class TestCaseInsensitiveComparator(DatabaseTestCase):
+class TestCaseInsensitiveComparator(TestCase):
     def create_models(self):
         class User(self.Base):
             __tablename__ = 'user'

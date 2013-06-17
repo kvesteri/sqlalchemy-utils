@@ -1,10 +1,10 @@
 from colour import Color
 import sqlalchemy as sa
 from sqlalchemy_utils import ColorType
-from tests import DatabaseTestCase
+from tests import TestCase
 
 
-class TestColorType(DatabaseTestCase):
+class TestColorType(TestCase):
     def create_models(self):
         class Document(self.Base):
             __tablename__ = 'document'

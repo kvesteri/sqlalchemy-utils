@@ -68,25 +68,3 @@ class TestCase(object):
         self.User = User
         self.Category = Category
         self.Article = Article
-
-
-class DatabaseTestCase(object):
-    def create_models(self):
-        pass
-
-    def setup_method(self, method):
-        self.engine = create_engine(
-            'sqlite:///'
-        )
-        #self.engine.echo = True
-        self.Base = declarative_base()
-
-        self.create_models()
-        self.Base.metadata.create_all(self.engine)
-        Session = sessionmaker(bind=self.engine)
-        self.session = Session()
-
-    def teardown_method(self, method):
-        self.engine.dispose()
-        self.Base.metadata.drop_all(self.engine)
-        self.session.expunge_all()

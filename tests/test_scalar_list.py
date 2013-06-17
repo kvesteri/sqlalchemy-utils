@@ -1,10 +1,10 @@
 import sqlalchemy as sa
 from sqlalchemy_utils import ScalarListType
 from pytest import raises
-from tests import DatabaseTestCase
+from tests import TestCase
 
 
-class TestScalarIntegerList(DatabaseTestCase):
+class TestScalarIntegerList(TestCase):
     def create_models(self):
         class User(self.Base):
             __tablename__ = 'user'
@@ -28,7 +28,7 @@ class TestScalarIntegerList(DatabaseTestCase):
         assert user.some_list == [1, 2, 3, 4]
 
 
-class TestScalarUnicodeList(DatabaseTestCase):
+class TestScalarUnicodeList(TestCase):
     def create_models(self):
         class User(self.Base):
             __tablename__ = 'user'

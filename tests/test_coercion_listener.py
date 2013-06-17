@@ -8,10 +8,10 @@ from sqlalchemy_utils import (
     PhoneNumber,
     coercion_listener
 )
-from tests import DatabaseTestCase
+from tests import TestCase
 
 
-class TestCoercionListener(DatabaseTestCase):
+class TestCoercionListener(TestCase):
     def create_models(self):
         class User(self.Base):
             __tablename__ = 'user'

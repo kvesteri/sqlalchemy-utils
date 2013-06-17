@@ -1,9 +1,9 @@
 import sqlalchemy as sa
 from sqlalchemy_utils import table_name
-from tests import DatabaseTestCase
+from tests import TestCase
 
 
-class TestTableName(DatabaseTestCase):
+class TestTableName(TestCase):
     def create_models(self):
         class Building(self.Base):
             __tablename__ = 'building'

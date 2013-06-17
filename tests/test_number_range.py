@@ -1,10 +1,10 @@
 import sqlalchemy as sa
 from pytest import raises
 from sqlalchemy_utils import NumberRangeType, NumberRange, NumberRangeException
-from tests import DatabaseTestCase
+from tests import TestCase
 
 
-class TestNumberRangeType(DatabaseTestCase):
+class TestNumberRangeType(TestCase):
     def create_models(self):
         class Building(self.Base):
             __tablename__ = 'building'
@@ -23,7 +23,6 @@ class TestNumberRangeType(DatabaseTestCase):
 
         self.session.add(building)
         self.session.commit()
-
         building = self.session.query(self.Building).first()
         assert building.persons_at_night.min_value == 1
         assert building.persons_at_night.max_value == 3

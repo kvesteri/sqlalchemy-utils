@@ -181,7 +181,10 @@ class NumberRangeType(types.TypeDecorator):
 
     def process_result_value(self, value, dialect):
         if value:
-            return NumberRange.from_normalized_str(value)
+            if not isinstance(value, basestring):
+                value = NumberRange.from_range_object(value)
+            else:
+                return NumberRange.from_normalized_str(value)
         return value
 
     def coercion_listener(self, target, value, oldvalue, initiator):
@@ -211,6 +214,18 @@ class NumberRange(object):
             raise RangeBoundsException(min_value, max_value)
         self.min_value = min_value
         self.max_value = max_value
+
+    @classmethod
+    def from_range_object(cls, value):
+        min_value = value.lower
+        max_value = value.upper
+        if not value.lower_inc:
+            min_value += 1
+
+        if not value.upper_inc:
+            max_value -= 1
+
+        return cls(min_value, max_value)
 
     @classmethod
     def from_normalized_str(cls, value):
