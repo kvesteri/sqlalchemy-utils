@@ -20,9 +20,7 @@ def count_sql_calls(conn, cursor, statement, parameters, context, executemany):
 
 class TestCase(object):
     def setup_method(self, method):
-        self.engine = create_engine(
-            'postgres://postgres@localhost/sqlalchemy_utils_test'
-        )
+        self.engine = create_engine('sqlite:///:memory:')
         self.connection = self.engine.connect()
         self.Base = declarative_base()
 

@@ -4,7 +4,6 @@ SQLAlchemy-Utils
 
 Various utility functions and custom data types for SQLAlchemy.
 """
-
 from setuptools import setup, Command
 import subprocess
 
@@ -22,6 +21,7 @@ class PyTest(Command):
         errno = subprocess.call(['py.test'])
         raise SystemExit(errno)
 
+
 setup(
     name='SQLAlchemy-Utils',
     version='0.13.3',
@@ -37,11 +37,26 @@ setup(
     zip_safe=False,
     include_package_data=True,
     platforms='any',
-    install_requires=[
-        'SQLAlchemy>=0.8.0',
-        'phonenumbers>=5.4b1',
-        'colour==0.0.2'
+    dependency_links=[
+        # 5.6 supports python 3.x / pending release
+        'git+git://github.com/daviddrysdale/python-phonenumbers.git@python3'
+        '#egg=phonenumbers3k-5.6b1',
     ],
+    install_requires=[
+        'six',
+        'SQLAlchemy>=0.8.0',
+        'phonenumbers3k==5.6b1',
+        'colour>=0.0.3'
+    ],
+    extras_require={
+        'test': [
+            'pytest==2.2.3',
+            'Pygments>=1.2',
+            'Jinja2>=2.3',
+            'docutils>=0.10',
+            'flexmock>=0.9.7',
+        ]
+    },
     cmdclass={'test': PyTest},
     classifiers=[
         'Environment :: Web Environment',

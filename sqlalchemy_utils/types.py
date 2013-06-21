@@ -1,3 +1,4 @@
+import six
 import phonenumbers
 from colour import Color
 from functools import wraps
@@ -56,7 +57,7 @@ class PhoneNumber(phonenumbers.phonenumber.PhoneNumber):
         return self.national
 
     def __str__(self):
-        return unicode(self).encode('utf-8')
+        return six.text_type(self.national).encode('utf-8')
 
 
 class PhoneNumberType(types.TypeDecorator):
@@ -95,7 +96,7 @@ class ColorType(types.TypeDecorator):
     Changes Color objects to a string representation on the way in and
     changes them back to Color objects on the way out.
     """
-    STORE_FORMAT = 'hex'
+    STORE_FORMAT = u'hex'
     impl = types.Unicode(20)
 
     def __init__(self, max_length=20, *args, **kwargs):
@@ -104,7 +105,7 @@ class ColorType(types.TypeDecorator):
 
     def process_bind_param(self, value, dialect):
         if value:
-            return getattr(value, self.STORE_FORMAT)
+            return six.text_type(getattr(value, self.STORE_FORMAT))
         return value
 
     def process_result_value(self, value, dialect):
@@ -125,22 +126,22 @@ class ScalarListException(Exception):
 class ScalarListType(types.TypeDecorator):
     impl = sa.UnicodeText()
 
-    def __init__(self, coerce_func=unicode, separator=u','):
-        self.separator = unicode(separator)
+    def __init__(self, coerce_func=six.text_type, separator=u','):
+        self.separator = six.text_type(separator)
         self.coerce_func = coerce_func
 
     def process_bind_param(self, value, dialect):
         # Convert list of values to unicode separator-separated list
         # Example: [1, 2, 3, 4] -> u'1, 2, 3, 4'
         if value is not None:
-            if any(self.separator in unicode(item) for item in value):
+            if any(self.separator in six.text_type(item) for item in value):
                 raise ScalarListException(
                     "List values can't contain string '%s' (its being used as "
                     "separator. If you wish for scalar list values to contain "
                     "these strings, use a different separator string."
                 )
             return self.separator.join(
-                map(unicode, value)
+                map(six.text_type, value)
             )
 
     def process_result_value(self, value, dialect):
@@ -148,9 +149,9 @@ class ScalarListType(types.TypeDecorator):
             if value == u'':
                 return []
             # coerce each value
-            return map(
+            return list(map(
                 self.coerce_func, value.split(self.separator)
-            )
+            ))
 
 
 class EmailType(sa.types.TypeDecorator):
@@ -181,7 +182,7 @@ class NumberRangeType(types.TypeDecorator):
 
     def process_result_value(self, value, dialect):
         if value:
-            if not isinstance(value, basestring):
+            if not isinstance(value, six.string_types):
                 value = NumberRange.from_range_object(value)
             else:
                 return NumberRange.from_normalized_str(value)
@@ -189,7 +190,7 @@ class NumberRangeType(types.TypeDecorator):
 
     def coercion_listener(self, target, value, oldvalue, initiator):
         if value is not None and not isinstance(value, NumberRange):
-            if isinstance(value, basestring):
+            if isinstance(value, six.string_types):
                 value = NumberRange.from_normalized_str(value)
             else:
                 raise TypeError
@@ -252,7 +253,7 @@ class NumberRange(object):
                 min_value, max_value = map(
                     lambda a: int(a.strip()), values
                 )
-            except ValueError, e:
+            except ValueError as e:
                 raise NumberRangeException(e.message)
 
             if value[0] == '(':
@@ -274,8 +275,8 @@ class NumberRange(object):
                     min_value, max_value = map(
                         lambda a: int(a.strip()), values
                     )
-                except ValueError, e:
-                    raise NumberRangeException(e.message)
+                except ValueError as e:
+                    raise NumberRangeException(str(e))
             return cls(min_value, max_value)
 
     @property

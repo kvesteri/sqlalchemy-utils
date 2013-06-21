@@ -1,3 +1,4 @@
+import six
 import sqlalchemy as sa
 from sqlalchemy_utils import ScalarListType
 from pytest import raises
@@ -33,7 +34,7 @@ class TestScalarUnicodeList(TestCase):
         class User(self.Base):
             __tablename__ = 'user'
             id = sa.Column(sa.Integer, primary_key=True)
-            some_list = sa.Column(ScalarListType(unicode))
+            some_list = sa.Column(ScalarListType(six.text_type))
 
             def __repr__(self):
                 return 'User(%r)' % self.id
