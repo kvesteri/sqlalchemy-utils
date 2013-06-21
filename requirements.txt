@@ -1,3 +1,0 @@
-SQLAlchemy>=0.8.0
-phonenumbers>=5.4b1
-colour==0.0.2
