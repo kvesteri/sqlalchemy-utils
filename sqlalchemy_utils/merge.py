@@ -1,3 +1,4 @@
+import six
 import sqlalchemy as sa
 from sqlalchemy.engine import reflection
 from sqlalchemy.orm import object_session, mapperlib
@@ -51,7 +52,7 @@ class Merger(object):
 
     def raw_merge(self, session, table, old_values, new_values):
         conditions = []
-        for key, value in old_values.items():
+        for key, value in six.iteritems(old_values):
             conditions.append(getattr(table.c, key) == value)
         sql = (
             table
