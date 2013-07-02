@@ -35,7 +35,6 @@ class QuerySorter(object):
             return self.query
 
         sort = self.parse_sort_arg(sort)
-        print sort
         if sort['attr'] in self.labels:
             return self.query.order_by(sort['func'](sort['attr']))
 
