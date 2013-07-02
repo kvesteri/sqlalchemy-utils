@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.14.2 (2013-07-02)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed py3 bug introduced in 0.14.1
+
+
 0.14.1 (2013-07-02)
 ^^^^^^^^^^^^^^^^^^^
 
