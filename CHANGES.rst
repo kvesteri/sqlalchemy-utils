@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.14.1 (2013-07-02)
+^^^^^^^^^^^^^^^^^^^
+
+- Made sort_query support column_property selects with labels
+
+
 0.14.0 (2013-07-02)
 ^^^^^^^^^^^^^^^^^^^
 

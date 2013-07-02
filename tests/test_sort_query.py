@@ -71,3 +71,14 @@ class TestSortQuery(TestCase):
         query = self.session.query(self.Article)
         sorted_query = sort_query(query, 'name', 'id')
         assert 'article.name ASC, article.id ASC' in str(sorted_query)
+
+    def test_sort_by_column_property(self):
+        self.Category.article_count = sa.orm.column_property(
+            sa.select([sa.func.count(self.Article.id)])
+            .where(self.Article.category_id == self.Category.id)
+            .label('article_count')
+        )
+
+        query = self.session.query(self.Category)
+        sorted_query = sort_query(query, 'article_count')
+        assert 'article_count ASC' in str(sorted_query)
