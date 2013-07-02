@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.14.0 (2013-07-02)
+^^^^^^^^^^^^^^^^^^^
+
+- Python 3 support, dropped python 2.5 support
+
+
 0.13.3 (2013-06-11)
 ^^^^^^^^^^^^^^^^^^^
 
