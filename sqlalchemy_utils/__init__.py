@@ -17,10 +17,11 @@ from .types import (
     NumberRangeType,
     ScalarListType,
     ScalarListException,
+    TSVectorType
 )
 
 
-__version__ = '0.14.3'
+__version__ = '0.14.4'
 
 
 __all__ = (
@@ -46,4 +47,5 @@ __all__ = (
     ProxyDict,
     ScalarListType,
     ScalarListException,
+    TSVectorType
 )

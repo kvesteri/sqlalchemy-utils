@@ -164,6 +164,14 @@ class EmailType(sa.types.TypeDecorator):
         return value
 
 
+class TSVectorType(types.UserDefinedType):
+    """
+    Text search vector type for postgresql.
+    """
+    def get_col_spec(self):
+        return 'tsvector'
+
+
 class NumberRangeRawType(types.UserDefinedType):
     """
     Raw number range type, only supports PostgreSQL for now.
