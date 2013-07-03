@@ -20,6 +20,9 @@ from .types import (
 )
 
 
+__version__ = '0.14.3'
+
+
 __all__ = (
     coercion_listener,
     sort_query,
