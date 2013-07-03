@@ -29,6 +29,8 @@ using these types to appropriate objects.
 
 Example
 ::
+
+
     from colour import Color
     from sqlalchemy_utils import ColorType
 
@@ -175,8 +177,13 @@ API Documentation
 -----------------
 
 .. module:: sqlalchemy_utils
+
 .. autoclass:: InstrumentedList
     :members:
+
+
+.. module:: sqlalchemy_utils.functions
+
 .. autofunction:: sort_query
 .. autofunction:: escape_like
 .. autofunction:: non_indexed_foreign_keys
