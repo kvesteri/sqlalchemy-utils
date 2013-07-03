@@ -23,7 +23,7 @@ class TestCase(object):
         self.engine = create_engine('sqlite:///:memory:')
         self.connection = self.engine.connect()
         self.Base = declarative_base()
-
+        self.Base2 = declarative_base()
         self.create_models()
         self.Base.metadata.create_all(self.connection)
 

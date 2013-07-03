@@ -179,6 +179,8 @@ API Documentation
     :members:
 .. autofunction:: sort_query
 .. autofunction:: escape_like
+.. autofunction:: non_indexed_foreign_keys
+.. autofunction:: is_indexed_foreign_key
 
 .. include:: ../CHANGES.rst
 

@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.14.3 (2013-07-03)
+^^^^^^^^^^^^^^^^^^^
+
+- Added non_indexed_foreign_keys utility function
+
+
 0.14.2 (2013-07-02)
 ^^^^^^^^^^^^^^^^^^^
 
