@@ -17,6 +17,8 @@ class TestDeferExcept(TestCase):
 
 
 class TestFindNonIndexedForeignKeys(TestCase):
+    dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
+
     def create_models(self):
         class User(self.Base):
             __tablename__ = 'user'

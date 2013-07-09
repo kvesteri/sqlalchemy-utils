@@ -1,3 +1,4 @@
+import warnings
 import sqlalchemy as sa
 
 from sqlalchemy import create_engine
@@ -18,12 +19,17 @@ def count_sql_calls(conn, cursor, statement, parameters, context, executemany):
         conn.query_count = 0
 
 
+warnings.simplefilter('error', sa.exc.SAWarning)
+
+
 class TestCase(object):
+    dns = 'sqlite:///:memory:'
+
     def setup_method(self, method):
-        self.engine = create_engine('sqlite:///:memory:')
+        self.engine = create_engine(self.dns)
         self.connection = self.engine.connect()
         self.Base = declarative_base()
-        self.Base2 = declarative_base()
+
         self.create_models()
         self.Base.metadata.create_all(self.connection)
 
