@@ -11,6 +11,7 @@ from .types import (
     instrumented_list,
     InstrumentedList,
     IPAddressType,
+    Password,
     PasswordType,
     PhoneNumber,
     PhoneNumberType,

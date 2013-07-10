@@ -10,7 +10,7 @@ from .number_range import (
     NumberRangeRawType,
     NumberRangeType,
 )
-from .password import PasswordType
+from .password import Password, PasswordType
 from .phone_number import PhoneNumber, PhoneNumberType
 from .scalar_list import ScalarListException, ScalarListType
 
@@ -23,6 +23,7 @@ __all__ = (
     NumberRangeException,
     NumberRangeRawType,
     NumberRangeType,
+    Password,
     PasswordType,
     PhoneNumber,
     PhoneNumberType,

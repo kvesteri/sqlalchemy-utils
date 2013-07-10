@@ -2,7 +2,7 @@ from pytest import mark
 import sqlalchemy as sa
 from tests import TestCase
 from sqlalchemy_utils.types import password
-from sqlalchemy_utils import coercion_listener
+from sqlalchemy_utils import Password, PasswordType, coercion_listener
 
 
 @mark.xfail('password.passlib is None')
@@ -12,7 +12,7 @@ class TestPasswordType(TestCase):
         class User(self.Base):
             __tablename__ = 'user'
             id = sa.Column(sa.Integer, primary_key=True)
-            password = sa.Column(password.PasswordType(
+            password = sa.Column(PasswordType(
                 schemes=[
                     'pbkdf2_sha512',
                     'md5_crypt'
@@ -63,7 +63,7 @@ class TestPasswordType(TestCase):
         from passlib.hash import md5_crypt
 
         obj = self.User()
-        obj.password = password.Password(md5_crypt.encrypt('b'))
+        obj.password = Password(md5_crypt.encrypt('b'))
 
         assert obj.password.raw.startswith('$1$')
         assert obj.password == 'b'
