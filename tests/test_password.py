@@ -32,8 +32,8 @@ class TestPasswordType(TestCase):
         obj = self.User()
         obj.password = b'b'
 
-        assert obj.password.raw != 'b'
-        assert obj.password.raw.startswith(b'$pbkdf2-sha512$')
+        assert obj.password.hash != 'b'
+        assert obj.password.hash.startswith(b'$pbkdf2-sha512$')
 
     def test_check(self):
         """
@@ -65,6 +65,6 @@ class TestPasswordType(TestCase):
         obj = self.User()
         obj.password = Password(md5_crypt.encrypt('b'))
 
-        assert obj.password.raw.startswith('$1$')
+        assert obj.password.hash.startswith('$1$')
         assert obj.password == 'b'
-        assert obj.password.raw.startswith('$pbkdf2-sha512$')
+        assert obj.password.hash.startswith('$pbkdf2-sha512$')

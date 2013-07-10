@@ -15,18 +15,18 @@ class Password(object):
 
     def __init__(self, value, context=None):
         # Store the hash.
-        self.raw = value
+        self.hash = value
 
         # Save weakref of the password context (if we have one)
         if context is not None:
             self.context = weakref.proxy(context)
 
     def __eq__(self, value):
-        valid, new = self.context.verify_and_update(value, self.raw)
+        valid, new = self.context.verify_and_update(value, self.hash)
         if valid and new:
             # New hash was calculated due to various reasons; stored one
             # wasn't optimal, etc.
-            self.raw = new
+            self.hash = new
         return valid
 
     def __ne__(self, value):
@@ -85,7 +85,7 @@ class PasswordType(types.TypeDecorator):
     def process_bind_param(self, value, dialect):
         if isinstance(value, Password):
             # Value has already been hashed.
-            return value.raw
+            return value.hash
 
         if isinstance(value, six.string_types):
             # Assume value has not been hashed.
