@@ -55,7 +55,8 @@ setup(
             'Jinja2>=2.3',
             'docutils>=0.10',
             'flexmock>=0.9.7',
-        ]
+        ],
+        'password': ['passlib >= 1.6, < 2.0']
     },
     cmdclass={'test': PyTest},
     classifiers=[
