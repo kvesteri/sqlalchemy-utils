@@ -45,8 +45,6 @@ setup(
     install_requires=[
         'six',
         'SQLAlchemy>=0.8.0',
-        'phonenumbers3k==5.6b1',
-        'colour>=0.0.3'
     ],
     extras_require={
         'test': [
@@ -56,6 +54,8 @@ setup(
             'docutils>=0.10',
             'flexmock>=0.9.7',
         ],
+        'phone': ['phonenumbers3k==5.6b1'],
+        'color': ['colour>=0.0.3'],
         'password': ['passlib >= 1.6, < 2.0']
     },
     cmdclass={'test': PyTest},

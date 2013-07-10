@@ -1,9 +1,18 @@
 import six
-import phonenumbers
 from sqlalchemy import types
+from sqlalchemy_utils import ImproperlyConfigured
 
 
-class PhoneNumber(phonenumbers.phonenumber.PhoneNumber):
+try:
+    import phonenumbers
+    from phonenumbers.phonenumber import PhoneNumber as BasePhoneNumber
+
+except ImportError:
+    phonenumbers = None
+    BasePhoneNumber = object
+
+
+class PhoneNumber(BasePhoneNumber):
     '''
     Extends a PhoneNumber class from `Python phonenumbers library`_. Adds
     different phone number formats to attributes, so they can be easily used
@@ -21,6 +30,11 @@ class PhoneNumber(phonenumbers.phonenumber.PhoneNumber):
         Country code of the phone number.
     '''
     def __init__(self, raw_number, country_code=None):
+        # Bail if phonenumbers is not found.
+        if phonenumbers is None:
+            raise ImproperlyConfigured(
+                "'phonenumbers' is required to use 'PhoneNumber'")
+
         self._phone_number = phonenumbers.parse(raw_number, country_code)
         super(PhoneNumber, self).__init__(
             country_code=self._phone_number.country_code,
@@ -66,6 +80,11 @@ class PhoneNumberType(types.TypeDecorator):
     impl = types.Unicode(20)
 
     def __init__(self, country_code='US', max_length=20, *args, **kwargs):
+        # Bail if phonenumbers is not found.
+        if phonenumbers is None:
+            raise ImproperlyConfigured(
+                "'phonenumbers' is required to use 'PhoneNumberType'")
+
         super(PhoneNumberType, self).__init__(*args, **kwargs)
         self.country_code = country_code
         self.impl = types.Unicode(max_length)

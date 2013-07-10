@@ -4,6 +4,6 @@ python:
   - 2.7
   - 3.3
 install:
-  - pip install -q -e ".[test,password]" --use-mirrors
+  - pip install -q -e ".[test,color,phone,password]" --use-mirrors
 script:
   - python setup.py test
