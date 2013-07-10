@@ -1,3 +1,4 @@
+from .exceptions import ImproperlyConfigured
 from .functions import (
     sort_query, defer_except, escape_like, primary_keys, table_name
 )
@@ -26,6 +27,7 @@ __version__ = '0.14.4'
 
 
 __all__ = (
+    ImproperlyConfigured,
     coercion_listener,
     sort_query,
     defer_except,
