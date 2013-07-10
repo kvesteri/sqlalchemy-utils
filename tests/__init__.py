@@ -5,10 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-from sqlalchemy_utils import (
-    InstrumentedList,
-    PhoneNumberType,
-)
+from sqlalchemy_utils import InstrumentedList
 
 
 @sa.event.listens_for(sa.engine.Engine, 'before_cursor_execute')
@@ -47,7 +44,6 @@ class TestCase(object):
             __tablename__ = 'user'
             id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
             name = sa.Column(sa.Unicode(255))
-            phone_number = sa.Column(PhoneNumberType())
 
         class Category(self.Base):
             __tablename__ = 'category'

@@ -45,8 +45,6 @@ setup(
     install_requires=[
         'six',
         'SQLAlchemy>=0.8.0',
-        'phonenumbers3k==5.6b1',
-        'colour>=0.0.3'
     ],
     extras_require={
         'test': [
@@ -55,7 +53,9 @@ setup(
             'Jinja2>=2.3',
             'docutils>=0.10',
             'flexmock>=0.9.7',
-        ]
+        ],
+        'phone': ['phonenumbers3k==5.6b1'],
+        'color': ['colour>=0.0.3']
     },
     cmdclass={'test': PyTest},
     classifiers=[
