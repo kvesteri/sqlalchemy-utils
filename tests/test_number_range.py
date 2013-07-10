@@ -1,7 +1,12 @@
 import sqlalchemy as sa
 from pytest import raises
-from sqlalchemy_utils import NumberRangeType, NumberRange, NumberRangeException
 from tests import TestCase
+from sqlalchemy_utils import (
+    NumberRangeType,
+    NumberRange,
+    NumberRangeException,
+    coercion_listener
+)
 
 
 class TestNumberRangeType(TestCase):
@@ -15,6 +20,7 @@ class TestNumberRangeType(TestCase):
                 return 'Building(%r)' % self.id
 
         self.Building = Building
+        sa.event.listen(sa.orm.mapper, 'mapper_configured', coercion_listener)
 
     def test_save_number_range(self):
         building = self.Building(
@@ -41,6 +47,11 @@ class TestNumberRangeType(TestCase):
 
         building = self.session.query(self.Building).first()
         assert building.persons_at_night is None
+
+    def test_scalar_attributes_get_coerced_to_objects(self):
+        building = self.Building(persons_at_night='[12, 18]')
+
+        assert isinstance(building.persons_at_night, NumberRange)
 
 
 class TestNumberRange(object):
