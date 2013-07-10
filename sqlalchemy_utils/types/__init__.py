@@ -1,6 +1,7 @@
 from functools import wraps
 from sqlalchemy.orm.collections import InstrumentedList as _InstrumentedList
 from sqlalchemy import types
+from sqlalchemy.dialects.postgresql.base import ischema_names
 from .color import ColorType
 from .email import EmailType
 from .ip_address import IPAddressType
@@ -35,6 +36,9 @@ class TSVectorType(types.UserDefinedType):
     """
     def get_col_spec(self):
         return 'tsvector'
+
+
+ischema_names['tsvector'] = TSVectorType
 
 
 class InstrumentedList(_InstrumentedList):
