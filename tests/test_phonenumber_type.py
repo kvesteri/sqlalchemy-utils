@@ -1,7 +1,11 @@
+from pytest import mark
 from tests import TestCase
-from sqlalchemy_utils import PhoneNumber
+import sqlalchemy as sa
+from sqlalchemy_utils import PhoneNumberType, PhoneNumber, coercion_listener
+from sqlalchemy_utils.types import phone_number
 
 
+@mark.xfail('phone_number.phonenumbers is None')
 class TestPhoneNumber(object):
     def setup_method(self, method):
         self.valid_phone_numbers = [
@@ -45,7 +49,19 @@ class TestPhoneNumber(object):
         assert phone_number.__str__() == phone_number.national.encode('utf-8')
 
 
+@mark.xfail('phone_number.phonenumbers is None')
 class TestPhoneNumberType(TestCase):
+
+    def create_models(self):
+        class User(self.Base):
+            __tablename__ = 'user'
+            id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
+            name = sa.Column(sa.Unicode(255))
+            phone_number = sa.Column(PhoneNumberType())
+
+        self.User = User
+        sa.event.listen(sa.orm.mapper, 'mapper_configured', coercion_listener)
+
     def setup_method(self, method):
         super(TestPhoneNumberType, self).setup_method(method)
         self.phone_number = PhoneNumber(
@@ -83,3 +99,8 @@ class TestPhoneNumberType(TestCase):
             {'param': user.id}
         )
         assert result.first()[0] is None
+
+    def test_scalar_attributes_get_coerced_to_objects(self):
+        user = self.User(phone_number='050111222')
+
+        assert isinstance(user.phone_number, PhoneNumber)

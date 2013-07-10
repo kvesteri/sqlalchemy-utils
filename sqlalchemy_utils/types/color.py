@@ -1,6 +1,15 @@
 import six
-from colour import Color
 from sqlalchemy import types
+from sqlalchemy_utils import ImproperlyConfigured
+
+
+try:
+    import colour
+    from colour import Color
+
+except ImportError:
+    colour = None
+    Color = None
 
 
 class ColorType(types.TypeDecorator):
@@ -12,6 +21,11 @@ class ColorType(types.TypeDecorator):
     impl = types.Unicode(20)
 
     def __init__(self, max_length=20, *args, **kwargs):
+        # Bail if colour is not found.
+        if colour is None:
+            raise ImproperlyConfigured(
+                "'colour' is required to use 'ColorType'")
+
         super(ColorType, self).__init__(*args, **kwargs)
         self.impl = types.Unicode(max_length)
 
