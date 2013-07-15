@@ -9,7 +9,7 @@ class UUIDType(types.TypeDecorator):
     a BINARY(16) or a CHAR(32) when it can't.
     """
 
-    impl = types.BINARY
+    impl = types.BINARY(16)
 
     python_type = uuid.UUID
 
@@ -26,7 +26,7 @@ class UUIDType(types.TypeDecorator):
 
         else:
             # Fallback to either a BINARY or a CHAR.
-            kind = types.BINARY(16) if self.binary else types.CHAR(32)
+            kind = self.impl if self.binary else types.CHAR(32)
             return dialect.type_descriptor(kind)
 
     @staticmethod
