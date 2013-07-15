@@ -173,6 +173,24 @@ NumberRange supports some arithmetic operators:
     # '30-140'
 
 
+UUIDType
+--------
+
+UUIDType will store a UUID in the database in a native format, if available,
+or a 16-byte BINARY column or a 32-character CHAR column if not.
+
+::
+
+    from sqlalchemy_utils import UUIDType
+    import uuid
+
+    class User(Base):
+        __tablename__ = 'user'
+
+        # Pass `binary=False` to fallback to CHAR instead of BINARY
+        id = sa.Column(UUIDType(binary=False), primary_key=True)
+
+
 API Documentation
 -----------------
 
