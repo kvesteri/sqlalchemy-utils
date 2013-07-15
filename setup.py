@@ -33,7 +33,7 @@ setup(
         'Various utility functions for SQLAlchemy.'
     ),
     long_description=__doc__,
-    packages=['sqlalchemy_utils'],
+    packages=['sqlalchemy_utils', 'sqlalchemy_utils.types'],
     zip_safe=False,
     include_package_data=True,
     platforms='any',
