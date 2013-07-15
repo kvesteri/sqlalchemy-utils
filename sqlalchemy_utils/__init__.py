@@ -19,7 +19,8 @@ from .types import (
     NumberRangeType,
     ScalarListType,
     ScalarListException,
-    TSVectorType
+    TSVectorType,
+    UUIDType,
 )
 
 
@@ -51,5 +52,6 @@ __all__ = (
     ProxyDict,
     ScalarListType,
     ScalarListException,
-    TSVectorType
+    TSVectorType,
+    UUIDType,
 )
