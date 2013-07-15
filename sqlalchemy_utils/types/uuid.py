@@ -45,7 +45,7 @@ class UUIDType(types.TypeDecorator):
             return value
 
         if not isinstance(value, uuid.UUID):
-            value = self._coerce(None, value, None, None)
+            value = self._coerce(value)
 
         if dialect == 'postgresql':
             return str(value)
