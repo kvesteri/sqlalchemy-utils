@@ -55,7 +55,7 @@ setup(
             'flexmock>=0.9.7',
         ],
         'phone': ['phonenumbers3k==5.6b1'],
-        'color': ['colour>=0.0.3']
+        'color': ['colour>=0.0.4']
     },
     cmdclass={'test': PyTest},
     classifiers=[

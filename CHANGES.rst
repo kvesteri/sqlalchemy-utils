@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.14.5 (2013-07-22)
+^^^^^^^^^^^^^^^^^^^
+
+- Added UUID type
+
+
 0.14.4 (2013-07-03)
 ^^^^^^^^^^^^^^^^^^^
 
