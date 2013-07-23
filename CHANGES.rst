@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.14.7 (2013-07-22)
+^^^^^^^^^^^^^^^^^^^
+
+- Lazy import for ipaddress package
+
+
 0.14.6 (2013-07-22)
 ^^^^^^^^^^^^^^^^^^^
 
