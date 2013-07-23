@@ -55,6 +55,7 @@ setup(
             'flexmock>=0.9.7',
         ],
         'phone': ['phonenumbers3k==5.6b1'],
+        'password': ['passlib >= 1.6, < 2.0'],
         'color': ['colour>=0.0.4']
     },
     cmdclass={'test': PyTest},

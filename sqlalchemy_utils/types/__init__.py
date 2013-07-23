@@ -11,6 +11,7 @@ from .number_range import (
     NumberRangeRawType,
     NumberRangeType,
 )
+from .password import Password, PasswordType
 from .phone_number import PhoneNumber, PhoneNumberType
 from .scalar_list import ScalarListException, ScalarListType
 from .uuid import UUIDType
@@ -24,6 +25,8 @@ __all__ = (
     NumberRangeException,
     NumberRangeRawType,
     NumberRangeType,
+    Password,
+    PasswordType,
     PhoneNumber,
     PhoneNumberType,
     ScalarListException,
