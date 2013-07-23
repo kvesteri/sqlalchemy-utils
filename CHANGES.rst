@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.15.1 (2013-07-22)
+^^^^^^^^^^^^^^^^^^^
+
+- Added utility functions declarative_base, identity and is_auto_assigned_date_column
+
+
 0.15.0 (2013-07-22)
 ^^^^^^^^^^^^^^^^^^^
 

@@ -206,6 +206,10 @@ API Documentation
 .. autofunction:: escape_like
 .. autofunction:: non_indexed_foreign_keys
 .. autofunction:: is_indexed_foreign_key
+.. autofunction:: identity
+.. autofunction:: is_auto_assigned_date_column
+.. autofunction:: declarative_base
+
 
 .. include:: ../CHANGES.rst
 
