@@ -24,7 +24,8 @@ class ColorType(types.TypeDecorator):
         # Bail if colour is not found.
         if colour is None:
             raise ImproperlyConfigured(
-                "'colour' is required to use 'ColorType'")
+                "'colour' package is required to use 'ColorType'"
+            )
 
         super(ColorType, self).__init__(*args, **kwargs)
         self.impl = types.Unicode(max_length)

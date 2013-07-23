@@ -24,7 +24,7 @@ class PyTest(Command):
 
 setup(
     name='SQLAlchemy-Utils',
-    version='0.14.4',
+    version='0.14.7',
     url='https://github.com/kvesteri/sqlalchemy-utils',
     license='BSD',
     author='Konsta Vesterinen',
@@ -33,7 +33,7 @@ setup(
         'Various utility functions for SQLAlchemy.'
     ),
     long_description=__doc__,
-    packages=['sqlalchemy_utils'],
+    packages=['sqlalchemy_utils', 'sqlalchemy_utils.types'],
     zip_safe=False,
     include_package_data=True,
     platforms='any',
@@ -55,8 +55,8 @@ setup(
             'flexmock>=0.9.7',
         ],
         'phone': ['phonenumbers3k==5.6b1'],
-        'color': ['colour>=0.0.3'],
-        'password': ['passlib >= 1.6, < 2.0']
+        'password': ['passlib >= 1.6, < 2.0'],
+        'color': ['colour>=0.0.4']
     },
     cmdclass={'test': PyTest},
     classifiers=[

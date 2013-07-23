@@ -21,11 +21,12 @@ from .types import (
     NumberRangeType,
     ScalarListType,
     ScalarListException,
-    TSVectorType
+    TSVectorType,
+    UUIDType,
 )
 
 
-__version__ = '0.14.4'
+__version__ = '0.14.7'
 
 
 __all__ = (
@@ -48,11 +49,13 @@ __all__ = (
     NumberRangeException,
     NumberRangeRawType,
     NumberRangeType,
+    Password,
     PasswordType,
     PhoneNumber,
     PhoneNumberType,
     ProxyDict,
     ScalarListType,
     ScalarListException,
-    TSVectorType
+    TSVectorType,
+    UUIDType,
 )

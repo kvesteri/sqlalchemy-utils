@@ -14,6 +14,7 @@ from .number_range import (
 from .password import Password, PasswordType
 from .phone_number import PhoneNumber, PhoneNumberType
 from .scalar_list import ScalarListException, ScalarListType
+from .uuid import UUIDType
 
 
 __all__ = (
@@ -30,6 +31,7 @@ __all__ = (
     PhoneNumberType,
     ScalarListException,
     ScalarListType,
+    UUIDType,
 )
 
 

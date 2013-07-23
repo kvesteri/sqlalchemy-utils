@@ -1,6 +1,12 @@
 import six
-import ipaddress
+
+ipaddress = None
+try:
+    import ipaddress
+except:
+    pass
 from sqlalchemy import types
+from sqlalchemy_utils import ImproperlyConfigured
 
 
 class IPAddressType(types.TypeDecorator):
@@ -11,6 +17,11 @@ class IPAddressType(types.TypeDecorator):
     impl = types.Unicode(50)
 
     def __init__(self, max_length=50, *args, **kwargs):
+        if not ipaddress:
+            raise ImproperlyConfigured(
+                "'ipaddress' package is required to use 'IPAddressType'"
+            )
+
         super(IPAddressType, self).__init__(*args, **kwargs)
         self.impl = types.Unicode(max_length)
 
