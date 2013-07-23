@@ -1,4 +1,3 @@
-import ipaddress
 import six
 import sqlalchemy as sa
 from sqlalchemy_utils import IPAddressType
@@ -19,7 +18,7 @@ class TestIPAddressType(TestCase):
 
     def test_parameter_processing(self):
         visitor = self.Visitor(
-            ip_address=ipaddress.ip_address(u'111.111.111.111')
+            ip_address=u'111.111.111.111'
         )
 
         self.session.add(visitor)
