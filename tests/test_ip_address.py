@@ -1,15 +1,17 @@
+from pytest import mark
 import six
 import sqlalchemy as sa
-from sqlalchemy_utils import IPAddressType
+from sqlalchemy_utils.types import ip_address
 from tests import TestCase
 
 
+@mark.xfail('ip_address.ipaddress is None')
 class TestIPAddressType(TestCase):
     def create_models(self):
         class Visitor(self.Base):
             __tablename__ = 'document'
             id = sa.Column(sa.Integer, primary_key=True)
-            ip_address = sa.Column(IPAddressType)
+            ip_address = sa.Column(ip_address.IPAddressType)
 
             def __repr__(self):
                 return 'Visitor(%r)' % self.id
