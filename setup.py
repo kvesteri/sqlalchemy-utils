@@ -53,6 +53,7 @@ setup(
             'Jinja2>=2.3',
             'docutils>=0.10',
             'flexmock>=0.9.7',
+            'psycopg2>=2.4.6'
         ],
         'phone': ['phonenumbers3k==5.6b1'],
         'password': ['passlib >= 1.6, < 2.0'],
