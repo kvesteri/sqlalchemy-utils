@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.15.0 (2013-07-22)
+^^^^^^^^^^^^^^^^^^^
+
+- Added PasswordType
+
+
 0.14.7 (2013-07-22)
 ^^^^^^^^^^^^^^^^^^^
 
