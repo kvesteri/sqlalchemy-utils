@@ -1,6 +1,6 @@
 from pytest import mark
 import sqlalchemy as sa
-from sqlalchemy_utils import ColorType, coercion_listener
+from sqlalchemy_utils import ColorType
 from sqlalchemy_utils.types import color
 from tests import TestCase
 
@@ -17,8 +17,6 @@ class TestColorType(TestCase):
                 return 'Document(%r)' % self.id
 
         self.Document = Document
-        sa.event.listen(sa.orm.mapper, 'mapper_configured', coercion_listener)
-
 
     def test_color_parameter_processing(self):
         from colour import Color

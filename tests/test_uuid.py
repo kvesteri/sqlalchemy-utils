@@ -1,11 +1,10 @@
 import sqlalchemy as sa
 from tests import TestCase
-from sqlalchemy_utils import UUIDType, coercion_listener
+from sqlalchemy_utils import UUIDType
 import uuid
 
 
 class TestUUIDType(TestCase):
-
     def create_models(self):
         class User(self.Base):
             __tablename__ = 'user'
@@ -15,7 +14,6 @@ class TestUUIDType(TestCase):
                 return 'User(%r)' % self.id
 
         self.User = User
-        sa.event.listen(sa.orm.mapper, 'mapper_configured', coercion_listener)
 
     def test_commit(self):
         obj = self.User()

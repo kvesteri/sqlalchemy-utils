@@ -55,6 +55,7 @@ setup(
             'flexmock>=0.9.7',
             'psycopg2>=2.4.6'
         ],
+        'arrow': ['arrow>=0.3.4'],
         'phone': ['phonenumbers3k==5.6b1'],
         'password': ['passlib >= 1.6, < 2.0'],
         'color': ['colour>=0.0.4']

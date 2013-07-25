@@ -2,7 +2,7 @@ from pytest import mark
 import sqlalchemy as sa
 from tests import TestCase
 from sqlalchemy_utils.types import password
-from sqlalchemy_utils import Password, PasswordType, coercion_listener
+from sqlalchemy_utils import Password, PasswordType
 
 
 @mark.xfail('password.passlib is None')
@@ -25,7 +25,6 @@ class TestPasswordType(TestCase):
                 return 'User(%r)' % self.id
 
         self.User = User
-        sa.event.listen(sa.orm.mapper, 'mapper_configured', coercion_listener)
 
     def test_encrypt(self):
         """Should encrypt the password on setting the attribute."""

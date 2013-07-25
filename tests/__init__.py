@@ -6,6 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy_utils import InstrumentedList
+from sqlalchemy_utils import coercion_listener
 
 
 @sa.event.listens_for(sa.engine.Engine, 'before_cursor_execute')
@@ -17,6 +18,9 @@ def count_sql_calls(conn, cursor, statement, parameters, context, executemany):
 
 
 warnings.simplefilter('error', sa.exc.SAWarning)
+
+
+sa.event.listen(sa.orm.mapper, 'mapper_configured', coercion_listener)
 
 
 class TestCase(object):

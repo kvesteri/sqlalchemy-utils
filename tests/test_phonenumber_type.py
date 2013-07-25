@@ -1,7 +1,7 @@
 from pytest import mark
 from tests import TestCase
 import sqlalchemy as sa
-from sqlalchemy_utils import PhoneNumberType, PhoneNumber, coercion_listener
+from sqlalchemy_utils import PhoneNumberType, PhoneNumber
 from sqlalchemy_utils.types import phone_number
 
 
@@ -60,7 +60,6 @@ class TestPhoneNumberType(TestCase):
             phone_number = sa.Column(PhoneNumberType())
 
         self.User = User
-        sa.event.listen(sa.orm.mapper, 'mapper_configured', coercion_listener)
 
     def setup_method(self, method):
         super(TestPhoneNumberType, self).setup_method(method)
