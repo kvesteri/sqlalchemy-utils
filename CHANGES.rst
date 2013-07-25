@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.16.0 (2013-07-25)
+^^^^^^^^^^^^^^^^^^^
+
+- Added ArrowType
+
+
 0.15.1 (2013-07-22)
 ^^^^^^^^^^^^^^^^^^^
 

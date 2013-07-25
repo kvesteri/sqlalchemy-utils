@@ -6,6 +6,7 @@ from .listeners import coercion_listener
 from .merge import merge, Merger
 from .proxy_dict import ProxyDict, proxy_dict
 from .types import (
+    ArrowType,
     ColorType,
     EmailType,
     instrumented_list,
@@ -26,7 +27,7 @@ from .types import (
 )
 
 
-__version__ = '0.15.1'
+__version__ = '0.16.0'
 
 
 __all__ = (
@@ -40,6 +41,7 @@ __all__ = (
     primary_keys,
     proxy_dict,
     table_name,
+    ArrowType,
     ColorType,
     EmailType,
     InstrumentedList,
