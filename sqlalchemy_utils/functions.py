@@ -1,8 +1,10 @@
 from collections import defaultdict
+import six
+import datetime
 import sqlalchemy as sa
 from sqlalchemy.orm import defer
 from sqlalchemy.orm.mapper import Mapper
-from sqlalchemy.orm.query import _ColumnEntity
+from sqlalchemy.orm.query import _ColumnEntity, Query
 from sqlalchemy.orm.properties import ColumnProperty
 from sqlalchemy.orm.util import AliasedInsp
 from sqlalchemy.schema import MetaData, Table, ForeignKeyConstraint
@@ -352,3 +354,35 @@ def identity(obj):
             if column.primary_key:
                 id_.append(getattr(obj, column.name))
     return tuple(id_)
+
+
+def render_statement(statement, bind=None):
+    """
+    Generate an SQL expression string with bound parameters rendered inline
+    for the given SQLAlchemy statement.
+    """
+
+    if isinstance(statement, Query):
+        if bind is None:
+            bind = statement.session.get_bind(statement._mapper_zero_or_none())
+
+        statement = statement.statement
+
+    elif bind is None:
+        bind = statement.bind
+
+    class Compiler(bind.dialect.statement_compiler):
+
+        def visit_bindparam(self, bindparam, *args, **kwargs):
+            return self.render_literal_value(bindparam.value, bindparam.type)
+
+        def render_literal_value(self, value, type_):
+            if isinstance(value, six.integer_types):
+                return str(value)
+
+            elif isinstance(value, (datetime.date, datetime.datetime)):
+                return "'%s'" % value
+
+            return super(Compiler, self).render_literal_value(value, type_)
+
+    return Compiler(bind.dialect, statement).process(statement)
