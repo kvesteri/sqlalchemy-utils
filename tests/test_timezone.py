@@ -13,7 +13,7 @@ except ImportError:
 
 
 @mark.skipif('dateutil is None')
-class TestIPAddressType(TestCase):
+class TestTimezoneType(TestCase):
     def create_models(self):
         class Visitor(self.Base):
             __tablename__ = 'document'
