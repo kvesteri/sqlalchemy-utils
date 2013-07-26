@@ -23,7 +23,7 @@ class PyTest(Command):
         sys.exit(errno)
 
 
-PY3 = sys.version_info.major == 3
+PY3 = sys.version_info[0] == 3
 
 
 extras_require = {
