@@ -191,6 +191,24 @@ or a 16-byte BINARY column or a 32-character CHAR column if not.
         id = sa.Column(UUIDType(binary=False), primary_key=True)
 
 
+TimezoneType
+------------
+
+TimezoneType provides a way for saving timezones (from either the pytz or the dateutil package) objects into database.
+TimezoneType saves timezone objects as strings on the way in and converts them back to objects when querying the database.
+
+
+::
+
+    from sqlalchemy_utils import UUIDType
+
+    class User(Base):
+        __tablename__ = 'user'
+
+        # Pass backend='pytz' to change it to use pytz (dateutil by default)
+        timezone = sa.Column(TimezoneType(backend='pytz'))
+
+
 API Documentation
 -----------------
 
