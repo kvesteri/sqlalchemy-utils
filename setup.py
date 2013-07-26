@@ -6,6 +6,7 @@ Various utility functions and custom data types for SQLAlchemy.
 """
 from setuptools import setup, Command
 import subprocess
+import sys
 
 
 class PyTest(Command):
@@ -19,7 +20,10 @@ class PyTest(Command):
 
     def run(self):
         errno = subprocess.call(['py.test'])
-        raise SystemExit(errno)
+        sys.exit(errno)
+
+
+PY3 = sys.version_info.major == 3
 
 
 setup(
@@ -38,7 +42,7 @@ setup(
     include_package_data=True,
     platforms='any',
     dependency_links=[
-        # 5.6 supports python 3.x / pending release
+        # 5.6b1 only supports python 3.x / pending release
         'git+git://github.com/daviddrysdale/python-phonenumbers.git@python3'
         '#egg=phonenumbers3k-5.6b1',
     ],
@@ -56,7 +60,10 @@ setup(
             'psycopg2>=2.4.6'
         ],
         'arrow': ['arrow>=0.3.4'],
-        'phone': ['phonenumbers3k==5.6b1'],
+        'phone': [
+            # The phonenumbers library has a split for 2.x and 3.x support.
+            'phonenumbers3k==5.6b1' if PY3 else 'phonenumbers<5.6b1'
+        ],
         'password': ['passlib >= 1.6, < 2.0'],
         'color': ['colour>=0.0.4']
     },
