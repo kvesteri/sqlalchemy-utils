@@ -42,6 +42,7 @@ extras_require = {
     ],
     'password': ['passlib >= 1.6, < 2.0'],
     'color': ['colour>=0.0.4'],
+    'ipaddress': ['ipaddr'] if not PY3 else []
 }
 
 

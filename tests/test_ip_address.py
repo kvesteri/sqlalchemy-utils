@@ -5,7 +5,7 @@ from sqlalchemy_utils.types import ip_address
 from tests import TestCase
 
 
-@mark.skipif('ip_address.ipaddress is None')
+@mark.skipif('ip_address.ip_address is None')
 class TestIPAddressType(TestCase):
     def create_models(self):
         class Visitor(self.Base):
