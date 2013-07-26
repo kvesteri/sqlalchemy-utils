@@ -26,6 +26,31 @@ class PyTest(Command):
 PY3 = sys.version_info.major == 3
 
 
+extras_require = {
+    'test': [
+        'pytest==2.2.3',
+        'Pygments>=1.2',
+        'Jinja2>=2.3',
+        'docutils>=0.10',
+        'flexmock>=0.9.7',
+        'psycopg2>=2.4.6'
+    ],
+    'arrow': ['arrow>=0.3.4'],
+    'phone': [
+        # The phonenumbers library has a split for 2.x and 3.x support.
+        'phonenumbers3k==5.6b1' if PY3 else 'phonenumbers<5.6b1'
+    ],
+    'password': ['passlib >= 1.6, < 2.0'],
+    'color': ['colour>=0.0.4'],
+}
+
+
+# Add all optional dependencies to testing requirements.
+for name, requirements in extras_require.items():
+    if name != 'test':
+        extras_require['test'] += requirements
+
+
 setup(
     name='SQLAlchemy-Utils',
     version='0.16.0',
@@ -50,23 +75,7 @@ setup(
         'six',
         'SQLAlchemy>=0.8.0',
     ],
-    extras_require={
-        'test': [
-            'pytest==2.2.3',
-            'Pygments>=1.2',
-            'Jinja2>=2.3',
-            'docutils>=0.10',
-            'flexmock>=0.9.7',
-            'psycopg2>=2.4.6'
-        ],
-        'arrow': ['arrow>=0.3.4'],
-        'phone': [
-            # The phonenumbers library has a split for 2.x and 3.x support.
-            'phonenumbers3k==5.6b1' if PY3 else 'phonenumbers<5.6b1'
-        ],
-        'password': ['passlib >= 1.6, < 2.0'],
-        'color': ['colour>=0.0.4']
-    },
+    extras_require=extras_require,
     cmdclass={'test': PyTest},
     classifiers=[
         'Environment :: Web Environment',
