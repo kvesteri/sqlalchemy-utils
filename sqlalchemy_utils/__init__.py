@@ -22,6 +22,7 @@ from .types import (
     NumberRangeType,
     ScalarListType,
     ScalarListException,
+    TimezoneType,
     TSVectorType,
     UUIDType,
 )
@@ -58,6 +59,7 @@ __all__ = (
     ProxyDict,
     ScalarListType,
     ScalarListException,
+    TimezoneType,
     TSVectorType,
     UUIDType,
 )
