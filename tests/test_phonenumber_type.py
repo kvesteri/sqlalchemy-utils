@@ -5,7 +5,7 @@ from sqlalchemy_utils import PhoneNumberType, PhoneNumber
 from sqlalchemy_utils.types import phone_number
 
 
-@mark.xfail('phone_number.phonenumbers is None')
+@mark.skipif('phone_number.phonenumbers is None')
 class TestPhoneNumber(object):
     def setup_method(self, method):
         self.valid_phone_numbers = [
@@ -49,7 +49,7 @@ class TestPhoneNumber(object):
         assert phone_number.__str__() == phone_number.national.encode('utf-8')
 
 
-@mark.xfail('phone_number.phonenumbers is None')
+@mark.skipif('phone_number.phonenumbers is None')
 class TestPhoneNumberType(TestCase):
 
     def create_models(self):

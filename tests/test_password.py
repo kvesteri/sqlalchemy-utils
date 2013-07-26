@@ -5,7 +5,7 @@ from sqlalchemy_utils.types import password
 from sqlalchemy_utils import Password, PasswordType
 
 
-@mark.xfail('password.passlib is None')
+@mark.skipif('password.passlib is None')
 class TestPasswordType(TestCase):
 
     def create_models(self):

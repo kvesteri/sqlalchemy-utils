@@ -5,7 +5,7 @@ from sqlalchemy_utils.types import arrow
 from tests import TestCase
 
 
-@mark.xfail('arrow.arrow is None')
+@mark.skipif('arrow.arrow is None')
 class TestArrowDateTimeType(TestCase):
     def create_models(self):
         class Article(self.Base):
