@@ -1,7 +1,10 @@
 import sqlalchemy as sa
 from sqlalchemy_utils import escape_like, defer_except
-from sqlalchemy_utils.functions import non_indexed_foreign_keys
 from tests import TestCase
+from sqlalchemy_utils.functions import (
+    non_indexed_foreign_keys,
+    render_statement
+)
 
 
 class TestEscapeLike(TestCase):
@@ -62,3 +65,19 @@ class TestFindNonIndexedForeignKeys(TestCase):
         ]
         assert 'category_id' in column_names
         assert 'author_id' not in column_names
+
+    def test_render_statement_query(self):
+        query = self.session.query(self.User).filter_by(id=3)
+        render = render_statement(query)
+
+        assert 'SELECT user.id, user.name' in render
+        assert 'FROM user' in render
+        assert 'WHERE user.id = 3' in render
+
+    def test_render_statement(self):
+        statement = self.User.__table__.select().where(self.User.id == 3)
+        render = render_statement(statement, bind=self.session.bind)
+
+        assert 'SELECT user.id, user.name' in render
+        assert 'FROM user' in render
+        assert 'WHERE user.id = 3' in render

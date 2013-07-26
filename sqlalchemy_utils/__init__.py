@@ -1,6 +1,7 @@
 from .exceptions import ImproperlyConfigured
 from .functions import (
-    sort_query, defer_except, escape_like, primary_keys, table_name
+    sort_query, defer_except, escape_like, primary_keys, table_name,
+    render_statement
 )
 from .listeners import coercion_listener
 from .merge import merge, Merger
@@ -41,6 +42,7 @@ __all__ = (
     merge,
     primary_keys,
     proxy_dict,
+    render_statement,
     table_name,
     ArrowType,
     ColorType,
