@@ -67,15 +67,3 @@ class TestPasswordType(TestCase):
         assert obj.password.hash.startswith('$1$')
         assert obj.password == 'b'
         assert obj.password.hash.startswith('$pbkdf2-sha512$')
-
-    def test_comparator(self):
-        from passlib.hash import md5_crypt
-
-        obj = self.User()
-        obj.password = Password(md5_crypt.encrypt('b'))
-
-        assert (
-            self.session.query(self.User)
-            .filter(self.User.password == 'b')
-            .first()
-        )
