@@ -3,7 +3,7 @@ from sqlalchemy_utils import escape_like, defer_except
 from tests import TestCase
 from sqlalchemy_utils.functions import (
     non_indexed_foreign_keys,
-    render_statement
+    render_statement,
 )
 
 

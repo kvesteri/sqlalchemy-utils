@@ -1,7 +1,5 @@
 from functools import wraps
 from sqlalchemy.orm.collections import InstrumentedList as _InstrumentedList
-from sqlalchemy import types
-from sqlalchemy.dialects.postgresql.base import ischema_names
 from .arrow import ArrowType
 from .color import ColorType
 from .email import EmailType
@@ -16,6 +14,7 @@ from .password import Password, PasswordType
 from .phone_number import PhoneNumber, PhoneNumberType
 from .scalar_list import ScalarListException, ScalarListType
 from .timezone import TimezoneType
+from .ts_vector import TSVectorType
 from .uuid import UUIDType
 
 
@@ -35,19 +34,9 @@ __all__ = (
     ScalarListException,
     ScalarListType,
     TimezoneType,
+    TSVectorType,
     UUIDType,
 )
-
-
-class TSVectorType(types.UserDefinedType):
-    """
-    Text search vector type for postgresql.
-    """
-    def get_col_spec(self):
-        return 'tsvector'
-
-
-ischema_names['tsvector'] = TSVectorType
 
 
 class InstrumentedList(_InstrumentedList):
