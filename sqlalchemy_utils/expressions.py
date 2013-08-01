@@ -14,7 +14,7 @@ def compile_tsvector_match(element, compiler, **kw):
     args = list(element.clauses)
     if len(args) < 2:
         raise Exception(
-            "Function 'match_tsvector' expects atleast two arguments."
+            "Function 'tsvector_match' expects atleast two arguments."
         )
     if len(args) == 2:
         return '(%s) @@ to_tsquery(%s)' % (
