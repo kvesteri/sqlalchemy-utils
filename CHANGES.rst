@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.16.2 (2013-08-01)
+^^^^^^^^^^^^^^^^^^^
+
+- Added to_tsquery and plainto_tsquery sql function expressions
+
+
 0.16.1 (2013-08-01)
 ^^^^^^^^^^^^^^^^^^^
 
