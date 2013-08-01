@@ -16,17 +16,42 @@ def compile_tsvector_match(element, compiler, **kw):
         raise Exception(
             "Function 'tsvector_match' expects atleast two arguments."
         )
-    if len(args) == 2:
-        return '(%s) @@ to_tsquery(%s)' % (
-            compiler.process(args[0]),
-            compiler.process(args[1])
+    return '(%s) @@ %s' % (
+        compiler.process(args[0]),
+        compiler.process(args[1])
+    )
+
+
+class to_tsquery(expression.FunctionElement):
+    type = sa.types.Unicode()
+    name = 'to_tsquery'
+
+
+@compiles(to_tsquery)
+def compile_to_tsquery(element, compiler, **kw):
+    if len(element.clauses) < 1:
+        raise Exception(
+            "Function 'to_tsquery' expects atleast one argument."
         )
-    elif len(args) == 3:
-        return '(%s) @@ to_tsquery(%s, %s)' % (
-            compiler.process(args[0]),
-            compiler.process(args[2]),
-            compiler.process(args[1])
+    return 'to_tsquery(%s)' % (
+        ', '.join(map(compiler.process, element.clauses))
+    )
+
+
+class plainto_tsquery(expression.FunctionElement):
+    type = sa.types.Unicode()
+    name = 'plainto_tsquery'
+
+
+@compiles(plainto_tsquery)
+def compile_plainto_tsquery(element, compiler, **kw):
+    if len(element.clauses) < 1:
+        raise Exception(
+            "Function 'plainto_tsquery' expects atleast one argument."
         )
+    return 'plainto_tsquery(%s)' % (
+        ', '.join(map(compiler.process, element.clauses))
+    )
 
 
 class tsvector_concat(expression.FunctionElement):
