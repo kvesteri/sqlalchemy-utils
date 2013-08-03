@@ -33,7 +33,7 @@ extras_require = {
         'Jinja2>=2.3',
         'docutils>=0.10',
         'flexmock>=0.9.7',
-        'psycopg2>=2.4.6'
+        'psycopg2>=2.4.6',
     ],
     'arrow': ['arrow>=0.3.4'],
     'phone': [

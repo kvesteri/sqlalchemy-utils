@@ -386,3 +386,49 @@ def render_statement(statement, bind=None):
             return super(Compiler, self).render_literal_value(value, type_)
 
     return Compiler(bind.dialect, statement).process(statement)
+
+
+from sqlalchemy.orm.session import object_session
+from sqlalchemy.orm import RelationshipProperty
+from sqlalchemy.orm.attributes import set_committed_value
+
+
+def batch_fetch(entities, attr):
+    if entities:
+        first = entities[0]
+        if isinstance(attr, six.string_types):
+            attr = getattr(
+                first.__class__, attr
+            )
+
+        prop = attr.property
+        if not isinstance(prop, RelationshipProperty):
+            raise Exception(
+                'Given attribute is not a relationship property.'
+            )
+
+        model = prop.mapper.class_
+        session = object_session(first)
+
+        if len(prop.remote_side) > 1:
+            raise Exception(
+                'Only relationships with single remote side columns are '
+                'supported.'
+            )
+
+        column_name = list(prop.remote_side)[0].name
+        parent_ids = [entity.id for entity in entities]
+
+        related_entities = (
+            session.query(model)
+            .filter(
+                getattr(model, column_name).in_(parent_ids)
+            )
+        )
+
+        parent_dict = dict((entity.id, []) for entity in entities)
+        for entity in related_entities:
+            parent_dict[getattr(entity, column_name)].append(entity)
+
+        for entity in entities:
+            set_committed_value(entity, prop.key, parent_dict[entity.id])

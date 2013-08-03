@@ -1,7 +1,12 @@
 from .exceptions import ImproperlyConfigured
 from .functions import (
-    sort_query, defer_except, escape_like, primary_keys, table_name,
-    render_statement
+    batch_fetch,
+    defer_except,
+    escape_like,
+    primary_keys,
+    render_statement,
+    sort_query,
+    table_name,
 )
 from .listeners import coercion_listener
 from .merge import merge, Merger
@@ -33,9 +38,8 @@ __version__ = '0.16.2'
 
 
 __all__ = (
-    ImproperlyConfigured,
+    batch_fetch,
     coercion_listener,
-    sort_query,
     defer_except,
     escape_like,
     instrumented_list,
@@ -43,10 +47,12 @@ __all__ = (
     primary_keys,
     proxy_dict,
     render_statement,
+    sort_query,
     table_name,
     ArrowType,
     ColorType,
     EmailType,
+    ImproperlyConfigured,
     InstrumentedList,
     IPAddressType,
     Merger,
@@ -59,8 +65,8 @@ __all__ = (
     PhoneNumber,
     PhoneNumberType,
     ProxyDict,
-    ScalarListType,
     ScalarListException,
+    ScalarListType,
     TimezoneType,
     TSVectorType,
     UUIDType,

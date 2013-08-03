@@ -8,6 +8,6 @@ python:
   - 2.7
   - 3.3
 install:
-  - pip install -q -e ".[test]" --use-mirrors
+  - pip install -e ".[test]"
 script:
   - python setup.py test
