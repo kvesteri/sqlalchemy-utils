@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.16.3 (2013-08-05)
+^^^^^^^^^^^^^^^^^^^
+
+- Added batch_fetch function
+
+
 0.16.2 (2013-08-01)
 ^^^^^^^^^^^^^^^^^^^
 

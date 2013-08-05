@@ -2,10 +2,12 @@ from collections import defaultdict
 import six
 import datetime
 import sqlalchemy as sa
-from sqlalchemy.orm import defer
+from sqlalchemy.orm import defer, RelationshipProperty
+from sqlalchemy.orm.attributes import set_committed_value
 from sqlalchemy.orm.mapper import Mapper
-from sqlalchemy.orm.query import _ColumnEntity, Query
 from sqlalchemy.orm.properties import ColumnProperty
+from sqlalchemy.orm.query import _ColumnEntity, Query
+from sqlalchemy.orm.session import object_session
 from sqlalchemy.orm.util import AliasedInsp
 from sqlalchemy.schema import MetaData, Table, ForeignKeyConstraint
 from sqlalchemy.sql.expression import desc, asc, Label
@@ -388,12 +390,28 @@ def render_statement(statement, bind=None):
     return Compiler(bind.dialect, statement).process(statement)
 
 
-from sqlalchemy.orm.session import object_session
-from sqlalchemy.orm import RelationshipProperty
-from sqlalchemy.orm.attributes import set_committed_value
-
-
 def batch_fetch(entities, attr):
+    """
+    Batch fetch given relationship attribute for collection of entities.
+
+    This function is in many cases a valid alternative for SQLAlchemy's
+    subqueryload and performs lot better.
+
+    :param entities: list of entities of the same type
+    :param attr:
+        Either InstrumentedAttribute object or a string representing the name
+        of the instrumented attribute
+
+    Example::
+
+
+        from sqlalchemy_utils import batch_fetch
+
+
+        users = session.query(User).limit(20).all()
+
+        batch_fetch(users, User.phonenumbers)
+    """
     if entities:
         first = entities[0]
         if isinstance(attr, six.string_types):
