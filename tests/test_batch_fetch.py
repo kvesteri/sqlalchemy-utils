@@ -112,3 +112,5 @@ class TestBatchFetch(TestCase):
         query_count = self.connection.query_count
         categories[0].articles[0].tags
         assert self.connection.query_count == query_count
+        categories[1].articles[1].tags
+        assert self.connection.query_count == query_count
