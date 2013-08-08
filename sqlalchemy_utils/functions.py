@@ -390,7 +390,7 @@ def render_statement(statement, bind=None):
     return Compiler(bind.dialect, statement).process(statement)
 
 
-def batch_fetch(entities, attr):
+def batch_fetch(entities, *attr_paths):
     """
     Batch fetch given relationship attribute for collection of entities.
 
@@ -412,41 +412,94 @@ def batch_fetch(entities, attr):
 
         batch_fetch(users, User.phonenumbers)
     """
+
     if entities:
         first = entities[0]
-        if isinstance(attr, six.string_types):
-            attr = getattr(
-                first.__class__, attr
-            )
-
-        prop = attr.property
-        if not isinstance(prop, RelationshipProperty):
-            raise Exception(
-                'Given attribute is not a relationship property.'
-            )
-
-        model = prop.mapper.class_
-        session = object_session(first)
-
-        if len(prop.remote_side) > 1:
-            raise Exception(
-                'Only relationships with single remote side columns are '
-                'supported.'
-            )
-
-        column_name = list(prop.remote_side)[0].name
         parent_ids = [entity.id for entity in entities]
-
-        related_entities = (
-            session.query(model)
-            .filter(
-                getattr(model, column_name).in_(parent_ids)
-            )
-        )
-
         parent_dict = dict((entity.id, []) for entity in entities)
-        for entity in related_entities:
-            parent_dict[getattr(entity, column_name)].append(entity)
 
-        for entity in entities:
-            set_committed_value(entity, prop.key, parent_dict[entity.id])
+        for attr_path in attr_paths:
+            if isinstance(attr_path, six.string_types):
+                attrs = attr_path.split('.')
+
+                if len(attrs) > 1:
+                    related_entities = []
+                    for entity in entities:
+                        related_entities.extend(getattr(entity, attrs[0]))
+
+                    batch_fetch(related_entities, '.'.join(attrs[1:]))
+                    continue
+                else:
+                    attr = getattr(
+                        first.__class__, attrs[0]
+                    )
+            else:
+                attr = attr_path
+
+            prop = attr.property
+            if not isinstance(prop, RelationshipProperty):
+                raise Exception(
+                    'Given attribute is not a relationship property.'
+                )
+
+            model = prop.mapper.class_
+
+            session = object_session(first)
+
+            if prop.secondary is None:
+                if len(prop.remote_side) > 1:
+                    raise Exception(
+                        'Only relationships with single remote side columns '
+                        'are supported.'
+                    )
+
+                column_name = list(prop.remote_side)[0].name
+
+                related_entities = (
+                    session.query(model)
+                    .filter(
+                        getattr(model, column_name).in_(parent_ids)
+                    )
+                )
+
+                for entity in related_entities:
+                    parent_dict[getattr(entity, column_name)].append(
+                        entity
+                    )
+
+                for entity in entities:
+                    set_committed_value(
+                        entity, prop.key, parent_dict[entity.id]
+                    )
+            else:
+                column_name = None
+                for column in prop.remote_side:
+                    for fk in column.foreign_keys:
+                        # TODO: make this support inherited tables
+                        if fk.column.table == first.__class__.__table__:
+                            column_name = fk.parent.name
+                            break
+                    if column_name:
+                        break
+
+                related_entities = (
+                    session
+                    .query(model, getattr(prop.secondary.c, column_name))
+                    .join(
+                        prop.secondary, prop.secondaryjoin
+                    )
+                    .filter(
+                        getattr(prop.secondary.c, column_name).in_(
+                            parent_ids
+                        )
+                    )
+                )
+                for entity, parent_id in related_entities:
+                    parent_dict[parent_id].append(
+                        entity
+                    )
+
+                for entity in entities:
+                    set_committed_value(
+                        entity, prop.key, parent_dict[entity.id]
+                    )

@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.16.4 (2013-08-08)
+^^^^^^^^^^^^^^^^^^^
+
+- Initial many-to-many relations support for batch_fetch
+
+
 0.16.3 (2013-08-05)
 ^^^^^^^^^^^^^^^^^^^
 
