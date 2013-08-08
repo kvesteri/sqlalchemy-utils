@@ -416,9 +416,9 @@ def batch_fetch(entities, *attr_paths):
     if entities:
         first = entities[0]
         parent_ids = [entity.id for entity in entities]
-        parent_dict = dict((entity.id, []) for entity in entities)
 
         for attr_path in attr_paths:
+            parent_dict = dict((entity.id, []) for entity in entities)
             if isinstance(attr_path, six.string_types):
                 attrs = attr_path.split('.')
 
