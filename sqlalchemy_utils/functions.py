@@ -411,6 +411,27 @@ def batch_fetch(entities, *attr_paths):
         users = session.query(User).limit(20).all()
 
         batch_fetch(users, User.phonenumbers)
+
+
+    Function also accepts strings as attribute names: ::
+
+
+        users = session.query(User).limit(20).all()
+
+        batch_fetch(users, 'phonenumbers')
+
+
+    Multiple attributes may be provided: ::
+
+
+        clubs = session.query(Club).limit(20).all()
+
+        batch_fetch(
+            clubs,
+            'teams',
+            'teams.players',
+            'teams.players.friends'
+        )
     """
 
     if entities:
