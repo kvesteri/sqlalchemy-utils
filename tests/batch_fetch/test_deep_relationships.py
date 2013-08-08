@@ -89,7 +89,7 @@ class TestBatchFetch(TestCase):
         self.session.add(category2)
         self.session.commit()
 
-    def test_multiple_relationships(self):
+    def test_deep_relationships(self):
         categories = self.session.query(self.Category).all()
         batch_fetch(
             categories,
@@ -100,4 +100,20 @@ class TestBatchFetch(TestCase):
         categories[0].articles[0].tags
         assert self.connection.query_count == query_count
         categories[1].articles[1].tags
+        assert self.connection.query_count == query_count
+
+    def test_many_to_many_backref_population(self):
+        categories = self.session.query(self.Category).all()
+        batch_fetch(
+            categories,
+            'articles',
+            'articles.tags -pb',
+        )
+        query_count = self.connection.query_count
+        tags = categories[0].articles[0].tags
+        tags2 = categories[1].articles[1].tags
+        tags[0].articles
+        tags2[0].articles
+        names = [article.name for article in tags[0].articles]
+        assert u'Article 1' in names
         assert self.connection.query_count == query_count

@@ -430,8 +430,21 @@ def batch_fetch(entities, *attr_paths):
             clubs,
             'teams',
             'teams.players',
-            'teams.players.friends'
+            'teams.players.user_groups'
         )
+
+    You can also force populate backrefs: ::
+
+
+        clubs = session.query(Club).limit(20).all()
+
+        batch_fetch(
+            clubs,
+            'teams',
+            'teams.players',
+            'teams.players.user_groups -pb'
+        )
+
     """
 
     if entities:
@@ -440,6 +453,8 @@ def batch_fetch(entities, *attr_paths):
 
         for attr_path in attr_paths:
             parent_dict = dict((entity.id, []) for entity in entities)
+            populate_backrefs = False
+
             if isinstance(attr_path, six.string_types):
                 attrs = attr_path.split('.')
 
@@ -448,11 +463,18 @@ def batch_fetch(entities, *attr_paths):
                     for entity in entities:
                         related_entities.extend(getattr(entity, attrs[0]))
 
-                    batch_fetch(related_entities, '.'.join(attrs[1:]))
+                    batch_fetch(
+                        related_entities,
+                        '.'.join(attrs[1:])
+                    )
                     continue
                 else:
+                    args = attrs[-1].split(' ')
+                    if '-pb' in args:
+                        populate_backrefs = True
+
                     attr = getattr(
-                        first.__class__, attrs[0]
+                        first.__class__, args[0]
                     )
             else:
                 attr = attr_path
@@ -488,10 +510,6 @@ def batch_fetch(entities, *attr_paths):
                         entity
                     )
 
-                for entity in entities:
-                    set_committed_value(
-                        entity, prop.key, parent_dict[entity.id]
-                    )
             else:
                 column_name = None
                 for column in prop.remote_side:
@@ -520,7 +538,19 @@ def batch_fetch(entities, *attr_paths):
                         entity
                     )
 
-                for entity in entities:
+            for entity in entities:
+                set_committed_value(
+                    entity, prop.key, parent_dict[entity.id]
+                )
+            if populate_backrefs:
+                backref_dict = dict(
+                    (entity.id, []) for entity, parent_id in related_entities
+                )
+                for entity, parent_id in related_entities:
+                    backref_dict[entity.id].append(
+                        session.query(first.__class__).get(parent_id)
+                    )
+                for entity, parent_id in related_entities:
                     set_committed_value(
-                        entity, prop.key, parent_dict[entity.id]
+                        entity, prop.back_populates, backref_dict[entity.id]
                     )

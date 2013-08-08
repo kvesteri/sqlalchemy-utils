@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.16.5 (2013-08-08)
+^^^^^^^^^^^^^^^^^^^
+
+- Initial backref population forcing for batch_fetch
+
+
 0.16.4 (2013-08-08)
 ^^^^^^^^^^^^^^^^^^^
 
