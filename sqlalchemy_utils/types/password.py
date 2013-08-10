@@ -77,7 +77,8 @@ class PasswordType(types.TypeDecorator):
         # Bail if passlib is not found.
         if passlib is None:
             raise ImproperlyConfigured(
-                "'passlib' is required to use 'PasswordType'")
+                "'passlib' is required to use 'PasswordType'"
+            )
 
         # Construct the passlib crypt context.
         self.context = CryptContext(**kwargs)
@@ -95,7 +96,7 @@ class PasswordType(types.TypeDecorator):
         if value is not None:
             return Password(value, self.context)
 
-    def coercion_listener(self, target, value, oldvalue, initiator):
+    def _coerce(self, value):
         if not isinstance(value, Password):
             # Hash the password using the default scheme.
             value = self.context.encrypt(value).encode('utf8')
@@ -106,3 +107,6 @@ class PasswordType(types.TypeDecorator):
             value.context = weakref.proxy(self.context)
 
         return value
+
+    def coercion_listener(self, target, value, oldvalue, initiator):
+        return self._coerce(value)

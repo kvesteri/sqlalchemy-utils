@@ -106,6 +106,9 @@ def sort_query(query, *args):
 
     The examples use the following model definition:
 
+    ::
+
+
         >>> import sqlalchemy as sa
         >>> from sqlalchemy import create_engine
         >>> from sqlalchemy.orm import sessionmaker
