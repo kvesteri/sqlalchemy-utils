@@ -2,6 +2,7 @@ import six
 import weakref
 from sqlalchemy_utils import ImproperlyConfigured
 from sqlalchemy import types
+from .scalar_coercible import ScalarCoercible
 
 try:
     import passlib
@@ -33,7 +34,7 @@ class Password(object):
         return not (self == value)
 
 
-class PasswordType(types.TypeDecorator):
+class PasswordType(types.TypeDecorator, ScalarCoercible):
     """
     Hashes passwords as they come into the database and allows verifying
     them using a pythonic interface ::
@@ -107,6 +108,3 @@ class PasswordType(types.TypeDecorator):
             value.context = weakref.proxy(self.context)
 
         return value
-
-    def coercion_listener(self, target, value, oldvalue, initiator):
-        return self._coerce(value)

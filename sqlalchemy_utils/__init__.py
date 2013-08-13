@@ -15,6 +15,8 @@ from .proxy_dict import ProxyDict, proxy_dict
 from .types import (
     ArrowType,
     ColorType,
+    CountryType,
+    Country,
     EmailType,
     instrumented_list,
     InstrumentedList,
@@ -53,6 +55,8 @@ __all__ = (
     with_backrefs,
     ArrowType,
     ColorType,
+    CountryType,
+    Country,
     EmailType,
     ImproperlyConfigured,
     InstrumentedList,

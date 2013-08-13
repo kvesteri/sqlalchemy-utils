@@ -1,6 +1,7 @@
 import six
 from sqlalchemy import types
 from sqlalchemy_utils import ImproperlyConfigured
+from .scalar_coercible import ScalarCoercible
 
 
 try:
@@ -12,7 +13,7 @@ except ImportError:
     Color = None
 
 
-class ColorType(types.TypeDecorator):
+class ColorType(types.TypeDecorator, ScalarCoercible):
     """
     Changes Color objects to a string representation on the way in and
     changes them back to Color objects on the way out.
@@ -40,7 +41,7 @@ class ColorType(types.TypeDecorator):
             return Color(value)
         return value
 
-    def coercion_listener(self, target, value, oldvalue, initiator):
+    def _coerce(self, value):
         if value is not None and not isinstance(value, Color):
-            value = Color(value)
+            return Color(value)
         return value

@@ -2,6 +2,7 @@ from functools import wraps
 from sqlalchemy.orm.collections import InstrumentedList as _InstrumentedList
 from .arrow import ArrowType
 from .color import ColorType
+from .country import CountryType, Country
 from .email import EmailType
 from .ip_address import IPAddressType
 from .number_range import (
@@ -21,6 +22,8 @@ from .uuid import UUIDType
 __all__ = (
     ArrowType,
     ColorType,
+    CountryType,
+    Country,
     EmailType,
     IPAddressType,
     NumberRange,
@@ -37,6 +40,14 @@ __all__ = (
     TSVectorType,
     UUIDType,
 )
+
+
+class ScalarCoercedType(object):
+    def _coerce(self, value):
+        raise NotImplemented
+
+    def coercion_listener(self, target, value, oldvalue, initiator):
+        return self._coerce(value)
 
 
 class InstrumentedList(_InstrumentedList):
