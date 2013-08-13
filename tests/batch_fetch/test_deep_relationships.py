@@ -1,5 +1,5 @@
 import sqlalchemy as sa
-from sqlalchemy_utils import batch_fetch
+from sqlalchemy_utils import batch_fetch, with_backrefs
 from tests import TestCase
 
 
@@ -107,7 +107,7 @@ class TestBatchFetch(TestCase):
         batch_fetch(
             categories,
             'articles',
-            'articles.tags -pb',
+            with_backrefs('articles.tags'),
         )
         query_count = self.connection.query_count
         tags = categories[0].articles[0].tags

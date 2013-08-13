@@ -6,13 +6,14 @@ from sqlalchemy.orm import defer
 from sqlalchemy.orm.properties import ColumnProperty
 from sqlalchemy.orm.query import Query
 from sqlalchemy.schema import MetaData, Table, ForeignKeyConstraint
-from .batch_fetch import batch_fetch
+from .batch_fetch import batch_fetch, with_backrefs
 from .sort_query import sort_query
 
 
 __all__ = (
     batch_fetch,
-    sort_query
+    sort_query,
+    with_backrefs
 )
 
 

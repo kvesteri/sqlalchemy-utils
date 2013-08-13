@@ -7,6 +7,7 @@ from .functions import (
     render_statement,
     sort_query,
     table_name,
+    with_backrefs
 )
 from .listeners import coercion_listener
 from .merge import merge, Merger
@@ -49,6 +50,7 @@ __all__ = (
     render_statement,
     sort_query,
     table_name,
+    with_backrefs,
     ArrowType,
     ColorType,
     EmailType,
