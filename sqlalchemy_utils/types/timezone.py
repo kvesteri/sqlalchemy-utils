@@ -1,9 +1,10 @@
 import six
 from sqlalchemy import types
 from sqlalchemy_utils import ImproperlyConfigured
+from .scalar_coercible import ScalarCoercible
 
 
-class TimezoneType(types.TypeDecorator):
+class TimezoneType(types.TypeDecorator, ScalarCoercible):
     """
     Changes Timezone objects to a string representation on the way in and
     changes them back to Timezone objects on the way out.
@@ -63,9 +64,6 @@ class TimezoneType(types.TypeDecorator):
             return obj
 
         return value
-
-    def coercion_listener(self, target, value, oldvalue, initiator):
-        return self._coerce(value)
 
     def process_bind_param(self, value, dialect):
         return self._from(self._coerce(value)) if value else None
