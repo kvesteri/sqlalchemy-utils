@@ -1,6 +1,7 @@
 import six
 from sqlalchemy import types
 from sqlalchemy_utils import ImproperlyConfigured
+from .scalar_coercible import ScalarCoercible
 
 
 try:
@@ -69,7 +70,7 @@ class PhoneNumber(BasePhoneNumber):
         return six.text_type(self.national).encode('utf-8')
 
 
-class PhoneNumberType(types.TypeDecorator):
+class PhoneNumberType(types.TypeDecorator, ScalarCoercible):
     """
     Changes PhoneNumber objects to a string representation on the way in and
     changes them back to PhoneNumber objects on the way out. If E164 is used
@@ -99,7 +100,7 @@ class PhoneNumberType(types.TypeDecorator):
             return PhoneNumber(value, self.country_code)
         return value
 
-    def coercion_listener(self, target, value, oldvalue, initiator):
+    def _coerce(self, value):
         if value is not None and not isinstance(value, PhoneNumber):
             value = PhoneNumber(value, country_code=self.country_code)
         return value
