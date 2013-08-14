@@ -4,7 +4,7 @@ SQLAlchemy-Utils
 
 Various utility functions and custom data types for SQLAlchemy.
 """
-from setuptools import setup, Command
+from setuptools import setup, Command, find_packages
 import subprocess
 import sys
 
@@ -64,7 +64,7 @@ setup(
         'Various utility functions for SQLAlchemy.'
     ),
     long_description=__doc__,
-    packages=['sqlalchemy_utils', 'sqlalchemy_utils.types'],
+    packages=find_packages('.'),
     zip_safe=False,
     include_package_data=True,
     platforms='any',
