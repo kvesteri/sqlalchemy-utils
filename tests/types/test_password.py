@@ -1,6 +1,7 @@
 from pytest import mark
 import sqlalchemy as sa
 from tests import TestCase
+from sqlalchemy import inspect
 from sqlalchemy_utils.types import password
 from sqlalchemy_utils import Password, PasswordType
 
@@ -15,6 +16,7 @@ class TestPasswordType(TestCase):
             password = sa.Column(PasswordType(
                 schemes=[
                     'pbkdf2_sha512',
+                    'pbkdf2_sha256',
                     'md5_crypt'
                 ],
 
@@ -67,3 +69,20 @@ class TestPasswordType(TestCase):
         assert obj.password.hash.startswith('$1$')
         assert obj.password == 'b'
         assert obj.password.hash.startswith('$pbkdf2-sha512$')
+
+    def test_auto_column_length(self):
+        """Should derive the correct column length from the specified schemes.
+        """
+
+        from passlib.hash import pbkdf2_sha512
+
+        impl = inspect(self.User).c.password.type.impl
+
+        # name + rounds + salt + hash + ($ * 4) of largest hash
+        expected_length = len(pbkdf2_sha512.name)
+        expected_length += len(str(pbkdf2_sha512.max_rounds))
+        expected_length += pbkdf2_sha512.max_salt_size
+        expected_length += pbkdf2_sha512.encoded_checksum_size
+        expected_length += 4
+
+        assert impl.length == expected_length

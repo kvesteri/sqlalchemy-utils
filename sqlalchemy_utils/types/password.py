@@ -48,14 +48,15 @@ class PasswordType(types.TypeDecorator, ScalarCoercible):
 
     """
 
-    impl = types.BINARY(60)
+    impl = types.VARBINARY(1024)
 
     python_type = Password
 
-    def __init__(self, **kwargs):
+    def __init__(self, max_length=None, **kwargs):
         """
-        All keyword arguments are forwarded to the construction of a
-        `passlib.context.CryptContext` object.
+        All keyword arguments (aside from max_length) are
+        forwarded to the construction of a `passlib.context.CryptContext`
+        object.
 
         The following usage will create a password column that will
         automatically hash new passwords as `pbkdf2_sha512` but still compare
@@ -83,6 +84,25 @@ class PasswordType(types.TypeDecorator, ScalarCoercible):
 
         # Construct the passlib crypt context.
         self.context = CryptContext(**kwargs)
+
+        if max_length is None:
+            # Calculate the largest possible encoded password.
+            # name + rounds + salt + hash + ($ * 4) of largest hash
+            max_lengths = []
+            for name in self.context.schemes():
+                scheme = getattr(__import__('passlib.hash').hash, name)
+                length = 4 + len(scheme.name)
+                length += len(str(getattr(scheme, 'max_rounds', '')))
+                length += scheme.max_salt_size or 0
+                length += getattr(scheme, 'encoded_checksum_size',
+                    scheme.checksum_size)
+                max_lengths.append(length)
+
+            # Set the max_length to the maximum calculated max length.
+            max_length = max(max_lengths)
+
+        # Set the impl to the now-calculated max length.
+        self.impl = types.VARBINARY(max_length)
 
     def process_bind_param(self, value, dialect):
         if isinstance(value, Password):
