@@ -3,7 +3,7 @@ from sqlalchemy_utils import batch_fetch
 from tests import TestCase
 
 
-class TestBatchFetch(TestCase):
+class TestBatchFetchAssociations(TestCase):
     def create_models(self):
         class Category(self.Base):
             __tablename__ = 'category'
