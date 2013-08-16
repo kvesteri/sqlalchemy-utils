@@ -5,6 +5,10 @@ from sqlalchemy.orm.session import object_session
 
 
 class with_backrefs(object):
+    """
+    Marks given attribute path so that whenever its fetched with batch_fetch
+    the backref relations are force set too.
+    """
     def __init__(self, attr_path):
         self.attr_path = attr_path
 
