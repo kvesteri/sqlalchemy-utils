@@ -29,8 +29,16 @@ class TestBatchFetchManyToOneRelationships(TestCase):
     def setup_method(self, method):
         TestCase.setup_method(self, method)
         articles = [
-            self.Article(name=u'Article 1', author=self.User(name=u'John')),
-            self.Article(name=u'Article 2', author=self.User(name=u'Matt')),
+            self.Article(
+                id=1,
+                name=u'Article 1',
+                author=self.User(id=333, name=u'John')
+            ),
+            self.Article(
+                id=2,
+                name=u'Article 2',
+                author=self.User(id=334, name=u'Matt')
+            ),
         ]
         self.session.add_all(articles)
         self.session.commit()
