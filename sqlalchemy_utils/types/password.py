@@ -94,8 +94,11 @@ class PasswordType(types.TypeDecorator, ScalarCoercible):
                 length = 4 + len(scheme.name)
                 length += len(str(getattr(scheme, 'max_rounds', '')))
                 length += scheme.max_salt_size or 0
-                length += getattr(scheme, 'encoded_checksum_size',
-                    scheme.checksum_size)
+                length += getattr(
+                    scheme,
+                    'encoded_checksum_size',
+                    scheme.checksum_size
+                )
                 max_lengths.append(length)
 
             # Set the max_length to the maximum calculated max length.
