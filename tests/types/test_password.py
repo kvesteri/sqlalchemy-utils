@@ -8,7 +8,6 @@ from sqlalchemy_utils import Password, PasswordType
 
 @mark.skipif('password.passlib is None')
 class TestPasswordType(TestCase):
-
     def create_models(self):
         class User(self.Base):
             __tablename__ = 'user'
@@ -86,3 +85,6 @@ class TestPasswordType(TestCase):
         expected_length += 4
 
         assert impl.length == expected_length
+
+    def test_without_schemes(self):
+        assert PasswordType(schemes=[]).length == 1024
