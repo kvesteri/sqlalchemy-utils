@@ -75,7 +75,7 @@ class TestPasswordType(TestCase):
 
         from passlib.hash import pbkdf2_sha512
 
-        impl = inspect(self.User).c.password.type.impl
+        kind = inspect(self.User).c.password.type
 
         # name + rounds + salt + hash + ($ * 4) of largest hash
         expected_length = len(pbkdf2_sha512.name)
@@ -84,7 +84,7 @@ class TestPasswordType(TestCase):
         expected_length += pbkdf2_sha512.encoded_checksum_size
         expected_length += 4
 
-        assert impl.length == expected_length
+        assert kind.length == expected_length
 
     def test_without_schemes(self):
         assert PasswordType(schemes=[]).length == 1024
