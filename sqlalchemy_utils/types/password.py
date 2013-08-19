@@ -2,6 +2,7 @@ import six
 import weakref
 from sqlalchemy_utils import ImproperlyConfigured
 from sqlalchemy import types
+from sqlalchemy.dialects import postgresql
 from .scalar_coercible import ScalarCoercible
 
 try:
@@ -101,8 +102,18 @@ class PasswordType(types.TypeDecorator, ScalarCoercible):
             # Set the max_length to the maximum calculated max length.
             max_length = max(max_lengths)
 
-        # Set the impl to the now-calculated max length.
-        self.impl = types.VARBINARY(max_length)
+        # Set the length to the now-calculated max length.
+        self.length = max_length
+
+    def load_dialect_impl(self, dialect):
+        if dialect.name == 'postgresql':
+            # Use a BYTEA type for postgresql.
+            impl = postgresql.BYTEA(self.length)
+            return dialect.type_descriptor(impl)
+
+        # Use a VARBINARY for all other dialects.
+        impl = types.VARBINARY(self.length)
+        return dialect.type_descriptor(impl)
 
     def process_bind_param(self, value, dialect):
         if isinstance(value, Password):
