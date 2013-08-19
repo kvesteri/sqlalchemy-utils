@@ -4,10 +4,23 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.16.7 (2013-08-18)
+^^^^^^^^^^^^^^^^^^^
+
+- Added better handling of local column names in batch_fetch
+- PasswordType gets default length even if no crypt context schemes provided
+
+
+0.16.6 (2013-08-16)
+^^^^^^^^^^^^^^^^^^^
+
+- Rewritten batch_fetch schematics, new syntax for backref population
+
+
 0.16.5 (2013-08-08)
 ^^^^^^^^^^^^^^^^^^^
 
-- Initial backref population forcing for batch_fetch
+- Initial backref population forcing support for batch_fetch
 
 
 0.16.4 (2013-08-08)

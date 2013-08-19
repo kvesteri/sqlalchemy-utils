@@ -89,14 +89,17 @@ class PasswordType(types.TypeDecorator, ScalarCoercible):
         if max_length is None:
             # Calculate the largest possible encoded password.
             # name + rounds + salt + hash + ($ * 4) of largest hash
-            max_lengths = []
+            max_lengths = [1024]
             for name in self.context.schemes():
                 scheme = getattr(__import__('passlib.hash').hash, name)
                 length = 4 + len(scheme.name)
                 length += len(str(getattr(scheme, 'max_rounds', '')))
                 length += scheme.max_salt_size or 0
-                length += getattr(scheme, 'encoded_checksum_size',
-                    scheme.checksum_size)
+                length += getattr(
+                    scheme,
+                    'encoded_checksum_size',
+                    scheme.checksum_size
+                )
                 max_lengths.append(length)
 
             # Set the max_length to the maximum calculated max length.

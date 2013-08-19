@@ -3,7 +3,7 @@ from sqlalchemy_utils import batch_fetch, with_backrefs
 from tests import TestCase
 
 
-class TestBatchFetch(TestCase):
+class TestBatchFetchDeepRelationships(TestCase):
     def create_models(self):
         class User(self.Base):
             __tablename__ = 'user'
