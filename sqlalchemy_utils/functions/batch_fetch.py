@@ -156,7 +156,9 @@ class Fetcher(object):
         self.entities = coordinator.entities
         self.first = self.entities[0]
         self.session = object_session(self.first)
+        self.init_parent_dict()
 
+    def init_parent_dict(self):
         self.parent_dict = dict(
             (self.local_values(entity), [])
             for entity in self.entities
@@ -237,6 +239,12 @@ class ManyToManyFetcher(Fetcher):
 
 
 class ManyToOneFetcher(Fetcher):
+    def init_parent_dict(self):
+        self.parent_dict = dict(
+            (self.local_values(entity), None)
+            for entity in self.entities
+        )
+
     def fetch(self):
         column_name = list(self.prop.remote_side)[0].name
 
@@ -248,9 +256,7 @@ class ManyToOneFetcher(Fetcher):
         )
 
         for entity in self.related_entities:
-            self.parent_dict[getattr(entity, column_name)].append(
-                entity
-            )
+            self.parent_dict[getattr(entity, column_name)] = entity
 
 
 class OneToManyFetcher(Fetcher):

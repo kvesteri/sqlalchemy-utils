@@ -28,17 +28,25 @@ class TestBatchFetchManyToOneRelationships(TestCase):
 
     def setup_method(self, method):
         TestCase.setup_method(self, method)
+        self.users = [
+            self.User(id=333, name=u'John'),
+            self.User(id=334, name=u'Matt')
+        ]
         articles = [
             self.Article(
                 id=1,
                 name=u'Article 1',
-                author=self.User(id=333, name=u'John')
+                author=self.users[0]
             ),
             self.Article(
                 id=2,
                 name=u'Article 2',
-                author=self.User(id=334, name=u'Matt')
+                author=self.users[1]
             ),
+            self.Article(
+                id=3,
+                name=u'Article 3'
+            )
         ]
         self.session.add_all(articles)
         self.session.commit()
@@ -50,6 +58,7 @@ class TestBatchFetchManyToOneRelationships(TestCase):
             'author'
         )
         query_count = self.connection.query_count
-        assert articles[0].author  # no lazy load should occur
-        assert articles[1].author  # no lazy load should occur
+        assert articles[0].author == self.users[0]  # no lazy load should occur
+        assert articles[1].author == self.users[1]  # no lazy load should occur
+        assert articles[2].author is None  # no lazy load should occur
         assert self.connection.query_count == query_count
