@@ -4,6 +4,7 @@ import sqlalchemy as sa
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from sqlalchemy_utils import InstrumentedList
 from sqlalchemy_utils import coercion_listener
@@ -54,6 +55,18 @@ class TestCase(object):
             __tablename__ = 'category'
             id = sa.Column(sa.Integer, primary_key=True)
             name = sa.Column(sa.Unicode(255))
+
+            @hybrid_property
+            def articles_count(self):
+                return len(self.articles)
+
+            @articles_count.expression
+            def articles_count(cls):
+                return (
+                    sa.select([sa.func.count(self.Article.id)])
+                    .where(self.Article.category_id == self.Category.id)
+                    .label('article_count')
+                )
 
         class Article(self.Base):
             __tablename__ = 'article'

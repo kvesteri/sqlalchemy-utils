@@ -93,3 +93,8 @@ class TestSortQuery(TestCase):
         query = self.session.query(self.Category)
         sorted_query = sort_query(query, '-article_count')
         assert 'article_count DESC' in str(sorted_query)
+
+    def test_sort_by_hybrid_property(self):
+        query = self.session.query(self.Category)
+        query = sort_query(query, 'articles_count')
+        assert 'ORDER BY (SELECT count(article.id) AS count_1' in str(query)

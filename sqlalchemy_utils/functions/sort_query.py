@@ -52,6 +52,7 @@ class QuerySorter(object):
                 if sort['entity'] and table.name != sort['entity']:
                     continue
                 return self.assign_entity_attr_order_by(entity, sort)
+
         return self.query
 
     def assign_entity_attr_order_by(self, entity, sort):
@@ -67,6 +68,11 @@ class QuerySorter(object):
                         attr = attr.property.columns[0].name
 
                 return self.query.order_by(sort['func'](attr))
+
+        # Check hybrid properties.
+        if hasattr(entity, sort['attr']):
+            return self.query.order_by(getattr(entity, sort['attr']))
+
         return self.query
 
     def parse_sort_arg(self, arg):
