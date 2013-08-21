@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.16.8 (2013-08-21)
+^^^^^^^^^^^^^^^^^^^
+
+- PasswordType support for PostgreSQL
+- Hybrid property for sort_query
+
+
 0.16.7 (2013-08-18)
 ^^^^^^^^^^^^^^^^^^^
 
