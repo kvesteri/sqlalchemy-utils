@@ -13,6 +13,11 @@ class with_backrefs(object):
         self.attr_path = attr_path
 
 
+class compound_path(object):
+    def __init__(self, *attr_paths):
+        self.attr_paths = attr_paths
+
+
 def batch_fetch(entities, *attr_paths):
     """
     Batch fetch given relationship attribute for collection of entities.
@@ -118,7 +123,7 @@ class FetchingCoordinator(object):
                 'are supported.'
             )
 
-    def fetcher(self, property_):
+    def fetcher_for_property(self, property_):
         if not isinstance(property_, RelationshipProperty):
             raise Exception(
                 'Given attribute is not a relationship property.'
@@ -132,7 +137,7 @@ class FetchingCoordinator(object):
             else:
                 return OneToManyFetcher(self, property_)
 
-    def __call__(self, attr_path):
+    def fetcher_for_attr_path(self, attr_path):
         if isinstance(attr_path, with_backrefs):
             self.should_populate_backrefs = True
             attr_path = attr_path.attr_path
@@ -142,10 +147,26 @@ class FetchingCoordinator(object):
         attr = self.parse_attr_path(attr_path, self.should_populate_backrefs)
         if not attr:
             return
+        return self.fetcher_for_property(attr.property)
 
-        fetcher = self.fetcher(attr.property)
-        fetcher.fetch()
-        fetcher.populate()
+    def __call__(self, attr_path):
+        if isinstance(attr_path, compound_path):
+            for path in attr_path.attr_paths:
+                self(path)
+        else:
+            fetcher = self.fetcher_for_attr_path(attr_path)
+            if not fetcher:
+                return
+            fetcher.fetch()
+            fetcher.populate()
+
+
+class CompoundFetcher(object):
+    def __init__(self, coordinator, path):
+        self.coordinator = coordinator
+        self.entities = coordinator.entities
+        self.first = self.entities[0]
+        self.session = object_session(self.first)
 
 
 class Fetcher(object):
@@ -207,31 +228,49 @@ class Fetcher(object):
         if self.coordinator.should_populate_backrefs:
             self.populate_backrefs(self.related_entities)
 
+    @property
+    def remote_column_name(self):
+        return list(self.prop.remote_side)[0].name
+
+    @property
+    def condition(self):
+        return getattr(self.model, self.remote_column_name).in_(
+            self.local_values_list
+        )
+
+    @property
+    def related_entities(self):
+        return self.session.query(self.model).filter(self.condition)
+
 
 class ManyToManyFetcher(Fetcher):
-    def fetch(self):
-        column_name = None
+    @property
+    def remote_column_name(self):
         for column in self.prop.remote_side:
             for fk in column.foreign_keys:
                 # TODO: make this support inherited tables
                 if fk.column.table == self.first.__class__.__table__:
-                    column_name = fk.parent.name
-                    break
-            if column_name:
-                break
+                    return fk.parent.name
 
-        self.related_entities = (
+    @property
+    def related_entities(self):
+        return (
             self.session
-            .query(self.model, getattr(self.prop.secondary.c, column_name))
+            .query(
+                self.model,
+                getattr(self.prop.secondary.c, self.remote_column_name)
+            )
             .join(
                 self.prop.secondary, self.prop.secondaryjoin
             )
             .filter(
-                getattr(self.prop.secondary.c, column_name).in_(
+                getattr(self.prop.secondary.c, self.remote_column_name).in_(
                     self.local_values_list
                 )
             )
         )
+
+    def fetch(self):
         for entity, parent_id in self.related_entities:
             self.parent_dict[parent_id].append(
                 entity
@@ -246,31 +285,13 @@ class ManyToOneFetcher(Fetcher):
         )
 
     def fetch(self):
-        column_name = list(self.prop.remote_side)[0].name
-
-        self.related_entities = (
-            self.session.query(self.model)
-            .filter(
-                getattr(self.model, column_name).in_(self.local_values_list)
-            )
-        )
-
         for entity in self.related_entities:
-            self.parent_dict[getattr(entity, column_name)] = entity
+            self.parent_dict[getattr(entity, self.remote_column_name)] = entity
 
 
 class OneToManyFetcher(Fetcher):
     def fetch(self):
-        column_name = list(self.prop.remote_side)[0].name
-
-        self.related_entities = (
-            self.session.query(self.model)
-            .filter(
-                getattr(self.model, column_name).in_(self.local_values_list)
-            )
-        )
-
         for entity in self.related_entities:
-            self.parent_dict[getattr(entity, column_name)].append(
+            self.parent_dict[getattr(entity, self.remote_column_name)].append(
                 entity
             )
