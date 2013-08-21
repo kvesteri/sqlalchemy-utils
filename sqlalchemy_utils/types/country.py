@@ -19,7 +19,9 @@ class Country(object):
 
     @property
     def name(self):
-        return self.get_locale.im_func().territories[self.code]
+        return six.get_method_function(
+            self.get_locale
+        )().territories[self.code]
 
     def __eq__(self, other):
         if isinstance(other, Country):
