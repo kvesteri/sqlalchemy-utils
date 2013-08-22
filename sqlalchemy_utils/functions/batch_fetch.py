@@ -189,15 +189,11 @@ class CompoundFetcher(AbstractFetcher):
             *[fetcher.condition for fetcher in self.fetchers]
         )
 
-    def fetcher_for_entity(self, entity):
-        for fetcher in self.fetchers:
-            if getattr(entity, fetcher.remote_column_name) is not None:
-                return fetcher
-
     def fetch(self):
-        self.parent_dict = defaultdict(list)
         for entity in self.related_entities:
-            self.fetcher_for_entity(entity).append_entity(entity)
+            for fetcher in self.fetchers:
+                if getattr(entity, fetcher.remote_column_name) is not None:
+                    fetcher.append_entity(entity)
 
     def populate(self):
         for fetcher in self.fetchers:
