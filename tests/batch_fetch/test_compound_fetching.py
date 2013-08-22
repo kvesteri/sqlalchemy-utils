@@ -26,7 +26,7 @@ class TestCompoundBatchFetching(TestCase):
             )
 
         class Equipment(self.Base):
-            __tablename__ = 'article'
+            __tablename__ = 'equipment'
             id = sa.Column(sa.Integer, primary_key=True)
             name = sa.Column(sa.Unicode(255))
             building_id = sa.Column(sa.Integer, sa.ForeignKey(Building.id))
