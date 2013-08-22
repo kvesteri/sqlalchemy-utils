@@ -1,6 +1,6 @@
 import sqlalchemy as sa
 from sqlalchemy_utils import batch_fetch
-from sqlalchemy_utils.functions import compound_path
+from sqlalchemy_utils.functions import CompositePath
 from tests import TestCase
 
 
@@ -93,7 +93,7 @@ class TestCompoundOneToManyBatchFetching(TestCase):
         batch_fetch(
             buildings,
             'business_premises',
-            compound_path(
+            CompositePath(
                 'equipment',
                 'business_premises.equipment'
             )
@@ -198,7 +198,7 @@ class TestCompoundManyToOneBatchFetching(TestCase):
         batch_fetch(
             buildings,
             'business_premises',
-            compound_path(
+            CompositePath(
                 'equipment',
                 'business_premises.equipment'
             )
