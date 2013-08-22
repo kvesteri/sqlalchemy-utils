@@ -63,5 +63,16 @@ class TestBatchFetchOneToManyRelationships(TestCase):
         categories = self.session.query(self.Category).all()
         batch_fetch(categories, self.Category.articles)
         query_count = self.connection.query_count
-        categories[0].articles  # no lazy load should occur
+        articles = categories[0].articles  # no lazy load should occur
+        assert len(articles) == 2
+        article_names = [article.name for article in articles]
+
+        assert 'Article 1' in article_names
+        assert 'Article 2' in article_names
+        articles = categories[1].articles  # no lazy load should occur
+        assert len(articles) == 3
+        article_names = [article.name for article in articles]
+        assert 'Article 3' in article_names
+        assert 'Article 4' in article_names
+        assert 'Article 5' in article_names
         assert self.connection.query_count == query_count

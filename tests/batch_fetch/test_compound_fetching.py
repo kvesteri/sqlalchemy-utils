@@ -4,7 +4,7 @@ from sqlalchemy_utils.functions import compound_path
 from tests import TestCase
 
 
-class TestCompoundBatchFetching(TestCase):
+class TestCompoundOneToManyBatchFetching(TestCase):
     def create_models(self):
         class Building(self.Base):
             __tablename__ = 'building'
@@ -54,27 +54,33 @@ class TestCompoundBatchFetching(TestCase):
     def setup_method(self, method):
         TestCase.setup_method(self, method)
         self.buildings = [
-            self.Building(name=u'B 1'),
-            self.Building(name=u'B 2'),
-            self.Building(name=u'B 3'),
+            self.Building(id=12, name=u'B 1'),
+            self.Building(id=15, name=u'B 2'),
+            self.Building(id=19, name=u'B 3'),
         ]
         self.business_premises = [
-            self.BusinessPremise(name=u'BP 1', building=self.buildings[0]),
-            self.BusinessPremise(name=u'BP 2', building=self.buildings[0]),
-            self.BusinessPremise(name=u'BP 3', building=self.buildings[2]),
+            self.BusinessPremise(
+                id=22, name=u'BP 1', building=self.buildings[0]
+            ),
+            self.BusinessPremise(
+                id=33, name=u'BP 2', building=self.buildings[0]
+            ),
+            self.BusinessPremise(
+                id=44, name=u'BP 3', building=self.buildings[2]
+            ),
         ]
         self.equipment = [
             self.Equipment(
-                name=u'E 1', building=self.buildings[0]
+                id=2, name=u'E 1', building=self.buildings[0]
             ),
             self.Equipment(
-                name=u'E 2', building=self.buildings[2]
+                id=4, name=u'E 2', building=self.buildings[2]
             ),
             self.Equipment(
-                name=u'E 3', business_premise=self.business_premises[0]
+                id=6, name=u'E 3', business_premise=self.business_premises[0]
             ),
             self.Equipment(
-                name=u'E 4', business_premise=self.business_premises[2]
+                id=8, name=u'E 4', business_premise=self.business_premises[2]
             ),
         ]
         self.session.add_all(self.buildings)
@@ -94,7 +100,10 @@ class TestCompoundBatchFetching(TestCase):
         )
         query_count = self.connection.query_count
 
-        buildings[0].equipment
-        buildings[1].equipment
-        buildings[0].business_premises[0].equipment
+        assert len(buildings[0].equipment) == 1
+        assert buildings[0].equipment[0].name == 'E 1'
+        assert not buildings[1].equipment
+        assert buildings[0].business_premises[0].equipment
+        assert self.business_premises[2].equipment
+        assert self.business_premises[2].equipment[0].name == 'E 4'
         assert self.connection.query_count == query_count

@@ -154,16 +154,19 @@ class FetchingCoordinator(object):
                 fetchers.append(self.fetcher_for_attr_path(path))
 
             fetcher = CompoundFetcher(*fetchers)
-            print fetcher.condition
         else:
             fetcher = self.fetcher_for_attr_path(attr_path)
-            if not fetcher:
-                return
-            fetcher.fetch()
-            fetcher.populate()
+        fetcher.fetch()
+        fetcher.populate()
 
 
-class CompoundFetcher(object):
+class AbstractFetcher(object):
+    @property
+    def related_entities(self):
+        return self.session.query(self.model).filter(self.condition)
+
+
+class CompoundFetcher(AbstractFetcher):
     def __init__(self, *fetchers):
         if not all(fetchers[0].model == fetcher.model for fetcher in fetchers):
             raise Exception(
@@ -173,17 +176,35 @@ class CompoundFetcher(object):
         self.fetchers = fetchers
 
     @property
+    def session(self):
+        return self.fetchers[0].session
+
+    @property
+    def model(self):
+        return self.fetchers[0].model
+
+    @property
     def condition(self):
         return sa.or_(
             *[fetcher.condition for fetcher in self.fetchers]
         )
 
-    @property
-    def local_values(self):
-        pass
+    def fetcher_for_entity(self, entity):
+        for fetcher in self.fetchers:
+            if getattr(entity, fetcher.remote_column_name) is not None:
+                return fetcher
+
+    def fetch(self):
+        self.parent_dict = defaultdict(list)
+        for entity in self.related_entities:
+            self.fetcher_for_entity(entity).append_entity(entity)
+
+    def populate(self):
+        for fetcher in self.fetchers:
+            fetcher.populate()
 
 
-class Fetcher(object):
+class Fetcher(AbstractFetcher):
     def __init__(self, entities, property_, populate_backrefs=False):
         self.should_populate_backrefs = populate_backrefs
         self.entities = entities
@@ -191,6 +212,7 @@ class Fetcher(object):
         self.model = self.prop.mapper.class_
         self.first = self.entities[0]
         self.session = object_session(self.first)
+        self.parent_dict = defaultdict(list)
 
     @property
     def local_values_list(self):
@@ -245,9 +267,9 @@ class Fetcher(object):
             self.local_values_list
         )
 
-    @property
-    def related_entities(self):
-        return self.session.query(self.model).filter(self.condition)
+    def fetch(self):
+        for entity in self.related_entities:
+            self.append_entity(entity)
 
 
 class ManyToManyFetcher(Fetcher):
@@ -278,7 +300,6 @@ class ManyToManyFetcher(Fetcher):
         )
 
     def fetch(self):
-        self.parent_dict = defaultdict(list)
         for entity, parent_id in self.related_entities:
             self.parent_dict[parent_id].append(
                 entity
@@ -286,16 +307,16 @@ class ManyToManyFetcher(Fetcher):
 
 
 class ManyToOneFetcher(Fetcher):
-    def fetch(self):
+    def __init__(self, entities, property_, populate_backrefs=False):
+        Fetcher.__init__(self, entities, property_, populate_backrefs)
         self.parent_dict = defaultdict(lambda: None)
-        for entity in self.related_entities:
-            self.parent_dict[getattr(entity, self.remote_column_name)] = entity
+
+    def append_entity(self, entity):
+        self.parent_dict[getattr(entity, self.remote_column_name)] = entity
 
 
 class OneToManyFetcher(Fetcher):
-    def fetch(self):
-        self.parent_dict = defaultdict(list)
-        for entity in self.related_entities:
-            self.parent_dict[getattr(entity, self.remote_column_name)].append(
-                entity
-            )
+    def append_entity(self, entity):
+        self.parent_dict[getattr(entity, self.remote_column_name)].append(
+            entity
+        )
