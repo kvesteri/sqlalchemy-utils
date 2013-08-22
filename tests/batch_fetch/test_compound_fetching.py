@@ -207,5 +207,7 @@ class TestCompoundManyToOneBatchFetching(TestCase):
 
         assert buildings[0].equipment.name == 'E 1'
         assert buildings[1].equipment.name == 'E 2'
+        assert not buildings[2].equipment
+        assert not buildings[1].business_premises
         assert buildings[2].business_premises[0].equipment.name == 'E 2'
         assert self.connection.query_count == query_count
