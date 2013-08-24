@@ -11,7 +11,8 @@ from sqlalchemy.orm.session import object_session
 class with_backrefs(object):
     """
     Marks given attribute path so that whenever its fetched with batch_fetch
-    the backref relations are force set too.
+    the backref relations are force set too. Very useful when dealing with
+    certain many-to-many relationship scenarios.
     """
     def __init__(self, path):
         self.path = path
