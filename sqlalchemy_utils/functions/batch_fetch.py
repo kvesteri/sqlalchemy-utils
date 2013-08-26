@@ -393,17 +393,11 @@ class ManyToOneFetcher(Fetcher):
 
     @property
     def remote_column_names(self):
-        names = []
-        for local, remote in self.prop.local_remote_pairs:
-            names.append(remote.name)
-        return names
+        return [remote.name for local, remote in self.prop.local_remote_pairs]
 
     @property
     def local_column_names(self):
-        names = []
-        for local, remote in self.prop.local_remote_pairs:
-            names.append(local.name)
-        return names
+        return [local.name for local, remote in self.prop.local_remote_pairs]
 
 
 class OneToManyFetcher(Fetcher):
