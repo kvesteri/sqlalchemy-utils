@@ -293,10 +293,14 @@ class Fetcher(object):
             self.populate_backrefs(self.related_entities)
 
     @property
+    def remote(self):
+        return self.path.model
+
+    @property
     def condition(self):
         names = self.remote_column_names
         if len(names) == 1:
-            return getattr(self.path.model, names[0]).in_(
+            return getattr(self.remote, names[0]).in_(
                 value[0] for value in self.local_values_list
             )
         else:
@@ -305,10 +309,11 @@ class Fetcher(object):
                 conditions.append(
                     sa.and_(
                         *[
-                            getattr(self.path.model, remote.name)
+                            getattr(self.remote, remote.name)
                             ==
                             getattr(entity, local.name)
                             for local, remote in self.prop.local_remote_pairs
+                            if remote in self.remote_column_names
                         ]
                     )
                 )
@@ -321,6 +326,10 @@ class Fetcher(object):
 
 class ManyToManyFetcher(Fetcher):
     @property
+    def remote(self):
+        return self.prop.secondary.c
+
+    @property
     def remote_column_names(self):
         names = []
         for local, remote in self.prop.local_remote_pairs:
@@ -330,31 +339,6 @@ class ManyToManyFetcher(Fetcher):
                     names.append(fk.parent.name)
 
         return names
-
-    @property
-    def condition(self):
-        if len(self.remote_column_names) == 1:
-            return (
-                getattr(self.prop.secondary.c, self.remote_column_names[0])
-                .in_(
-                    [value[0] for value in self.local_values_list]
-                )
-            )
-        else:
-            conditions = []
-            for entity in self.path.entities:
-                conditions.append(
-                    sa.and_(
-                        *[
-                            getattr(self.prop.secondary.c, remote.name)
-                            ==
-                            getattr(entity, local.name)
-                            for local, remote in self.prop.local_remote_pairs
-                            if remote.name in self.remote_column_names
-                        ]
-                    )
-                )
-            return sa.or_(*conditions)
 
     @property
     def related_entities(self):
