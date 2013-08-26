@@ -226,8 +226,12 @@ class Fetcher(object):
         ]
 
     @property
+    def relation_query_base(self):
+        return self.path.session.query(self.path.model)
+
+    @property
     def related_entities(self):
-        return self.path.session.query(self.path.model).filter(self.condition)
+        return self.relation_query_base.filter(self.condition)
 
     @property
     def local_column_names(self):
@@ -341,7 +345,7 @@ class ManyToManyFetcher(Fetcher):
         return names
 
     @property
-    def related_entities(self):
+    def relation_query_base(self):
         return (
             self.path.session
             .query(
@@ -353,9 +357,6 @@ class ManyToManyFetcher(Fetcher):
             )
             .join(
                 self.prop.secondary, self.prop.secondaryjoin
-            )
-            .filter(
-                self.condition
             )
         )
 
