@@ -11,6 +11,7 @@ from .functions import (
 )
 from .listeners import coercion_listener
 from .merge import merge, Merger
+from .generic import generic_relationship
 from .proxy_dict import ProxyDict, proxy_dict
 from .types import (
     ArrowType,
