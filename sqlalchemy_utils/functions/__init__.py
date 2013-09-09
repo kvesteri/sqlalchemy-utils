@@ -90,14 +90,22 @@ def primary_keys(class_):
             yield column
 
 
-def table_name(class_):
+def table_name(obj):
     """
-    Return table name of given declarative class.
+    Return table name of given target, declarative class or the
+    table name where the declarative attribute is bound to.
     """
+    class_ = getattr(obj, 'class_', obj)
+
     try:
         return class_.__tablename__
     except AttributeError:
+        pass
+
+    try:
         return class_.__table__.name
+    except AttributeError:
+        pass
 
 
 def non_indexed_foreign_keys(metadata, engine=None):
