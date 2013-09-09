@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import sqlalchemy as sa
 from tests import TestCase
 from sqlalchemy_utils import generic_relationship
