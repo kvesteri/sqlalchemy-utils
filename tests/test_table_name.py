@@ -12,7 +12,14 @@ class TestTableName(TestCase):
 
         self.Building = Building
 
-    def test_table_name(self):
+    def test_class(self):
         assert table_name(self.Building) == 'building'
         del self.Building.__tablename__
         assert table_name(self.Building) == 'building'
+
+    def test_attribute(self):
+        assert table_name(self.Building.id) == 'building'
+        assert table_name(self.Building.name) == 'building'
+
+    def test_target(self):
+        assert table_name(self.Building()) == 'building'
