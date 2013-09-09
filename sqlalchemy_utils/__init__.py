@@ -54,6 +54,7 @@ __all__ = (
     sort_query,
     table_name,
     with_backrefs,
+    generic_relationship,
     ArrowType,
     ColorType,
     CountryType,
