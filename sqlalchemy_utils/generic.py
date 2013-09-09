@@ -2,7 +2,8 @@ from sqlalchemy.orm.interfaces import MapperProperty, PropComparator
 from sqlalchemy.orm.session import _state_session
 from sqlalchemy.orm import attributes, class_mapper
 from sqlalchemy.util import set_creation_order
-from sqlalchemy import exc as sa_exc, inspect
+from sqlalchemy import exc as sa_exc
+from .functions import table_name
 
 
 class GenericAttributeImpl(attributes.ScalarAttributeImpl):
@@ -23,7 +24,7 @@ class GenericAttributeImpl(attributes.ScalarAttributeImpl):
         discriminator = state.attrs[self.parent_token.discriminator.key].value
         target_class = None
         for class_ in state.class_._decl_class_registry.values():
-            name = getattr(class_, '__tablename__', None)
+            name = table_name(class_)
             if name and name == discriminator:
                 target_class = class_
 
@@ -46,7 +47,8 @@ class GenericAttributeImpl(attributes.ScalarAttributeImpl):
         # Set us on the state.
         dict_[self.key] = initiator
 
-        # Get the primary key of the initiator.
+        # Get the primary key of the initiator and ensure we
+        # can support this assignment.
         mapper = class_mapper(type(initiator))
         if len(mapper.primary_key) > 1:
             raise sa_exc.InvalidRequestError(
@@ -56,9 +58,10 @@ class GenericAttributeImpl(attributes.ScalarAttributeImpl):
         pk = mapper.identity_key_from_instance(initiator)[1][0]
 
         # Set the identifier and the discriminator.
-        discriminator = type(initiator).__tablename__
+        discriminator = table_name(initiator)
         dict_[self.parent_token.id.key] = pk
         dict_[self.parent_token.discriminator.key] = discriminator
+
 
 class GenericRelationshipProperty(MapperProperty):
     """A generic form of the relationship property.
@@ -73,8 +76,8 @@ class GenericRelationshipProperty(MapperProperty):
     """
 
     def __init__(self, discriminator, id, doc=None):
-        self.discriminator = discriminator
-        self.id = id
+        self._discriminator_col = discriminator
+        self._id_col = id
         self.doc = doc
 
         set_creation_order(self)
@@ -87,14 +90,27 @@ class GenericRelationshipProperty(MapperProperty):
 
     def init(self):
         # Resolve columns to attributes.
-        self.discriminator = self._column_to_property(self.discriminator)
-        self.id = self._column_to_property(self.id)
+        self.discriminator = self._column_to_property(self._discriminator_col)
+        self.id = self._column_to_property(self._id_col)
 
     class Comparator(PropComparator):
 
         def __init__(self, prop, parentmapper):
             self.prop = prop
             self._parentmapper = parentmapper
+
+        def __eq__(self, other):
+            discriminator = table_name(other)
+            q = self.prop._discriminator_col == discriminator
+            q &= self.prop._id_col == other.id
+            return q
+
+        def __ne__(self, other):
+            return ~(self == other)
+
+        def is_type(self, other):
+            discriminator = table_name(other)
+            return self.prop._discriminator_col == discriminator
 
     def instrument_class(self, mapper):
         attributes.register_attribute(
@@ -106,6 +122,7 @@ class GenericRelationshipProperty(MapperProperty):
             impl_class=GenericAttributeImpl,
             parent_token=self
         )
+
 
 def generic_relationship(*args, **kwargs):
     return GenericRelationshipProperty(*args, **kwargs)

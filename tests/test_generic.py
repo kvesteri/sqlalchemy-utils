@@ -1,5 +1,4 @@
 import sqlalchemy as sa
-from sqlalchemy import orm
 from tests import TestCase
 from sqlalchemy_utils import generic_relationship
 
@@ -14,10 +13,6 @@ class TestGenericForiegnKey(TestCase):
         class User(self.Base):
             __tablename__ = 'user'
             id = sa.Column(sa.Integer, primary_key=True)
-
-            building_id = sa.Column(sa.Integer, sa.ForeignKey(Building.id), name='buildingID')
-
-            building = orm.relationship(Building)
 
         class Event(self.Base):
             __tablename__ = 'event'
@@ -64,3 +59,67 @@ class TestGenericForiegnKey(TestCase):
         self.session.commit()
 
         assert event.object == user
+
+    def test_compare_instance(self):
+        user1 = self.User()
+        user2 = self.User()
+
+        self.session.add_all([user1, user2])
+        self.session.commit()
+
+        event = self.Event(object=user1)
+
+        self.session.add(event)
+        self.session.commit()
+
+        assert event.object == user1
+        assert event.object != user2
+
+    def test_compare_query(self):
+        user1 = self.User()
+        user2 = self.User()
+
+        self.session.add_all([user1, user2])
+        self.session.commit()
+
+        event = self.Event(object=user1)
+
+        self.session.add(event)
+        self.session.commit()
+
+        q = self.session.query(self.Event)
+        assert q.filter_by(object=user1).first() is not None
+        assert q.filter_by(object=user2).first() is None
+        assert q.filter(self.Event.object == user2).first() is None
+
+    def test_compare_not_query(self):
+        user1 = self.User()
+        user2 = self.User()
+
+        self.session.add_all([user1, user2])
+        self.session.commit()
+
+        event = self.Event(object=user1)
+
+        self.session.add(event)
+        self.session.commit()
+
+        q = self.session.query(self.Event)
+        assert q.filter(self.Event.object != user2).first() is not None
+
+    def test_compare_type(self):
+        user1 = self.User()
+        user2 = self.User()
+
+        self.session.add_all([user1, user2])
+        self.session.commit()
+
+        event1 = self.Event(object=user1)
+        event2 = self.Event(object=user2)
+
+        self.session.add_all([event1, event2])
+        self.session.commit()
+
+        statement = self.Event.object.is_type(self.User)
+        q = self.session.query(self.Event).filter(statement)
+        assert q.first() is not None
