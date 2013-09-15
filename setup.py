@@ -58,7 +58,7 @@ setup(
     version='0.16.9',
     url='https://github.com/kvesteri/sqlalchemy-utils',
     license='BSD',
-    author='Konsta Vesterinen',
+    author='Konsta Vesterinen, Ryan Leckey, Janne Vanhala, Vesa Uimonen',
     author_email='konsta@fastmonkeys.com',
     description=(
         'Various utility functions for SQLAlchemy.'
