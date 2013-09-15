@@ -1,7 +1,7 @@
 from sqlalchemy import types
-from sqlalchemy_utils import ImproperlyConfigured
 import six
 from .scalar_coercible import ScalarCoercible
+from ..exceptions import ImproperlyConfigured
 
 
 class Country(object):
@@ -14,7 +14,7 @@ class Country(object):
 
         if self.get_locale is None:
             raise ImproperlyConfigured(
-                "Country class needs define get_locale."
+                "Country class needs to define get_locale."
             )
 
     @property

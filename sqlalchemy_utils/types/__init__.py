@@ -17,6 +17,7 @@ from .scalar_list import ScalarListException, ScalarListType
 from .timezone import TimezoneType
 from .ts_vector import TSVectorType
 from .uuid import UUIDType
+from .weekdays import WeekDay, WeekDays, WeekDaysType
 
 
 __all__ = (
@@ -39,15 +40,10 @@ __all__ = (
     TimezoneType,
     TSVectorType,
     UUIDType,
+    WeekDay,
+    WeekDays,
+    WeekDaysType
 )
-
-
-class ScalarCoercedType(object):
-    def _coerce(self, value):
-        raise NotImplemented
-
-    def coercion_listener(self, target, value, oldvalue, initiator):
-        return self._coerce(value)
 
 
 class InstrumentedList(_InstrumentedList):
