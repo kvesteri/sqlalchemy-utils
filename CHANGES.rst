@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.16.10 (2013-09-16)
+^^^^^^^^^^^^^^^^^^^^
+
+- Added WeekDaysType
+
+
 0.16.9 (2013-08-21)
 ^^^^^^^^^^^^^^^^^^^
 

@@ -35,6 +35,7 @@ extras_require = {
         'flexmock>=0.9.7',
         'psycopg2>=2.4.6',
     ],
+    'babel': ['Babel>=1.3'],
     'arrow': ['arrow>=0.3.4'],
     'phone': [
         # The phonenumbers library has a split for 2.x and 3.x support.
@@ -55,7 +56,7 @@ for name, requirements in extras_require.items():
 
 setup(
     name='SQLAlchemy-Utils',
-    version='0.16.9',
+    version='0.16.10',
     url='https://github.com/kvesteri/sqlalchemy-utils',
     license='BSD',
     author='Konsta Vesterinen, Ryan Leckey, Janne Vanhala, Vesa Uimonen',
