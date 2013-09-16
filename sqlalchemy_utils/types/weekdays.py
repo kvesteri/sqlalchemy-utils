@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import six
 from sqlalchemy import types
 from sqlalchemy.dialects.postgresql import BIT
 get_day_names = None
@@ -47,7 +48,7 @@ class WeekDay(object):
         return '%s(%r)' % (self.__class__.__name__, self.index)
 
     def __str__(self):
-        return unicode(self).encode('utf-8')
+        return six.text_type(self).encode('utf-8')
 
     def __unicode__(self):
         return self.name
@@ -74,7 +75,7 @@ class WeekDay(object):
 
 class WeekDays(object):
     def __init__(self, bit_string_or_week_days):
-        if isinstance(bit_string_or_week_days, basestring):
+        if isinstance(bit_string_or_week_days, six.text_type):
             self._days = set()
 
             if len(bit_string_or_week_days) != WeekDay.NUM_WEEK_DAYS:
@@ -99,7 +100,7 @@ class WeekDays(object):
     def __eq__(self, other):
         if isinstance(other, WeekDays):
             return self._days == other._days
-        elif isinstance(other, basestring):
+        elif isinstance(other, six.text_type):
             return self.as_bit_string() == other
         else:
             return NotImplemented
@@ -118,10 +119,10 @@ class WeekDays(object):
         )
 
     def __str__(self):
-        return unicode(self).encode('utf-8')
+        return six.text_type(self).encode('utf-8')
 
     def __unicode__(self):
-        return u', '.join(unicode(day) for day in self)
+        return u', '.join(six.text_type(day) for day in self)
 
     def as_bit_string(self):
         return ''.join(
@@ -137,7 +138,7 @@ class WeekDaysType(types.TypeDecorator):
         if isinstance(value, WeekDays):
             return value.as_bit_string()
 
-        if isinstance(value, basestring):
+        if isinstance(value, six.text_type):
             return value
 
     def process_result_value(self, value, dialect):
