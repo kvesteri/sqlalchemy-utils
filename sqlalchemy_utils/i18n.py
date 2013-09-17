@@ -1,4 +1,4 @@
-from exceptions import ImproperlyConfigured
+from .exceptions import ImproperlyConfigured
 
 
 try:
