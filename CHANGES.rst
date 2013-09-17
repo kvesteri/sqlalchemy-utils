@@ -4,10 +4,17 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.16.14 (2013-09-17)
+^^^^^^^^^^^^^^^^^^^^
+
+- More pythonic __init__ for Country allowing Country(Country('fi')) == Country('fi')
+- Better equality operator for Country
+
+
 0.16.13 (2013-09-17)
 ^^^^^^^^^^^^^^^^^^^^
 
-- Added global i18n module for configuration of locale dependant types
+- Added i18n module for configuration of locale dependant types
 
 
 0.16.12 (2013-09-17)
