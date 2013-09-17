@@ -5,8 +5,11 @@ from sqlalchemy_utils import i18n
 
 
 class Country(object):
-    def __init__(self, code):
-        self.code = code
+    def __init__(self, code_or_country):
+        if isinstance(code_or_country, Country):
+            self.code = code_or_country.code
+        else:
+            self.code = code_or_country
 
     @property
     def name(self):
@@ -15,6 +18,8 @@ class Country(object):
     def __eq__(self, other):
         if isinstance(other, Country):
             return self.code == other.code
+        elif isinstance(other, six.string_types):
+            return self.code == other
         else:
             return NotImplemented
 

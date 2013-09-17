@@ -13,6 +13,16 @@ def get_locale():
 i18n.get_locale = get_locale
 
 
+class TestCountry(object):
+    def test_init(self):
+        assert Country(u'fi') == Country(Country(u'fi'))
+
+    def test_equality_operator(self):
+        assert Country(u'fi') == u'fi'
+        assert u'fi' == Country(u'fi')
+        assert Country(u'fi') == Country(u'fi')
+
+
 class TestCountryType(TestCase):
     def create_models(self):
         class User(self.Base):
