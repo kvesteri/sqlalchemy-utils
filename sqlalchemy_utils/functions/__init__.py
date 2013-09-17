@@ -197,6 +197,23 @@ def is_auto_assigned_date_column(column):
     )
 
 
+def has_changed(obj, attr):
+    """
+    Simple shortcut function for checking if given attribute of given
+    declarative model object has changed during the transaction.
+
+    :param obj: SQLAlchemy declarative model object
+    :param attr: Name of the attribute
+    """
+    return (
+        sa.inspect(obj)
+        .attrs
+        .get(attr)
+        .history
+        .has_changes()
+    )
+
+
 def identity(obj):
     """
     Return the identity of given sqlalchemy declarative model instance as a
