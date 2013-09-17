@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.16.11 (2013-09-17)
+^^^^^^^^^^^^^^^^^^^^
+
+- Python 3 support for WeekDaysType
+- Fixed a bug in batch fetch for situations where joined paths contain zero entitites
+
+
 0.16.10 (2013-09-16)
 ^^^^^^^^^^^^^^^^^^^^
 
