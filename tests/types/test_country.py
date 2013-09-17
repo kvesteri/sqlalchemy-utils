@@ -1,5 +1,5 @@
 import sqlalchemy as sa
-from sqlalchemy_utils import CountryType, Country
+from sqlalchemy_utils import CountryType, Country, i18n
 from tests import TestCase
 
 
@@ -10,7 +10,7 @@ def get_locale():
     return Locale()
 
 
-Country.get_locale = get_locale
+i18n.get_locale = get_locale
 
 
 class TestCountryType(TestCase):

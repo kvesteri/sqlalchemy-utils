@@ -1,27 +1,16 @@
 from sqlalchemy import types
 import six
 from .scalar_coercible import ScalarCoercible
-from ..exceptions import ImproperlyConfigured
+from sqlalchemy_utils import i18n
 
 
 class Country(object):
-    get_locale = None
-
-    def __init__(self, code, get_locale=None):
+    def __init__(self, code):
         self.code = code
-        if get_locale is not None:
-            self.get_locale = get_locale
-
-        if self.get_locale is None:
-            raise ImproperlyConfigured(
-                "Country class needs to define get_locale."
-            )
 
     @property
     def name(self):
-        return six.get_method_function(
-            self.get_locale
-        )().territories[self.code]
+        return i18n.get_locale().territories[self.code]
 
     def __eq__(self, other):
         if isinstance(other, Country):
@@ -43,12 +32,6 @@ class CountryType(types.TypeDecorator, ScalarCoercible):
     """
 
     impl = types.String(2)
-    get_locale = None
-
-    def __init__(self, get_locale=None, *args, **kwargs):
-        if get_locale is not None:
-            self.get_locale = get_locale
-        types.TypeDecorator.__init__(self, *args, **kwargs)
 
     def process_bind_param(self, value, dialect):
         if isinstance(value, Country):
@@ -59,7 +42,7 @@ class CountryType(types.TypeDecorator, ScalarCoercible):
 
     def process_result_value(self, value, dialect):
         if value is not None:
-            return Country(value, get_locale=self.get_locale)
+            return Country(value)
 
     def _coerce(self, value):
         if value is not None and not isinstance(value, Country):

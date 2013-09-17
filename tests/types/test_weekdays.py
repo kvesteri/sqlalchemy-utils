@@ -8,12 +8,13 @@ import pytest
 
 import six
 from sqlalchemy_utils.types import WeekDay, WeekDays
+from sqlalchemy_utils import i18n
 
 
 @pytest.mark.skipif('Locale is None')
 class TestWeekDay(object):
     def setup_method(self, method):
-        WeekDay.get_locale = lambda: Locale('fi')
+        i18n.get_locale = lambda: Locale('fi')
 
     def test_constructor_with_valid_index(self):
         day = WeekDay(1)
@@ -58,17 +59,15 @@ class TestWeekDay(object):
         ]
     )
     def test_position(self, index, first_week_day, position):
-        fake_locale = flexmock(first_week_day=first_week_day)
-        day = WeekDay(index, get_locale=lambda: fake_locale)
+        i18n.get_locale = flexmock(first_week_day=first_week_day)
+        day = WeekDay(index)
         assert day.position == position
 
     def test_get_name_returns_localized_week_day_name(self):
-        locale = Locale('fi')
-        day = WeekDay(0, get_locale=lambda: locale)
+        day = WeekDay(0)
         assert day.get_name() == u'maanantaina'
 
     def test_override_get_locale_as_class_method(self):
-        WeekDay.get_locale = lambda: Locale('fi')
         day = WeekDay(0)
         assert day.get_name() == u'maanantaina'
 
@@ -150,13 +149,12 @@ class TestWeekDays(object):
         assert days != 0
 
     def test_iterator_starts_from_locales_first_week_day(self):
-        fake_locale = flexmock(first_week_day=1)
-        WeekDay.get_locale = lambda: fake_locale
+        i18n.get_locale = lambda: flexmock(first_week_day=1)
         days = WeekDays('1111111')
         indices = list(day.index for day in days)
         assert indices == [1, 2, 3, 4, 5, 6, 0]
 
     def test_unicode(self):
-        WeekDay.get_locale = lambda: Locale('fi')
+        i18n.get_locale = lambda: Locale('fi')
         days = WeekDays('1000100')
         assert six.text_type(days) == u'maanantaina, perjantaina'

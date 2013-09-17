@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.16.13 (2013-09-17)
+^^^^^^^^^^^^^^^^^^^^
+
+- Added global i18n module for configuration of locale dependant types
+
+
 0.16.12 (2013-09-17)
 ^^^^^^^^^^^^^^^^^^^^
 

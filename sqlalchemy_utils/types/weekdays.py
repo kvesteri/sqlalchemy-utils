@@ -3,42 +3,21 @@ import sys
 from sqlalchemy import types
 from sqlalchemy.dialects.postgresql import BIT
 import six
-get_day_names = None
-try:
-    from babel.dates import get_day_names
-except ImportError:
-    pass
 
 from ..compat import total_ordering
-from ..exceptions import ImproperlyConfigured
-
-
-def call_unbound(func, *args, **kwargs):
-    try:
-        return six.get_unbound_function(func)(*args, **kwargs)
-    except AttributeError:
-        return func(*args, **kwargs)
+from sqlalchemy_utils import i18n
 
 
 @total_ordering
 class WeekDay(object):
     NUM_WEEK_DAYS = 7
-    get_locale = None
 
-    def __init__(self, index, get_locale=None):
+    def __init__(self, index):
         if not (0 <= index < self.NUM_WEEK_DAYS):
             raise ValueError(
                 "index must be between 0 and %d" % self.NUM_WEEK_DAYS
             )
         self.index = index
-
-        if get_locale is not None:
-            self.get_locale = get_locale
-
-        if self.get_locale is None:
-            raise ImproperlyConfigured(
-                "Weekday class needs to define get_locale."
-            )
 
     def __eq__(self, other):
         if isinstance(other, WeekDay):
@@ -62,10 +41,10 @@ class WeekDay(object):
         return self.name
 
     def get_name(self, width='wide', context='format'):
-        names = get_day_names(
+        names = i18n.get_day_names(
             width,
             context,
-            call_unbound(self.get_locale)
+            i18n.get_locale()
         )
         return names[self.index]
 
@@ -77,7 +56,7 @@ class WeekDay(object):
     def position(self):
         return (
             self.index -
-            call_unbound(self.get_locale).first_week_day
+            i18n.get_locale().first_week_day
         ) % self.NUM_WEEK_DAYS
 
 
