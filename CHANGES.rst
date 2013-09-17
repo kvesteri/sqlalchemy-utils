@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.16.15 (2013-09-17)
+^^^^^^^^^^^^^^^^^^^^
+
+- Fixed sort_query hybrid property handling (now supports both ascending and descending sorting)
+
+
 0.16.14 (2013-09-17)
 ^^^^^^^^^^^^^^^^^^^^
 
