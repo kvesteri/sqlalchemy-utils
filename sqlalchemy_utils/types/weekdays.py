@@ -34,8 +34,12 @@ class WeekDay(object):
     def __repr__(self):
         return '%s(%r)' % (self.__class__.__name__, self.index)
 
-    def __str__(self):
-        return six.text_type(self).encode('utf-8')
+    if sys.version_info[0] >= 3:  # Python 3
+        def __str__(self):
+            return self.__unicode__()
+    else:  # Python 2
+        def __str__(self):
+            return self.__unicode__().encode('utf8')
 
     def __unicode__(self):
         return self.name
