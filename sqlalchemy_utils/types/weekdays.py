@@ -13,6 +13,13 @@ from ..compat import total_ordering
 from ..exceptions import ImproperlyConfigured
 
 
+def call_unbound(func, *args, **kwargs):
+    try:
+        return six.get_unbound_function(func)(*args, **kwargs)
+    except AttributeError:
+        return func(*args, **kwargs)
+
+
 @total_ordering
 class WeekDay(object):
     NUM_WEEK_DAYS = 7
@@ -58,7 +65,7 @@ class WeekDay(object):
         names = get_day_names(
             width,
             context,
-            self.get_locale()
+            call_unbound(self.get_locale)
         )
         return names[self.index]
 
@@ -70,7 +77,7 @@ class WeekDay(object):
     def position(self):
         return (
             self.index -
-            self.get_locale().first_week_day
+            call_unbound(self.get_locale).first_week_day
         ) % self.NUM_WEEK_DAYS
 
 

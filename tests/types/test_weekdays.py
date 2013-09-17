@@ -10,11 +10,11 @@ import six
 from sqlalchemy_utils.types import WeekDay, WeekDays
 
 
-WeekDay.get_locale = lambda: Locale('fi')
-
-
 @pytest.mark.skipif('Locale is None')
 class TestWeekDay(object):
+    def setup_method(self, method):
+        WeekDay.get_locale = lambda: Locale('fi')
+
     def test_constructor_with_valid_index(self):
         day = WeekDay(1)
         assert day.index == 1
@@ -67,6 +67,11 @@ class TestWeekDay(object):
         day = WeekDay(0, get_locale=lambda: locale)
         assert day.get_name() == u'maanantaina'
 
+    def test_override_get_locale_as_class_method(self):
+        WeekDay.get_locale = lambda: Locale('fi')
+        day = WeekDay(0)
+        assert day.get_name() == u'maanantaina'
+
     def test_name_delegates_to_get_name(self):
         day = WeekDay(0)
         flexmock(day).should_receive('get_name').and_return(u'maanantaina')
@@ -76,11 +81,6 @@ class TestWeekDay(object):
         day = WeekDay(0)
         flexmock(day).should_receive('name').and_return(u'maanantaina')
         assert six.text_type(day) == u'maanantaina'
-
-    def test_str(self):
-        day = WeekDay(0)
-        flexmock(day).should_receive('__unicode__').and_return(u'maanantaina')
-        assert six.binary_type(day) == 'maanantaina'
 
 
 @pytest.mark.skipif('Locale is None')
@@ -151,19 +151,12 @@ class TestWeekDays(object):
 
     def test_iterator_starts_from_locales_first_week_day(self):
         fake_locale = flexmock(first_week_day=1)
-        flexmock(WeekDay).should_receive('get_locale').and_return(fake_locale)
+        WeekDay.get_locale = lambda: fake_locale
         days = WeekDays('1111111')
         indices = list(day.index for day in days)
         assert indices == [1, 2, 3, 4, 5, 6, 0]
 
     def test_unicode(self):
-        locale = Locale('fi')
-        flexmock(WeekDay).should_receive('get_locale').and_return(locale)
+        WeekDay.get_locale = lambda: Locale('fi')
         days = WeekDays('1000100')
         assert six.text_type(days) == u'maanantaina, perjantaina'
-
-    def test_str(self):
-        locale = Locale('fi')
-        flexmock(WeekDay).should_receive('get_locale').and_return(locale)
-        days = WeekDays('1000100')
-        assert six.binary_type(days) == 'maanantaina, perjantaina'
