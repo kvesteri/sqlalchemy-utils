@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import sys
 from sqlalchemy import types
 from sqlalchemy.dialects.postgresql import BIT
 import six
@@ -118,8 +119,12 @@ class WeekDays(object):
             self.as_bit_string()
         )
 
-    def __str__(self):
-        return six.text_type(self).encode('utf-8')
+    if sys.version_info[0] >= 3:  # Python 3
+        def __str__(self):
+            return self.__unicode__()
+    else:  # Python 2
+        def __str__(self):
+            return self.__unicode__().encode('utf8')
 
     def __unicode__(self):
         return u', '.join(six.text_type(day) for day in self)
