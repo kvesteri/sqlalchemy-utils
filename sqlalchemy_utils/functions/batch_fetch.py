@@ -54,6 +54,8 @@ class Path(object):
                 for entity in entities:
                     related_entities.extend(getattr(entity, attrs[0]))
 
+                if not related_entities:
+                    return
                 subpath = '.'.join(attrs[1:])
                 return Path.parse(related_entities, subpath, populate_backrefs)
             else:
@@ -146,8 +148,9 @@ def batch_fetch(entities, *attr_paths):
     if entities:
         for path in attr_paths:
             fetcher = fetcher_factory(entities, path)
-            fetcher.fetch()
-            fetcher.populate()
+            if fetcher:
+                fetcher.fetch()
+                fetcher.populate()
 
 
 def fetcher_factory(entities, path):
@@ -159,13 +162,17 @@ def fetcher_factory(entities, path):
     if isinstance(path, CompositePath):
         fetchers = []
         for path in path.paths:
-            fetchers.append(
-                Path.parse(entities, path, populate_backrefs).fetcher
-            )
+            path = Path.parse(entities, path, populate_backrefs)
+            if path:
+                fetchers.append(
+                    path.fetcher
+                )
 
         return CompositeFetcher(*fetchers)
     else:
-        return Path.parse(entities, path, populate_backrefs).fetcher
+        path = Path.parse(entities, path, populate_backrefs)
+        if path:
+            return path.fetcher
 
 
 class CompositeFetcher(object):
