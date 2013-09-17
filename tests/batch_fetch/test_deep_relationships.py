@@ -61,8 +61,7 @@ class TestBatchFetchDeepRelationships(TestCase):
         self.Article = Article
         self.Tag = Tag
 
-    def setup_method(self, method):
-        TestCase.setup_method(self, method)
+    def init_data(self):
         articles = [
             self.Article(name=u'Article 1'),
             self.Article(name=u'Article 2'),
@@ -89,7 +88,22 @@ class TestBatchFetchDeepRelationships(TestCase):
         self.session.add(category2)
         self.session.commit()
 
+    def test_supports_empty_related_entities(self):
+        category = self.Category(name=u'Category #1')
+        self.session.add(category)
+        self.session.commit()
+        categories = self.session.query(self.Category).all()
+        batch_fetch(
+            categories,
+            'articles',
+            'articles.tags'
+        )
+        query_count = self.connection.query_count
+        assert not categories[0].articles
+        assert self.connection.query_count == query_count
+
     def test_deep_relationships(self):
+        self.init_data()
         categories = self.session.query(self.Category).all()
         batch_fetch(
             categories,
@@ -103,6 +117,7 @@ class TestBatchFetchDeepRelationships(TestCase):
         assert self.connection.query_count == query_count
 
     def test_many_to_many_backref_population(self):
+        self.init_data()
         categories = self.session.query(self.Category).all()
         batch_fetch(
             categories,
