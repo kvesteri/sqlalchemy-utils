@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.16.12 (2013-09-17)
+^^^^^^^^^^^^^^^^^^^^
+
+- Fixed remaining Python 3 issues with WeekDaysType
+- Better bound method handling for WeekDay get_locale
+
+
 0.16.11 (2013-09-17)
 ^^^^^^^^^^^^^^^^^^^^
 
