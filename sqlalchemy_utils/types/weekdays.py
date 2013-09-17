@@ -127,7 +127,7 @@ class WeekDays(object):
     def as_bit_string(self):
         return ''.join(
             '1' if WeekDay(index) in self._days else '0'
-            for index in xrange(WeekDay.NUM_WEEK_DAYS)
+            for index in six.moves.xrange(WeekDay.NUM_WEEK_DAYS)
         )
 
 

@@ -6,6 +6,7 @@ except ImportError:
 from flexmock import flexmock
 import pytest
 
+import six
 from sqlalchemy_utils.types import WeekDay, WeekDays
 
 
@@ -74,12 +75,12 @@ class TestWeekDay(object):
     def test_unicode(self):
         day = WeekDay(0)
         flexmock(day).should_receive('name').and_return(u'maanantaina')
-        assert unicode(day) == u'maanantaina'
+        assert six.text_type(day) == u'maanantaina'
 
     def test_str(self):
         day = WeekDay(0)
         flexmock(day).should_receive('__unicode__').and_return(u'maanantaina')
-        assert str(day) == 'maanantaina'
+        assert six.binary_type(day) == 'maanantaina'
 
 
 @pytest.mark.skipif('Locale is None')
@@ -159,10 +160,10 @@ class TestWeekDays(object):
         locale = Locale('fi')
         flexmock(WeekDay).should_receive('get_locale').and_return(locale)
         days = WeekDays('1000100')
-        assert unicode(days) == u'maanantaina, perjantaina'
+        assert six.text_type(days) == u'maanantaina, perjantaina'
 
     def test_str(self):
         locale = Locale('fi')
         flexmock(WeekDay).should_receive('get_locale').and_return(locale)
         days = WeekDays('1000100')
-        assert str(days) == 'maanantaina, perjantaina'
+        assert six.binary_type(days) == 'maanantaina, perjantaina'
