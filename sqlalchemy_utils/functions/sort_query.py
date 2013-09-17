@@ -71,7 +71,9 @@ class QuerySorter(object):
 
         # Check hybrid properties.
         if hasattr(entity, sort['attr']):
-            return self.query.order_by(getattr(entity, sort['attr']))
+            return self.query.order_by(
+                sort['func'](getattr(entity, sort['attr']))
+            )
 
         return self.query
 
