@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.16.16 (2013-09-18)
+^^^^^^^^^^^^^^^^^^^^
+
+- Fixed fatal bug in batch fetch join table inheritance handling (not handling one-to-many relations properly)
+
+
 0.16.15 (2013-09-17)
 ^^^^^^^^^^^^^^^^^^^^
 

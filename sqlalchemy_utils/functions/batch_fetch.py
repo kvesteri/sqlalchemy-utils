@@ -8,6 +8,10 @@ from sqlalchemy.orm.attributes import (
 from sqlalchemy.orm.session import object_session
 
 
+class PathException(Exception):
+    pass
+
+
 class with_backrefs(object):
     """
     Marks given attribute path so that whenever its fetched with batch_fetch
@@ -27,7 +31,7 @@ class Path(object):
         self.entities = entities
         self.populate_backrefs = populate_backrefs
         if not isinstance(self.property, RelationshipProperty):
-            raise Exception(
+            raise PathException(
                 'Given attribute is not a relationship property.'
             )
         self.fetcher = self.fetcher_class(self)
@@ -65,7 +69,7 @@ class Path(object):
         elif isinstance(path, InstrumentedAttribute):
             attr = path
         else:
-            raise Exception('Unknown path type.')
+            raise PathException('Unknown path type.')
 
         return Path(entities, attr.property, populate_backrefs)
 
@@ -181,7 +185,7 @@ class CompositeFetcher(object):
             fetchers[0].path.model == fetcher.path.model
             for fetcher in fetchers
         ):
-            raise Exception(
+            raise PathException(
                 'Each relationship property must have the same class when '
                 'using CompositeFetcher.'
             )
@@ -321,7 +325,7 @@ class Fetcher(object):
                 )
             return sa.or_(*conditions)
         else:
-            raise Exception(
+            raise PathException(
                 'Could not obtain remote column names.'
             )
 
@@ -354,7 +358,7 @@ class ManyToManyFetcher(Fetcher):
         for local, remote in self.prop.local_remote_pairs:
             for fk in remote.foreign_keys:
                 if fk.column.table in self.prop.parent.tables:
-                    names.append(fk.parent.name)
+                    names.append(remote.name)
         return names
 
     @property
