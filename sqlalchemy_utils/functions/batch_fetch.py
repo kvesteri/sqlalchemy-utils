@@ -223,7 +223,10 @@ class Fetcher(object):
     def __init__(self, path):
         self.path = path
         self.prop = self.path.property
-        self.parent_dict = defaultdict(list)
+        if self.prop.uselist:
+            self.parent_dict = defaultdict(list)
+        else:
+            self.parent_dict = defaultdict(lambda: None)
 
     @property
     def local_values_list(self):
@@ -387,10 +390,6 @@ class ManyToManyFetcher(Fetcher):
 
 
 class ManyToOneFetcher(Fetcher):
-    def __init__(self, path):
-        Fetcher.__init__(self, path)
-        self.parent_dict = defaultdict(lambda: None)
-
     def append_entity(self, entity):
         #print 'appending entity ', entity, ' to key ', self.parent_key(entity)
         self.parent_dict[self.parent_key(entity)] = entity
