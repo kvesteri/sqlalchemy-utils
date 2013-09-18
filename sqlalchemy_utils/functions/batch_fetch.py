@@ -242,13 +242,7 @@ class Fetcher(object):
 
     @property
     def local_column_names(self):
-        names = []
-        for local, remote in self.prop.local_remote_pairs:
-            for fk in remote.foreign_keys:
-                # TODO: make this support inherited tables
-                if fk.column.table in self.prop.parent.tables:
-                    names.append(local.name)
-        return names
+        return [local.name for local, remote in self.prop.local_remote_pairs]
 
     def parent_key(self, entity):
         return tuple(
@@ -314,7 +308,7 @@ class Fetcher(object):
             return getattr(self.remote, names[0]).in_(
                 value[0] for value in self.local_values_list
             )
-        else:
+        elif len(names) > 1:
             conditions = []
             for entity in self.path.entities:
                 conditions.append(
@@ -329,16 +323,34 @@ class Fetcher(object):
                     )
                 )
             return sa.or_(*conditions)
+        else:
+            raise Exception(
+                'Could not obtain remote column names.'
+            )
 
     def fetch(self):
         for entity in self.related_entities:
             self.append_entity(entity)
+
+    @property
+    def remote_column_names(self):
+        return [remote.name for local, remote in self.prop.local_remote_pairs]
 
 
 class ManyToManyFetcher(Fetcher):
     @property
     def remote(self):
         return self.prop.secondary.c
+
+    @property
+    def local_column_names(self):
+        names = []
+        for local, remote in self.prop.local_remote_pairs:
+            for fk in remote.foreign_keys:
+                # TODO: make this support inherited tables
+                if fk.column.table in self.prop.parent.tables:
+                    names.append(local.name)
+        return names
 
     @property
     def remote_column_names(self):
@@ -383,14 +395,6 @@ class ManyToOneFetcher(Fetcher):
         #print 'appending entity ', entity, ' to key ', self.parent_key(entity)
         self.parent_dict[self.parent_key(entity)] = entity
 
-    @property
-    def remote_column_names(self):
-        return [remote.name for local, remote in self.prop.local_remote_pairs]
-
-    @property
-    def local_column_names(self):
-        return [local.name for local, remote in self.prop.local_remote_pairs]
-
 
 class OneToManyFetcher(Fetcher):
     def append_entity(self, entity):
@@ -398,14 +402,3 @@ class OneToManyFetcher(Fetcher):
         self.parent_dict[self.parent_key(entity)].append(
             entity
         )
-
-    @property
-    def remote_column_names(self):
-        names = []
-        for local, remote in self.prop.local_remote_pairs:
-            for fk in remote.foreign_keys:
-                # TODO: make this support inherited tables
-                if fk.column.table == self.path.parent_model.__table__:
-                    names.append(fk.parent.name)
-
-        return names

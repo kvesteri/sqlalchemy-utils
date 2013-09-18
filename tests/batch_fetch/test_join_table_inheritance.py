@@ -3,10 +3,15 @@ from sqlalchemy_utils import batch_fetch
 from tests import TestCase
 
 
-class TestBatchFetchJoinTableInheritedModels(TestCase):
+class JoinTableInheritanceTestCase(TestCase):
     def create_models(self):
         class Category(self.Base):
             __tablename__ = 'category'
+            id = sa.Column(sa.Integer, primary_key=True)
+            name = sa.Column(sa.Unicode(255))
+
+        class User(self.Base):
+            __tablename__ = 'user'
             id = sa.Column(sa.Integer, primary_key=True)
             name = sa.Column(sa.Unicode(255))
 
@@ -17,6 +22,16 @@ class TestBatchFetchJoinTableInheritedModels(TestCase):
             category_id = sa.Column(
                 sa.Integer,
                 sa.ForeignKey(Category.id)
+            )
+            author_id = sa.Column(
+                sa.Integer,
+                sa.ForeignKey(User.id)
+            )
+            author = sa.orm.relationship(
+                User,
+                backref=sa.orm.backref(
+                    'text_items'
+                )
             )
 
             type = sa.Column(sa.Unicode(255))
@@ -55,10 +70,26 @@ class TestBatchFetchJoinTableInheritedModels(TestCase):
                 )
             )
 
-        self.TextItem = TextItem
-        self.Category = Category
+        class Attachment(self.Base):
+            __tablename__ = 'attachment'
+            id = sa.Column(
+                sa.Integer, primary_key=True
+            )
+            name = sa.Column(
+                sa.Unicode(255), index=True
+            )
+            text_item_id = sa.Column(
+                sa.Integer,
+                sa.ForeignKey(TextItem.id),
+            )
+            text_item = sa.orm.relationship(TextItem, backref='attachments')
+
         self.Article = Article
+        self.Attachment = Attachment
         self.BlogPost = BlogPost
+        self.Category = Category
+        self.TextItem = TextItem
+        self.User = User
 
     def setup_method(self, method):
         TestCase.setup_method(self, method)
@@ -82,8 +113,17 @@ class TestBatchFetchJoinTableInheritedModels(TestCase):
         category2.blog_posts = text_items[-1:]
         self.session.add(category)
         self.session.add(category2)
+        text_items[0].attachments = [
+            self.Attachment(id=22, name=u'Attachment 1'),
+            self.Attachment(id=34, name=u'Attachment 2')
+        ]
+        text_items[0].author = self.User(name=u'John Matrix')
+        text_items[1].author = self.User(name=u'John Doe')
+
         self.session.commit()
 
+
+class TestBatchFetchJoinTableInheritedModels(JoinTableInheritanceTestCase):
     def test_multiple_relationships(self):
         categories = self.session.query(self.Category).all()
         batch_fetch(
@@ -98,3 +138,25 @@ class TestBatchFetchJoinTableInheritedModels(TestCase):
         categories[1].articles[1]
         categories[1].blog_posts[0]
         assert self.connection.query_count == query_count
+
+    def test_one_to_many_relationships(self):
+        articles = (
+            self.session.query(self.Article)
+            .filter_by(name=u'Article 1')
+            .all()
+        )
+        batch_fetch(
+            articles,
+            'attachments'
+        )
+
+    def test_many_to_one_relationships(self):
+        articles = (
+            self.session.query(self.Article)
+            .filter_by(name=u'Article 1')
+            .all()
+        )
+        batch_fetch(
+            articles,
+            'author'
+        )
