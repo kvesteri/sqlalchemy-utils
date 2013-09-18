@@ -285,12 +285,6 @@ class Fetcher(object):
         Populate batch fetched entities to parent objects.
         """
         for entity in self.path.entities:
-            # print (
-            #     "setting committed value for ",
-            #     entity,
-            #     " using local values ",
-            #     self.local_values(entity)
-            # )
             set_committed_value(
                 entity,
                 self.prop.key,
@@ -350,7 +344,6 @@ class ManyToManyFetcher(Fetcher):
         names = []
         for local, remote in self.prop.local_remote_pairs:
             for fk in remote.foreign_keys:
-                # TODO: make this support inherited tables
                 if fk.column.table in self.prop.parent.tables:
                     names.append(local.name)
         return names
@@ -360,10 +353,8 @@ class ManyToManyFetcher(Fetcher):
         names = []
         for local, remote in self.prop.local_remote_pairs:
             for fk in remote.foreign_keys:
-                # TODO: make this support inherited tables
-                if fk.column.table == self.path.parent_model.__table__:
+                if fk.column.table in self.prop.parent.tables:
                     names.append(fk.parent.name)
-
         return names
 
     @property
