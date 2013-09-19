@@ -65,6 +65,7 @@ class TestCase(object):
                 return (
                     sa.select([sa.func.count(self.Article.id)])
                     .where(self.Article.category_id == self.Category.id)
+                    .correlate(self.Article.__table__)
                     .label('article_count')
                 )
 
