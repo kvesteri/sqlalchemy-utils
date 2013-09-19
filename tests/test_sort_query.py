@@ -129,5 +129,4 @@ class TestSortQuery(TestCase):
             )
         )
         query = sort_query(query, '-category-articles_count')
-        print query
-        #assert 'ORDER BY (SELECT count(article.id) AS count_1' in str(query)
+        assert 'ORDER BY (SELECT count(article.id) AS count_1' in str(query)

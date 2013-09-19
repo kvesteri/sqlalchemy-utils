@@ -20,6 +20,15 @@ def sort_expression(expr, attr_name):
         return getattr(expr, attr_name)
 
 
+def get_entity(expr):
+    if isinstance(expr, AliasedInsp):
+        return expr.mapper.class_
+    elif isinstance(expr, Mapper):
+        return expr.class_
+    else:
+        return expr
+
+
 def matches_entity(alias, entity):
     if not alias:
         return True
@@ -85,6 +94,7 @@ class QuerySorter(object):
             ))
 
         # Check hybrid properties.
+        entity = get_entity(entity)
         if hasattr(entity, sort['attr']):
             return self.query.order_by(
                 sort['func'](getattr(entity, sort['attr']))
