@@ -1,8 +1,34 @@
+from sqlalchemy import inspect
 from sqlalchemy.orm.mapper import Mapper
 from sqlalchemy.orm.properties import ColumnProperty
 from sqlalchemy.orm.query import _ColumnEntity
 from sqlalchemy.orm.util import AliasedInsp
 from sqlalchemy.sql.expression import desc, asc, Label
+
+
+def attrs(expr):
+    if isinstance(expr, AliasedInsp):
+        return expr.mapper.attrs
+    else:
+        return inspect(expr).attrs
+
+
+def sort_expression(expr, attr_name):
+    if isinstance(expr, AliasedInsp):
+        return getattr(expr.selectable.c, attr_name)
+    else:
+        return getattr(expr, attr_name)
+
+
+def matches_entity(alias, entity):
+    if not alias:
+        return True
+    if isinstance(entity, AliasedInsp):
+        name = entity.name
+    else:
+        name = entity.__table__.name
+
+    return name == alias
 
 
 class QuerySorter(object):
@@ -38,43 +64,31 @@ class QuerySorter(object):
             return self.query.order_by(sort['func'](sort['attr']))
 
         for entity in self.entities:
-            if isinstance(entity, AliasedInsp):
-                if sort['entity'] and entity.name != sort['entity']:
-                    continue
+            if not matches_entity(sort['entity'], entity):
+                continue
 
-                selectable = entity.selectable
-
-                if sort['attr'] in selectable.c:
-                    attr = selectable.c[sort['attr']]
-                    return self.query.order_by(sort['func'](attr))
-            else:
-                table = entity.__table__
-                if sort['entity'] and table.name != sort['entity']:
-                    continue
-                return self.assign_entity_attr_order_by(entity, sort)
+            return self.assign_entity_attr_order_by(entity, sort)
 
         return self.query
 
     def assign_entity_attr_order_by(self, entity, sort):
-        if sort['attr'] in entity.__mapper__.class_manager.keys():
-            try:
-                attr = getattr(entity, sort['attr'])
-            except AttributeError:
-                pass
-            else:
-                property_ = attr.property
-                if isinstance(property_, ColumnProperty):
-                    if isinstance(attr.property.columns[0], Label):
-                        attr = attr.property.columns[0].name
-
-                return self.query.order_by(sort['func'](attr))
+        properties = attrs(entity)
+        if sort['attr'] in properties:
+            property_ = properties[sort['attr']]
+            if isinstance(property_, ColumnProperty):
+                if isinstance(property_.columns[0], Label):
+                    expr = property_.columns[0].name
+                else:
+                    expr = sort_expression(entity, property_.key)
+            return self.query.order_by(sort['func'](
+                expr
+            ))
 
         # Check hybrid properties.
         if hasattr(entity, sort['attr']):
             return self.query.order_by(
                 sort['func'](getattr(entity, sort['attr']))
             )
-
         return self.query
 
     def parse_sort_arg(self, arg):
