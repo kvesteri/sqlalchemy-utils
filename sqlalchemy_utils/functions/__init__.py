@@ -7,7 +7,7 @@ from sqlalchemy.orm.properties import ColumnProperty
 from sqlalchemy.orm.query import Query
 from sqlalchemy.schema import MetaData, Table, ForeignKeyConstraint
 from .batch_fetch import batch_fetch, with_backrefs, CompositePath
-from .sort_query import sort_query
+from .sort_query import sort_query, QuerySorterException
 
 
 __all__ = (
@@ -15,6 +15,7 @@ __all__ = (
     sort_query,
     with_backrefs,
     CompositePath,
+    QuerySorterException
 )
 
 

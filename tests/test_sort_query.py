@@ -1,5 +1,7 @@
+from pytest import raises
 import sqlalchemy as sa
 from sqlalchemy_utils import sort_query
+from sqlalchemy_utils.functions import QuerySorterException
 from tests import TestCase
 
 
@@ -21,6 +23,11 @@ class TestSortQuery(TestCase):
         query = self.session.query(self.Article)
         sorted_query = sort_query(query, '-unknown')
         assert query == sorted_query
+
+    def test_non_silent_mode(self):
+        query = self.session.query(self.Article)
+        with raises(QuerySorterException):
+            sort_query(query, '-unknown', silent=False)
 
     def test_calculated_value_ascending(self):
         query = self.session.query(
@@ -116,10 +123,10 @@ class TestSortQuery(TestCase):
         query = sort_query(query, '-category-articles_count')
         assert 'ORDER BY (SELECT count(article.id) AS count_1' in str(query)
 
-    def test_aliased_relation_hybrid_property(self):
+    def test_aliased_hybrid_property(self):
         alias = sa.orm.aliased(
             self.Category,
-            name='category'
+            name='categories'
         )
         query = (
             self.session.query(self.Article)
@@ -128,5 +135,5 @@ class TestSortQuery(TestCase):
                 sa.orm.contains_eager(self.Article.category, alias=alias)
             )
         )
-        query = sort_query(query, '-category-articles_count')
+        query = sort_query(query, '-categories-articles_count')
         assert 'ORDER BY (SELECT count(article.id) AS count_1' in str(query)
