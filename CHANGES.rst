@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.16.19 (2013-09-21)
+^^^^^^^^^^^^^^^^^^^^
+
+- Added configuration for silent mode in sort_query
+- Added support for aliased entity hybrid properties in sort_query
+
+
 0.16.18 (2013-09-19)
 ^^^^^^^^^^^^^^^^^^^^
 
