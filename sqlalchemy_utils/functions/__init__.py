@@ -2,45 +2,21 @@ from collections import defaultdict
 import six
 import datetime
 import sqlalchemy as sa
-from sqlalchemy.orm import defer
-from sqlalchemy.orm.properties import ColumnProperty
 from sqlalchemy.orm.query import Query
 from sqlalchemy.schema import MetaData, Table, ForeignKeyConstraint
 from .batch_fetch import batch_fetch, with_backrefs, CompositePath
+from .defer_except import defer_except
 from .sort_query import sort_query, QuerySorterException
 
 
 __all__ = (
     batch_fetch,
+    defer_except,
     sort_query,
     with_backrefs,
     CompositePath,
     QuerySorterException
 )
-
-
-def defer_except(query, columns):
-    """
-    Deferred loads all columns in given query, except the ones given.
-
-    This function is very useful when working with models with myriad of
-    columns and you want to deferred load many columns.
-
-        >>> from sqlalchemy_utils import defer_except
-        >>> query = session.query(Article)
-        >>> query = defer_except(Article, [Article.id, Article.name])
-
-    :param columns: columns not to deferred load
-    """
-    model = query._entities[0].entity_zero.class_
-    fields = set(model._sa_class_manager.values())
-    for field in fields:
-        property_ = field.property
-        if isinstance(property_, ColumnProperty):
-            column = property_.columns[0]
-            if column.name not in columns:
-                query = query.options(defer(property_.key))
-    return query
 
 
 def escape_like(string, escape_char='*'):

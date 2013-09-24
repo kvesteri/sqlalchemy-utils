@@ -12,13 +12,6 @@ class TestEscapeLike(TestCase):
         assert escape_like('_*%') == '*_***%'
 
 
-class TestDeferExcept(TestCase):
-    def test_deferred_loads_all_columns_except_the_ones_given(self):
-        query = self.session.query(self.Article)
-        query = defer_except(query, ['id'])
-        assert str(query) == 'SELECT article.id AS article_id \nFROM article'
-
-
 class TestFindNonIndexedForeignKeys(TestCase):
     # dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
 
