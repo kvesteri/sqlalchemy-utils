@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.16.20 (2013-09-26)
+^^^^^^^^^^^^^^^^^^^^
+
+- Fixed an issue with sort_query where sort by main entity's attribute would fail if joins where applied.
+
+
 0.16.19 (2013-09-21)
 ^^^^^^^^^^^^^^^^^^^^
 
