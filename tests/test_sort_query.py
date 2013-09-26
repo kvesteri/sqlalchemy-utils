@@ -29,6 +29,14 @@ class TestSortQuery(TestCase):
         with raises(QuerySorterException):
             sort_query(query, '-unknown', silent=False)
 
+    def test_join(self):
+        query = (
+            self.session.query(self.Article)
+            .join(self.Article.category)
+        )
+        query = sort_query(query, 'name', silent=False)
+        assert 'ORDER BY article.name ASC' in str(query)
+
     def test_calculated_value_ascending(self):
         query = self.session.query(
             self.Category, sa.func.count(self.Article.id).label('articles')

@@ -20,17 +20,6 @@ def sort_expression(expr, attr_name):
         return getattr(expr, attr_name)
 
 
-def matches_entity(alias, entity):
-    if not alias:
-        return True
-    if isinstance(entity, AliasedInsp):
-        name = entity.name
-    else:
-        name = entity.__table__.name
-
-    return name == alias
-
-
 class QuerySorterException(Exception):
     pass
 
@@ -60,6 +49,19 @@ class QuerySorter(object):
             else:
                 self.entities.append(mapper)
 
+    def get_entity_by_alias(self, alias):
+        if not alias:
+            return self.entities[0]
+
+        for entity in self.entities:
+            if isinstance(entity, AliasedInsp):
+                name = entity.name
+            else:
+                name = entity.__table__.name
+
+            if name == alias:
+                return entity
+
     def assign_order_by(self, sort):
         if not sort:
             return self.query
@@ -69,10 +71,8 @@ class QuerySorter(object):
         if sort['attr'] in self.labels:
             expr = sort['attr']
         else:
-            for entity in self.entities:
-                if not matches_entity(sort['entity'], entity):
-                    continue
-
+            entity = self.get_entity_by_alias(sort['entity'])
+            if entity:
                 expr = self.order_by_attr(entity, sort['attr'])
 
         if expr is not None:
