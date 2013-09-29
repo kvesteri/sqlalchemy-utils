@@ -109,6 +109,11 @@ class TestSortQuery(TestCase):
         sorted_query = sort_query(query, '-article_count')
         assert 'article_count DESC' in str(sorted_query)
 
+    def test_relationship_property(self):
+        query = self.session.query(self.Category)
+        query = sort_query(query, 'articles')
+        assert 'ORDER BY' not in str(query)
+
     def test_hybrid_property(self):
         query = self.session.query(self.Category)
         query = sort_query(query, 'articles_count')

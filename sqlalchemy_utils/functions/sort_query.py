@@ -94,7 +94,9 @@ class QuerySorter(object):
                     expr = property_.columns[0].name
                 else:
                     expr = sort_expression(entity, property_.key)
-            return expr
+                return expr
+            else:
+                return
 
         if isinstance(entity, AliasedInsp):
             entity = entity.entity
