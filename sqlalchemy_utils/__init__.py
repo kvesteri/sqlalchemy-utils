@@ -38,7 +38,7 @@ from .types import (
 )
 
 
-__version__ = '0.16.20'
+__version__ = '0.16.21'
 
 
 __all__ = (
