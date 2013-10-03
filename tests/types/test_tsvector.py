@@ -30,3 +30,8 @@ class TestTSVector(TestCase):
             autoload_with=self.engine
         )
         assert isinstance(table.c['search_index'].type, TSVectorType)
+
+    def test_catalog_and_columns_as_args(self):
+        type_ = TSVectorType('name', 'age', catalog='pg_catalog.simple')
+        assert type_.columns == ('name', 'age')
+        assert type_.options['catalog'] == 'pg_catalog.simple'

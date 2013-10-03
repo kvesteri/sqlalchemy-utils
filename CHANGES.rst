@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.16.22 (2013-10-03)
+^^^^^^^^^^^^^^^^^^^^
+
+- Added optional columns and options parameter for TSVectorType
+
+
 0.16.21 (2013-09-29)
 ^^^^^^^^^^^^^^^^^^^^
 
