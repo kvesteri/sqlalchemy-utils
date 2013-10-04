@@ -1,3 +1,4 @@
+import six
 import sqlalchemy as sa
 from sqlalchemy_utils import TSVectorType
 from tests import TestCase
@@ -35,3 +36,8 @@ class TestTSVector(TestCase):
         type_ = TSVectorType('name', 'age', catalog='pg_catalog.simple')
         assert type_.columns == ('name', 'age')
         assert type_.options['catalog'] == 'pg_catalog.simple'
+
+    def test_match(self):
+        assert six.text_type(self.User.search_index.match(u'something')) == (
+            '("user".search_index) @@ :tsvector_match_1'
+        )
