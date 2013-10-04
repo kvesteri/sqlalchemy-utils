@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.16.24 (2013-10-04)
+^^^^^^^^^^^^^^^^^^^^
+
+- Renamed match operator of TSVectorType to match_tsquery in order to avoid confusion with existing match operator
+- Added catalog parameter support for match_tsquery operator
+
+
 0.16.23 (2013-10-04)
 ^^^^^^^^^^^^^^^^^^^^
 

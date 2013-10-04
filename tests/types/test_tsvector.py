@@ -38,6 +38,15 @@ class TestTSVector(TestCase):
         assert type_.options['catalog'] == 'pg_catalog.simple'
 
     def test_match(self):
-        assert six.text_type(self.User.search_index.match(u'something')) == (
-            '("user".search_index) @@ :tsvector_match_1'
+        expr = self.User.search_index.match_tsquery(u'something')
+        assert six.text_type(expr) == (
+            '("user".search_index) @@ to_tsquery(:to_tsquery_1)'
+        )
+
+    def test_match_with_catalog(self):
+        expr = self.User.search_index.match_tsquery(
+            u'something', catalog='pg_catalog.simple'
+        )
+        assert six.text_type(expr) == (
+            '("user".search_index) @@ to_tsquery(:to_tsquery_1, :to_tsquery_2)'
         )

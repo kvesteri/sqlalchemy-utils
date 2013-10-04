@@ -4,10 +4,20 @@ from sqlalchemy.dialects.postgresql.base import ischema_names
 
 class TSVectorType(sa.types.UserDefinedType):
     class comparator_factory(sa.types.TypeEngine.Comparator):
-        def match(self, other):
-            from sqlalchemy_utils.expressions import tsvector_match
+        def match_tsquery(self, other, catalog=None):
+            from sqlalchemy_utils.expressions import tsvector_match, to_tsquery
 
-            return tsvector_match(self.expr, other)
+            args = []
+            if catalog:
+                args.append(catalog)
+            elif self.type.options.get('catalog'):
+                args.append(self.type.options.get('catalog'))
+            args.append(other)
+
+            return tsvector_match(
+                self.expr,
+                to_tsquery(*args)
+            )
 
     def __init__(self, *args, **kwargs):
         """
