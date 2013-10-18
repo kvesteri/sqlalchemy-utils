@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.16.25 (2013-10-18)
+^^^^^^^^^^^^^^^^^^^^
+
+- Added __ne__ operator implementation for Country object
+- New utility function: naturally_equivalent
+
+
 0.16.24 (2013-10-04)
 ^^^^^^^^^^^^^^^^^^^^
 
