@@ -174,7 +174,7 @@ def is_auto_assigned_date_column(column):
     )
 
 
-def has_changed(obj, attr):
+def has_changes(obj, attr):
     """
     Simple shortcut function for checking if given attribute of given
     declarative model object has changed during the transaction.
@@ -214,6 +214,11 @@ def render_statement(statement, bind=None):
     """
     Generate an SQL expression string with bound parameters rendered inline
     for the given SQLAlchemy statement.
+
+    :param statement: SQLAlchemy Query object.
+    :param bind:
+        Optional SQLAlchemy bind, if None uses the bind of the given query
+        object.
     """
 
     if isinstance(statement, Query):
