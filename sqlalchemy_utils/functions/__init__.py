@@ -210,6 +210,26 @@ def identity(obj):
     return tuple(id_)
 
 
+def naturally_equivalent(obj, obj2):
+    """
+    Returns whether or not two given SQLAlchemy declarative instances are
+    naturally equivalent (all their non primary key properties are equivalent).
+
+    :param obj: SQLAlchemy declarative model object
+    :param obj2: SQLAlchemy declarative model object to compare with `obj`
+    """
+    for prop in sa.inspect(obj.__class__).iterate_properties:
+        if not isinstance(prop, sa.orm.ColumnProperty):
+            continue
+
+        if prop.columns[0].primary_key:
+            continue
+
+        if not (getattr(obj, prop.key) == getattr(obj2, prop.key)):
+            return False
+    return True
+
+
 def render_statement(statement, bind=None):
     """
     Generate an SQL expression string with bound parameters rendered inline

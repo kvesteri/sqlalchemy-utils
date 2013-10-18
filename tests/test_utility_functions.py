@@ -1,5 +1,6 @@
 import sqlalchemy as sa
-from sqlalchemy_utils import escape_like, defer_except
+from sqlalchemy_utils import escape_like
+from sqlalchemy_utils.functions import naturally_equivalent
 from tests import TestCase
 from sqlalchemy_utils.functions import (
     non_indexed_foreign_keys,
@@ -10,6 +11,18 @@ from sqlalchemy_utils.functions import (
 class TestEscapeLike(TestCase):
     def test_escapes_wildcards(self):
         assert escape_like('_*%') == '*_***%'
+
+
+class TestNaturallyEquivalent(TestCase):
+    def test_returns_true_when_properties_match(self):
+        assert naturally_equivalent(
+            self.User(name=u'someone'), self.User(name=u'someone')
+        )
+
+    def test_skips_primary_keys(self):
+        assert naturally_equivalent(
+            self.User(id=1, name=u'someone'), self.User(id=2, name=u'someone')
+        )
 
 
 class TestFindNonIndexedForeignKeys(TestCase):
