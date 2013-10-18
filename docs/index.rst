@@ -272,6 +272,8 @@ API Documentation
 
 .. autofunction:: sort_query
 .. autofunction:: escape_like
+.. autofunction:: naturally_equivalent
+.. autofunction:: has_changes
 .. autofunction:: non_indexed_foreign_keys
 .. autofunction:: is_indexed_foreign_key
 .. autofunction:: identity

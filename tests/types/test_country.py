@@ -22,6 +22,10 @@ class TestCountry(object):
         assert u'fi' == Country(u'fi')
         assert Country(u'fi') == Country(u'fi')
 
+    def test_non_equality_operator(self):
+        assert Country(u'fi') != u'sv'
+        assert not (Country(u'fi') != u'fi')
+
 
 class TestCountryType(TestCase):
     def create_models(self):

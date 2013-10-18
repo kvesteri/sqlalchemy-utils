@@ -23,6 +23,9 @@ class Country(object):
         else:
             return NotImplemented
 
+    def __ne__(self, other):
+        return not (self == other)
+
     def __repr__(self):
         return '%s(%r)' % (self.__class__.__name__, self.code)
 
