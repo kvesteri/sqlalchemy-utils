@@ -1,3 +1,4 @@
+from .decorators import generates
 from .exceptions import ImproperlyConfigured
 from .functions import (
     batch_fetch,
@@ -49,6 +50,8 @@ __all__ = (
     coercion_listener,
     defer_except,
     escape_like,
+    generates,
+    generic_relationship,
     instrumented_list,
     merge,
     primary_keys,
@@ -60,7 +63,6 @@ __all__ = (
     sort_query,
     table_name,
     with_backrefs,
-    generic_relationship,
     ArrowType,
     ColorType,
     CountryType,
