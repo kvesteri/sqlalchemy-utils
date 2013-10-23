@@ -271,7 +271,7 @@ def create_mock_engine(bind, stream=None):
             text = re.sub(r'\n+', '\n', text)
             text = text.strip('\n').strip()
 
-            if stream.tell() > 0:
+            if not stream.seekable() or stream.tell() > 0:
                 stream.write('\n')
 
             stream.write(text)
