@@ -313,7 +313,7 @@ def mock_engine(engine, stream=None):
             target = frame.f_locals['__target']
             break
 
-        except StandardError:
+        except:
             pass
 
     else:
