@@ -1,9 +1,23 @@
+from collections import defaultdict
 import sqlalchemy as sa
-from sqlalchemy_utils import generates
+from sqlalchemy_utils import generates, decorators
 from tests import TestCase
 
 
-class TestGeneratesWithBoundMethodAndClassVariableArg(TestCase):
+class GeneratesTestCase(TestCase):
+    def setup_method(self, method):
+        TestCase.setup_method(self, method)
+        decorators.generator_registry = defaultdict(list)
+
+    def test_generates_value_before_flush(self):
+        article = self.Article()
+        article.name = u'some article name'
+        self.session.add(article)
+        self.session.flush()
+        assert article.slug == u'some-article-name'
+
+
+class TestGeneratesWithBoundMethodAndClassVariableArg(GeneratesTestCase):
     def create_models(self):
         class Article(self.Base):
             __tablename__ = 'article'
@@ -17,15 +31,8 @@ class TestGeneratesWithBoundMethodAndClassVariableArg(TestCase):
 
         self.Article = Article
 
-    def test_generates_value_before_flush(self):
-        article = self.Article()
-        article.name = u'some article name'
-        self.session.add(article)
-        self.session.flush()
-        assert article.slug == u'some-article-name'
 
-
-class TestGeneratesWithBoundMethodAndStringArg(TestCase):
+class TestGeneratesWithBoundMethodAndStringArg(GeneratesTestCase):
     def create_models(self):
         class Article(self.Base):
             __tablename__ = 'article'
@@ -39,15 +46,8 @@ class TestGeneratesWithBoundMethodAndStringArg(TestCase):
 
         self.Article = Article
 
-    def test_generates_value_before_flush(self):
-        article = self.Article()
-        article.name = u'some article name'
-        self.session.add(article)
-        self.session.flush()
-        assert article.slug == u'some-article-name'
 
-
-class TestGeneratesWithFunctionAndStringArg(TestCase):
+class TestGeneratesWithFunctionAndStringArg(GeneratesTestCase):
     def create_models(self):
         class Article(self.Base):
             __tablename__ = 'article'
@@ -61,15 +61,8 @@ class TestGeneratesWithFunctionAndStringArg(TestCase):
 
         self.Article = Article
 
-    def test_generates_value_before_flush(self):
-        article = self.Article()
-        article.name = u'some article name'
-        self.session.add(article)
-        self.session.flush()
-        assert article.slug == u'some-article-name'
 
-
-class TestGeneratesWithFunctionAndClassVariableArg(TestCase):
+class TestGeneratesWithFunctionAndClassVariableArg(GeneratesTestCase):
     def create_models(self):
         class Article(self.Base):
             __tablename__ = 'article'
@@ -82,10 +75,3 @@ class TestGeneratesWithFunctionAndClassVariableArg(TestCase):
             return self.name.lower().replace(' ', '-')
 
         self.Article = Article
-
-    def test_generates_value_before_flush(self):
-        article = self.Article()
-        article.name = u'some article name'
-        self.session.add(article)
-        self.session.flush()
-        assert article.slug == u'some-article-name'
