@@ -102,9 +102,10 @@ class TestRender(TestCase):
         assert 'WHERE user.id = 3' in text
 
     def test_render_ddl(self):
-        context = {'table': self.User.__table__}
-        expression = 'table.create(engine)'
-        text = render_expression(expression, self.engine, context)
+        expression = 'self.User.__table__.create(engine)'
+        stream = render_expression(expression, self.engine)
+
+        text = stream.getvalue()
 
         assert 'CREATE TABLE user' in text
         assert 'PRIMARY KEY' in text

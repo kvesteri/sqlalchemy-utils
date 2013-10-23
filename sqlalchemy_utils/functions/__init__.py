@@ -340,7 +340,7 @@ def mock_engine(engine, stream=None):
     six.exec_('del __mock', frame.f_globals, frame.f_locals)
 
 
-def render_expression(expression, bind, context=None):
+def render_expression(expression, bind, stream=None):
     """Generate a SQL expression from the passed python expression.
 
     Only the global variable, `engine`, is available for use in the
@@ -351,15 +351,36 @@ def render_expression(expression, bind, context=None):
     blindly pass user input to this function as it uses exec.
 
     :param bind: A SQLAlchemy engine or bind URL.
-    :param context: Dictionary of local variables for the expression.
+    :param stream: Render all DDL operations to the stream.
     """
 
-    stream = cStringIO()
+    # Create a stream if not present.
+
+    if stream is None:
+        stream = cStringIO()
+
     engine = create_mock_engine(bind, stream)
 
-    six.exec_(expression, {'engine': engine}, context)
+    # Navigate the stack and find the calling frame that allows the
+    # expression to execuate.
 
-    return stream.getvalue()
+    for frame in inspect.stack()[1:]:
+
+        try:
+            frame = frame[0]
+            local = dict(frame.f_locals)
+            local['engine'] = engine
+            six.exec_(expression, frame.f_globals, local)
+            break
+
+        except:
+            pass
+
+    else:
+
+        raise ValueError('Not a valid python expression', engine)
+
+    return stream
 
 
 def render_statement(statement, bind=None):
