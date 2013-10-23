@@ -271,9 +271,7 @@ def create_mock_engine(bind, stream=None):
             text = re.sub(r'\n+', '\n', text)
             text = text.strip('\n').strip()
 
-            stream.write('\n')
-            stream.write(text)
-            stream.write(';')
+            stream.write('\n%s;' % text)
 
     else:
 
