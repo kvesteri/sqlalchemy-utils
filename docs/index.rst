@@ -48,8 +48,15 @@ Example
     session.commit()
 
 
+
+Data types
+----------
+
+SQLAlchemy-Utils provides various new data types for SQLAlchemy.
+
+
 ScalarListType
---------------
+^^^^^^^^^^^^^^
 
 ScalarListType type provides convenient way for saving multiple scalar values in one
 column. ScalarListType works like list on python side and saves the result as comma-separated list
@@ -92,7 +99,7 @@ You can easily set up integer lists too:
 
 
 ColorType
----------
+^^^^^^^^^
 
 ColorType provides a way for saving Color (from colour_ package) objects into database.
 ColorType saves Color objects as strings on the way in and converts them back to objects when querying the database.
@@ -130,7 +137,7 @@ For more information about colour package and Color object, see https://github.c
 
 
 NumberRangeType
----------------
+^^^^^^^^^^^^^^^
 
 NumberRangeType provides way for saving range of numbers into database.
 
@@ -174,7 +181,7 @@ NumberRange supports some arithmetic operators:
 
 
 URLType
--------
+^^^^^^^
 
 URLType stores furl_ objects into database.
 
@@ -203,7 +210,7 @@ URLType stores furl_ objects into database.
 
 
 UUIDType
---------
+^^^^^^^^
 
 UUIDType will store a UUID in the database in a native format, if available,
 or a 16-byte BINARY column or a 32-character CHAR column if not.
@@ -221,7 +228,7 @@ or a 16-byte BINARY column or a 32-character CHAR column if not.
 
 
 TimezoneType
-------------
+^^^^^^^^^^^^
 
 TimezoneType provides a way for saving timezones (from either the pytz or the dateutil package) objects into database.
 TimezoneType saves timezone objects as strings on the way in and converts them back to objects when querying the database.
@@ -236,6 +243,63 @@ TimezoneType saves timezone objects as strings on the way in and converts them b
 
         # Pass backend='pytz' to change it to use pytz (dateutil by default)
         timezone = sa.Column(TimezoneType(backend='pytz'))
+
+
+The generates decorator
+-----------------------
+
+Many times you may have properties which values are being generated. Usual cases include slugs from names or resized thumbnails from images.
+
+SQLAlchemy-Utils provides a way to do this easily with `generates` decorator:
+
+::
+
+
+    class Article(self.Base):
+        __tablename__ = 'article'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
+        slug = sa.Column(sa.Unicode(255))
+
+        @generates(slug)
+        def _create_slug(self):
+            return self.name.lower().replace(' ', '-')
+
+
+    article = self.Article()
+    article.name = u'some article name'
+    self.session.add(article)
+    self.session.flush()
+    assert article.slug == u'some-article-name'
+
+
+You can also pass the attribute name as a string argument for `generates`:
+
+::
+
+    class Article(self.Base):
+        ...
+
+        @generates('slug')
+        def _create_slug(self):
+            return self.name.lower().replace(' ', '-')
+
+
+These property generators can even be defined outside classes:
+
+::
+
+
+    class Article(self.Base):
+        __tablename__ = 'article'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
+        slug = sa.Column(sa.Unicode(255))
+
+
+    @generates(Article.slug)
+    def _create_article_slug(self):
+        return self.name.lower().replace(' ', '-')
 
 
 Generic Relationship
