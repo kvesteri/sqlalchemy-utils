@@ -248,7 +248,7 @@ TimezoneType saves timezone objects as strings on the way in and converts them b
 The generates decorator
 -----------------------
 
-Many times you may have properties which values are being generated. Usual cases include slugs from names or resized thumbnails from images.
+Many times you may have generated property values. Usual cases include slugs from names or resized thumbnails from images.
 
 SQLAlchemy-Utils provides a way to do this easily with `generates` decorator:
 
@@ -298,6 +298,16 @@ These property generators can even be defined outside classes:
 
 
     @generates(Article.slug)
+    def _create_article_slug(self):
+        return self.name.lower().replace(' ', '-')
+
+
+Or with lazy evaluated string argument:
+
+::
+
+
+    @generates('Article.slug')
     def _create_article_slug(self):
         return self.name.lower().replace(' ', '-')
 
