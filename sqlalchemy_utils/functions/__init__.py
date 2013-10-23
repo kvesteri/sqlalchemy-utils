@@ -7,7 +7,6 @@ import inspect
 import sqlalchemy as sa
 from sqlalchemy.orm.query import Query
 from sqlalchemy.schema import MetaData, Table, ForeignKeyConstraint
-from sqlalchemy.engine import url
 from six.moves import cStringIO
 from .batch_fetch import batch_fetch, with_backrefs, CompositePath
 from .defer_except import defer_except
@@ -323,7 +322,7 @@ def mock_engine(engine, stream=None):
 
     # Evaluate the expression and get the target engine.
 
-    frame.f_locals['__mock'] = mock = create_mock_engine(target, stream)
+    frame.f_locals['__mock'] = create_mock_engine(target, stream)
 
     # Replace the target with our mock.
 

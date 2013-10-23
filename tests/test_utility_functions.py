@@ -2,7 +2,6 @@ import sqlalchemy as sa
 from sqlalchemy_utils import escape_like
 from sqlalchemy_utils.functions import naturally_equivalent
 from tests import TestCase
-from six.moves import cStringIO
 from sqlalchemy_utils.functions import (
     non_indexed_foreign_keys,
     render_statement,
