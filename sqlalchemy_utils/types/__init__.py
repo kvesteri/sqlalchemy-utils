@@ -16,6 +16,7 @@ from .phone_number import PhoneNumber, PhoneNumberType
 from .scalar_list import ScalarListException, ScalarListType
 from .timezone import TimezoneType
 from .ts_vector import TSVectorType
+from .url import URLType
 from .uuid import UUIDType
 from .weekdays import WeekDay, WeekDays, WeekDaysType
 
@@ -39,6 +40,7 @@ __all__ = (
     ScalarListType,
     TimezoneType,
     TSVectorType,
+    URLType,
     UUIDType,
     WeekDay,
     WeekDays,

@@ -94,7 +94,7 @@ You can easily set up integer lists too:
 ColorType
 ---------
 
-ColorType provides a way for saving Color (from colour package) objects into database.
+ColorType provides a way for saving Color (from colour_ package) objects into database.
 ColorType saves Color objects as strings on the way in and converts them back to objects when querying the database.
 
 ::
@@ -171,6 +171,35 @@ NumberRange supports some arithmetic operators:
     )
     print total
     # '30-140'
+
+
+URLType
+-------
+
+URLType stores furl_ objects into database.
+
+::
+
+    from sqlalchemy_utils import URLType
+    from furl import furl
+
+
+    class User(Base):
+        __tablename__ = 'user'
+
+        id = sa.Column(sa.Integer, primary_key=True)
+        website = sa.Column(URLType)
+
+
+    user = User(website=u'www.example.com')
+
+    # website is coerced to furl object, hence all nice furl operations come
+    # available
+    user.website.args['some_argument'] = '12'
+
+    print user.website
+    # www.example.com?some_argument=12
+
 
 
 UUIDType
@@ -257,6 +286,11 @@ Generic relationship is a form of relationship that supports creating a 1 to man
 
     # Find any events that are bound to users.
     session.query(Event).filter(Event.object.is_type(User)).all()
+
+
+
+.. _furl: https://github.com/gruns/furl
+.. _colour: https://github.com/vaab/colour
 
 
 API Documentation
