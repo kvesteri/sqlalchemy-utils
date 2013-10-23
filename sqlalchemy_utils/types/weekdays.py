@@ -4,7 +4,11 @@ from sqlalchemy import types
 from sqlalchemy.dialects.postgresql import BIT
 import six
 
-from ..compat import total_ordering
+try:
+    from functools import total_ordering
+except ImportError:
+    # Python 2.6 port
+    from total_ordering import total_ordering
 from sqlalchemy_utils import i18n
 
 

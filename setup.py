@@ -57,7 +57,7 @@ for name, requirements in extras_require.items():
 
 setup(
     name='SQLAlchemy-Utils',
-    version='0.17.0',
+    version='0.17.1',
     url='https://github.com/kvesteri/sqlalchemy-utils',
     license='BSD',
     author='Konsta Vesterinen, Ryan Leckey, Janne Vanhala, Vesa Uimonen',
@@ -78,6 +78,8 @@ setup(
     install_requires=[
         'six',
         'SQLAlchemy>=0.8.0',
+        'total_ordering>=0.1'
+        if sys.version_info[0] == 2 and sys.version_info[1] < 7 else ''
     ],
     extras_require=extras_require,
     cmdclass={'test': PyTest},
