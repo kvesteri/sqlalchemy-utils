@@ -5,6 +5,8 @@ from .functions import (
     escape_like,
     primary_keys,
     render_statement,
+    render_expression,
+    mock_engine,
     sort_query,
     table_name,
     with_backrefs

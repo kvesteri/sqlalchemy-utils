@@ -2,9 +2,12 @@ import sqlalchemy as sa
 from sqlalchemy_utils import escape_like
 from sqlalchemy_utils.functions import naturally_equivalent
 from tests import TestCase
+from six.moves import cStringIO
 from sqlalchemy_utils.functions import (
     non_indexed_foreign_keys,
     render_statement,
+    render_expression,
+    mock_engine
 )
 
 
@@ -72,18 +75,46 @@ class TestFindNonIndexedForeignKeys(TestCase):
         assert 'category_id' in column_names
         assert 'author_id' not in column_names
 
+
+class TestRender(TestCase):
+
+    def create_models(self):
+        class User(self.Base):
+            __tablename__ = 'user'
+            id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
+            name = sa.Column(sa.Unicode(255))
+
+        self.User = User
+
     def test_render_statement_query(self):
         query = self.session.query(self.User).filter_by(id=3)
-        render = render_statement(query)
+        text = render_statement(query)
 
-        assert 'SELECT user.id, user.name' in render
-        assert 'FROM user' in render
-        assert 'WHERE user.id = 3' in render
+        assert 'SELECT user.id, user.name' in text
+        assert 'FROM user' in text
+        assert 'WHERE user.id = 3' in text
 
     def test_render_statement(self):
         statement = self.User.__table__.select().where(self.User.id == 3)
-        render = render_statement(statement, bind=self.session.bind)
+        text = render_statement(statement, bind=self.session.bind)
 
-        assert 'SELECT user.id, user.name' in render
-        assert 'FROM user' in render
-        assert 'WHERE user.id = 3' in render
+        assert 'SELECT user.id, user.name' in text
+        assert 'FROM user' in text
+        assert 'WHERE user.id = 3' in text
+
+    def test_render_ddl(self):
+        context = {'table': self.User.__table__}
+        expression = 'table.create(engine)'
+        text = render_expression(expression, self.engine, context)
+
+        assert 'CREATE TABLE user' in text
+        assert 'PRIMARY KEY' in text
+
+    def test_render_mock_ddl(self):
+        with mock_engine('self.engine') as stream:
+            self.User.__table__.create(self.engine)
+
+        text = stream.getvalue()
+
+        assert 'CREATE TABLE user' in text
+        assert 'PRIMARY KEY' in text
