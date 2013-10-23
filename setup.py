@@ -44,7 +44,8 @@ extras_require = {
     'password': ['passlib >= 1.6, < 2.0'],
     'color': ['colour>=0.0.4'],
     'ipaddress': ['ipaddr'] if not PY3 else [],
-    'timezone': ['python-dateutil']
+    'timezone': ['python-dateutil'],
+    'url': ['furl >= 0.3.5']
 }
 
 
@@ -56,7 +57,7 @@ for name, requirements in extras_require.items():
 
 setup(
     name='SQLAlchemy-Utils',
-    version='0.16.25',
+    version='0.17.0',
     url='https://github.com/kvesteri/sqlalchemy-utils',
     license='BSD',
     author='Konsta Vesterinen, Ryan Leckey, Janne Vanhala, Vesa Uimonen',
