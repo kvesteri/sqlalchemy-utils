@@ -5,8 +5,8 @@ from tests import TestCase
 
 
 class GeneratesTestCase(TestCase):
-    def setup_method(self, method):
-        TestCase.setup_method(self, method)
+    def teardown_method(self, method):
+        TestCase.teardown_method(self, method)
         decorators.generator_registry = defaultdict(list)
 
     def test_generates_value_before_flush(self):

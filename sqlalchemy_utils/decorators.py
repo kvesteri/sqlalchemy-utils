@@ -18,6 +18,9 @@ def generates(attr):
             parts = attr.split('.')
             generator_registry[parts[0]].append(wrapper)
             wrapper.__generates__ = parts[1]
+        elif isinstance(attr, sa.orm.attributes.InstrumentedAttribute):
+            generator_registry[attr.class_.__name__].append(wrapper)
+            wrapper.__generates__ = attr
         else:
             wrapper.__generates__ = attr
         return wrapper
