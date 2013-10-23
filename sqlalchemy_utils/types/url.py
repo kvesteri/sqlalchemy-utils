@@ -8,12 +8,12 @@ from sqlalchemy import types
 from .scalar_coercible import ScalarCoercible
 
 
-class UrlType(types.TypeDecorator, ScalarCoercible):
+class URLType(types.TypeDecorator, ScalarCoercible):
     impl = types.UnicodeText
 
     def process_bind_param(self, value, dialect):
         if isinstance(value, furl):
-            return value.code
+            return six.text_type(value)
 
         if isinstance(value, six.string_types):
             return value
