@@ -103,8 +103,7 @@ ChoiceType is very useful when the rendered values change based on user's locale
     user = User(type=u'admin')
     user.type  # Choice(type='admin', value=u'Admin')
 
-
-
+    print user.type  # u'Admin'
 
 
 ColorType
