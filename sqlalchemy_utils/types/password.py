@@ -5,12 +5,12 @@ from sqlalchemy import types
 from sqlalchemy.dialects import postgresql
 from .scalar_coercible import ScalarCoercible
 
+passlib = None
 try:
     import passlib
     from passlib.context import CryptContext
-
 except ImportError:
-    passlib = None
+    pass
 
 
 class Password(object):
