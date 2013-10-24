@@ -5,6 +5,7 @@ from .color import ColorType
 from .country import CountryType, Country
 from .email import EmailType
 from .ip_address import IPAddressType
+from .locale import LocaleType
 from .number_range import (
     NumberRange,
     NumberRangeException,
@@ -28,6 +29,7 @@ __all__ = (
     Country,
     EmailType,
     IPAddressType,
+    LocaleType,
     NumberRange,
     NumberRangeException,
     NumberRangeRawType,

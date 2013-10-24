@@ -39,7 +39,7 @@ class TestCountryType(TestCase):
 
         self.User = User
 
-    def test_color_parameter_processing(self):
+    def test_parameter_processing(self):
         user = self.User(
             country=Country(u'fi')
         )
