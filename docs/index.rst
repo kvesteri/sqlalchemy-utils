@@ -55,49 +55,6 @@ Data types
 SQLAlchemy-Utils provides various new data types for SQLAlchemy.
 
 
-ScalarListType
-^^^^^^^^^^^^^^
-
-ScalarListType type provides convenient way for saving multiple scalar values in one
-column. ScalarListType works like list on python side and saves the result as comma-separated list
-in the database (custom separators can also be used).
-
-Example ::
-
-
-    from sqlalchemy_utils import ScalarListType
-
-
-    class User(Base):
-        __tablename__ = 'user'
-        id = db.Column(db.Integer, autoincrement=True)
-        hobbies = db.Column(ScalarListType())
-
-
-    user = User()
-    user.hobbies = [u'football', u'ice_hockey']
-    session.commit()
-
-
-You can easily set up integer lists too:
-
-::
-
-
-    from sqlalchemy_utils import ScalarListType
-
-
-    class Player(Base):
-        __tablename__ = 'player'
-        id = db.Column(db.Integer, autoincrement=True)
-        points = db.Column(ScalarListType(int))
-
-
-    player = Player()
-    player.points = [11, 12, 8, 80]
-    session.commit()
-
-
 ColorType
 ^^^^^^^^^
 
@@ -112,7 +69,7 @@ ColorType saves Color objects as strings on the way in and converts them back to
 
 
     class Document(Base):
-        __tablename__ = 'player'
+        __tablename__ = 'document'
         id = db.Column(db.Integer, autoincrement=True)
         name = db.Column(db.Unicode(50))
         background_color = db.Column(ColorType)
@@ -134,6 +91,39 @@ Querying the database returns Color objects:
 
 
 For more information about colour package and Color object, see https://github.com/vaab/colour
+
+
+LocaleType
+^^^^^^^^^^
+
+LocaleType saves Babel Locale objects into database. The Locale objects are converted to string on the way in and back to object on the way out.
+
+
+::
+
+
+    from sqlalchemy_utils import LocaleType
+    from babel import Locale
+
+
+    class User(Base):
+        __tablename__ = 'user'
+        id = db.Column(db.Integer, autoincrement=True)
+        name = db.Column(db.Unicode(50))
+        locale = db.Column(LocaleType)
+
+
+    user = User()
+    user.locale = Locale('en_US')
+    session.commit()
+
+
+Like many other types this type also supports scalar coercion:
+
+
+    user.locale = 'de_DE'
+    user.locale  # Locale('de_DE')
+
 
 
 NumberRangeType
@@ -178,6 +168,51 @@ NumberRange supports some arithmetic operators:
     )
     print total
     # '30-140'
+
+
+
+ScalarListType
+^^^^^^^^^^^^^^
+
+ScalarListType type provides convenient way for saving multiple scalar values in one
+column. ScalarListType works like list on python side and saves the result as comma-separated list
+in the database (custom separators can also be used).
+
+Example ::
+
+
+    from sqlalchemy_utils import ScalarListType
+
+
+    class User(Base):
+        __tablename__ = 'user'
+        id = db.Column(db.Integer, autoincrement=True)
+        hobbies = db.Column(ScalarListType())
+
+
+    user = User()
+    user.hobbies = [u'football', u'ice_hockey']
+    session.commit()
+
+
+You can easily set up integer lists too:
+
+::
+
+
+    from sqlalchemy_utils import ScalarListType
+
+
+    class Player(Base):
+        __tablename__ = 'player'
+        id = db.Column(db.Integer, autoincrement=True)
+        points = db.Column(ScalarListType(int))
+
+
+    player = Player()
+    player.points = [11, 12, 8, 80]
+    session.commit()
+
 
 
 URLType
