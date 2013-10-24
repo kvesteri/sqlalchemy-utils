@@ -120,6 +120,8 @@ LocaleType saves Babel Locale objects into database. The Locale objects are conv
 
 Like many other types this type also supports scalar coercion:
 
+::
+
 
     user.locale = 'de_DE'
     user.locale  # Locale('de_DE')
