@@ -96,7 +96,9 @@ For more information about colour package and Color object, see https://github.c
 LocaleType
 ^^^^^^^^^^
 
-LocaleType saves Babel Locale objects into database. The Locale objects are converted to string on the way in and back to object on the way out.
+LocaleType saves Babel_ Locale objects into database. The Locale objects are converted to string on the way in and back to object on the way out.
+
+In order to use LocaleType you need to install Babel_ first.
 
 
 ::
@@ -400,6 +402,7 @@ Generic relationship is a form of relationship that supports creating a 1 to man
 
 
 
+.. _Babel: http://babel.pocoo.org/
 .. _furl: https://github.com/gruns/furl
 .. _colour: https://github.com/vaab/colour
 
