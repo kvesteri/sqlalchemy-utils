@@ -1,5 +1,6 @@
 import six
 from sqlalchemy import types
+from .scalar_coercible import ScalarCoercible
 
 
 class NumberRangeRawType(types.UserDefinedType):
@@ -10,7 +11,7 @@ class NumberRangeRawType(types.UserDefinedType):
         return 'int4range'
 
 
-class NumberRangeType(types.TypeDecorator):
+class NumberRangeType(types.TypeDecorator, ScalarCoercible):
     impl = NumberRangeRawType
 
     def process_bind_param(self, value, dialect):
@@ -26,7 +27,7 @@ class NumberRangeType(types.TypeDecorator):
                 return NumberRange.from_normalized_str(value)
         return value
 
-    def coercion_listener(self, target, value, oldvalue, initiator):
+    def _coerce(self, value):
         if value is not None and not isinstance(value, NumberRange):
             if isinstance(value, six.string_types):
                 value = NumberRange.from_normalized_str(value)
