@@ -72,7 +72,7 @@ ChoiceType offers way of having fixed set of choices for given column. Columns w
 
         __tablename__ = 'user'
         id = sa.Column(sa.Integer, primary_key=True)
-        name = sa.Column
+        name = sa.Column(sa.Unicode(255))
         type = sa.Column(ChoiceType(TYPES))
 
 
@@ -96,7 +96,7 @@ ChoiceType is very useful when the rendered values change based on user's locale
 
         __tablename__ = 'user'
         id = sa.Column(sa.Integer, primary_key=True)
-        name = sa.Column
+        name = sa.Column(sa.Unicode(255))
         type = sa.Column(ChoiceType(TYPES))
 
 
