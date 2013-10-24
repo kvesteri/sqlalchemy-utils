@@ -12,9 +12,10 @@ except ImportError:
 
 from sqlalchemy import types
 from sqlalchemy_utils import ImproperlyConfigured
+from .scalar_coercible import ScalarCoercible
 
 
-class IPAddressType(types.TypeDecorator):
+class IPAddressType(types.TypeDecorator, ScalarCoercible):
     """
     Changes IPAddress objects to a string representation on the way in and
     changes them back to IPAddress objects on the way out.
@@ -38,5 +39,5 @@ class IPAddressType(types.TypeDecorator):
     def process_result_value(self, value, dialect):
         return ip_address(value) if value else None
 
-    def coercion_listener(self, target, value, oldvalue, initiator):
+    def _coerce(self, value):
         return ip_address(value) if value else None

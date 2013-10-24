@@ -10,9 +10,10 @@ except:
     pass
 from sqlalchemy import types
 from sqlalchemy_utils import ImproperlyConfigured
+from .scalar_coercible import ScalarCoercible
 
 
-class ArrowType(types.TypeDecorator):
+class ArrowType(types.TypeDecorator, ScalarCoercible):
     impl = types.DateTime
 
     def __init__(self, *args, **kwargs):
@@ -33,7 +34,7 @@ class ArrowType(types.TypeDecorator):
             return arrow.get(value)
         return value
 
-    def coercion_listener(self, target, value, oldvalue, initiator):
+    def _coerce(self, value):
         if value is None:
             return None
         elif isinstance(value, six.string_types):
