@@ -3,14 +3,11 @@ from sqlalchemy import types
 from sqlalchemy_utils import ImproperlyConfigured
 from .scalar_coercible import ScalarCoercible
 
-
+colour = None
 try:
     import colour
-    from colour import Color
-
 except ImportError:
-    colour = None
-    Color = None
+    pass
 
 
 class ColorType(types.TypeDecorator, ScalarCoercible):
@@ -22,7 +19,7 @@ class ColorType(types.TypeDecorator, ScalarCoercible):
     impl = types.Unicode(20)
 
     def __init__(self, max_length=20, *args, **kwargs):
-        # Bail if colour is not found.
+        # Fail if colour is not found.
         if colour is None:
             raise ImproperlyConfigured(
                 "'colour' package is required to use 'ColorType'"
@@ -38,10 +35,10 @@ class ColorType(types.TypeDecorator, ScalarCoercible):
 
     def process_result_value(self, value, dialect):
         if value:
-            return Color(value)
+            return colour.Color(value)
         return value
 
     def _coerce(self, value):
-        if value is not None and not isinstance(value, Color):
-            return Color(value)
+        if value is not None and not isinstance(value, colour.Color):
+            return colour.Color(value)
         return value
