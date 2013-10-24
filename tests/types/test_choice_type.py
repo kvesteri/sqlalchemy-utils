@@ -5,9 +5,6 @@ from tests import TestCase
 
 
 class TestChoice(object):
-    # def test_init(self):
-    #     assert Choice(1, 1) == Choice(Choice(1, 1))
-
     def test_equality_operator(self):
         assert Choice(1, 1) == 1
         assert 1 == Choice(1, 1)
@@ -54,3 +51,9 @@ class TestChoiceType(TestCase):
     def test_throws_exception_if_no_choices_given(self):
         with raises(ImproperlyConfigured):
             ChoiceType([])
+
+
+class TestChoiceTypeWithCustomUnderlyingType(TestCase):
+    def test_init_type(self):
+        type_ = ChoiceType([(1, u'something')], impl=sa.Integer)
+        assert type_.impl == sa.Integer

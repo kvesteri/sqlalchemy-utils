@@ -30,13 +30,15 @@ class Choice(object):
 class ChoiceType(types.TypeDecorator, ScalarCoercible):
     impl = types.Unicode(255)
 
-    def __init__(self, choices):
+    def __init__(self, choices, impl=None):
         if not choices:
             raise ImproperlyConfigured(
                 'ChoiceType needs list of choices defined.'
             )
         self.choices = choices
         self.choices_dict = dict(choices)
+        if impl:
+            self.impl = impl
 
     def _coerce(self, value):
         if value is None:

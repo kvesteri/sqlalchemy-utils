@@ -37,9 +37,9 @@ Example
 
     class Document(Base):
         __tablename__ = 'player'
-        id = db.Column(db.Integer, autoincrement=True)
-        name = db.Column(db.Unicode(50))
-        background_color = db.Column(ColorType)
+        id = sa.Column(sa.Integer, autoincrement=True)
+        name = sa.Column(sa.Unicode(50))
+        background_color = sa.Column(ColorType)
 
 
     document = Document()
@@ -53,6 +53,58 @@ Data types
 ----------
 
 SQLAlchemy-Utils provides various new data types for SQLAlchemy.
+
+
+ChoiceType
+^^^^^^^^^^
+
+ChoiceType offers way of having fixed set of choices for given column. Columns with ChoiceTypes are automatically coerced to Choice objects.
+
+
+::
+
+
+    class User(self.Base):
+        TYPES = [
+            (u'admin', u'Admin'),
+            (u'regular-user', u'Regular user')
+        ]
+
+        __tablename__ = 'user'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column
+        type = sa.Column(ChoiceType(TYPES))
+
+
+    user = User(type=u'admin')
+    user.type  # Choice(type='admin', value=u'Admin')
+
+
+
+ChoiceType is very useful when the rendered values change based on user's locale:
+
+::
+
+    from babel import lazy_gettext as _
+
+
+    class User(self.Base):
+        TYPES = [
+            (u'admin', _(u'Admin')),
+            (u'regular-user', _(u'Regular user'))
+        ]
+
+        __tablename__ = 'user'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column
+        type = sa.Column(ChoiceType(TYPES))
+
+
+    user = User(type=u'admin')
+    user.type  # Choice(type='admin', value=u'Admin')
+
+
+
 
 
 ColorType
@@ -70,9 +122,9 @@ ColorType saves Color objects as strings on the way in and converts them back to
 
     class Document(Base):
         __tablename__ = 'document'
-        id = db.Column(db.Integer, autoincrement=True)
-        name = db.Column(db.Unicode(50))
-        background_color = db.Column(ColorType)
+        id = sa.Column(sa.Integer, autoincrement=True)
+        name = sa.Column(sa.Unicode(50))
+        background_color = sa.Column(ColorType)
 
 
     document = Document()
@@ -110,9 +162,9 @@ In order to use LocaleType you need to install Babel_ first.
 
     class User(Base):
         __tablename__ = 'user'
-        id = db.Column(db.Integer, autoincrement=True)
-        name = db.Column(db.Unicode(50))
-        locale = db.Column(LocaleType)
+        id = sa.Column(sa.Integer, autoincrement=True)
+        name = sa.Column(sa.Unicode(50))
+        locale = sa.Column(LocaleType)
 
 
     user = User()
@@ -143,9 +195,9 @@ Example ::
 
     class Event(Base):
         __tablename__ = 'user'
-        id = db.Column(db.Integer, autoincrement=True)
-        name = db.Column(db.Unicode(255))
-        estimated_number_of_persons = db.Column(NumberRangeType)
+        id = sa.Column(sa.Integer, autoincrement=True)
+        name = sa.Column(sa.Unicode(255))
+        estimated_number_of_persons = sa.Column(NumberRangeType)
 
 
     party = Event(name=u'party')
@@ -190,8 +242,8 @@ Example ::
 
     class User(Base):
         __tablename__ = 'user'
-        id = db.Column(db.Integer, autoincrement=True)
-        hobbies = db.Column(ScalarListType())
+        id = sa.Column(sa.Integer, autoincrement=True)
+        hobbies = sa.Column(ScalarListType())
 
 
     user = User()
@@ -209,8 +261,8 @@ You can easily set up integer lists too:
 
     class Player(Base):
         __tablename__ = 'player'
-        id = db.Column(db.Integer, autoincrement=True)
-        points = db.Column(ScalarListType(int))
+        id = sa.Column(sa.Integer, autoincrement=True)
+        points = sa.Column(ScalarListType(int))
 
 
     player = Player()

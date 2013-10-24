@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.19.0 (2013-10-24)
+^^^^^^^^^^^^^^^^^^^
+
+- Added ChoiceType
+
+
 0.18.0 (2013-10-24)
 ^^^^^^^^^^^^^^^^^^^
 
