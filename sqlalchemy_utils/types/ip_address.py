@@ -1,14 +1,13 @@
 import six
 
+ip_address = None
 try:
     from ipaddress import ip_address
-
 except ImportError:
     try:
         from ipaddr import IPAddress as ip_address
-
     except ImportError:
-        ip_address = None
+        pass
 
 
 from sqlalchemy import types

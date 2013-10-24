@@ -8,6 +8,7 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 ^^^^^^^^^^^^^^^^^^^
 
 - Removed compat module, added total_ordering package to Python 2.6 requirements
+- Enhanced render_statement function
 
 
 0.17.0 (2013-10-23)
