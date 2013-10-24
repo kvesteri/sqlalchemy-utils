@@ -35,6 +35,7 @@ extras_require = {
         'flexmock>=0.9.7',
         'psycopg2>=2.4.6',
     ],
+    'anyjson': ['anyjson>=0.3.3'],
     'babel': ['Babel>=1.3'],
     'arrow': ['arrow>=0.3.4'],
     'phone': [
@@ -57,7 +58,7 @@ for name, requirements in extras_require.items():
 
 setup(
     name='SQLAlchemy-Utils',
-    version='0.19.0',
+    version='0.20.0',
     url='https://github.com/kvesteri/sqlalchemy-utils',
     license='BSD',
     author='Konsta Vesterinen, Ryan Leckey, Janne Vanhala, Vesa Uimonen',
