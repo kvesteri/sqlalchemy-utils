@@ -14,7 +14,6 @@ except ImportError:
 
 
 class Password(object):
-
     def __init__(self, value, context=None):
         # Store the hash.
         self.hash = value
@@ -87,26 +86,29 @@ class PasswordType(types.TypeDecorator, ScalarCoercible):
         self.context = CryptContext(**kwargs)
 
         if max_length is None:
-            # Calculate the largest possible encoded password.
-            # name + rounds + salt + hash + ($ * 4) of largest hash
-            max_lengths = [1024]
-            for name in self.context.schemes():
-                scheme = getattr(__import__('passlib.hash').hash, name)
-                length = 4 + len(scheme.name)
-                length += len(str(getattr(scheme, 'max_rounds', '')))
-                length += scheme.max_salt_size or 0
-                length += getattr(
-                    scheme,
-                    'encoded_checksum_size',
-                    scheme.checksum_size
-                )
-                max_lengths.append(length)
-
-            # Set the max_length to the maximum calculated max length.
-            max_length = max(max_lengths)
+            max_length = self.calculate_max_length()
 
         # Set the length to the now-calculated max length.
         self.length = max_length
+
+    def calculate_max_length(self):
+        # Calculate the largest possible encoded password.
+        # name + rounds + salt + hash + ($ * 4) of largest hash
+        max_lengths = [1024]
+        for name in self.context.schemes():
+            scheme = getattr(__import__('passlib.hash').hash, name)
+            length = 4 + len(scheme.name)
+            length += len(str(getattr(scheme, 'max_rounds', '')))
+            length += scheme.max_salt_size or 0
+            length += getattr(
+                scheme,
+                'encoded_checksum_size',
+                scheme.checksum_size
+            )
+            max_lengths.append(length)
+
+        # Return the maximum calculated max length.
+        return max(max_lengths)
 
     def load_dialect_impl(self, dialect):
         if dialect.name == 'postgresql':
