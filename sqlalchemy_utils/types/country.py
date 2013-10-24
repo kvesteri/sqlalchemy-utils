@@ -40,6 +40,7 @@ class CountryType(types.TypeDecorator, ScalarCoercible):
     """
 
     impl = types.String(2)
+    python_type = Country
 
     def process_bind_param(self, value, dialect):
         if isinstance(value, Country):

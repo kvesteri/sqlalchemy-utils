@@ -32,6 +32,10 @@ class TestChoiceType(TestCase):
 
         self.User = User
 
+    def test_python_type(self):
+        type_ = self.User.__table__.c.type.type
+        assert type_.python_type
+
     def test_parameter_processing(self):
         user = self.User(
             type=u'admin'

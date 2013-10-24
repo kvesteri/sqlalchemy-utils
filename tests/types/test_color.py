@@ -18,6 +18,10 @@ class TestColorType(TestCase):
 
         self.Document = Document
 
+    def test_python_type(self):
+        type_ = self.Document.__table__.c.bg_color.type
+        assert type_.python_type == color.colour.Color
+
     def test_color_parameter_processing(self):
         from colour import Color
 

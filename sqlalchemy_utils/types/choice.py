@@ -40,6 +40,10 @@ class ChoiceType(types.TypeDecorator, ScalarCoercible):
         if impl:
             self.impl = impl
 
+    @property
+    def python_type(self):
+        return self.impl.python_type
+
     def _coerce(self, value):
         if value is None:
             return value
