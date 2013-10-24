@@ -144,6 +144,33 @@ Querying the database returns Color objects:
 For more information about colour package and Color object, see https://github.com/vaab/colour
 
 
+JSONType
+^^^^^^^^
+
+JSONType offers way of saving JSON data structures to database. On PostgreSQL the underlying implementation of this data type is 'json' while on other databases its simply 'text'.
+
+::
+
+
+    from sqlalchemy_utils import JSONType
+
+
+    class Product(Base):
+        __tablename__ = 'product'
+        id = sa.Column(sa.Integer, autoincrement=True)
+        name = sa.Column(sa.Unicode(50))
+        details = sa.Column(JSONType)
+
+
+    product = Product()
+    product.details = {
+        'color': 'red',
+        'type': 'car',
+        'max-speed': '400 mph'
+    }
+    session.commit()
+
+
 LocaleType
 ^^^^^^^^^^
 
