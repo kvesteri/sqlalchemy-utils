@@ -2,9 +2,10 @@ from __future__ import absolute_import
 import uuid
 from sqlalchemy import types
 from sqlalchemy.dialects import postgresql
+from .scalar_coercible import ScalarCoercible
 
 
-class UUIDType(types.TypeDecorator):
+class UUIDType(types.TypeDecorator, ScalarCoercible):
     """
     Stores a UUID in the database natively when it can and falls back to
     a BINARY(16) or a CHAR(32) when it can't.
@@ -61,6 +62,3 @@ class UUIDType(types.TypeDecorator):
             return uuid.UUID(value)
 
         return uuid.UUID(bytes=value) if self.binary else uuid.UUID(value)
-
-    def coercion_listener(self, target, value, oldvalue, initiator):
-        return self._coerce(value)
