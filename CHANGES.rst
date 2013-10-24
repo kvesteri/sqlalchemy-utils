@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.18.0 (2013-10-24)
+^^^^^^^^^^^^^^^^^^^
+
+- Added LocaleType
+
+
 0.17.1 (2013-10-23)
 ^^^^^^^^^^^^^^^^^^^
 
