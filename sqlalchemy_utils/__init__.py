@@ -19,6 +19,8 @@ from .generic import generic_relationship
 from .proxy_dict import ProxyDict, proxy_dict
 from .types import (
     ArrowType,
+    Choice,
+    ChoiceType,
     ColorType,
     CountryType,
     Country,
@@ -65,6 +67,8 @@ __all__ = (
     table_name,
     with_backrefs,
     ArrowType,
+    Choice,
+    ChoiceType,
     ColorType,
     CountryType,
     Country,

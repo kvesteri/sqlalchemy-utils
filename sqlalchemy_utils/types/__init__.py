@@ -1,6 +1,7 @@
 from functools import wraps
 from sqlalchemy.orm.collections import InstrumentedList as _InstrumentedList
 from .arrow import ArrowType
+from .choice import ChoiceType, Choice
 from .color import ColorType
 from .country import CountryType, Country
 from .email import EmailType
@@ -24,6 +25,8 @@ from .weekdays import WeekDay, WeekDays, WeekDaysType
 
 __all__ = (
     ArrowType,
+    Choice,
+    ChoiceType,
     ColorType,
     CountryType,
     Country,
