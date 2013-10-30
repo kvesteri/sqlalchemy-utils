@@ -13,4 +13,11 @@ class TestIdentity(TestCase):
         self.Building = Building
 
     def test_for_transient_class_without_id(self):
-        assert identity(self.Building()) == (None,)
+        assert identity(self.Building()) is None
+
+    def test_for_transient_class_with_id(self):
+        building = self.Building(name=u'Some building')
+        self.session.add(building)
+        self.session.flush()
+
+        assert identity(building) == (building.id, )

@@ -201,16 +201,41 @@ def identity(obj):
     always returns the identity even if object is still in transient state (
     new object that is not yet persisted into database).
 
+    ::
+
+        from sqlalchemy import inspect
+        from sqlalchemy_utils import identity
+
+
+        user = User(name=u'John Matrix')
+        session.add(user)
+        identity(user)  # None
+        inspect(user).identity  # None
+
+        session.flush()  # User now has id but is still in transient state
+
+        identity(user)  # (1,)
+        inspect(user).identity  # None
+
+        session.commit()
+
+        identity(user)  # (1,)
+        inspect(user).identity  # (1, )
+
+
+    .. versionadded: 0.21.0
+
     :param obj: SQLAlchemy declarative model object
     """
     id_ = []
-    for attr in obj._sa_class_manager.values():
-        prop = attr.property
-        if isinstance(prop, sa.orm.ColumnProperty):
-            column = prop.columns[0]
-            if column.primary_key:
-                id_.append(getattr(obj, column.name))
-    return tuple(id_)
+    for column in sa.inspect(obj.__class__).columns:
+        if column.primary_key:
+            id_.append(getattr(obj, column.name))
+
+    if all(value is None for value in id_):
+        return None
+    else:
+        return tuple(id_)
 
 
 def naturally_equivalent(obj, obj2):
