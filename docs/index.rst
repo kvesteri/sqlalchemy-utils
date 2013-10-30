@@ -56,6 +56,14 @@ SQLAlchemy-Utils provides various new data types for SQLAlchemy.
 
 .. module:: sqlalchemy_utils.types
 
+
+ArrowType
+^^^^^^^^^
+
+.. module:: sqlalchemy_utils.types.arrow
+
+.. autoclass:: ArrowType
+
 ChoiceType
 ^^^^^^^^^^
 
@@ -97,12 +105,37 @@ NumberRangeType
 .. autoclass:: NumberRangeType
 
 
+PasswordType
+^^^^^^^^^^^^
+
+.. module:: sqlalchemy_utils.types.password
+
+.. autoclass:: PasswordType
+
+
+PhoneNumberType
+^^^^^^^^^^^^^^^
+
+.. module:: sqlalchemy_utils.types.phone_number
+
+.. autoclass:: PhoneNumberType
+
+
 ScalarListType
 ^^^^^^^^^^^^^^
 
 .. module:: sqlalchemy_utils.types.scalar_list
 
 .. autoclass:: ScalarListType
+
+
+TimezoneType
+^^^^^^^^^^^^
+
+
+.. module:: sqlalchemy_utils.types.timezone
+
+.. autoclass:: TimezoneType
 
 
 URLType
@@ -122,13 +155,7 @@ UUIDType
 .. autoclass:: UUIDType
 
 
-TimezoneType
-^^^^^^^^^^^^
 
-
-.. module:: sqlalchemy_utils.types.timezone
-
-.. autoclass:: TimezoneType
 
 
 The generates decorator

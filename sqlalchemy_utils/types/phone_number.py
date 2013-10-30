@@ -76,6 +76,21 @@ class PhoneNumberType(types.TypeDecorator, ScalarCoercible):
     changes them back to PhoneNumber objects on the way out. If E164 is used
     as storing format, no country code is needed for parsing the database
     value to PhoneNumber object.
+
+    ::
+
+        class User(self.Base):
+            __tablename__ = 'user'
+            id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
+            name = sa.Column(sa.Unicode(255))
+            phone_number = sa.Column(PhoneNumberType())
+
+
+        user = User(phone_number='+358401234567')
+
+        user.phone_number.e164  # u'+358401234567'
+        user.phone_number.international  # u'+358 40 1234567'
+        user.phone_number.national  # u'040 1234567'
     """
     STORE_FORMAT = 'e164'
     impl = types.Unicode(20)
