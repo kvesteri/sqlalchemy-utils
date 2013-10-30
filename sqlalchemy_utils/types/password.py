@@ -36,15 +36,42 @@ class Password(object):
 
 class PasswordType(types.TypeDecorator, ScalarCoercible):
     """
-    Hashes passwords as they come into the database and allows verifying
-    them using a pythonic interface ::
+    PasswordType hashes passwords as they come into the database and allows
+    verifying them using a pythonic interface.
 
-        >>> target = Model()
-        >>> target.password = 'b'
-        '$5$rounds=80000$H.............'
+    All keyword arguments (aside from max_length) are forwarded to the
+    construction of a `passlib.context.CryptContext` object.
 
-        >>> target.password == 'b'
-        True
+    The following usage will create a password column that will
+    automatically hash new passwords as `pbkdf2_sha512` but still compare
+    passwords against pre-existing `md5_crypt` hashes. As passwords are
+    compared; the password hash in the database will be updated to
+    be `pbkdf2_sha512`.
+
+    ::
+
+
+        class Model(Base):
+            password = sa.Column(PasswordType(
+                schemes=[
+                    'pbkdf2_sha512',
+                    'md5_crypt'
+                ],
+
+                deprecated=['md5_crypt']
+            ))
+
+
+    Verifying password is as easy as:
+
+    ::
+
+        target = Model()
+        target.password = 'b'
+        # '$5$rounds=80000$H.............'
+
+        target.password == 'b'
+        # True
 
     """
 
@@ -53,30 +80,7 @@ class PasswordType(types.TypeDecorator, ScalarCoercible):
     python_type = Password
 
     def __init__(self, max_length=None, **kwargs):
-        """
-        All keyword arguments (aside from max_length) are
-        forwarded to the construction of a `passlib.context.CryptContext`
-        object.
-
-        The following usage will create a password column that will
-        automatically hash new passwords as `pbkdf2_sha512` but still compare
-        passwords against pre-existing `md5_crypt` hashes. As passwords are
-        compared; the password hash in the database will be updated to
-        be `pbkdf2_sha512`. ::
-
-            class Model(Base):
-                password = sa.Column(PasswordType(
-                    schemes=[
-                        'pbkdf2_sha512',
-                        'md5_crypt'
-                    ],
-
-                    deprecated=['md5_crypt']
-                ))
-
-        """
-
-        # Bail if passlib is not found.
+        # Fail if passlib is not found.
         if passlib is None:
             raise ImproperlyConfigured(
                 "'passlib' is required to use 'PasswordType'"
