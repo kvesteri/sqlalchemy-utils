@@ -488,31 +488,54 @@ Generic relationship is a form of relationship that supports creating a 1 to man
 Utility functions
 -----------------
 
+.. module:: sqlalchemy_utils.functions
+
+
+declarative_base
+^^^^^^^^^^^^^^^^
+
+.. autofunction:: declarative_base
+
+
+escape_like
+^^^^^^^^^^^
+
+.. autofunction:: escape_like
+
+
+has_changes
+^^^^^^^^^^^
+
+.. autofunction:: has_changes
+
+
 identity
 ^^^^^^^^
 
 .. autofunction:: identity
 
 
-API Documentation
------------------
+is_indexed_foreign_key
+^^^^^^^^^^^^^^^^^^^^^^
 
-.. module:: sqlalchemy_utils
-
-.. autoclass:: InstrumentedList
-    :members:
+.. autofunction:: is_indexed_foreign_key
 
 
-.. module:: sqlalchemy_utils.functions
+naturally_equivalent
+^^^^^^^^^^^^^^^^^^^^
+
+.. autofunction:: naturally_equivalent
+
+non_indexed_foreign_keys
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autofunction:: non_indexed_foreign_keys
+
+
+sort_query
+^^^^^^^^^^
 
 .. autofunction:: sort_query
-.. autofunction:: escape_like
-.. autofunction:: naturally_equivalent
-.. autofunction:: has_changes
-.. autofunction:: non_indexed_foreign_keys
-.. autofunction:: is_indexed_foreign_key
-.. autofunction:: is_auto_assigned_date_column
-.. autofunction:: declarative_base
 
 
 License
