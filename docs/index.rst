@@ -485,6 +485,15 @@ Generic relationship is a form of relationship that supports creating a 1 to man
 .. _colour: https://github.com/vaab/colour
 
 
+Utility functions
+-----------------
+
+identity
+^^^^^^^^
+
+.. autofunction:: identity
+
+
 API Documentation
 -----------------
 
@@ -502,12 +511,8 @@ API Documentation
 .. autofunction:: has_changes
 .. autofunction:: non_indexed_foreign_keys
 .. autofunction:: is_indexed_foreign_key
-.. autofunction:: identity
 .. autofunction:: is_auto_assigned_date_column
 .. autofunction:: declarative_base
-
-
-.. include:: ../CHANGES.rst
 
 
 License
