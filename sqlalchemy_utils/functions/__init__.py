@@ -243,6 +243,20 @@ def naturally_equivalent(obj, obj2):
     Returns whether or not two given SQLAlchemy declarative instances are
     naturally equivalent (all their non primary key properties are equivalent).
 
+
+    ::
+
+        from sqlalchemy_utils import naturally_equivalent
+
+
+        user = User(name=u'someone')
+        user2 = User(name=u'someone')
+
+        user == user2  # False
+
+        naturally_equivalent(user, user2)  # True
+
+
     :param obj: SQLAlchemy declarative model object
     :param obj2: SQLAlchemy declarative model object to compare with `obj`
     """
