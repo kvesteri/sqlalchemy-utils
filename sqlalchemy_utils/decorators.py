@@ -8,6 +8,73 @@ listeners_registered = False
 
 
 def generates(attr):
+    """
+    Many times you may have generated property values. Usual cases include
+    slugs from names or resized thumbnails from images.
+
+    SQLAlchemy-Utils provides a way to do this easily with `generates`
+    decorator:
+
+    ::
+
+
+        class Article(self.Base):
+            __tablename__ = 'article'
+            id = sa.Column(sa.Integer, primary_key=True)
+            name = sa.Column(sa.Unicode(255))
+            slug = sa.Column(sa.Unicode(255))
+
+            @generates(slug)
+            def _create_slug(self):
+                return self.name.lower().replace(' ', '-')
+
+
+        article = self.Article()
+        article.name = u'some article name'
+        self.session.add(article)
+        self.session.flush()
+        assert article.slug == u'some-article-name'
+
+
+    You can also pass the attribute name as a string argument for `generates`:
+
+    ::
+
+        class Article(self.Base):
+            ...
+
+            @generates('slug')
+            def _create_slug(self):
+                return self.name.lower().replace(' ', '-')
+
+
+    These property generators can even be defined outside classes:
+
+    ::
+
+
+        class Article(self.Base):
+            __tablename__ = 'article'
+            id = sa.Column(sa.Integer, primary_key=True)
+            name = sa.Column(sa.Unicode(255))
+            slug = sa.Column(sa.Unicode(255))
+
+
+        @generates(Article.slug)
+        def _create_article_slug(self):
+            return self.name.lower().replace(' ', '-')
+
+
+    Or with lazy evaluated string argument:
+
+    ::
+
+
+        @generates('Article.slug')
+        def _create_article_slug(self):
+            return self.name.lower().replace(' ', '-')
+    """
+
     register_listeners()
 
     def wraps(func):

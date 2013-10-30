@@ -6,8 +6,21 @@ from .scalar_coercible import ScalarCoercible
 
 class TimezoneType(types.TypeDecorator, ScalarCoercible):
     """
-    Changes Timezone objects to a string representation on the way in and
-    changes them back to Timezone objects on the way out.
+    TimezoneType provides a way for saving timezones (from either the pytz or
+    the dateutil package) objects into database. TimezoneType saves timezone
+    objects as strings on the way in and converts them back to objects when
+    querying the database.
+
+
+    ::
+
+        from sqlalchemy_utils import TimezoneType
+
+        class User(Base):
+            __tablename__ = 'user'
+
+            # Pass backend='pytz' to change it to use pytz (dateutil by default)
+            timezone = sa.Column(TimezoneType(backend='pytz'))
     """
 
     impl = types.CHAR(50)

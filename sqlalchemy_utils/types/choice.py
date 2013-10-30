@@ -28,6 +28,57 @@ class Choice(object):
 
 
 class ChoiceType(types.TypeDecorator, ScalarCoercible):
+    """
+    ChoiceType offers way of having fixed set of choices for given column.
+    Columns with ChoiceTypes are automatically coerced to Choice objects.
+
+
+    ::
+
+
+        class User(self.Base):
+            TYPES = [
+                (u'admin', u'Admin'),
+                (u'regular-user', u'Regular user')
+            ]
+
+            __tablename__ = 'user'
+            id = sa.Column(sa.Integer, primary_key=True)
+            name = sa.Column(sa.Unicode(255))
+            type = sa.Column(ChoiceType(TYPES))
+
+
+        user = User(type=u'admin')
+        user.type  # Choice(type='admin', value=u'Admin')
+
+
+
+    ChoiceType is very useful when the rendered values change based on user's
+    locale:
+
+    ::
+
+        from babel import lazy_gettext as _
+
+
+        class User(self.Base):
+            TYPES = [
+                (u'admin', _(u'Admin')),
+                (u'regular-user', _(u'Regular user'))
+            ]
+
+            __tablename__ = 'user'
+            id = sa.Column(sa.Integer, primary_key=True)
+            name = sa.Column(sa.Unicode(255))
+            type = sa.Column(ChoiceType(TYPES))
+
+
+        user = User(type=u'admin')
+        user.type  # Choice(type='admin', value=u'Admin')
+
+        print user.type  # u'Admin'
+    """
+
     impl = types.Unicode(255)
 
     def __init__(self, choices, impl=None):

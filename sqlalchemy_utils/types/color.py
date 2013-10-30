@@ -12,8 +12,41 @@ except ImportError:
 
 class ColorType(types.TypeDecorator, ScalarCoercible):
     """
-    Changes Color objects to a string representation on the way in and
-    changes them back to Color objects on the way out.
+    ColorType provides a way for saving Color (from colour_ package) objects
+    into database. ColorType saves Color objects as strings on the way in and
+    converts them back to objects when querying the database.
+
+    ::
+
+
+        from colour import Color
+        from sqlalchemy_utils import ColorType
+
+
+        class Document(Base):
+            __tablename__ = 'document'
+            id = sa.Column(sa.Integer, autoincrement=True)
+            name = sa.Column(sa.Unicode(50))
+            background_color = sa.Column(ColorType)
+
+
+        document = Document()
+        document.background_color = Color('#F5F5F5')
+        session.commit()
+
+
+    Querying the database returns Color objects:
+
+    ::
+
+        document = session.query(Document).first()
+
+        document.background_color.hex
+        # '#f5f5f5'
+
+
+    For more information about colour package and Color object, see:
+    https://github.com/vaab/colour
     """
     STORE_FORMAT = u'hex'
     impl = types.Unicode(20)

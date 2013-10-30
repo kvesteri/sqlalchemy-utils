@@ -11,8 +11,40 @@ except ImportError:
 
 class LocaleType(types.TypeDecorator, ScalarCoercible):
     """
-    Changes babel.Locale objects to a string representation on the way in and
-    changes them back to Locale objects on the way out.
+    LocaleType saves Babel_ Locale objects into database. The Locale objects
+    are converted to string on the way in and back to object on the way out.
+
+    In order to use LocaleType you need to install Babel_ first.
+
+    .. _Babel: http://babel.pocoo.org/
+
+    ::
+
+
+        from sqlalchemy_utils import LocaleType
+        from babel import Locale
+
+
+        class User(Base):
+            __tablename__ = 'user'
+            id = sa.Column(sa.Integer, autoincrement=True)
+            name = sa.Column(sa.Unicode(50))
+            locale = sa.Column(LocaleType)
+
+
+        user = User()
+        user.locale = Locale('en_US')
+        session.commit()
+
+
+    Like many other types this type also supports scalar coercion:
+
+    ::
+
+
+        user.locale = 'de_DE'
+        user.locale  # Locale('de_DE')
+
     """
 
     impl = types.Unicode(10)

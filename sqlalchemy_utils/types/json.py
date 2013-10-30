@@ -23,8 +23,32 @@ ischema_names['json'] = PostgresJSONType
 
 
 class JSONType(sa.types.TypeDecorator):
-    "Represents an immutable structure as a json-encoded string."
+    """
+    JSONType offers way of saving JSON data structures to database. On
+    PostgreSQL the underlying implementation of this data type is 'json' while
+    on other databases its simply 'text'.
 
+    ::
+
+
+        from sqlalchemy_utils import JSONType
+
+
+        class Product(Base):
+            __tablename__ = 'product'
+            id = sa.Column(sa.Integer, autoincrement=True)
+            name = sa.Column(sa.Unicode(50))
+            details = sa.Column(JSONType)
+
+
+        product = Product()
+        product.details = {
+            'color': 'red',
+            'type': 'car',
+            'max-speed': '400 mph'
+        }
+        session.commit()
+    """
     impl = sa.UnicodeText
 
     def __init__(self):

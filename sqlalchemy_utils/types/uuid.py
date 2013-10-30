@@ -9,8 +9,18 @@ class UUIDType(types.TypeDecorator, ScalarCoercible):
     """
     Stores a UUID in the database natively when it can and falls back to
     a BINARY(16) or a CHAR(32) when it can't.
-    """
 
+    ::
+
+        from sqlalchemy_utils import UUIDType
+        import uuid
+
+        class User(Base):
+            __tablename__ = 'user'
+
+            # Pass `binary=False` to fallback to CHAR instead of BINARY
+            id = sa.Column(UUIDType(binary=False), primary_key=True)
+    """
     impl = types.BINARY(16)
 
     python_type = uuid.UUID
