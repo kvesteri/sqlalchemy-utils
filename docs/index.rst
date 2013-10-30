@@ -36,7 +36,7 @@ Example
 
 
     class Document(Base):
-        __tablename__ = 'player'
+        __tablename__ = 'document'
         id = sa.Column(sa.Integer, autoincrement=True)
         name = sa.Column(sa.Unicode(50))
         background_color = sa.Column(ColorType)
