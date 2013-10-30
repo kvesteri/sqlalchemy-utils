@@ -182,6 +182,22 @@ def has_changes(obj, attr):
     Simple shortcut function for checking if given attribute of given
     declarative model object has changed during the transaction.
 
+
+    ::
+
+
+        from sqlalchemy_utils import has_changes
+
+
+        user = User()
+
+        has_changes(user, 'name')  # False
+
+        user.name = u'someone'
+
+        has_changes(user, 'name')  # True
+
+
     :param obj: SQLAlchemy declarative model object
     :param attr: Name of the attribute
     """
