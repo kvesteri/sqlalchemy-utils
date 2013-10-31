@@ -48,10 +48,15 @@ class TestNumberRangeType(TestCase):
         building = self.session.query(self.Building).first()
         assert building.persons_at_night is None
 
-    def test_scalar_attributes_get_coerced_to_objects(self):
+    def test_string_coercion(self):
         building = self.Building(persons_at_night='[12, 18]')
 
         assert isinstance(building.persons_at_night, NumberRange)
+
+    def test_integer_coercion(self):
+        building = self.Building(persons_at_night=15)
+        assert building.persons_at_night.min_value == 15
+        assert building.persons_at_night.max_value == 15
 
 
 class TestNumberRange(object):
