@@ -61,8 +61,8 @@ def generates(attr):
 
 
         @generates(Article.slug)
-        def _create_article_slug(self):
-            return self.name.lower().replace(' ', '-')
+        def _create_article_slug(article):
+            return article.name.lower().replace(' ', '-')
 
 
     Or with lazy evaluated string argument:
@@ -71,8 +71,8 @@ def generates(attr):
 
 
         @generates('Article.slug')
-        def _create_article_slug(self):
-            return self.name.lower().replace(' ', '-')
+        def _create_article_slug(article):
+            return article.name.lower().replace(' ', '-')
     """
 
     register_listeners()
