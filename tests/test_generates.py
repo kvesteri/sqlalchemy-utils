@@ -1,13 +1,13 @@
-from collections import defaultdict
 import sqlalchemy as sa
-from sqlalchemy_utils import generates, decorators
+from sqlalchemy_utils import generates
+from sqlalchemy_utils.decorators import generator
 from tests import TestCase
 
 
 class GeneratesTestCase(TestCase):
     def teardown_method(self, method):
         TestCase.teardown_method(self, method)
-        decorators.generator_registry = defaultdict(list)
+        generator.reset()
 
     def test_generates_value_before_flush(self):
         article = self.Article()
