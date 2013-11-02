@@ -71,7 +71,7 @@ def generates(attr, generator=generator):
     ::
 
 
-        class Article(self.Base):
+        class Article(Base):
             __tablename__ = 'article'
             id = sa.Column(sa.Integer, primary_key=True)
             name = sa.Column(sa.Unicode(255))
@@ -93,7 +93,7 @@ def generates(attr, generator=generator):
 
     ::
 
-        class Article(self.Base):
+        class Article(Base):
             ...
 
             @generates('slug')
@@ -106,7 +106,7 @@ def generates(attr, generator=generator):
     ::
 
 
-        class Article(self.Base):
+        class Article(Base):
             __tablename__ = 'article'
             id = sa.Column(sa.Integer, primary_key=True)
             name = sa.Column(sa.Unicode(255))
