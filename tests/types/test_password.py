@@ -88,3 +88,15 @@ class TestPasswordType(TestCase):
 
     def test_without_schemes(self):
         assert PasswordType(schemes=[]).length == 1024
+
+    def test_compare(self):
+        from passlib.hash import md5_crypt
+
+        obj = self.User()
+        obj.password = Password(md5_crypt.encrypt('b'))
+
+        other = self.User()
+        other.password = Password(md5_crypt.encrypt('b'))
+
+        # Not sure what to assert here; the test raised an error before.
+        assert obj.password != other.password

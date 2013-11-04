@@ -23,6 +23,11 @@ class Password(object):
             self.context = weakref.proxy(context)
 
     def __eq__(self, value):
+        if isinstance(value, Password):
+            # Comparing 2 hashes isn't very useful; but this equality
+            # method breaks otherwise.
+            return value.hash == self.hash
+
         valid, new = self.context.verify_and_update(value, self.hash)
         if valid and new:
             # New hash was calculated due to various reasons; stored one
