@@ -24,7 +24,7 @@ class AggregateValueGenerator(object):
 
     def reset(self):
         self.generator_registry = defaultdict(list)
-        self.listeners_registered = False
+        self.pending_queries = defaultdict(list)
 
     def generator_wrapper(self, func, aggregate_func, relationship):
         func = aggregated_attr(func)
@@ -35,40 +35,64 @@ class AggregateValueGenerator(object):
         return func
 
     def register_listeners(self):
-        if not self.listeners_registered:
-            sa.event.listen(
-                sa.orm.mapper,
-                'mapper_configured',
-                self.update_generator_registry
-            )
-            sa.event.listen(
-                sa.orm.session.Session,
-                'after_flush',
-                self.update_generated_properties
-            )
-            self.listeners_registered = True
+        sa.event.listen(
+            sa.orm.mapper,
+            'mapper_configured',
+            self.update_generator_registry
+        )
+        sa.event.listen(
+            sa.orm.session.Session,
+            'after_flush',
+            self.construct_aggregate_queries
+        )
 
     def update_generator_registry(self, mapper, class_):
+        #self.reset()
         if hasattr(class_, '__aggregates__'):
             for key, value in six.iteritems(class_.__aggregates__):
-                rel = getattr(class_, value['relationship'])
-                rel_class = rel.mapper.class_
+                relationships = []
+                rel_class = class_
+
+                for path_name in value['relationship'].split('.'):
+                    rel = getattr(rel_class, path_name)
+                    relationships.append(rel)
+                    rel_class = rel.mapper.class_
+
                 self.generator_registry[rel_class.__name__].append({
                     'class': class_,
                     'attr': key,
-                    'relationship': rel,
+                    'relationship': list(reversed(relationships)),
                     'aggregate': value['func']
                 })
 
-    def update_generated_properties(self, session, ctx):
+    def construct_aggregate_queries(self, session, ctx):
         for obj in session:
             class_ = obj.__class__.__name__
             if class_ in self.generator_registry:
                 for func in self.generator_registry[class_]:
+                    if isinstance(func['aggregate'], six.string_types):
+                        agg_func = eval(func['aggregate'])
+                    else:
+                        agg_func = func['aggregate'](obj.__class__.id)
+
                     aggregate_value = (
-                        session.query(func['aggregate'](obj.__class__.id))
-                        .filter(func['relationship'].property.primaryjoin)
-                        .correlate(func['class']).as_scalar()
+                        session.query(agg_func)
+                    )
+
+                    for rel in func['relationship'][0:-1]:
+                        aggregate_value = (
+                            aggregate_value
+                            .join(
+                                rel.property.parent.class_,
+                                rel.property.primaryjoin
+                            )
+                        )
+                    aggregate_value = aggregate_value.filter(
+                        func['relationship'][-1]
+                    )
+
+                    aggregate_value = (
+                        aggregate_value.correlate(func['class']).as_scalar()
                     )
                     query = func['class'].__table__.update().values(
                         {func['attr']: aggregate_value}
@@ -77,6 +101,7 @@ class AggregateValueGenerator(object):
 
 
 generator = AggregateValueGenerator()
+generator.register_listeners()
 
 
 def aggregate(aggregate_func, relationship, generator=generator):
@@ -96,17 +121,10 @@ def aggregate(aggregate_func, relationship, generator=generator):
 
 
         class Thread(Base):
-            __tablename__ = 'article'
+            __tablename__ = 'thread'
             id = sa.Column(sa.Integer, primary_key=True)
             name = sa.Column(sa.Unicode(255))
 
-            # _comment_count = sa.Column(sa.Integer)
-
-            # comment_count = aggregate(
-            #     '_comment_count',
-            #     sa.func.count,
-            #     'comments'
-            # )
             @aggregate(sa.func.count, 'comments')
             def comment_count(self):
                 return sa.Column(sa.Integer)
@@ -114,7 +132,6 @@ def aggregate(aggregate_func, relationship, generator=generator):
             @aggregate(sa.func.max, 'comments')
             def latest_comment_id(self):
                 return sa.Column(sa.Integer)
-
 
             latest_comment = sa.orm.relationship('Comment', viewonly=True)
 
@@ -128,9 +145,37 @@ def aggregate(aggregate_func, relationship, generator=generator):
             thread = sa.orm.relationship(Thread, backref='comments')
 
 
-    """
-    generator.register_listeners()
 
+    ::
+
+
+        class Catalog(Base):
+            __tablename__ = 'catalog'
+            id = sa.Column(sa.Integer, primary_key=True)
+            name = sa.Column(sa.Unicode(255))
+
+            @aggregate(
+                sa.func.sum(price) +
+                sa.func.coalesce(monthly_license_price, 0),
+                'products'
+            )
+            def net_worth(self):
+                return sa.Column(sa.Integer)
+
+            products = sa.orm.relationship('Product')
+
+
+        class Product(Base):
+            __tablename__ = 'product'
+            id = sa.Column(sa.Integer, primary_key=True)
+            name = sa.Column(sa.Unicode(255))
+            price = sa.Column(sa.Numeric)
+            monthly_license_price = sa.Column(sa.Numeric)
+
+            catalog_id = sa.Column(sa.Integer, sa.ForeignKey(Catalog.id))
+
+
+    """
     def wraps(func):
         return generator.generator_wrapper(
             func,

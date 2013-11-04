@@ -6,8 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.hybrid import hybrid_property
 
-from sqlalchemy_utils import InstrumentedList
-from sqlalchemy_utils import coercion_listener
+from sqlalchemy_utils import InstrumentedList, coercion_listener, aggregates
 
 
 @sa.event.listens_for(sa.engine.Engine, 'before_cursor_execute')
@@ -40,6 +39,7 @@ class TestCase(object):
         self.session = Session()
 
     def teardown_method(self, method):
+        aggregates.generator.reset()
         self.session.close_all()
         self.Base.metadata.drop_all(self.connection)
         self.connection.close()
