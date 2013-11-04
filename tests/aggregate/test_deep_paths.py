@@ -11,7 +11,7 @@ class TestDeepModelPathsForAggregates(TestCase):
             id = sa.Column(sa.Integer, primary_key=True)
             name = sa.Column(sa.Unicode(255))
 
-            @aggregate(sa.func.count, 'categories.products')
+            @aggregate('categories.products')
             def product_count(self):
                 return sa.Column(sa.Integer, default=0)
 

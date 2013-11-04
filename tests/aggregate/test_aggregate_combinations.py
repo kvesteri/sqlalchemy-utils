@@ -5,17 +5,23 @@ from tests import TestCase
 
 
 class TestDeepModelPathsForAggregates(TestCase):
+    dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
+
     def create_models(self):
         class Catalog(self.Base):
             __tablename__ = 'catalog'
             id = sa.Column(sa.Integer, primary_key=True)
             name = sa.Column(sa.Unicode(255))
 
-            @aggregate(sa.func.count, 'categories.products')
-            def product_count(self):
-                return sa.Column(sa.Integer, default=0)
+            @aggregate('products')
+            def net_worth(self):
+                return sa.Column(sa.Numeric, default=0)
 
-            categories = sa.orm.relationship('Product', backref='catalog')
+            @net_worth.select_expression
+            def net_worth(self):
+                return sa.func.sum(Product.price)
+
+            products = sa.orm.relationship('Product', backref='catalog')
 
         class Product(self.Base):
             __tablename__ = 'product'
@@ -37,8 +43,9 @@ class TestDeepModelPathsForAggregates(TestCase):
         product = self.Product(
             name=u'Some product',
             price=Decimal('1000'),
+            catalog=catalog
         )
         self.session.add(product)
         self.session.commit()
         self.session.refresh(catalog)
-        assert catalog.product_count == 1
+        assert catalog.net_worth == Decimal('1000')
