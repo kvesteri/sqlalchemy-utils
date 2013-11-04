@@ -1,6 +1,6 @@
 from sqlalchemy.engine.url import make_url
 import sqlalchemy as sa
-from sqlalchemy.exc import ProgrammingError
+from sqlalchemy.exc import ProgrammingError, OperationalError
 import os
 
 
@@ -14,7 +14,7 @@ def database_exists(url):
 
     engine = sa.create_engine(url)
 
-    if engine.dialect.name == 'postgres':
+    if engine.dialect.name == 'postgresql':
         text = "SELECT 1 FROM pg_database WHERE datname='%s'" % database
         return bool(engine.execute(text).scalar())
 
@@ -34,7 +34,7 @@ def database_exists(url):
             engine.execute(text)
             return True
 
-        except ProgrammingError:
+        except (ProgrammingError, OperationalError):
             return False
 
 
@@ -50,7 +50,7 @@ def create_database(url, encoding='utf8'):
 
     engine = sa.create_engine(url)
 
-    if engine.dialect.name == 'postgres':
+    if engine.dialect.name == 'postgresql':
         text = "CREATE DATABASE %s ENCODING = '%s'" % (database, encoding)
         engine.execute(text)
 
