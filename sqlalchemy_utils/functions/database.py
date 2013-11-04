@@ -2,13 +2,14 @@ from sqlalchemy.engine.url import make_url
 import sqlalchemy as sa
 from sqlalchemy.exc import ProgrammingError, OperationalError
 import os
+from copy import copy
 
 
 def database_exists(url):
     """Check if a database exists.
     """
 
-    url = make_url(url)
+    url = copy(url)
     database = url.database
     url.database = None
 
@@ -42,7 +43,7 @@ def create_database(url, encoding='utf8'):
     """Issue the appropriate CREATE DATABASE statement.
     """
 
-    url = make_url(url)
+    url = copy(url)
 
     database = url.database
     if not url.drivername.startswith('sqlite'):
@@ -70,7 +71,7 @@ def drop_database(url):
     """Issue the appropriate DROP DATABASE statement.
     """
 
-    url = make_url(url)
+    url = copy(url)
 
     database = url.database
     if not url.drivername.startswith('sqlite'):
