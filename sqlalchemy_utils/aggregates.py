@@ -116,6 +116,7 @@ Now the net_worth column of Catalog model will be automatically whenever:
 * A product is deleted from the catalog
 * The price of catalog product is changed
 
+
 ::
 
 
@@ -127,7 +128,7 @@ Now the net_worth column of Catalog model will be automatically whenever:
 
 
     catalog = Catalog(
-        name=u'My first catalog'
+        name=u'My first catalog',
         products=[
             product1,
             product2
