@@ -1,21 +1,43 @@
 """
-SQLAlchemy-Utils provides way of automatically calculating aggregate values of related models and saving them to parent model.
+SQLAlchemy-Utils provides way of automatically calculating aggregate values of
+related models and saving them to parent model.
 
-This solution is inspired by RoR counter cache and especially counter_culture_.
+This solution is inspired by RoR counter cache,
+`counter_culture`_ and `stackoverflow reply by Michael Bayer`_.
+
+Why?
+----
+
+Many times you may have situations where you need to calculate dynamically some
+aggregate value for given model. Some simple examples include:
+
+- Number of products in a catalog
+- Average rating for movie
+- Latest forum post
+- Total price of orders for given customer
+
+Now all these aggregates can be elegantly implemented with SQLAlchemy
+column_property_ function. However when your data grows calculating these
+values on the fly might start to hurt the performance of your application. The
+more aggregates you are using the more performance penalty you get.
+
+This module provides way of calculating these values automatically and
+efficiently at the time of modification rather than on the fly.
 
 
+Features
+--------
 
-.. _counter_culter:: https://github.com/magnusvk/counter_culture
+* Automatically updates aggregate columns when aggregated values change
+* Supports aggregate values through arbitrary number levels of relations
+* Highly optimized: uses single query per transaction per aggregate column
+* Aggregated columns can be of any data type and use any selectable scalar expression
 
 
-Non-atomic implementation:
-
-http://stackoverflow.com/questions/13693872/
-
-
-We should avoid deadlocks:
-
-http://mina.naguib.ca/blog/2010/11/22/postgresql-foreign-key-deadlocks.html
+.. _column_property: http://docs.sqlalchemy.org/en/latest/orm/mapper_config.html#using-column-property
+.. _counter_culture: https://github.com/magnusvk/counter_culture
+.. _stackoverflow reply by Michael Bayer:
+    http://stackoverflow.com/questions/13693872/
 
 
 Simple aggregates
@@ -84,11 +106,15 @@ Custom aggregate expressions
         id = sa.Column(sa.Integer, primary_key=True)
         name = sa.Column(sa.Unicode(255))
         price = sa.Column(sa.Numeric)
-        monthly_license_price = sa.Column(sa.Numeric)
 
         catalog_id = sa.Column(sa.Integer, sa.ForeignKey(Catalog.id))
 
 
+Now the net_worth column of Catalog model will be automatically whenever:
+
+* A new product is added to the catalog
+* A product is deleted from the catalog
+* The price of catalog product is changed
 
 ::
 
@@ -96,18 +122,95 @@ Custom aggregate expressions
     from decimal import Decimal
 
 
+    product1 = Product(name='Some product', price=Decimal(1000))
+    product2 = Product(name='Some other product', price=Decimal(500))
+
+
     catalog = Catalog(
         name=u'My first catalog'
         products=[
-            Product(name='Some product', price=Decimal(1000)),
-            Product(name='Some other product', price=Decimal(500))
+            product1,
+            product2
         ]
     )
     session.add(catalog)
     session.commit()
 
+    session.refresh(catalog)
     catalog.net_worth  # 1500
 
+    session.delete(product2)
+    session.commit()
+    session.refresh(catalog)
+
+    catalog.net_worth  # 1000
+
+    product1.price = 2000
+    session.commit()
+    session.refresh(catalog)
+
+    catalog.net_worth  # 2000
+
+
+
+
+
+
+
+Multi-level aggregates
+----------------------
+
+
+::
+
+
+    from sqlalchemy_utils import aggregated_attr
+
+
+    class Catalog(Base):
+        __tablename__ = 'catalog'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
+
+        @aggregated_attr('categories.products')
+        def net_worth(self):
+            return sa.Column(sa.Integer)
+
+        @aggregated_attr.expression
+        def net_worth(self):
+            return sa.func.sum(Product.price)
+
+
+        categories = sa.orm.relationship('Product')
+
+
+    class Category(Base):
+        __tablename__ = 'category'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
+
+        catalog_id = sa.Column(sa.Integer, sa.ForeignKey(Catalog.id))
+
+        products = sa.orm.relationship('Product')
+
+
+    class Product(Base):
+        __tablename__ = 'product'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
+        price = sa.Column(sa.Numeric)
+
+        category_id = sa.Column(sa.Integer, sa.ForeignKey(Category.id))
+
+
+TODO
+----
+
+* Special consideration should be given to `deadlocks`_.
+
+
+.. _deadlocks:
+    http://mina.naguib.ca/blog/2010/11/22/postgresql-foreign-key-deadlocks.html
 
 """
 
