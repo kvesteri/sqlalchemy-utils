@@ -9,7 +9,7 @@ def database_exists(url):
     """Check if a database exists.
     """
 
-    url = copy(url)
+    url = copy(make_url(url))
     database = url.database
     url.database = None
 
@@ -43,7 +43,7 @@ def create_database(url, encoding='utf8'):
     """Issue the appropriate CREATE DATABASE statement.
     """
 
-    url = copy(url)
+    url = copy(make_url(url))
 
     database = url.database
     if not url.drivername.startswith('sqlite'):
@@ -76,7 +76,7 @@ def drop_database(url):
     """Issue the appropriate DROP DATABASE statement.
     """
 
-    url = copy(url)
+    url = copy(make_url(url))
 
     database = url.database
     if not url.drivername.startswith('sqlite'):
