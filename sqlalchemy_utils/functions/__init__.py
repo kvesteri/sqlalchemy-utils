@@ -6,6 +6,7 @@ from .defer_except import defer_except
 from .mock import create_mock_engine, mock_engine
 from .render import render_expression, render_statement
 from .sort_query import sort_query, QuerySorterException
+from .database import database_exists, create_database, drop_database
 
 
 __all__ = (
@@ -18,7 +19,10 @@ __all__ = (
     render_statement,
     with_backrefs,
     CompositePath,
-    QuerySorterException
+    QuerySorterException,
+    database_exists,
+    create_database,
+    drop_database
 )
 
 

@@ -13,7 +13,10 @@ from .functions import (
     mock_engine,
     sort_query,
     table_name,
-    with_backrefs
+    with_backrefs,
+    database_exists,
+    create_database,
+    drop_database
 )
 from .listeners import coercion_listener
 from .merge import merge, Merger
@@ -96,4 +99,7 @@ __all__ = (
     TimezoneType,
     TSVectorType,
     UUIDType,
+    database_exists,
+    create_database,
+    drop_database
 )
