@@ -100,3 +100,17 @@ class TestPasswordType(TestCase):
 
         # Not sure what to assert here; the test raised an error before.
         assert obj.password != other.password
+
+    def test_set_none(self):
+
+        obj = self.User()
+        obj.password = None
+
+        assert obj.password is None
+
+        self.session.add(obj)
+        self.session.commit()
+
+        obj = self.session.query(self.User).get(obj.id)
+
+        assert obj.password is None
