@@ -39,7 +39,7 @@ class TestCase(object):
         self.session = Session()
 
     def teardown_method(self, method):
-        aggregates.generator.reset()
+        aggregates.manager.reset()
         self.session.close_all()
         self.Base.metadata.drop_all(self.connection)
         self.connection.close()

@@ -156,6 +156,13 @@ UUIDType
 
 
 
+Aggregated attributes
+---------------------
+
+.. automodule:: sqlalchemy_utils.aggregates
+
+.. autofunction:: aggregated_attr
+
 
 
 The generates decorator

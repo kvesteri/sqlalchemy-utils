@@ -1,3 +1,117 @@
+"""
+SQLAlchemy-Utils provides way of automatically calculating aggregate values of related models and saving them to parent model.
+
+This solution is inspired by RoR counter cache and especially counter_culture_.
+
+
+
+.. _counter_culter:: https://github.com/magnusvk/counter_culture
+
+
+Non-atomic implementation:
+
+http://stackoverflow.com/questions/13693872/
+
+
+We should avoid deadlocks:
+
+http://mina.naguib.ca/blog/2010/11/22/postgresql-foreign-key-deadlocks.html
+
+
+Simple aggregates
+-----------------
+
+::
+
+    from sqlalchemy_utils import aggregated_attr
+
+
+    class Thread(Base):
+        __tablename__ = 'thread'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
+
+        @aggregated_attr('comments')
+        def comment_count(self):
+            return sa.Column(sa.Integer)
+
+        comments = sa.orm.relationship(
+            'Comment',
+            backref='thread'
+        )
+
+
+    class Comment(Base):
+        __tablename__ = 'comment'
+        id = sa.Column(sa.Integer, primary_key=True)
+        content = sa.Column(sa.UnicodeText)
+        thread_id = sa.Column(sa.Integer, sa.ForeignKey(Thread.id))
+
+        thread = sa.orm.relationship(Thread, backref='comments')
+
+
+
+
+Custom aggregate expressions
+----------------------------
+
+
+::
+
+
+    from sqlalchemy_utils import aggregated_attr
+
+
+    class Catalog(Base):
+        __tablename__ = 'catalog'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
+
+        @aggregated_attr
+        def net_worth(self):
+            return sa.Column(sa.Integer)
+
+        @aggregated_attr.expression
+        def net_worth(self):
+            return sa.func.sum(Product.price)
+
+
+        products = sa.orm.relationship('Product')
+
+
+    class Product(Base):
+        __tablename__ = 'product'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
+        price = sa.Column(sa.Numeric)
+        monthly_license_price = sa.Column(sa.Numeric)
+
+        catalog_id = sa.Column(sa.Integer, sa.ForeignKey(Catalog.id))
+
+
+
+::
+
+
+    from decimal import Decimal
+
+
+    catalog = Catalog(
+        name=u'My first catalog'
+        products=[
+            Product(name='Some product', price=Decimal(1000)),
+            Product(name='Some other product', price=Decimal(500))
+        ]
+    )
+    session.add(catalog)
+    session.commit()
+
+    catalog.net_worth  # 1500
+
+
+"""
+
+
 from collections import defaultdict
 
 import sqlalchemy as sa
@@ -6,35 +120,47 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.sql.expression import _FunctionGenerator
 
 
-class aggregated_attr(declared_attr):
-    def __init__(self, fget, *arg, **kw):
-        super(aggregated_attr, self).__init__(fget, *arg, **kw)
+class AggregatedAttribute(declared_attr):
+    def __init__(
+        self,
+        fget,
+        relationship,
+        expr,
+        *arg,
+        **kw
+    ):
+        super(AggregatedAttribute, self).__init__(fget, *arg, **kw)
         self.__doc__ = fget.__doc__
+        self.expr = expr
+        self.relationship = relationship
 
-    def select_expression(self, expr):
-        self.__aggregate__['select_expression'] = expr
+    def expression(self, expr):
+        self.expr = expr
         return self
 
     def __get__(desc, self, cls):
         result = desc.fget(cls)
-        cls.__aggregates__ = {
-            desc.fget.__name__: desc.__aggregate__
+        if not hasattr(cls, '__aggregates__'):
+            cls.__aggregates__ = {}
+        cls.__aggregates__[desc.fget.__name__] = {
+            'expression': desc.expr,
+            'relationship': desc.relationship
         }
         return result
 
 
 class AggregatedValue(object):
-    def __init__(self, class_, attr, relationships, select_expression):
+    def __init__(self, class_, attr, relationships, expr):
         self.class_ = class_
         self.attr = attr
         self.relationships = relationships
 
-        if isinstance(select_expression, sa.sql.visitors.Visitable):
-            self.select_expression = select_expression
-        elif isinstance(select_expression, _FunctionGenerator):
-            self.select_expression = select_expression(sa.sql.literal('1'))
+        if isinstance(expr, sa.sql.visitors.Visitable):
+            self.expr = expr
+        elif isinstance(expr, _FunctionGenerator):
+            self.expr = expr(sa.sql.text('1'))
         else:
-            self.select_expression = select_expression(class_)
+            self.expr = expr(class_)
 
     @property
     def aggregate_query(self):
@@ -50,7 +176,7 @@ class AggregatedValue(object):
             )
 
         query = sa.select(
-            [self.select_expression],
+            [self.expr],
             from_obj=[from_]
         )
 
@@ -65,21 +191,13 @@ class AggregatedValue(object):
         )
 
 
-class AggregateValueGenerator(object):
+class AggregationManager(object):
     def __init__(self):
         self.reset()
 
     def reset(self):
         self.generator_registry = defaultdict(list)
         self.pending_queries = defaultdict(list)
-
-    def generator_wrapper(self, func, relationship, select_expression):
-        func = aggregated_attr(func)
-        func.__aggregate__ = {
-            'select_expression': select_expression,
-            'relationship': relationship
-        }
-        return func
 
     def register_listeners(self):
         sa.event.listen(
@@ -109,7 +227,7 @@ class AggregateValueGenerator(object):
                         class_=class_,
                         attr=key,
                         relationships=list(reversed(relationships)),
-                        select_expression=value['select_expression']
+                        expr=value['expression']
                     )
                 )
 
@@ -118,93 +236,22 @@ class AggregateValueGenerator(object):
             class_ = obj.__class__.__name__
             if class_ in self.generator_registry:
                 for aggregate_value in self.generator_registry[class_]:
-                    session.execute(aggregate_value.update_query)
+                    query = aggregate_value.update_query
+                    session.execute(query)
 
 
-generator = AggregateValueGenerator()
-generator.register_listeners()
+manager = AggregationManager()
+manager.register_listeners()
 
 
-def aggregate(
+def aggregated_attr(
     relationship,
-    select_expression=sa.func.count,
-    generator=generator
+    expression=sa.func.count
 ):
-    """
-
-    Non-atomic implementation:
-
-    http://stackoverflow.com/questions/13693872/
-
-
-    We should avoid deadlocks:
-
-    http://mina.naguib.ca/blog/2010/11/22/postgresql-foreign-key-deadlocks.html
-
-
-    ::
-
-
-        class Thread(Base):
-            __tablename__ = 'thread'
-            id = sa.Column(sa.Integer, primary_key=True)
-            name = sa.Column(sa.Unicode(255))
-
-            @aggregate(sa.func.count, 'comments')
-            def comment_count(self):
-                return sa.Column(sa.Integer)
-
-            @aggregate(sa.func.max, 'comments')
-            def latest_comment_id(self):
-                return sa.Column(sa.Integer)
-
-            latest_comment = sa.orm.relationship('Comment', viewonly=True)
-
-
-        class Comment(Base):
-            __tablename__ = 'comment'
-            id = sa.Column(sa.Integer, primary_key=True)
-            content = sa.Column(sa.Unicode(255))
-            thread_id = sa.Column(sa.Integer, sa.ForeignKey(Thread.id))
-
-            thread = sa.orm.relationship(Thread, backref='comments')
-
-
-
-    ::
-
-
-        class Catalog(Base):
-            __tablename__ = 'catalog'
-            id = sa.Column(sa.Integer, primary_key=True)
-            name = sa.Column(sa.Unicode(255))
-
-            @aggregate(
-                sa.func.sum(price) +
-                sa.func.coalesce(monthly_license_price, 0),
-                'products'
-            )
-            def net_worth(self):
-                return sa.Column(sa.Integer)
-
-            products = sa.orm.relationship('Product')
-
-
-        class Product(Base):
-            __tablename__ = 'product'
-            id = sa.Column(sa.Integer, primary_key=True)
-            name = sa.Column(sa.Unicode(255))
-            price = sa.Column(sa.Numeric)
-            monthly_license_price = sa.Column(sa.Numeric)
-
-            catalog_id = sa.Column(sa.Integer, sa.ForeignKey(Catalog.id))
-
-
-    """
     def wraps(func):
-        return generator.generator_wrapper(
+        return AggregatedAttribute(
             func,
             relationship,
-            select_expression=select_expression
+            expression
         )
     return wraps

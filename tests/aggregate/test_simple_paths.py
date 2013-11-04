@@ -1,5 +1,5 @@
 import sqlalchemy as sa
-from sqlalchemy_utils.aggregates import aggregate
+from sqlalchemy_utils.aggregates import aggregated_attr
 from tests import TestCase
 
 
@@ -10,7 +10,7 @@ class TestAggregateValueGenerationForSimpleModelPaths(TestCase):
             id = sa.Column(sa.Integer, primary_key=True)
             name = sa.Column(sa.Unicode(255))
 
-            @aggregate('comments')
+            @aggregated_attr('comments')
             def comment_count(self):
                 return sa.Column(sa.Integer, default=0)
 
