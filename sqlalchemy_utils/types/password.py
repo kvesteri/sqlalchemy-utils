@@ -143,6 +143,9 @@ class PasswordType(types.TypeDecorator, ScalarCoercible):
             return Password(value, self.context)
 
     def _coerce(self, value):
+        if value is None:
+            return
+
         if not isinstance(value, Password):
             # Hash the password using the default scheme.
             value = self.context.encrypt(value).encode('utf8')
