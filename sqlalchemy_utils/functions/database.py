@@ -52,6 +52,11 @@ def create_database(url, encoding='utf8'):
     engine = sa.create_engine(url)
 
     if engine.dialect.name == 'postgresql':
+        if engine.driver == 'psycopg2':
+            from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
+            engine.raw_connection().set_isolation_level(
+                ISOLATION_LEVEL_AUTOCOMMIT)
+
         text = "CREATE DATABASE %s ENCODING = '%s'" % (database, encoding)
         engine.execute(text)
 
@@ -81,6 +86,12 @@ def drop_database(url):
 
     if engine.dialect.name == 'sqlite' and url.database != ':memory:':
         os.remove(url.database)
+
+    elif engine.dialect.name == 'postgresql' and engine.driver == 'psycopg2':
+        from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
+        engine.raw_connection().set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+        text = "DROP DATABASE %s" % database
+        engine.execute(text)
 
     else:
         text = "DROP DATABASE %s" % database
