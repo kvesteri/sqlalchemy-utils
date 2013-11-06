@@ -268,11 +268,11 @@ class AggregatedValue(object):
 
     @property
     def aggregate_query(self):
-        from_ = self.relationships[0].mapper.class_
+        from_ = self.relationships[0].mapper.class_.__table__
         for relationship in self.relationships[0:-1]:
             property_ = relationship.property
             from_ = (
-                from_.__table__
+                from_
                 .join(
                     property_.parent.class_,
                     property_.primaryjoin
@@ -288,11 +288,58 @@ class AggregatedValue(object):
 
         return query.correlate(self.class_).as_scalar()
 
-    @property
-    def update_query(self):
-        return self.class_.__table__.update().values(
+    def update_query(self, objects):
+        table = self.class_.__table__
+        query = table.update().values(
             {self.attr: self.aggregate_query}
         )
+        if len(self.relationships) == 1:
+            remote_pairs = self.relationships[-1].property.local_remote_pairs
+
+            query = query.where(
+                remote_pairs[0][0].in_(
+                    getattr(obj, remote_pairs[0][1].key) for obj in objects
+                )
+            )
+        else:
+            # Builds query such as:
+            #
+            # UPDATE catalog SET product_count = (aggregate_query)
+            # WHERE id IN (
+            #     SELECT catalog_id
+            #       FROM category
+            #       INNER JOIN sub_category
+            #           ON category.id = sub_category.category_id
+            #       WHERE sub_category.id IN (product_sub_category_ids)
+            # )
+            property_ = self.relationships[-1].property
+            remote_pairs = property_.local_remote_pairs
+            from_ = property_.mapper.class_.__table__
+            for relationship in reversed(self.relationships[1:-1]):
+                property_ = relationship.property
+                from_ = (
+                    from_.join(property_.mapper.class_, property_.primaryjoin)
+                )
+
+            property_ = self.relationships[0].property
+
+            query = query.where(
+                remote_pairs[0][0].in_(
+                    sa.select(
+                        [remote_pairs[0][1]],
+                        from_obj=[from_]
+                    ).where(
+                        property_.local_remote_pairs[0][0].in_(
+                            getattr(
+                                obj, property_.local_remote_pairs[0][1].key
+                            )
+                            for obj in objects
+                        )
+                    )
+                )
+            )
+
+        return query
 
 
 class AggregationManager(object):
@@ -336,12 +383,16 @@ class AggregationManager(object):
                 )
 
     def construct_aggregate_queries(self, session, ctx):
+        object_dict = defaultdict(list)
         for obj in session:
             class_ = obj.__class__.__name__
             if class_ in self.generator_registry:
-                for aggregate_value in self.generator_registry[class_]:
-                    query = aggregate_value.update_query
-                    session.execute(query)
+                object_dict[class_].append(obj)
+
+        for class_, objects in six.iteritems(object_dict):
+            for aggregate_value in self.generator_registry[class_]:
+                query = aggregate_value.update_query(objects)
+                session.execute(query)
 
 
 manager = AggregationManager()
