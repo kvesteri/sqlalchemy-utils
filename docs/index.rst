@@ -1,6 +1,10 @@
 SQLAlchemy-Utils
 ================
 
+.. toctree::
+   :maxdepth: 2
+
+
 SQLAlchemy-Utils provides custom data types and various utility functions for SQLAlchemy.
 
 Using automatic data coercion
