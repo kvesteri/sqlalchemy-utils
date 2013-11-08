@@ -1,9 +1,7 @@
 SQLAlchemy-Utils
 ================
 
-.. toctree::
-   :maxdepth: 2
-
+.. contents::
 
 SQLAlchemy-Utils provides custom data types and various utility functions for SQLAlchemy.
 

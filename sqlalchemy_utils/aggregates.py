@@ -93,7 +93,7 @@ Custom aggregate expressions
         def net_worth(self):
             return sa.Column(sa.Integer)
 
-        @aggregated_attr.expression
+        @net_worth.expression
         def net_worth(self):
             return sa.func.sum(Product.price)
 
@@ -177,7 +177,7 @@ Multi-level aggregates
         def net_worth(self):
             return sa.Column(sa.Integer)
 
-        @aggregated_attr.expression
+        @net_worth.expression
         def net_worth(self):
             return sa.func.sum(Product.price)
 
