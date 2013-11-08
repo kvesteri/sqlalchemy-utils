@@ -3,10 +3,11 @@ SQLAlchemy-Utils
 
 .. contents::
 
+
 SQLAlchemy-Utils provides custom data types and various utility functions for SQLAlchemy.
 
 Using automatic data coercion
------------------------------
+=============================
 
 SQLAlchemy-Utils provides various new data types for SQLAlchemy and in order to gain full
 advantage of these datatypes you should use coercion_listener. Setting up the listener is easy:
@@ -47,7 +48,7 @@ Example
 
 
 Data types
-----------
+==========
 
 SQLAlchemy-Utils provides various new data types for SQLAlchemy.
 
@@ -154,7 +155,7 @@ UUIDType
 
 
 Aggregated attributes
----------------------
+=====================
 
 .. automodule:: sqlalchemy_utils.aggregates
 
@@ -163,7 +164,7 @@ Aggregated attributes
 
 
 The generates decorator
------------------------
+=======================
 
 .. module:: sqlalchemy_utils.decorators
 
@@ -171,7 +172,7 @@ The generates decorator
 
 
 Generic Relationship
---------------------
+====================
 
 Generic relationship is a form of relationship that supports creating a 1 to many relationship to any target model.
 
@@ -223,7 +224,7 @@ Generic relationship is a form of relationship that supports creating a 1 to man
 
 
 Utility functions
------------------
+=================
 
 .. module:: sqlalchemy_utils.functions
 
@@ -276,6 +277,6 @@ sort_query
 
 
 License
--------
+=======
 
 .. include:: ../LICENSE
