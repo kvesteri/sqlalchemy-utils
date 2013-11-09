@@ -69,8 +69,6 @@ Simple aggregates
         content = sa.Column(sa.UnicodeText)
         thread_id = sa.Column(sa.Integer, sa.ForeignKey(Thread.id))
 
-        thread = sa.orm.relationship(Thread, backref='comments')
-
 
 
 
@@ -154,6 +152,59 @@ Now the net_worth column of Catalog model will be automatically whenever:
 
 
 
+
+Multiple aggregates per class
+-----------------------------
+
+Sometimes you may need to define multiple aggregate values for same class. If you need
+to define lots of relationships pointing to same class, remember to define the relationships as viewonly when possible.
+
+
+::
+
+
+    from sqlalchemy_utils import aggregated_attr
+
+
+    class Customer(Base):
+        __tablename__ = 'customer'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
+
+        @aggregated_attr('orders')
+        def orders_sum(self):
+            return sa.Column(sa.Integer)
+
+        @orders_sum.expression
+        def orders_sum(self):
+            return sa.func.sum(Order.price)
+
+        @aggregated_attr('open_orders')
+        def open_orders_sum(self):
+            return sa.Column(sa.Integer)
+
+        @open_orders_sum.expression
+        def open_orders_sum(self):
+            return sa.func.sum(Order.price)
+
+
+        orders = sa.orm.relationship('Order')
+
+        open_orders = sa.orm.relationship(
+            'Order',
+            primaryjoin=
+                'db.and_(Order.customer_id == Customer.id, Order.invoiced)',
+            viewonly=True
+        )
+
+
+    class Order(Base):
+        __tablename__ = 'order'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
+        price = sa.Column(sa.Numeric)
+        invoiced = sa.Column(sa.Boolean, default=False)
+        customer_id = sa.Column(sa.Integer, sa.ForeignKey(Customer.id))
 
 
 
