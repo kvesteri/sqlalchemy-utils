@@ -1,3 +1,4 @@
+from .aggregates import aggregated_attr
 from .decorators import generates
 from .exceptions import ImproperlyConfigured
 from .functions import (
@@ -50,10 +51,11 @@ from .types import (
 )
 
 
-__version__ = '0.20.0'
+__version__ = '0.21.0'
 
 
 __all__ = (
+    aggregated_attr,
     batch_fetch,
     coercion_listener,
     defer_except,

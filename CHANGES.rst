@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.21.0 (2013-11-11)
+^^^^^^^^^^^^^^^^^^^
+
+- Added support for cached aggregates
+
+
 0.20.0 (2013-10-24)
 ^^^^^^^^^^^^^^^^^^^
 
