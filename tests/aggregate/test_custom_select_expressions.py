@@ -34,7 +34,7 @@ class TestLazyEvaluatedSelectExpressionsForAggregates(TestCase):
         self.Catalog = Catalog
         self.Product = Product
 
-    def test_assigns_aggregates(self):
+    def test_assigns_aggregates_insert(self):
         catalog = self.Catalog(
             name=u'Some catalog'
         )
@@ -49,3 +49,21 @@ class TestLazyEvaluatedSelectExpressionsForAggregates(TestCase):
         self.session.commit()
         self.session.refresh(catalog)
         assert catalog.net_worth == Decimal('1000')
+
+    def test_assigns_aggregates_on_update(self):
+        catalog = self.Catalog(
+            name=u'Some catalog'
+        )
+        self.session.add(catalog)
+        self.session.commit()
+        product = self.Product(
+            name=u'Some product',
+            price=Decimal('1000'),
+            catalog=catalog
+        )
+        self.session.add(product)
+        self.session.commit()
+        product.price = Decimal('500')
+        self.session.commit()
+        self.session.refresh(catalog)
+        assert catalog.net_worth == Decimal('500')
