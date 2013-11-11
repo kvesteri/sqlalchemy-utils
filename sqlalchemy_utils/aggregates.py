@@ -179,21 +179,21 @@ to define lots of relationships pointing to same class, remember to define the r
         def orders_sum(self):
             return sa.func.sum(Order.price)
 
-        @aggregated_attr('open_orders')
-        def open_orders_sum(self):
+        @aggregated_attr('invoiced_orders')
+        def invoiced_orders_sum(self):
             return sa.Column(sa.Integer)
 
-        @open_orders_sum.expression
-        def open_orders_sum(self):
+        @invoiced_orders_sum.expression
+        def invoiced_orders_sum(self):
             return sa.func.sum(Order.price)
 
 
         orders = sa.orm.relationship('Order')
 
-        open_orders = sa.orm.relationship(
+        invoiced_orders = sa.orm.relationship(
             'Order',
             primaryjoin=
-                'db.and_(Order.customer_id == Customer.id, Order.invoiced)',
+                'sa.and_(Order.customer_id == Customer.id, Order.invoiced)',
             viewonly=True
         )
 
