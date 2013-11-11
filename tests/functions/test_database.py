@@ -1,6 +1,12 @@
-import sqlalchemy as sa
+from pytest import mark
+pymysql = None
+try:
+    import pymysql
+except ImportError:
+    pass
 import os
 from tests import TestCase
+
 from sqlalchemy_utils import (
     create_database,
     drop_database,
@@ -30,6 +36,7 @@ class TestDatabaseSQLite(DatabaseTest):
         assert database_exists('sqlite:///:memory:')
 
 
+@mark.skipif('pymysql is None')
 class TestDatabaseMySQL(DatabaseTest):
     url = 'mysql+pymysql://travis@localhost/db_test_sqlalchemy_util'
 
