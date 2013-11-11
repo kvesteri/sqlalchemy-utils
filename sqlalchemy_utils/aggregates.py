@@ -258,6 +258,7 @@ Multi-level aggregates
 TODO
 ----
 
+* Support calculation of many-to-many aggregates
 * Special consideration should be given to `deadlocks`_.
 
 
@@ -281,10 +282,10 @@ class AggregatedAttribute(declared_attr):
         fget,
         relationship,
         expr,
-        *arg,
-        **kw
+        *args,
+        **kwargs
     ):
-        super(AggregatedAttribute, self).__init__(fget, *arg, **kw)
+        super(AggregatedAttribute, self).__init__(fget, *args, **kwargs)
         self.__doc__ = fget.__doc__
         self.expr = expr
         self.relationship = relationship

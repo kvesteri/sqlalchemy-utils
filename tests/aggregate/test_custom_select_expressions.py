@@ -34,7 +34,7 @@ class TestLazyEvaluatedSelectExpressionsForAggregates(TestCase):
         self.Catalog = Catalog
         self.Product = Product
 
-    def test_assigns_aggregates_insert(self):
+    def test_assigns_aggregates_on_insert(self):
         catalog = self.Catalog(
             name=u'Some catalog'
         )
