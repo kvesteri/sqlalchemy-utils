@@ -8,8 +8,6 @@ from .email import EmailType
 from .ip_address import IPAddressType
 from .locale import LocaleType
 from .number_range import (
-    NumberRange,
-    NumberRangeException,
     NumberRangeRawType,
     NumberRangeType,
 )
@@ -33,8 +31,6 @@ __all__ = (
     EmailType,
     IPAddressType,
     LocaleType,
-    NumberRange,
-    NumberRangeException,
     NumberRangeRawType,
     NumberRangeType,
     Password,
