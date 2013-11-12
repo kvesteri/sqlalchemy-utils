@@ -45,7 +45,7 @@ Simple aggregates
 
 ::
 
-    from sqlalchemy_utils import aggregated_attr
+    from sqlalchemy_utils import aggregated
 
 
     class Thread(Base):
@@ -53,9 +53,9 @@ Simple aggregates
         id = sa.Column(sa.Integer, primary_key=True)
         name = sa.Column(sa.Unicode(255))
 
-        @aggregated_attr('comments')
+        @aggregated('comments', sa.Column(sa.Integer))
         def comment_count(self):
-            return sa.Column(sa.Integer)
+            return sa.func.count('1')
 
         comments = sa.orm.relationship(
             'Comment',
@@ -79,7 +79,7 @@ Custom aggregate expressions
 ::
 
 
-    from sqlalchemy_utils import aggregated_attr
+    from sqlalchemy_utils import aggregated
 
 
     class Catalog(Base):
@@ -87,14 +87,9 @@ Custom aggregate expressions
         id = sa.Column(sa.Integer, primary_key=True)
         name = sa.Column(sa.Unicode(255))
 
-        @aggregated_attr
-        def net_worth(self):
-            return sa.Column(sa.Integer)
-
-        @net_worth.expression
+        @aggregated('products', sa.Column(sa.Integer))
         def net_worth(self):
             return sa.func.sum(Product.price)
-
 
         products = sa.orm.relationship('Product')
 
@@ -163,7 +158,7 @@ to define lots of relationships pointing to same class, remember to define the r
 ::
 
 
-    from sqlalchemy_utils import aggregated_attr
+    from sqlalchemy_utils import aggregated
 
 
     class Customer(Base):
@@ -171,22 +166,13 @@ to define lots of relationships pointing to same class, remember to define the r
         id = sa.Column(sa.Integer, primary_key=True)
         name = sa.Column(sa.Unicode(255))
 
-        @aggregated_attr('orders')
-        def orders_sum(self):
-            return sa.Column(sa.Integer)
-
-        @orders_sum.expression
+        @aggregated('orders', sa.Column(sa.Integer))
         def orders_sum(self):
             return sa.func.sum(Order.price)
 
-        @aggregated_attr('invoiced_orders')
-        def invoiced_orders_sum(self):
-            return sa.Column(sa.Integer)
-
-        @invoiced_orders_sum.expression
+        @aggregated('invoiced_orders', sa.Column(sa.Integer))
         def invoiced_orders_sum(self):
             return sa.func.sum(Order.price)
-
 
         orders = sa.orm.relationship('Order')
 
@@ -216,7 +202,7 @@ Multi-level aggregates
 ::
 
 
-    from sqlalchemy_utils import aggregated_attr
+    from sqlalchemy_utils import aggregated
 
 
     class Catalog(Base):
@@ -224,14 +210,9 @@ Multi-level aggregates
         id = sa.Column(sa.Integer, primary_key=True)
         name = sa.Column(sa.Unicode(255))
 
-        @aggregated_attr('categories.products')
-        def net_worth(self):
-            return sa.Column(sa.Integer)
-
-        @net_worth.expression
+        @aggregated('categories.products', sa.Column(sa.Integer))
         def net_worth(self):
             return sa.func.sum(Product.price)
-
 
         categories = sa.orm.relationship('Product')
 
