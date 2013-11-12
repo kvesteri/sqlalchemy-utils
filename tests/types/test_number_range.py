@@ -31,6 +31,16 @@ class TestNumberRangeType(TestCase):
         assert building.persons_at_night.lower == 1
         assert building.persons_at_night.upper == 3
 
+    def test_infinite_upper_bound(self):
+        building = self.Building(
+            persons_at_night=NumberRange(1, float('inf'))
+        )
+        self.session.add(building)
+        self.session.commit()
+        building = self.session.query(self.Building).first()
+        assert building.persons_at_night.lower == 1
+        assert building.persons_at_night.upper is None
+
     def test_nullify_number_range(self):
         building = self.Building(
             persons_at_night=NumberRange(1, 3)

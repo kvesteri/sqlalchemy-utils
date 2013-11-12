@@ -19,6 +19,18 @@ class RangeBoundsException(NumberRangeException):
         )
 
 
+def parse_number(number):
+    if (
+        number == float('inf') or
+        number == -float('inf') or
+        number is None or
+        number == ''
+    ):
+        return None
+    else:
+        return int(number)
+
+
 @total_ordering
 class NumberRange(object):
     def __init__(self, *args):
@@ -30,8 +42,8 @@ class NumberRange(object):
             lower, upper = args
             if lower > upper:
                 raise RangeBoundsException(lower, upper)
-            self.lower = lower
-            self.upper = upper
+            self.lower = parse_number(lower)
+            self.upper = parse_number(upper)
             self.lower_inc = self.upper_inc = True
         else:
             if isinstance(args[0], six.integer_types):
@@ -70,10 +82,10 @@ class NumberRange(object):
             range.lower = 24
             range.upper = 44
         """
-        values = value[1:-1].split(',')
+        values = value.strip()[1:-1].split(',')
         try:
             lower, upper = map(
-                lambda a: int(a.strip()), values
+                lambda a: parse_number(a.strip()), values
             )
         except ValueError as e:
             raise NumberRangeException(e.message)
@@ -93,11 +105,11 @@ class NumberRange(object):
         if value is not None:
             values = value.split('-')
             if len(values) == 1:
-                lower = upper = int(value.strip())
+                lower = upper = parse_number(value.strip())
             else:
                 try:
                     lower, upper = map(
-                        lambda a: int(a.strip()), values
+                        lambda a: parse_number(a.strip()), values
                     )
                 except ValueError as e:
                     raise NumberRangeException(str(e))
@@ -105,7 +117,10 @@ class NumberRange(object):
 
     @property
     def normalized(self):
-        return '[%s, %s]' % (self.lower, self.upper)
+        return '[%s, %s]' % (
+            self.lower if self.lower is not None else '',
+            self.upper if self.upper is not None else ''
+        )
 
     def __eq__(self, other):
         try:

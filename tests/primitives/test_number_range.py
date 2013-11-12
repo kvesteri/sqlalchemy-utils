@@ -75,11 +75,6 @@ def test_raises_exception_for_badly_constructed_range():
         NumberRange(3, 2)
 
 
-def test_from_str_exception_handling():
-    with raises(NumberRangeException):
-        NumberRange('1 - ')
-
-
 class TestArithmeticOperators(object):
     def test_add_operator(self):
         assert NumberRange(1, 2) + NumberRange(1, 2) == NumberRange(2, 4)
