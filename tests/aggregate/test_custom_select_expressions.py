@@ -1,6 +1,6 @@
 from decimal import Decimal
 import sqlalchemy as sa
-from sqlalchemy_utils.aggregates import aggregated_attr
+from sqlalchemy_utils.aggregates import aggregated
 from tests import TestCase
 
 
@@ -13,12 +13,8 @@ class TestLazyEvaluatedSelectExpressionsForAggregates(TestCase):
             id = sa.Column(sa.Integer, primary_key=True)
             name = sa.Column(sa.Unicode(255))
 
-            @aggregated_attr('products')
+            @aggregated('products', sa.Column(sa.Numeric, default=0))
             def net_worth(self):
-                return sa.Column(sa.Numeric, default=0)
-
-            @net_worth.expression
-            def net_worth_expr(self):
                 return sa.func.sum(Product.price)
 
             products = sa.orm.relationship('Product', backref='catalog')

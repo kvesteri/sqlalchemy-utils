@@ -1,6 +1,6 @@
 from decimal import Decimal
 import sqlalchemy as sa
-from sqlalchemy_utils.aggregates import aggregated_attr
+from sqlalchemy_utils.aggregates import aggregated
 from tests import TestCase
 
 
@@ -13,9 +13,12 @@ class TestDeepModelPathsForAggregates(TestCase):
             id = sa.Column(sa.Integer, primary_key=True)
             name = sa.Column(sa.Unicode(255))
 
-            @aggregated_attr('categories.products')
+            @aggregated(
+                'categories.products',
+                sa.Column(sa.Integer, default=0)
+            )
             def product_count(self):
-                return sa.Column(sa.Integer, default=0)
+                return sa.func.count('1')
 
             categories = sa.orm.relationship('Category', backref='catalog')
 
@@ -69,9 +72,12 @@ class Test3LevelDeepModelPathsForAggregates(TestCase):
             id = sa.Column(sa.Integer, primary_key=True)
             name = sa.Column(sa.Unicode(255))
 
-            @aggregated_attr('categories.sub_categories.products')
+            @aggregated(
+                'categories.sub_categories.products',
+                sa.Column(sa.Integer, default=0)
+            )
             def product_count(self):
-                return sa.Column(sa.Integer, default=0)
+                return sa.func.count('1')
 
             categories = sa.orm.relationship('Category', backref='catalog')
 

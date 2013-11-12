@@ -1,5 +1,5 @@
 import sqlalchemy as sa
-from sqlalchemy_utils.aggregates import aggregated_attr
+from sqlalchemy_utils.aggregates import aggregated
 from tests import TestCase
 
 
@@ -10,13 +10,16 @@ class TestAggregateValueGenerationForSimpleModelPaths(TestCase):
             id = sa.Column(sa.Integer, primary_key=True)
             name = sa.Column(sa.Unicode(255))
 
-            @aggregated_attr('comments')
+            @aggregated(
+                'comments',
+                sa.Column(sa.Integer, default=0)
+            )
             def comment_count(self):
-                return sa.Column(sa.Integer, default=0)
+                return sa.func.count('1')
 
-            @aggregated_attr('comments', sa.func.max)
+            @aggregated('comments', sa.Column(sa.Integer))
             def last_comment_id(self):
-                return sa.Column(sa.Integer)
+                return sa.func.max(Comment.id)
 
             comments = sa.orm.relationship(
                 'Comment',

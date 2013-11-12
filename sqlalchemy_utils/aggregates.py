@@ -281,28 +281,23 @@ class AggregatedAttribute(declared_attr):
         self,
         fget,
         relationship,
-        expr,
+        column,
         *args,
         **kwargs
     ):
         super(AggregatedAttribute, self).__init__(fget, *args, **kwargs)
         self.__doc__ = fget.__doc__
-        self.expr = expr
+        self.column = column
         self.relationship = relationship
 
-    def expression(self, expr):
-        self.expr = expr
-        return self
-
     def __get__(desc, self, cls):
-        result = desc.fget(cls)
         if not hasattr(cls, '__aggregates__'):
             cls.__aggregates__ = {}
         cls.__aggregates__[desc.fget.__name__] = {
-            'expression': desc.expr,
+            'expression': desc.fget,
             'relationship': desc.relationship
         }
-        return result
+        return desc.column
 
 
 class AggregatedValue(object):
@@ -430,7 +425,7 @@ class AggregationManager(object):
                         class_=class_,
                         attr=key,
                         relationships=list(reversed(relationships)),
-                        expr=value['expression']
+                        expr=value['expression'](class_)
                     )
                 )
 
@@ -451,14 +446,14 @@ manager = AggregationManager()
 manager.register_listeners()
 
 
-def aggregated_attr(
+def aggregated(
     relationship,
-    expression=sa.func.count
+    column
 ):
     def wraps(func):
         return AggregatedAttribute(
             func,
             relationship,
-            expression
+            column
         )
     return wraps
