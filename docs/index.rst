@@ -13,6 +13,7 @@ SQLAlchemy-Utils provides custom data types and various utility functions for SQ
    aggregates
    decorators
    generic_relationship
+   eav
    database_helpers
    model_helpers
    license

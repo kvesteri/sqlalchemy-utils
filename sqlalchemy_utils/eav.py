@@ -1,3 +1,49 @@
+"""
+SQLAlchemy-Utils provides some helpers for defining EAV_ models.
+
+
+.. _EAV:
+    http://en.wikipedia.org/wiki/Entity%E2%80%93attribute%E2%80%93value_model
+
+::
+
+
+    from sqlalchemy_utils import MetaType, MetaValue
+
+
+    class Product(self.Base):
+        __tablename__ = 'product'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
+
+
+    class ProductAttribute(self.Base):
+        __tablename__ = 'product_attribute'
+        id = sa.Column(sa.Integer, primary_key=True)
+        data_type = sa.Column(
+            MetaType({
+                'unicode': sa.UnicodeText,
+                'int': sa.Integer,
+                'datetime': sa.DateTime
+            })
+        )
+        name = sa.Column(sa.Unicode(255))
+
+
+    class ProductAttributeValue(self.Base):
+        __tablename__ = 'product_attribute_value'
+        id = sa.Column(sa.Integer, primary_key=True)
+
+        product_attr_id = sa.Column(
+            sa.Integer, sa.ForeignKey(ProductAttribute.id)
+        )
+        product_attr = sa.orm.relationship(ProductAttribute)
+
+        value = MetaValue('product_attr', 'data_type')
+
+
+"""
+
 from inspect import isclass
 import sqlalchemy as sa
 from sqlalchemy.ext.hybrid import hybrid_property
