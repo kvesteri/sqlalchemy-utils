@@ -1,5 +1,6 @@
 from .aggregates import aggregated
 from .decorators import generates
+from .eav import MetaValue, MetaType
 from .exceptions import ImproperlyConfigured
 from .functions import (
     batch_fetch,
@@ -86,6 +87,8 @@ __all__ = (
     IPAddressType,
     LocaleType,
     Merger,
+    MetaType,
+    MetaValue,
     NumberRange,
     NumberRangeException,
     NumberRangeRawType,

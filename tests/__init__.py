@@ -37,6 +37,7 @@ class TestCase(object):
 
         Session = sessionmaker(bind=self.connection)
         self.session = Session()
+        sa.orm.configure_mappers()
 
     def teardown_method(self, method):
         aggregates.manager.reset()
