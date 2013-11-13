@@ -431,6 +431,18 @@ def aggregated(
     relationship,
     column
 ):
+    """
+    Decorator that generates an aggregated attribute. The decorated function
+    should return an aggregate select expression.
+
+    :param relationship:
+        Defines the relationship of which the aggregate is calculated from.
+        The class needs to have given relationship in order to calculate the
+        aggregate.
+    :param column:
+        SQLAlchemy Column object. The column definition of this aggregate
+        attribute.
+    """
     def wraps(func):
         return AggregatedAttribute(
             func,
