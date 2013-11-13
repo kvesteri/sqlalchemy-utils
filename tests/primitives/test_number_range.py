@@ -64,6 +64,12 @@ class TestComparisonOperators(object):
         assert NumberRange(0, 2) <= NumberRange(1, 3)
         assert NumberRange(1, 3) >= NumberRange(1, 3)
 
+    def test_integer_comparison(self):
+        assert NumberRange(2, 2) <= 3
+        assert NumberRange(1, 3) >= 0
+        assert NumberRange(2, 2) == 2
+        assert NumberRange(2, 2) != 3
+
 
 def test_str_representation():
     assert str(NumberRange(1, 3)) == '1 - 3'

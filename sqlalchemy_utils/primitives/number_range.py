@@ -123,6 +123,8 @@ class NumberRange(object):
         )
 
     def __eq__(self, other):
+        if isinstance(other, six.integer_types):
+            return self.lower == other == self.upper
         try:
             return (
                 self.lower == other.lower and
@@ -135,6 +137,9 @@ class NumberRange(object):
         return not (self == other)
 
     def __gt__(self, other):
+        if isinstance(other, six.integer_types):
+            return self.lower > other and self.upper > other
+
         try:
             return self.lower > other.lower and self.upper > other.upper
         except AttributeError:
