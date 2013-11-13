@@ -115,7 +115,7 @@ those have their own limitations compared to traditional RDBMS.
         value = MetaValue('attr', 'data_type')
 
 
-Now SQLAlchemy-Utils would create these columns for ProductAttributeValue:
+Now SQLAlchemy-Utils would create these columns for AttributeValue:
 
     * value_unicode
     * value_int
