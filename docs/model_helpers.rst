@@ -1,5 +1,5 @@
-Utility functions
-=================
+Model helpers
+=============
 
 .. module:: sqlalchemy_utils.functions
 
@@ -28,21 +28,10 @@ identity
 .. autofunction:: identity
 
 
-is_indexed_foreign_key
-^^^^^^^^^^^^^^^^^^^^^^
-
-.. autofunction:: is_indexed_foreign_key
-
-
 naturally_equivalent
 ^^^^^^^^^^^^^^^^^^^^
 
 .. autofunction:: naturally_equivalent
-
-non_indexed_foreign_keys
-^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. autofunction:: non_indexed_foreign_keys
 
 
 sort_query
