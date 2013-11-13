@@ -54,8 +54,9 @@ queries such as:
     * Find all cars that were manufactured before 1990?
 
 
-This is very JSON / XML columns fall short. You could switch to using NoSQL
-databases but those have their own limitations compared to RDBMS.
+This is where JSON / XML columns fall short. You can't make these comparisons
+using those column types. You could switch to using some NoSQL database but
+those have their own limitations compared to traditional RDBMS.
 
 ::
 
