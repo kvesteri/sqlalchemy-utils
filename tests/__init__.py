@@ -6,7 +6,9 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.hybrid import hybrid_property
 
-from sqlalchemy_utils import InstrumentedList, coercion_listener, aggregates
+from sqlalchemy_utils import (
+    InstrumentedList, coercion_listener, aggregates, i18n
+)
 
 
 @sa.event.listens_for(sa.engine.Engine, 'before_cursor_execute')
@@ -21,6 +23,13 @@ warnings.simplefilter('error', sa.exc.SAWarning)
 
 
 sa.event.listen(sa.orm.mapper, 'mapper_configured', coercion_listener)
+
+
+def get_locale():
+    class Locale():
+        territories = {'fi': 'Finland'}
+
+    return Locale()
 
 
 class TestCase(object):
@@ -38,6 +47,7 @@ class TestCase(object):
         Session = sessionmaker(bind=self.connection)
         self.session = Session()
         sa.orm.configure_mappers()
+        i18n.get_locale = get_locale
 
     def teardown_method(self, method):
         aggregates.manager.reset()

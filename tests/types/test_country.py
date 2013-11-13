@@ -1,16 +1,6 @@
 import sqlalchemy as sa
-from sqlalchemy_utils import CountryType, Country, i18n
+from sqlalchemy_utils import CountryType, Country
 from tests import TestCase
-
-
-def get_locale():
-    class Locale():
-        territories = {'fi': 'Finland'}
-
-    return Locale()
-
-
-i18n.get_locale = get_locale
 
 
 class TestCountry(object):
