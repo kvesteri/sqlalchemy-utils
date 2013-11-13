@@ -5,6 +5,58 @@ SQLAlchemy-Utils provides some helpers for defining EAV_ models.
 .. _EAV:
     http://en.wikipedia.org/wiki/Entity%E2%80%93attribute%E2%80%93value_model
 
+Why?
+----
+
+Consider you have a catalog of products with each Product having very different
+set of attributes. Clearly adding separate tables for each product with
+distinct columns for each table becomes very time consuming task. Not to
+mention it would be impossible for anyone but database admin to add new
+attributes to each product.
+
+
+One solution is to store product attributes in a JSON / XML typed column. This
+has some benefits:
+
+    * Schema is easy to define
+    * Needs no 'magic'
+
+::
+
+
+    from sqlalchemy_utils import JSONType
+
+
+    class Product(self.Base):
+        __tablename__ = 'product'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
+        category = sa.Column(sa.Unicode(255))
+        attributes = sa.Column(JSONType)
+
+
+    product = Product(
+        name='Porsche 911',
+        category='car',
+        attributes={
+            'manufactured': '1991',
+            'color': 'red',
+            'maxspeed': '300'
+        }
+    )
+
+
+All good? We have easily defined a model for product which is extendable and
+supports all kinds of attributes for products. However what if you want to make
+queries such as:
+
+    * Find all red cars with maximum speed reaching atleast 300 km/h?
+    * Find all cars that were manufactured before 1990?
+
+
+This is very JSON / XML columns fall short. You could switch to using NoSQL
+databases but those have their own limitations compared to RDBMS.
+
 ::
 
 
@@ -28,6 +80,10 @@ SQLAlchemy-Utils provides some helpers for defining EAV_ models.
             })
         )
         name = sa.Column(sa.Unicode(255))
+        product_id = sa.Column(
+            sa.Integer, sa.ForeignKey(Product.id)
+        )
+        product = sa.orm.relationship(Product)
 
 
     class ProductAttributeValue(self.Base):
