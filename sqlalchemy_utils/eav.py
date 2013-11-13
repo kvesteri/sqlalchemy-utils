@@ -27,7 +27,7 @@ has some benefits:
     from sqlalchemy_utils import JSONType
 
 
-    class Product(self.Base):
+    class Product(Base):
         __tablename__ = 'product'
         id = sa.Column(sa.Integer, primary_key=True)
         name = sa.Column(sa.Unicode(255))
@@ -64,13 +64,24 @@ those have their own limitations compared to traditional RDBMS.
     from sqlalchemy_utils import MetaType, MetaValue
 
 
-    class Product(self.Base):
+    class Product(Base):
+        __tablename__ = 'product'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
+
+        category_id = sa.Column(
+            sa.Integer, sa.ForeignKey(Category.id)
+        )
+        category = sa.orm.relationship(Category)
+
+
+    class Category(Base):
         __tablename__ = 'product'
         id = sa.Column(sa.Integer, primary_key=True)
         name = sa.Column(sa.Unicode(255))
 
 
-    class ProductAttribute(self.Base):
+    class Attribute(Base):
         __tablename__ = 'product_attribute'
         id = sa.Column(sa.Integer, primary_key=True)
         data_type = sa.Column(
@@ -81,23 +92,36 @@ those have their own limitations compared to traditional RDBMS.
             })
         )
         name = sa.Column(sa.Unicode(255))
+        category_id = sa.Column(
+            sa.Integer, sa.ForeignKey(Category.id)
+        )
+        category = sa.orm.relationship(Category)
+
+
+    class AttributeValue(Base):
+        __tablename__ = 'attribute_value'
+        id = sa.Column(sa.Integer, primary_key=True)
+
         product_id = sa.Column(
             sa.Integer, sa.ForeignKey(Product.id)
         )
         product = sa.orm.relationship(Product)
 
-
-    class ProductAttributeValue(self.Base):
-        __tablename__ = 'product_attribute_value'
-        id = sa.Column(sa.Integer, primary_key=True)
-
-        product_attr_id = sa.Column(
+        attr_id = sa.Column(
             sa.Integer, sa.ForeignKey(ProductAttribute.id)
         )
-        product_attr = sa.orm.relationship(ProductAttribute)
+        attr = sa.orm.relationship(ProductAttribute)
 
-        value = MetaValue('product_attr', 'data_type')
+        value = MetaValue('attr', 'data_type')
 
+
+Now SQLAlchemy-Utils would create these columns for ProductAttributeValue:
+
+    * value_unicode
+    * value_int
+    * value_datetime
+
+The `value` attribute is set as hybrid_property.
 
 """
 
