@@ -42,11 +42,12 @@ class TestCase(object):
         self.Base = declarative_base()
 
         self.create_models()
+        sa.orm.configure_mappers()
         self.Base.metadata.create_all(self.connection)
 
         Session = sessionmaker(bind=self.connection)
         self.session = Session()
-        sa.orm.configure_mappers()
+
         i18n.get_locale = get_locale
 
     def teardown_method(self, method):
