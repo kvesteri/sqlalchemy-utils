@@ -55,13 +55,7 @@ class TestMetaModel(TestCase):
         question = self.Question(data_type=sa.String)
         answer = self.Answer(question=question)
         answer.value = 'some answer'
-        assert answer.value == answer.value_str
-
-    def test_meta_value_as_expression(self):
-        assert str(self.Answer.value) == (
-            'coalesce(answer.value_int, answer.value_unicode'
-            ', answer.value_str, answer.value_datetime)'
-        )
+        assert answer.value == answer.value_str == 'some answer'
 
 
 class MetaTypedCollection(MappedCollection):
@@ -280,24 +274,24 @@ class TestProductCatalog(TestCase):
         assert product.attributes[u'color'] == u'red'
         assert product.attributes[u'maxspeed'] == 300
 
-    def test_dynamic_hybrid_properties(self):
-        category = self.Category(name=u'cars')
-        category.attributes = {
-            u'color': self.Attribute(name=u'color', data_type=sa.UnicodeText),
-            u'maxspeed': self.Attribute(name=u'maxspeed', data_type=sa.Integer)
-        }
-        product = self.Product(
-            name=u'Porsche 911',
-            category=category
-        )
-        self.session.add(product)
+    # def test_dynamic_hybrid_properties(self):
+    #     category = self.Category(name=u'cars')
+    #     category.attributes = {
+    #         u'color': self.Attribute(name=u'color', data_type=sa.UnicodeText),
+    #         u'maxspeed': self.Attribute(name=u'maxspeed', data_type=sa.Integer)
+    #     }
+    #     product = self.Product(
+    #         name=u'Porsche 911',
+    #         category=category
+    #     )
+    #     self.session.add(product)
 
-        product.attributes[u'color'] = u'red'
-        product.attributes[u'maxspeed'] = 300
-        self.session.commit()
+    #     product.attributes[u'color'] = u'red'
+    #     product.attributes[u'maxspeed'] = 300
+    #     self.session.commit()
 
-        (
-            self.session.query(self.Product)
-            .filter(self.Product.attributes['color'].in_([u'red', u'blue']))
-            .order_by(self.Product.attributes['color'])
-        )
+    #     (
+    #         self.session.query(self.Product)
+    #         .filter(self.Product.attributes['color'].in_([u'red', u'blue']))
+    #         .order_by(self.Product.attributes['color'])
+    #     )

@@ -218,18 +218,12 @@ def instrument_meta_values(mapper, class_):
                     value
                 )
 
-            def expression(self):
-                return sa.func.coalesce(
-                    *map(lambda key: getattr(self, key), generated_keys)
-                )
-
             operations.append((
                 class_,
                 key,
-                hybrid_property(
+                property(
                     getter,
-                    setter,
-                    expr=expression
+                    setter
                 )
             ))
 
