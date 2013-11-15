@@ -1,4 +1,10 @@
 """
+.. warning::
+
+    This module is *EXPERIMENTAL*. Everything in the API may change in the
+    future and break backwards compatibility. Use at your own risk.
+
+
 SQLAlchemy-Utils provides some helpers for defining EAV_ models.
 
 
@@ -176,6 +182,7 @@ def instrument_meta_values(mapper, class_):
         if isinstance(attr_value, MetaValue):
             attr = attr_value.attr
             type_column = attr_value.type_column
+            value_key = key
 
             parent_class = getattr(class_, attr).mapper.class_
             type_prop = getattr(parent_class, type_column).property
@@ -196,15 +203,18 @@ def instrument_meta_values(mapper, class_):
                 )
 
             def setter(self, value):
-                setattr(
-                    self,
-                    key + '_' +
+                typed_key = (
+                    value_key + '_' +
                     type_.type_key(
                         getattr(
                             getattr(self, attr),
                             type_column
                         )
-                    ),
+                    )
+                )
+                setattr(
+                    self,
+                    typed_key,
                     value
                 )
 
