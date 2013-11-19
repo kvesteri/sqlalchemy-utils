@@ -15,6 +15,17 @@ class TestJSONType(TestCase):
 
         self.Document = Document
 
+    def test_list(self):
+        document = self.Document(
+            json=[1, 2, 3]
+        )
+
+        self.session.add(document)
+        self.session.commit()
+
+        document = self.session.query(self.Document).first()
+        assert document.json == [1, 2, 3]
+
     def test_parameter_processing(self):
         document = self.Document(
             json={'something': 12}
