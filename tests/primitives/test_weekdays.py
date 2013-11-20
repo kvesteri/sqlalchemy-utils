@@ -81,6 +81,11 @@ class TestWeekDay(object):
         flexmock(day).should_receive('name').and_return(u'maanantaina')
         assert six.text_type(day) == u'maanantaina'
 
+    def test_str(self):
+        day = WeekDay(0)
+        flexmock(day).should_receive('name').and_return(u'maanantaina')
+        assert str(day) == 'maanantaina'
+
 
 @pytest.mark.skipif('Locale is None')
 class TestWeekDays(object):
@@ -158,3 +163,8 @@ class TestWeekDays(object):
         i18n.get_locale = lambda: Locale('fi')
         days = WeekDays('1000100')
         assert six.text_type(days) == u'maanantaina, perjantaina'
+
+    def test_str(self):
+        i18n.get_locale = lambda: Locale('fi')
+        days = WeekDays('1000100')
+        assert str(days) == 'maanantaina, perjantaina'
