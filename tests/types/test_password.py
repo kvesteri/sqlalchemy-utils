@@ -65,9 +65,9 @@ class TestPasswordType(TestCase):
         obj = self.User()
         obj.password = Password(md5_crypt.encrypt('b'))
 
-        assert obj.password.hash.startswith('$1$')
+        assert obj.password.hash.decode('utf8').startswith('$1$')
         assert obj.password == 'b'
-        assert obj.password.hash.startswith('$pbkdf2-sha512$')
+        assert obj.password.hash.decode('utf8').startswith('$pbkdf2-sha512$')
 
     def test_auto_column_length(self):
         """Should derive the correct column length from the specified schemes.
@@ -114,3 +114,60 @@ class TestPasswordType(TestCase):
         obj = self.session.query(self.User).get(obj.id)
 
         assert obj.password is None
+
+    def test_update_none(self):
+        """
+        Should be able to change a password from ``None`` to a valid
+        password.
+        """
+
+        obj = self.User()
+        obj.password = None
+
+        self.session.add(obj)
+        self.session.commit()
+
+        obj = self.session.query(self.User).get(obj.id)
+        obj.password = 'b'
+
+        self.session.commit()
+
+    def test_compare_none(self):
+        """
+        Should be able to compare a password of ``None``.
+        """
+
+        obj = self.User()
+        obj.password = None
+
+        assert obj.password is None
+        assert obj.password == None
+
+        obj.password = 'b'
+
+        assert obj.password is not None
+        assert obj.password != None
+
+    def test_check_and_update_persist(self):
+        """
+        When a password is compared, the hash should update if needed to
+        change the algorithm; and, commit to the database.
+        """
+
+        from passlib.hash import md5_crypt
+
+        obj = self.User()
+        obj.password = Password(md5_crypt.encrypt('b'))
+
+        self.session.add(obj)
+        self.session.commit()
+
+        assert obj.password.hash.decode('utf8').startswith('$1$')
+        assert obj.password == 'b'
+
+        self.session.commit()
+
+        obj = self.session.query(self.User).get(obj.id)
+
+        assert obj.password.hash.decode('utf8').startswith('$pbkdf2-sha512$')
+        assert obj.password == 'b'
