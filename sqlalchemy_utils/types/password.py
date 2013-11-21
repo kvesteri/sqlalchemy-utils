@@ -166,6 +166,10 @@ class PasswordType(types.TypeDecorator, ScalarCoercible):
 
     def process_bind_param(self, value, dialect):
         if isinstance(value, Password):
+            # If were given a password secret; encrypt it.
+            if value.secret is not None:
+                return self.context.encrypt(value.secret).encode('utf8')
+
             # Value has already been hashed.
             return value.hash
 
