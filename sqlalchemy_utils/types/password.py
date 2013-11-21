@@ -62,7 +62,7 @@ class Password(Mutable, object):
                 self.hash = new
 
                 # The hash should be bytes.
-                if isinstance(self.hash, six.text_type):
+                if isinstance(self.hash, six.string_types):
                     self.hash = self.hash.encode('utf8')
                     self.changed()
 
