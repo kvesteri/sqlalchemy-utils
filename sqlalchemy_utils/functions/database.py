@@ -7,6 +7,23 @@ from copy import copy
 
 def database_exists(url):
     """Check if a database exists.
+
+    :param url: A SQLAlchemy engine URL.
+
+    Performs backend-specific testing to quickly determine if a database
+    exists on the server. ::
+
+        database_exists('postgres://postgres@localhost/name')  #=> False
+        create_database('postgres://postgres@localhost/name')
+        database_exists('postgres://postgres@localhost/name')  #=> True
+
+    Supports checking against a constructed URL as well. ::
+
+        engine = create_engine('postgres://postgres@localhost/name')
+        database_exists(engine.url)  #=> False
+        create_database(engine.url)
+        database_exists(engine.url)  #=> True
+
     """
 
     url = copy(make_url(url))
@@ -41,6 +58,21 @@ def database_exists(url):
 
 def create_database(url, encoding='utf8'):
     """Issue the appropriate CREATE DATABASE statement.
+
+    :param url: A SQLAlchemy engine URL.
+    :param encoding: The encoding to create the database as.
+
+    To create a database, you can pass a simple URL that would have
+    been passed to ``create_engine``. ::
+
+        create_database('postgres://postgres@localhost/name')
+
+    You may also pass the url from an existing engine. ::
+
+        create_database(engine.url)
+
+    Has full support for mysql, postgres, and sqlite. In theory,
+    other database engines should be supported.
     """
 
     url = copy(make_url(url))
@@ -74,6 +106,15 @@ def create_database(url, encoding='utf8'):
 
 def drop_database(url):
     """Issue the appropriate DROP DATABASE statement.
+
+    :param url: A SQLAlchemy engine URL.
+
+    Works similar to the :ref:`create_database` method in that both url text
+    and a constructed url are accepted. ::
+
+        drop_database('postgres://postgres@localhost/name')
+        drop_database(engine.url)
+
     """
 
     url = copy(make_url(url))
