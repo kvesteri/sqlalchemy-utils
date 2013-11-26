@@ -58,7 +58,7 @@ class JSONType(sa.types.TypeDecorator):
             )
 
     def load_dialect_impl(self, dialect):
-        if dialect.name == 'postgresql':
+        if dialect.name in ['postgresql', 'postgres']:
             # Use the native JSON type.
             return dialect.type_descriptor(PostgresJSONType())
         else:
