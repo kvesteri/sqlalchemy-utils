@@ -1,6 +1,6 @@
 import sqlalchemy as sa
 from sqlalchemy_utils import batch_fetch
-from sqlalchemy_utils.functions import CompositePath
+from sqlalchemy_utils.batch import CompositePath
 from tests import TestCase
 
 

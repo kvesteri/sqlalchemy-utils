@@ -3,11 +3,18 @@ from sqlalchemy.orm.session import _state_session
 from sqlalchemy.orm import attributes, class_mapper
 from sqlalchemy.util import set_creation_order
 from sqlalchemy import exc as sa_exc
-from .functions import table_name
+from sqlalchemy_utils.functions import table_name
+
+
+def class_from_table_name(state, table):
+    for class_ in state.class_._decl_class_registry.values():
+        name = table_name(class_)
+        if name and name == table:
+            return class_
+    return None
 
 
 class GenericAttributeImpl(attributes.ScalarAttributeImpl):
-
     def get(self, state, dict_, passive=attributes.PASSIVE_OFF):
         if self.key in dict_:
             return dict_[self.key]
@@ -22,11 +29,7 @@ class GenericAttributeImpl(attributes.ScalarAttributeImpl):
         # Find class for discriminator.
         # TODO: Perhaps optimize with some sort of lookup?
         discriminator = state.attrs[self.parent_token.discriminator.key].value
-        target_class = None
-        for class_ in state.class_._decl_class_registry.values():
-            name = table_name(class_)
-            if name and name == discriminator:
-                target_class = class_
+        target_class = class_from_table_name(state, discriminator)
 
         if target_class is None:
             # Unknown discriminator; return nothing.
@@ -96,13 +99,13 @@ class GenericRelationshipProperty(MapperProperty):
     class Comparator(PropComparator):
 
         def __init__(self, prop, parentmapper):
-            self.prop = prop
+            self.property = prop
             self._parentmapper = parentmapper
 
         def __eq__(self, other):
             discriminator = table_name(other)
-            q = self.prop._discriminator_col == discriminator
-            q &= self.prop._id_col == other.id
+            q = self.property._discriminator_col == discriminator
+            q &= self.property._id_col == other.id
             return q
 
         def __ne__(self, other):
@@ -110,7 +113,7 @@ class GenericRelationshipProperty(MapperProperty):
 
         def is_type(self, other):
             discriminator = table_name(other)
-            return self.prop._discriminator_col == discriminator
+            return self.property._discriminator_col == discriminator
 
     def instrument_class(self, mapper):
         attributes.register_attribute(

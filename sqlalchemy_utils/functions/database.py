@@ -1,8 +1,53 @@
+from collections import defaultdict
 from sqlalchemy.engine.url import make_url
 import sqlalchemy as sa
+from sqlalchemy.schema import MetaData, Table, ForeignKeyConstraint
 from sqlalchemy.exc import ProgrammingError, OperationalError
 import os
 from copy import copy
+
+
+def escape_like(string, escape_char='*'):
+    """
+    Escapes the string paremeter used in SQL LIKE expressions
+
+        >>> from sqlalchemy_utils import escape_like
+        >>> query = session.query(User).filter(
+        ...     User.name.ilike(escape_like('John'))
+        ... )
+
+
+    :param string: a string to escape
+    :param escape_char: escape character
+    """
+    return (
+        string
+        .replace(escape_char, escape_char * 2)
+        .replace('%', escape_char + '%')
+        .replace('_', escape_char + '_')
+    )
+
+
+def is_auto_assigned_date_column(column):
+    """
+    Returns whether or not given SQLAlchemy Column object's is auto assigned
+    DateTime or Date.
+
+    :param column: SQLAlchemy Column object
+    """
+    return (
+        (
+            isinstance(column.type, sa.DateTime) or
+            isinstance(column.type, sa.Date)
+        )
+        and
+        (
+            column.default or
+            column.server_default or
+            column.onupdate or
+            column.server_onupdate
+        )
+    )
 
 
 def database_exists(url):
@@ -137,3 +182,55 @@ def drop_database(url):
     else:
         text = "DROP DATABASE %s" % database
         engine.execute(text)
+
+
+def non_indexed_foreign_keys(metadata, engine=None):
+    """
+    Finds all non indexed foreign keys from all tables of given MetaData.
+
+    Very useful for optimizing postgresql database and finding out which
+    foreign keys need indexes.
+
+    :param metadata: MetaData object to inspect tables from
+    """
+    reflected_metadata = MetaData()
+
+    if metadata.bind is None and engine is None:
+        raise Exception(
+            'Either pass a metadata object with bind or '
+            'pass engine as a second parameter'
+        )
+
+    constraints = defaultdict(list)
+
+    for table_name in metadata.tables.keys():
+        table = Table(
+            table_name,
+            reflected_metadata,
+            autoload=True,
+            autoload_with=metadata.bind or engine
+        )
+
+        for constraint in table.constraints:
+            if not isinstance(constraint, ForeignKeyConstraint):
+                continue
+
+            if not is_indexed_foreign_key(constraint):
+                constraints[table.name].append(constraint)
+
+    return dict(constraints)
+
+
+def is_indexed_foreign_key(constraint):
+    """
+    Whether or not given foreign key constraint's columns have been indexed.
+
+    :param constraint: ForeignKeyConstraint object to check the indexes
+    """
+    for index in constraint.table.indexes:
+        index_column_names = set([
+            column.name for column in index.columns
+        ])
+        if index_column_names == set(constraint.columns):
+            return True
+    return False

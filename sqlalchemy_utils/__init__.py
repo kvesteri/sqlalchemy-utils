@@ -1,9 +1,9 @@
 from .aggregates import aggregated
+from .batch_fetch import batch_fetch, with_backrefs
 from .decorators import generates
 from .eav import MetaValue, MetaType
 from .exceptions import ImproperlyConfigured
 from .functions import (
-    batch_fetch,
     defer_except,
     escape_like,
     identity,
@@ -15,7 +15,6 @@ from .functions import (
     mock_engine,
     sort_query,
     table_name,
-    with_backrefs,
     database_exists,
     create_database,
     drop_database
