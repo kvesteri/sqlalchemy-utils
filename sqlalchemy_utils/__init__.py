@@ -1,5 +1,5 @@
 from .aggregates import aggregated
-from .batch_fetch import batch_fetch, with_backrefs
+from .batch import batch_fetch, with_backrefs
 from .decorators import generates
 from .eav import MetaValue, MetaType
 from .exceptions import ImproperlyConfigured
