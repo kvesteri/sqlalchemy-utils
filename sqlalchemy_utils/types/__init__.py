@@ -6,6 +6,7 @@ from .color import ColorType
 from .country import CountryType, Country
 from .email import EmailType
 from .ip_address import IPAddressType
+from .json import JSONType
 from .locale import LocaleType
 from .number_range import (
     NumberRangeRawType,
@@ -30,6 +31,7 @@ __all__ = (
     Country,
     EmailType,
     IPAddressType,
+    JSONType,
     LocaleType,
     NumberRangeRawType,
     NumberRangeType,

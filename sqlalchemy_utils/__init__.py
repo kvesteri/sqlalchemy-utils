@@ -35,6 +35,7 @@ from .types import (
     instrumented_list,
     InstrumentedList,
     IPAddressType,
+    JSONType,
     LocaleType,
     Password,
     PasswordType,
