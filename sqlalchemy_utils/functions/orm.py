@@ -1,5 +1,4 @@
 import sqlalchemy as sa
-from collections import defaultdict
 
 
 def remove_property(class_, name):
@@ -45,6 +44,32 @@ def table_name(obj):
         return class_.__table__.name
     except AttributeError:
         pass
+
+
+def local_column_names(prop):
+    if not hasattr(prop, 'secondary'):
+        yield prop._discriminator_col.key
+        yield prop._id_col.key
+    elif prop.secondary is None:
+        for local, _ in prop.local_remote_pairs:
+            yield local.name
+    else:
+        if prop.secondary is not None:
+            for local, remote in prop.local_remote_pairs:
+                for fk in remote.foreign_keys:
+                    if fk.column.table in prop.parent.tables:
+                        yield local.name
+
+
+def remote_column_names(prop):
+    if not hasattr(prop, 'secondary') or prop.secondary is None:
+        for _, remote in prop.local_remote_pairs:
+            yield remote.name
+    else:
+        for _, remote in prop.local_remote_pairs:
+            for fk in remote.foreign_keys:
+                if fk.column.table in prop.parent.tables:
+                    yield remote.name
 
 
 def declarative_base(model):

@@ -10,6 +10,9 @@ from sqlalchemy.orm.session import object_session
 from sqlalchemy_utils.generic import (
     GenericRelationshipProperty, class_from_table_name
 )
+from sqlalchemy_utils.functions.orm import (
+    local_column_names, remote_column_names
+)
 
 
 class PathException(Exception):
@@ -34,8 +37,10 @@ class Path(object):
         self.property = prop
         self.entities = entities
         self.populate_backrefs = populate_backrefs
-        if (not isinstance(self.property, RelationshipProperty) and
-            not isinstance(self.property, GenericRelationshipProperty)):
+        if (
+            not isinstance(self.property, RelationshipProperty) and
+            not isinstance(self.property, GenericRelationshipProperty)
+        ):
             raise PathException(
                 'Given attribute is not a relationship property.'
             )
@@ -210,7 +215,7 @@ class CompositeFetcher(object):
     @property
     def condition(self):
         return sa.or_(
-            *[fetcher.condition for fetcher in self.fetchers]
+            *(fetcher.condition for fetcher in self.fetchers)
         )
 
     @property
@@ -222,7 +227,7 @@ class CompositeFetcher(object):
             for fetcher in self.fetchers:
                 if any(
                     getattr(entity, name)
-                    for name in fetcher.remote_column_names
+                    for name in remote_column_names(fetcher.prop)
                 ):
                     fetcher.append_entity(entity)
 
@@ -242,7 +247,7 @@ class AbstractFetcher(object):
     def local_values(self, entity):
         return tuple(
             getattr(entity, name)
-            for name in self.local_column_names
+            for name in local_column_names(self.prop)
         )
 
 
@@ -258,7 +263,7 @@ class Fetcher(AbstractFetcher):
     def parent_key(self, entity):
         return tuple(
             getattr(entity, name)
-            for name in self.remote_column_names
+            for name in remote_column_names(self.prop)
         )
 
     @property
@@ -268,10 +273,6 @@ class Fetcher(AbstractFetcher):
     @property
     def related_entities(self):
         return self.relation_query_base.filter(self.condition)
-
-    @property
-    def local_column_names(self):
-        return [local.name for local, remote in self.prop.local_remote_pairs]
 
     def populate_backrefs(self, related_entities):
         """
@@ -314,7 +315,7 @@ class Fetcher(AbstractFetcher):
 
     @property
     def condition(self):
-        names = list(self.remote_column_names)
+        names = list(remote_column_names(self.prop))
         if len(names) == 1:
             return getattr(self.remote, names[0]).in_(
                 value[0] for value in self.local_values_list
@@ -329,7 +330,7 @@ class Fetcher(AbstractFetcher):
                             ==
                             getattr(entity, local.name)
                             for local, remote in self.prop.local_remote_pairs
-                            if remote in self.remote_column_names
+                            if remote in names
                         ]
                     )
                 )
@@ -342,11 +343,6 @@ class Fetcher(AbstractFetcher):
     def fetch(self):
         for entity in self.related_entities:
             self.append_entity(entity)
-
-    @property
-    def remote_column_names(self):
-        for local, remote in self.prop.local_remote_pairs:
-            yield remote.name
 
 
 class GenericRelationshipFetcher(AbstractFetcher):
@@ -365,10 +361,6 @@ class GenericRelationshipFetcher(AbstractFetcher):
     def append_entity(self, entity):
         self.parent_dict[self.parent_key(entity)] = entity
 
-    @property
-    def local_column_names(self):
-        return (self.prop._discriminator_col.key, self.prop._id_col.key)
-
     def populate(self):
         """
         Populate batch fetched entities to parent objects.
@@ -382,7 +374,6 @@ class GenericRelationshipFetcher(AbstractFetcher):
 
     @property
     def related_entities(self):
-        classes = []
         id_dict = defaultdict(list)
         for entity in self.path.entities:
             discriminator = getattr(entity, self.prop._discriminator_col.key)
@@ -403,25 +394,10 @@ class GenericRelationshipFetcher(AbstractFetcher):
             )
 
 
-
 class ManyToManyFetcher(Fetcher):
     @property
     def remote(self):
         return self.prop.secondary.c
-
-    @property
-    def local_column_names(self):
-        for local, remote in self.prop.local_remote_pairs:
-            for fk in remote.foreign_keys:
-                if fk.column.table in self.prop.parent.tables:
-                    yield local.name
-
-    @property
-    def remote_column_names(self):
-        for local, remote in self.prop.local_remote_pairs:
-            for fk in remote.foreign_keys:
-                if fk.column.table in self.prop.parent.tables:
-                    yield remote.name
 
     @property
     def relation_query_base(self):
@@ -431,7 +407,7 @@ class ManyToManyFetcher(Fetcher):
                 self.path.model,
                 *[
                     getattr(self.prop.secondary.c, name)
-                    for name in self.remote_column_names
+                    for name in remote_column_names(self.prop)
                 ]
             )
             .join(
