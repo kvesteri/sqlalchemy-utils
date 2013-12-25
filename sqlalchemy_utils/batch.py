@@ -343,9 +343,6 @@ class GenericRelationshipFetcher(AbstractFetcher):
         for entity in self.related_entities:
             self.append_entity(entity)
 
-    def parent_key(self, entity):
-        return (entity.__tablename__, getattr(entity, 'id'))
-
     def append_entity(self, entity):
         self.parent_dict[remote_values(entity, self.prop)] = entity
 
