@@ -1,3 +1,4 @@
+from functools import partial
 import sqlalchemy as sa
 
 
@@ -46,6 +47,18 @@ def table_name(obj):
         pass
 
 
+def getattrs(obj, attrs):
+    return map(partial(getattr, obj), attrs)
+
+
+def local_values(entity, prop):
+    return tuple(getattrs(entity, local_column_names(prop)))
+
+
+def remote_values(entity, prop):
+    return tuple(getattrs(entity, remote_column_names(prop)))
+
+
 def local_column_names(prop):
     if not hasattr(prop, 'secondary'):
         yield prop._discriminator_col.key
@@ -62,7 +75,10 @@ def local_column_names(prop):
 
 
 def remote_column_names(prop):
-    if not hasattr(prop, 'secondary') or prop.secondary is None:
+    if not hasattr(prop, 'secondary'):
+        yield '__tablename__'
+        yield 'id'
+    elif prop.secondary is None:
         for _, remote in prop.local_remote_pairs:
             yield remote.name
     else:
