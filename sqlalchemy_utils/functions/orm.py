@@ -1,4 +1,6 @@
 from functools import partial
+from funcy import first
+from toolz import curry
 import sqlalchemy as sa
 
 
@@ -51,12 +53,45 @@ def getattrs(obj, attrs):
     return map(partial(getattr, obj), attrs)
 
 
-def local_values(entity, prop):
+def mapfirst(iterable):
+    return map(first, iterable)
+
+
+@curry
+def local_values(prop, entity):
     return tuple(getattrs(entity, local_column_names(prop)))
 
 
-def remote_values(entity, prop):
+def list_local_values(prop, entities):
+    return map(local_values(prop), entities)
+
+
+def remote_values(prop, entity):
     return tuple(getattrs(entity, remote_column_names(prop)))
+
+
+@curry
+def local_remote_expr(prop, entity):
+    return sa.and_(
+        *[
+            getattr(remote(prop), r.name)
+            ==
+            getattr(entity, l.name)
+            for l, r in prop.local_remote_pairs
+            if r in remote_column_names(prop)
+        ]
+    )
+
+
+def list_local_remote_exprs(prop, entities):
+    return map(local_remote_expr(prop), entities)
+
+
+def remote(prop):
+    try:
+        return prop.secondary.c
+    except AttributeError:
+        return prop.mapper.class_
 
 
 def local_column_names(prop):
