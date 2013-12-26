@@ -37,30 +37,32 @@ class with_backrefs(object):
         self.path = path
 
 
+
+
+
 class Path(object):
     """
     A class that represents an attribute path.
     """
     def __init__(self, entities, prop, populate_backrefs=False):
+        self.validate_property(prop)
         self.property = prop
         self.entities = entities
         self.populate_backrefs = populate_backrefs
+        self.fetcher = self.fetcher_class(self)
+
+    def validate_property(self, prop):
         if (
-            not isinstance(self.property, RelationshipProperty) and
-            not isinstance(self.property, GenericRelationshipProperty)
+            not isinstance(prop, RelationshipProperty) and
+            not isinstance(prop, GenericRelationshipProperty)
         ):
             raise PathException(
                 'Given attribute is not a relationship property.'
             )
-        self.fetcher = self.fetcher_class(self)
 
     @property
     def session(self):
         return object_session(self.entities[0])
-
-    @property
-    def parent_model(self):
-        return self.entities[0].__class__
 
     @property
     def model(self):
@@ -267,7 +269,7 @@ class Fetcher(object):
         )
         for value in related_entities:
             backref_dict[local_values(self.prop, value[0])].append(
-                self.path.session.query(self.path.parent_model).get(
+                self.path.session.query(self.path.entities[0].__class__).get(
                     tuple(value[1:])
                 )
             )

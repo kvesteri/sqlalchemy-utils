@@ -2,6 +2,10 @@ from functools import partial
 from funcy import first
 from toolz import curry
 import sqlalchemy as sa
+from sqlalchemy import inspect
+from sqlalchemy.orm.query import _ColumnEntity
+from sqlalchemy.orm.mapper import Mapper
+from sqlalchemy.orm.util import AliasedInsp
 
 
 def remove_property(class_, name):
@@ -121,6 +125,83 @@ def remote_column_names(prop):
             for fk in remote.foreign_keys:
                 if fk.column.table in prop.parent.tables:
                     yield remote.name
+
+
+
+def query_labels(query):
+    """
+    Return all labels for given SQLAlchemy query object.
+
+    Example::
+
+
+        query = session.query(
+            Category,
+            db.func.count(Article.id).label('articles')
+        )
+
+        query_labels(query)  # ('articles', )
+
+    :param query: SQLAlchemy Query object
+    """
+    for entity in query._entities:
+        if isinstance(entity, _ColumnEntity) and entity._label_name:
+            yield entity._label_name
+
+
+def query_entities(query):
+    """
+    Return all entities for given SQLAlchemy query object.
+
+    Example::
+
+
+        query = session.query(
+            Category
+        )
+
+        query_entities(query)  # ('Category', )
+
+    :param query: SQLAlchemy Query object
+    """
+    for entity in query._entities:
+        yield entity.entity_zero.class_
+
+    for entity in query._join_entities:
+        if isinstance(entity, Mapper):
+            yield entity.class_
+        else:
+            yield entity
+
+
+def get_query_entity_by_alias(query, alias):
+    entities = query_entities(query)
+    if not alias:
+        return first(entities)
+
+    for entity in entities:
+        if isinstance(entity, AliasedInsp):
+            name = entity.name
+        else:
+            name = entity.__table__.name
+
+        if name == alias:
+            return entity
+
+
+def attrs(expr):
+    if isinstance(expr, AliasedInsp):
+        return expr.mapper.attrs
+    else:
+        return inspect(expr).attrs
+
+
+def get_expr_attr(expr, attr_name):
+    if isinstance(expr, AliasedInsp):
+        return getattr(expr.selectable.c, attr_name)
+    else:
+        return getattr(expr, attr_name)
+
 
 
 def declarative_base(model):

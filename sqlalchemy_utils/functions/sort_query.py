@@ -1,23 +1,13 @@
-from sqlalchemy import inspect
-from sqlalchemy.orm.mapper import Mapper
 from sqlalchemy.orm.properties import ColumnProperty
-from sqlalchemy.orm.query import _ColumnEntity
-from sqlalchemy.orm.util import AliasedInsp
 from sqlalchemy.sql.expression import desc, asc, Label
-
-
-def attrs(expr):
-    if isinstance(expr, AliasedInsp):
-        return expr.mapper.attrs
-    else:
-        return inspect(expr).attrs
-
-
-def sort_expression(expr, attr_name):
-    if isinstance(expr, AliasedInsp):
-        return getattr(expr.selectable.c, attr_name)
-    else:
-        return getattr(expr, attr_name)
+from sqlalchemy.orm.util import AliasedInsp
+from .orm import (
+    attrs,
+    query_labels,
+    query_entities,
+    get_query_entity_by_alias,
+    get_expr_attr
+)
 
 
 class QuerySorterException(Exception):
@@ -31,57 +21,20 @@ class QuerySorter(object):
         self.separator = separator
         self.silent = silent
 
-    def inspect_labels_and_entities(self):
-        for entity in self.query._entities:
-            # get all label names for queries such as:
-            # db.session.query(
-            #       Category,
-            #       db.func.count(Article.id).label('articles')
-            # )
-            if isinstance(entity, _ColumnEntity) and entity._label_name:
-                self.labels.append(entity._label_name)
-            else:
-                self.entities.append(entity.entity_zero.class_)
-
-        for mapper in self.query._join_entities:
-            if isinstance(mapper, Mapper):
-                self.entities.append(mapper.class_)
-            else:
-                self.entities.append(mapper)
-
-    def get_entity_by_alias(self, alias):
-        if not alias:
-            return self.entities[0]
-
-        for entity in self.entities:
-            if isinstance(entity, AliasedInsp):
-                name = entity.name
-            else:
-                name = entity.__table__.name
-
-            if name == alias:
-                return entity
-
-    def assign_order_by(self, sort):
-        if not sort:
-            return self.query
-
-        sort = self.parse_sort_arg(sort)
+    def assign_order_by(self, entity, attr, func):
         expr = None
-        if sort['attr'] in self.labels:
-            expr = sort['attr']
+        if attr in self.labels:
+            expr = attr
         else:
-            entity = self.get_entity_by_alias(sort['entity'])
+            entity = get_query_entity_by_alias(self.query, entity)
             if entity:
-                expr = self.order_by_attr(entity, sort['attr'])
+                expr = self.order_by_attr(entity, attr)
 
         if expr is not None:
-            return self.query.order_by(
-                sort['func'](expr)
-            )
+            return self.query.order_by(func(expr))
         if not self.silent:
             raise QuerySorterException(
-                "Could not sort query with expression '%s'" % sort['attr']
+                "Could not sort query with expression '%s'" % attr
             )
         return self.query
 
@@ -93,7 +46,7 @@ class QuerySorter(object):
                 if isinstance(property_.columns[0], Label):
                     expr = property_.columns[0].name
                 else:
-                    expr = sort_expression(entity, property_.key)
+                    expr = get_expr_attr(entity, property_.key)
                 return expr
             else:
                 return
@@ -119,9 +72,14 @@ class QuerySorter(object):
 
     def __call__(self, query, *args):
         self.query = query
-        self.inspect_labels_and_entities()
+        self.labels = query_labels(query)
+        self.entities = query_entities(query)
         for sort in args:
-            self.query = self.assign_order_by(sort)
+            if not sort:
+                continue
+            self.query = self.assign_order_by(
+                **self.parse_sort_arg(sort)
+            )
         return self.query
 
 
