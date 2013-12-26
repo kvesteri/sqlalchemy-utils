@@ -1,6 +1,5 @@
 from functools import partial
-from funcy import first
-from toolz import curry
+from toolz import curry, first
 import sqlalchemy as sa
 from sqlalchemy import inspect
 from sqlalchemy.orm.query import _ColumnEntity

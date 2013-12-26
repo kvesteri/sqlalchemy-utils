@@ -78,7 +78,6 @@ setup(
         '#egg=phonenumbers3k-5.6b1',
     ],
     install_requires=[
-        'funcy>=0.8',
         'six',
         'SQLAlchemy>=0.8.0',
         'toolz>=0.4.1',
