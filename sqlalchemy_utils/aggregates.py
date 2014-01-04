@@ -254,7 +254,12 @@ from collections import defaultdict
 import sqlalchemy as sa
 import six
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.sql.expression import _FunctionGenerator
+try:
+    # SQLAlchemy 0.9
+    from sqlalchemy.sql.functions import _FunctionGenerator
+except ImportError:
+    # SQLAlchemy 0.8
+    from sqlalchemy.sql.expression import _FunctionGenerator
 
 
 class AggregatedAttribute(declared_attr):
