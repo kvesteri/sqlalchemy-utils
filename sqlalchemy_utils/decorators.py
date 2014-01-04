@@ -6,11 +6,23 @@ import six
 
 class AttributeValueGenerator(object):
     def __init__(self):
+        self.listener_args = [
+            (
+                sa.orm.mapper,
+                'mapper_configured',
+                self.update_generator_registry
+            ),
+            (
+                sa.orm.session.Session,
+                'before_flush',
+                self.update_generated_properties
+            )
+        ]
         self.reset()
 
     def reset(self):
-        self.generator_registry = defaultdict(list)
         self.listeners_registered = False
+        self.generator_registry = defaultdict(list)
 
     def generator_wrapper(self, func, attr):
         def wrapper(self, *args, **kwargs):
@@ -29,16 +41,8 @@ class AttributeValueGenerator(object):
 
     def register_listeners(self):
         if not self.listeners_registered:
-            sa.event.listen(
-                sa.orm.mapper,
-                'mapper_configured',
-                self.update_generator_registry
-            )
-            sa.event.listen(
-                sa.orm.session.Session,
-                'before_flush',
-                self.update_generated_properties
-            )
+            for args in self.listener_args:
+                sa.event.listen(*args)
             self.listeners_registered = True
 
     def update_generator_registry(self, mapper, class_):

@@ -5,10 +5,6 @@ from tests import TestCase
 
 
 class GeneratesTestCase(TestCase):
-    def teardown_method(self, method):
-        TestCase.teardown_method(self, method)
-        generator.reset()
-
     def test_generates_value_before_flush(self):
         article = self.Article()
         article.name = u'some article name'
