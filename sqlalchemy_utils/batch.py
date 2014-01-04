@@ -27,6 +27,10 @@ class PathException(Exception):
     pass
 
 
+class DataException(Exception):
+    pass
+
+
 class with_backrefs(object):
     """
     Marks given attribute path so that whenever its fetched with batch_fetch
@@ -35,9 +39,6 @@ class with_backrefs(object):
     """
     def __init__(self, path):
         self.path = path
-
-
-
 
 
 class Path(object):
@@ -79,7 +80,8 @@ class Path(object):
                     related_entities.extend(getattr(entity, attrs[0]))
 
                 if not related_entities:
-                    return
+                    raise DataException('No related entities.')
+
                 subpath = '.'.join(attrs[1:])
                 return Path.parse(related_entities, subpath, populate_backrefs)
             else:
@@ -105,11 +107,6 @@ class Path(object):
                     return ManyToOneFetcher
                 else:
                     return OneToManyFetcher
-
-
-class CompositePath(object):
-    def __init__(self, *paths):
-        self.paths = paths
 
 
 def batch_fetch(entities, *attr_paths):
@@ -174,10 +171,16 @@ def batch_fetch(entities, *attr_paths):
 
     if entities:
         for path in attr_paths:
-            fetcher = fetcher_factory(entities, path)
-            if fetcher:
+            try:
+                fetcher = fetcher_factory(entities, path)
                 fetcher.fetch()
                 fetcher.populate()
+            except DataException:
+                pass
+
+
+def get_fetcher(entities, path, populate_backrefs):
+    return Path.parse(entities, path, populate_backrefs).fetcher
 
 
 def fetcher_factory(entities, path):
@@ -186,20 +189,12 @@ def fetcher_factory(entities, path):
         path = path.path
         populate_backrefs = True
 
-    if isinstance(path, CompositePath):
-        fetchers = []
-        for path in path.paths:
-            path = Path.parse(entities, path, populate_backrefs)
-            if path:
-                fetchers.append(
-                    path.fetcher
-                )
-
-        return CompositeFetcher(*fetchers)
+    if isinstance(path, tuple):
+        return CompositeFetcher(
+            *(get_fetcher(entities, p, populate_backrefs) for p in path)
+        )
     else:
-        path = Path.parse(entities, path, populate_backrefs)
-        if path:
-            return path.fetcher
+        return get_fetcher(entities, path, populate_backrefs)
 
 
 class CompositeFetcher(object):
