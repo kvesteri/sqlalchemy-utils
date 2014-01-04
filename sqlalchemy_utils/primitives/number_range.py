@@ -39,33 +39,44 @@ class NumberRange(object):
                 'NumberRange takes at most two arguments'
             )
         elif len(args) == 2:
-            lower, upper = args
-            if lower > upper:
-                raise RangeBoundsException(lower, upper)
-            self.lower = parse_number(lower)
-            self.upper = parse_number(upper)
-            self.lower_inc = self.upper_inc = True
+            self.parse_sequence(args)
         else:
             arg, = args
             if isinstance(arg, six.integer_types):
-                self.lower = self.upper = arg
-                self.lower_inc = self.upper_inc = True
+                self.parse_integer(arg)
             elif isinstance(arg, six.string_types):
-                if ',' not in arg:
-                    self.lower, self.upper = self.parse_range(arg)
-                    self.lower_inc = self.upper_inc = True
-                else:
-                    self.from_range_with_bounds(arg)
+                self.parse_string(arg)
             elif hasattr(arg, 'lower') and hasattr(arg, 'upper'):
-                self.lower = arg.lower
-                self.upper = arg.upper
-                if not arg.lower_inc:
-                    self.lower += 1
+                self.parse_object(arg)
 
-                if not arg.upper_inc:
-                    self.upper -= 1
+    def parse_object(self, obj):
+        self.lower = obj.lower
+        self.upper = obj.upper
+        if not obj.lower_inc:
+            self.lower += 1
 
-    def from_range_with_bounds(self, value):
+        if not obj.upper_inc:
+            self.upper -= 1
+
+    def parse_string(self, value):
+        if ',' not in value:
+            self.parse_hyphen_range(value)
+        else:
+            self.parse_bounded_range(value)
+
+    def parse_sequence(self, seq):
+        lower, upper = seq
+        if lower > upper:
+            raise RangeBoundsException(lower, upper)
+        self.lower = parse_number(lower)
+        self.upper = parse_number(upper)
+        self.lower_inc = self.upper_inc = True
+
+    def parse_integer(self, value):
+        self.lower = self.upper = value
+        self.lower_inc = self.upper_inc = True
+
+    def parse_bounded_range(self, value):
         """
         Returns new NumberRange object from normalized number range format.
 
@@ -102,19 +113,18 @@ class NumberRange(object):
         self.lower = lower
         self.upper = upper
 
-    def parse_range(self, value):
-        if value is not None:
-            values = value.split('-')
-            if len(values) == 1:
-                lower = upper = parse_number(value.strip())
-            else:
-                try:
-                    lower, upper = map(
-                        lambda a: parse_number(a.strip()), values
-                    )
-                except ValueError as e:
-                    raise NumberRangeException(str(e))
-            return lower, upper
+    def parse_hyphen_range(self, value):
+        values = value.split('-')
+        if len(values) == 1:
+            self.lower = self.upper = parse_number(value.strip())
+        else:
+            try:
+                self.lower, self.upper = map(
+                    lambda a: parse_number(a.strip()), values
+                )
+            except ValueError as e:
+                raise NumberRangeException(str(e))
+        self.lower_inc = self.upper_inc = True
 
     @property
     def normalized(self):
