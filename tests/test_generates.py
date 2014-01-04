@@ -43,21 +43,6 @@ class TestGeneratesWithBoundMethodAndStringArg(GeneratesTestCase):
         self.Article = Article
 
 
-class TestGeneratesWithFunctionAndStringArg(GeneratesTestCase):
-    def create_models(self):
-        class Article(self.Base):
-            __tablename__ = 'article'
-            id = sa.Column(sa.Integer, primary_key=True)
-            name = sa.Column(sa.Unicode(255))
-            slug = sa.Column(sa.Unicode(255))
-
-        @generates('Article.slug')
-        def _create_article_slug(self):
-            return self.name.lower().replace(' ', '-')
-
-        self.Article = Article
-
-
 class TestGeneratesWithFunctionAndClassVariableArg(GeneratesTestCase):
     def create_models(self):
         class Article(self.Base):

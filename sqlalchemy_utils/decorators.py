@@ -21,6 +21,13 @@ class AttributeValueGenerator(object):
         self.reset()
 
     def reset(self):
+        if (
+            hasattr(self, 'listeners_registered') and
+            self.listeners_registered
+        ):
+            for args in self.listener_args:
+                sa.event.remove(*args)
+
         self.listeners_registered = False
         self.generator_registry = defaultdict(list)
 
@@ -28,12 +35,8 @@ class AttributeValueGenerator(object):
         def wrapper(self, *args, **kwargs):
             return func(self, *args, **kwargs)
 
-        if isinstance(attr, six.string_types) and '.' in attr:
-            parts = attr.split('.')
-            self.generator_registry[parts[0]].append(wrapper)
-            wrapper.__generates__ = parts[1]
-        elif isinstance(attr, sa.orm.attributes.InstrumentedAttribute):
-            self.generator_registry[attr.class_.__name__].append(wrapper)
+        if isinstance(attr, sa.orm.attributes.InstrumentedAttribute):
+            self.generator_registry[attr.class_].append(wrapper)
             wrapper.__generates__ = attr
         else:
             wrapper.__generates__ = attr
@@ -46,18 +49,22 @@ class AttributeValueGenerator(object):
             self.listeners_registered = True
 
     def update_generator_registry(self, mapper, class_):
+        """
+        Adds generator functions to generator_registry.
+        """
         for value in class_.__dict__.values():
             if hasattr(value, '__generates__'):
-                self.generator_registry[class_.__name__].append(value)
+                self.generator_registry[class_].append(value)
 
     def update_generated_properties(self, session, ctx, instances):
         for obj in itertools.chain(session.new, session.dirty):
-            class_ = obj.__class__.__name__
+            class_ = obj.__class__
             if class_ in self.generator_registry:
                 for func in self.generator_registry[class_]:
                     attr = func.__generates__
                     if not isinstance(attr, six.string_types):
                         attr = attr.name
+                    print obj, attr
                     setattr(obj, attr, func(obj))
 
 
@@ -118,16 +125,6 @@ def generates(attr, generator=generator):
 
 
         @generates(Article.slug)
-        def _create_article_slug(article):
-            return article.name.lower().replace(' ', '-')
-
-
-    Or with lazy evaluated string argument:
-
-    ::
-
-
-        @generates('Article.slug')
         def _create_article_slug(article):
             return article.name.lower().replace(' ', '-')
     """
