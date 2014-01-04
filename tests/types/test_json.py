@@ -5,8 +5,7 @@ from sqlalchemy_utils.types import json
 from tests import TestCase
 
 
-@mark.skipif('json.json is None')
-class TestJSONType(TestCase):
+class JSONTestCase(TestCase):
     def create_models(self):
         class Document(self.Base):
             __tablename__ = 'document'
@@ -47,3 +46,12 @@ class TestJSONType(TestCase):
 
         document = self.session.query(self.Document).first()
         assert document.json == {'something': u'äääööö'}
+
+
+@mark.skipif('json.json is None')
+class TestSqliteJSONType(JSONTestCase):
+    pass
+
+@mark.skipif('json.json is None')
+class TestPostgresJSONType(JSONTestCase):
+    dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'

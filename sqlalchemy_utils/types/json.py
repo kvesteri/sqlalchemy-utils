@@ -10,16 +10,19 @@ import six
 from sqlalchemy.dialects.postgresql.base import ischema_names
 from ..exceptions import ImproperlyConfigured
 
+try:
+    from sqlalchemy.dialects.postgresql import JSON
+    has_postgres_json = True
+except ImportError:
+    class PostgresJSONType(sa.types.UserDefinedType):
+        """
+        Text search vector type for postgresql.
+        """
+        def get_col_spec(self):
+            return 'json'
 
-class PostgresJSONType(sa.types.UserDefinedType):
-    """
-    Text search vector type for postgresql.
-    """
-    def get_col_spec(self):
-        return 'json'
-
-
-ischema_names['json'] = PostgresJSONType
+    ischema_names['json'] = PostgresJSONType
+    has_postgres_json = False
 
 
 class JSONType(sa.types.TypeDecorator):
@@ -60,16 +63,23 @@ class JSONType(sa.types.TypeDecorator):
     def load_dialect_impl(self, dialect):
         if dialect.name == 'postgresql':
             # Use the native JSON type.
-            return dialect.type_descriptor(PostgresJSONType())
+            if has_postgres_json:
+                return dialect.type_descriptor(JSON())
+            else:
+                return dialect.type_descriptor(PostgresJSONType())
         else:
             return dialect.type_descriptor(self.impl)
 
     def process_bind_param(self, value, dialect):
+        if dialect.name == 'postgresql' and has_postgres_json:
+            return value
         if value is not None:
             value = six.text_type(json.dumps(value))
         return value
 
     def process_result_value(self, value, dialect):
+        if dialect.name == 'postgresql' and has_postgres_json:
+            return value
         if value is not None:
             value = json.loads(value)
         return value
