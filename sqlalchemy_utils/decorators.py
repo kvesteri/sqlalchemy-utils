@@ -64,7 +64,6 @@ class AttributeValueGenerator(object):
                     attr = func.__generates__
                     if not isinstance(attr, six.string_types):
                         attr = attr.name
-                    print obj, attr
                     setattr(obj, attr, func(obj))
 
 
