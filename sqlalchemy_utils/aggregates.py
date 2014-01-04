@@ -350,7 +350,7 @@ class AggregatedValue(object):
             property_ = self.relationships[-1].property
             remote_pairs = property_.local_remote_pairs
             local = remote_pairs[0][0]
-            remote = remote_paris[0][1]
+            remote = remote_pairs[0][1]
 
 
             from_ = property_.mapper.class_.__table__
