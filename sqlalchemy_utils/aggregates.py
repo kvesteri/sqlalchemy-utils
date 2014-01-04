@@ -368,15 +368,22 @@ class AggregatedValue(object):
                         [remote],
                         from_obj=[from_]
                     ).where(
-                        local.in_(
-                            getattr(obj, remote.key)
-                            for obj in objects
-                        )
+                        self.local_condition(property_, objects)
                     )
                 )
             )
 
         return query
+
+
+    def local_condition(self, prop, objects):
+        return prop.local_remote_pairs[0][0].in_(
+            getattr(
+                obj,
+                prop.local_remote_pairs[0][1].key
+            )
+            for obj in objects
+        )
 
 
 class AggregationManager(object):
