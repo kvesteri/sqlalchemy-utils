@@ -1,3 +1,6 @@
+addons:
+  postgresql: 9.3
+
 before_script:
   - psql -c 'create database sqlalchemy_utils_test;' -U postgres
 
