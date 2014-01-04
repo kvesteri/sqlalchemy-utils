@@ -46,22 +46,23 @@ class NumberRange(object):
             self.upper = parse_number(upper)
             self.lower_inc = self.upper_inc = True
         else:
-            if isinstance(args[0], six.integer_types):
-                self.lower = self.upper = args[0]
+            arg, = args
+            if isinstance(arg, six.integer_types):
+                self.lower = self.upper = arg
                 self.lower_inc = self.upper_inc = True
-            elif isinstance(args[0], six.string_types):
-                if ',' not in args[0]:
-                    self.lower, self.upper = self.parse_range(args[0])
+            elif isinstance(arg, six.string_types):
+                if ',' not in arg:
+                    self.lower, self.upper = self.parse_range(arg)
                     self.lower_inc = self.upper_inc = True
                 else:
-                    self.from_range_with_bounds(args[0])
-            elif hasattr(args[0], 'lower') and hasattr(args[0], 'upper'):
-                self.lower = args[0].lower
-                self.upper = args[0].upper
-                if not args[0].lower_inc:
+                    self.from_range_with_bounds(arg)
+            elif hasattr(arg, 'lower') and hasattr(arg, 'upper'):
+                self.lower = arg.lower
+                self.upper = arg.upper
+                if not arg.lower_inc:
                     self.lower += 1
 
-                if not args[0].upper_inc:
+                if not arg.upper_inc:
                     self.upper -= 1
 
     def from_range_with_bounds(self, value):
@@ -70,15 +71,15 @@ class NumberRange(object):
 
         Example ::
 
-            range = NumberRange.from_normalized_str('[23, 45]')
+            range = NumberRange('[23, 45]')
             range.lower = 23
             range.upper = 45
 
-            range = NumberRange.from_normalized_str('(23, 45]')
+            range = NumberRange('(23, 45]')
             range.lower = 24
             range.upper = 45
 
-            range = NumberRange.from_normalized_str('(23, 45)')
+            range = NumberRange('(23, 45)')
             range.lower = 24
             range.upper = 44
         """
