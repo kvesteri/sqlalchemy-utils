@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.22.0 (2014-01-04)
+^^^^^^^^^^^^^^^^^^^
+
+- SQLAlchemy 0.9 support
+- JSONType uses sqlalchemy.dialects.postgresql.JSON if available
+
+
 0.21.0 (2013-11-11)
 ^^^^^^^^^^^^^^^^^^^
 
