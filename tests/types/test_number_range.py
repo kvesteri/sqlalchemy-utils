@@ -18,7 +18,6 @@ class TestNumberRangeType(TestCase):
                 return 'Building(%r)' % self.id
 
         self.Building = Building
-        sa.event.listen(sa.orm.mapper, 'mapper_configured', coercion_listener)
 
     def test_save_number_range(self):
         building = self.Building(
