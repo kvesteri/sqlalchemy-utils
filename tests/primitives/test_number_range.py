@@ -1,5 +1,7 @@
-from pytest import raises
-from sqlalchemy_utils.primitives import NumberRange, NumberRangeException
+from pytest import raises, mark
+from sqlalchemy_utils.primitives import (
+    NumberRange, NumberRangeException, RangeBoundsException
+)
 
 
 class TestNumberRangeInit(object):
@@ -76,9 +78,19 @@ def test_str_representation():
     assert str(NumberRange(1, 1)) == '1'
 
 
-def test_raises_exception_for_badly_constructed_range():
-    with raises(NumberRangeException):
-        NumberRange(3, 2)
+
+@mark.parametrize('number_range',
+    (
+        (3, 2),
+        [4, 2],
+        '5-2',
+        (float('inf'), 2),
+        '[4, 3]',
+    )
+)
+def test_raises_exception_for_badly_constructed_range(number_range):
+    with raises(RangeBoundsException):
+        NumberRange(number_range)
 
 
 class TestArithmeticOperators(object):
