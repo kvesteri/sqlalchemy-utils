@@ -104,6 +104,17 @@ class NumberRange(object):
             >>> range.lower == range.upper == 34
             True
 
+
+        5. Object argument
+
+        ::
+
+            >>> range = NumberRange(NumberRange(20, 30))
+            >>> range.lower
+            20
+            >>> range.upper
+            30
+
         """
         if len(args) > 2:
             raise NumberRangeException(
