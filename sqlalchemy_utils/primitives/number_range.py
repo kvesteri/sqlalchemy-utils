@@ -65,7 +65,8 @@ class NumberRange(object):
     def lower(self, value):
         if value is None:
             self._lower = -float('inf')
-        self._lower = value
+        else:
+            self._lower = value
 
     @property
     def upper(self):
@@ -75,7 +76,22 @@ class NumberRange(object):
     def upper(self, value):
         if value is None:
             self._upper = float('inf')
-        self._upper = value
+        else:
+            self._upper = value
+
+    @property
+    def open(self):
+        """
+        Returns whether or not this object is an open interval.
+        """
+        return not self.lower_inc and not self.upper_inc
+
+    @property
+    def closed(self):
+        """
+        Returns whether or not this object is a closed interval.
+        """
+        return self.lower_inc and self.upper_inc
 
     def parse_object(self, obj):
         self.lower = obj.lower
@@ -93,7 +109,10 @@ class NumberRange(object):
         lower, upper = seq
         self.lower = parse_number(lower)
         self.upper = parse_number(upper)
-        self.lower_inc = self.upper_inc = True
+        if isinstance(seq, tuple):
+            self.lower_inc = self.upper_inc = False
+        else:
+            self.lower_inc = self.upper_inc = True
 
     def parse_integer(self, value):
         self.lower = self.upper = value
@@ -125,14 +144,8 @@ class NumberRange(object):
         except ValueError as e:
             raise NumberRangeException(e.message)
 
-        self.lower_inc = value[0] == '('
-        if self.lower_inc:
-            lower += 1
-
-        self.upper_inc = value[-1] == ')'
-        if self.upper_inc:
-            upper -= 1
-
+        self.lower_inc = value[0] == '['
+        self.upper_inc = value[-1] == ']'
         self.lower = lower
         self.upper = upper
 
@@ -151,9 +164,11 @@ class NumberRange(object):
 
     @property
     def normalized(self):
-        return '[%s, %s]' % (
-            self.lower if self.lower is not None else '',
-            self.upper if self.upper is not None else ''
+        return '%s%s, %s%s' % (
+            '[' if self.lower_inc else '(',
+            self.lower if self.lower != -float('inf') else '',
+            self.upper if self.upper != float('inf') else '',
+            ']' if self.upper_inc else ')'
         )
 
     def __eq__(self, other):

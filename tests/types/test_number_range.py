@@ -36,9 +36,10 @@ class TestNumberRangeType(TestCase):
         )
         self.session.add(building)
         self.session.commit()
+
         building = self.session.query(self.Building).first()
         assert building.persons_at_night.lower == 1
-        assert building.persons_at_night.upper is None
+        assert building.persons_at_night.upper == float('inf')
 
     def test_infinite_lower_bound(self):
         building = self.Building(
@@ -47,8 +48,8 @@ class TestNumberRangeType(TestCase):
         self.session.add(building)
         self.session.commit()
         building = self.session.query(self.Building).first()
-        assert building.persons_at_night.lower is None
-        assert building.persons_at_night.upper is 1
+        assert building.persons_at_night.lower == -float('inf')
+        assert building.persons_at_night.upper == 1
 
     def test_nullify_number_range(self):
         building = self.Building(

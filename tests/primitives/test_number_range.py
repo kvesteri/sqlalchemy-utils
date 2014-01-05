@@ -30,6 +30,11 @@ class TestNumberRangeInit(object):
         assert num_range.lower == 1
         assert num_range.upper == 3
 
+    def test_empty_string_as_upper_bound(self):
+        num_range = NumberRange('[1,)')
+        assert num_range.lower == 1
+        assert num_range.upper == float('inf')
+
     def test_supports_exact_ranges_as_strings(self):
         num_range = NumberRange('3')
         assert num_range.lower == 3
@@ -91,6 +96,36 @@ def test_str_representation():
 def test_raises_exception_for_badly_constructed_range(number_range):
     with raises(RangeBoundsException):
         NumberRange(number_range)
+
+
+@mark.parametrize(('number_range', 'is_open'),
+    (
+        ((2, 3), True),
+        ('(2, 5)', True),
+        ('[3, 4)', False),
+        ('(4, 5]', False),
+        ('3 - 4', False),
+        ([4, 5], False),
+        ('[4, 5]', False)
+    )
+)
+def test_open(number_range, is_open):
+    assert NumberRange(number_range).open == is_open
+
+
+@mark.parametrize(('number_range', 'is_closed'),
+    (
+        ((2, 3), False),
+        ('(2, 5)', False),
+        ('[3, 4)', False),
+        ('(4, 5]', False),
+        ('3 - 4', True),
+        ([4, 5], True),
+        ('[4, 5]', True)
+    )
+)
+def test_closed(number_range, is_closed):
+    assert NumberRange(number_range).closed == is_closed
 
 
 class TestArithmeticOperators(object):
