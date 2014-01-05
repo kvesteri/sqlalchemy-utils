@@ -21,4 +21,4 @@ install:
   - "pip install $SQLALCHEMY"
   - pip install -e ".[test]"
 script:
-  - python setup.py test
+  - py.test
