@@ -37,6 +37,74 @@ def parse_number(number):
 @total_ordering
 class NumberRange(object):
     def __init__(self, *args):
+        """
+        Parses given args and assigns lower and upper bound for this number
+        range.
+
+        1. Comma separated string argument
+
+        ::
+
+
+            >>> range = NumberRange('[23, 45]')
+            >>> range.lower
+            23
+            >>> range.upper
+            45
+
+
+            >>> range = NumberRange('(23, 45]')
+            >>> range.lower_inc
+            False
+
+            >>> range = NumberRange('(23, 45)')
+            >>> range.lower_inc
+            False
+            >>> range.upper_inc
+            False
+
+        2. Sequence of arguments
+
+        ::
+
+
+            >>> range = NumberRange(23, 45)
+            >>> range.lower
+            23
+            >>> range.upper
+            45
+
+
+        3. Lists and tuples as an argument
+
+        ::
+
+
+            >>> range = NumberRange([23, 45])
+            >>> range.lower
+            23
+            >>> range.upper
+            45
+            >>> range.closed
+            True
+
+
+            >>> range = NumberRange((23, 45))
+            >>> range.lower
+            23
+            >>> range.closed
+            False
+
+        4. Integer argument
+
+        ::
+
+
+            >>> range = NumberRange(34)
+            >>> range.lower == range.upper == 34
+            True
+
+        """
         if len(args) > 2:
             raise NumberRangeException(
                 'NumberRange takes at most two arguments'
@@ -83,6 +151,14 @@ class NumberRange(object):
     def open(self):
         """
         Returns whether or not this object is an open interval.
+
+        ::
+
+            range = NumberRange('(23, 45)')
+            range.open  # True
+
+            range = NumberRange('[23, 45]')
+            range.open  # False
         """
         return not self.lower_inc and not self.upper_inc
 
@@ -90,6 +166,14 @@ class NumberRange(object):
     def closed(self):
         """
         Returns whether or not this object is a closed interval.
+
+        ::
+
+            range = NumberRange('(23, 45)')
+            range.closed  # False
+
+            range = NumberRange('[23, 45]')
+            range.closed  # True
         """
         return self.lower_inc and self.upper_inc
 
@@ -119,23 +203,6 @@ class NumberRange(object):
         self.lower_inc = self.upper_inc = True
 
     def parse_bounded_range(self, value):
-        """
-        Returns new NumberRange object from normalized number range format.
-
-        Example ::
-
-            range = NumberRange('[23, 45]')
-            range.lower = 23
-            range.upper = 45
-
-            range = NumberRange('(23, 45]')
-            range.lower = 24
-            range.upper = 45
-
-            range = NumberRange('(23, 45)')
-            range.lower = 24
-            range.upper = 44
-        """
         values = value.strip()[1:-1].split(',')
         try:
             lower, upper = map(
