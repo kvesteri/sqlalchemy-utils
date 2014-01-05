@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from collections import Iterable
+from decimal import Decimal
 try:
     from functools import total_ordering
 except ImportError:
@@ -13,20 +15,21 @@ class NumberRangeException(Exception):
 
 class RangeBoundsException(NumberRangeException):
     def __init__(self, min_value, max_value):
-        self.message = 'Min value %d is bigger than max value %d.' % (
+        self.message = 'Min value %s is bigger than max value %s.' % (
             min_value,
             max_value
         )
 
 
+def is_number(number):
+    return isinstance(number, (float, int, Decimal))
+
+
 def parse_number(number):
-    if (
-        number == float('inf') or
-        number == -float('inf') or
-        number is None or
-        number == ''
-    ):
+    if number is None or number == '':
         return None
+    elif is_number(number):
+        return number
     else:
         return int(number)
 
@@ -46,17 +49,39 @@ class NumberRange(object):
                 self.parse_integer(arg)
             elif isinstance(arg, six.string_types):
                 self.parse_string(arg)
+            elif isinstance(arg, Iterable):
+                self.parse_sequence(arg)
             elif hasattr(arg, 'lower') and hasattr(arg, 'upper'):
                 self.parse_object(arg)
+
+        if self.lower > self.upper:
+            raise RangeBoundsException(self.lower, self.upper)
+
+    @property
+    def lower(self):
+        return self._lower
+
+    @lower.setter
+    def lower(self, value):
+        if value is None:
+            self._lower = -float('inf')
+        self._lower = value
+
+    @property
+    def upper(self):
+        return self._upper
+
+    @upper.setter
+    def upper(self, value):
+        if value is None:
+            self._upper = float('inf')
+        self._upper = value
 
     def parse_object(self, obj):
         self.lower = obj.lower
         self.upper = obj.upper
-        if not obj.lower_inc:
-            self.lower += 1
-
-        if not obj.upper_inc:
-            self.upper -= 1
+        self.lower_inc = obj.lower_inc
+        self.upper_inc = obj.upper_inc
 
     def parse_string(self, value):
         if ',' not in value:
@@ -66,8 +91,6 @@ class NumberRange(object):
 
     def parse_sequence(self, seq):
         lower, upper = seq
-        if lower > upper:
-            raise RangeBoundsException(lower, upper)
         self.lower = parse_number(lower)
         self.upper = parse_number(upper)
         self.lower_inc = self.upper_inc = True
