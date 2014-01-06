@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.22.1 (2014-01-06)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed in issue where NumberRange would not always raise RangeBoundsException with object initialization
+
+
 0.22.0 (2014-01-04)
 ^^^^^^^^^^^^^^^^^^^
 
