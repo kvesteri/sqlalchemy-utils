@@ -64,10 +64,7 @@ class NumberRangeType(types.TypeDecorator, ScalarCoercible):
 
     def process_result_value(self, value, dialect):
         if value:
-            if not isinstance(value, six.string_types):
-                value = NumberRange(value)
-            else:
-                return NumberRange(value)
+            return NumberRange(value)
         return value
 
     def _coerce(self, value):
