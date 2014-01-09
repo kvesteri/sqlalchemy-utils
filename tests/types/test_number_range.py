@@ -1,3 +1,4 @@
+from pytest import mark
 import sqlalchemy as sa
 from tests import TestCase
 from sqlalchemy_utils import (
@@ -19,9 +20,16 @@ class TestNumberRangeType(TestCase):
 
         self.Building = Building
 
-    def test_save_number_range(self):
+    @mark.parametrize(
+        'number_range',
+        (
+            (1, 3),
+            '1-3'
+        )
+    )
+    def test_save_number_range(self, number_range):
         building = self.Building(
-            persons_at_night=NumberRange(1, 3)
+            persons_at_night=number_range
         )
 
         self.session.add(building)

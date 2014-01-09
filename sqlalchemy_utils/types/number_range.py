@@ -68,12 +68,6 @@ class NumberRangeType(types.TypeDecorator, ScalarCoercible):
         return value
 
     def _coerce(self, value):
-        if value is not None and not isinstance(value, NumberRange):
-            if (
-                isinstance(value, six.string_types) or
-                isinstance(value, six.integer_types)
-            ):
-                value = NumberRange(value)
-            else:
-                raise TypeError('Could not coerce value to NumberRange.')
+        if value is not None:
+            value = NumberRange(value)
         return value
