@@ -40,17 +40,23 @@ class URLType(types.TypeDecorator, ScalarCoercible):
     impl = types.UnicodeText
 
     def process_bind_param(self, value, dialect):
-        if isinstance(value, furl):
+        if furl is not None and isinstance(value, furl):
             return six.text_type(value)
 
         if isinstance(value, six.string_types):
             return value
 
     def process_result_value(self, value, dialect):
+        if furl is None:
+            return value
+
         if value is not None:
             return furl(value)
 
     def _coerce(self, value):
+        if furl is None:
+            return value
+
         if value is not None and not isinstance(value, furl):
             return furl(value)
         return value
