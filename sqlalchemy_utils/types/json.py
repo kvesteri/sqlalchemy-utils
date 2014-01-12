@@ -54,11 +54,12 @@ class JSONType(sa.types.TypeDecorator):
     """
     impl = sa.UnicodeText
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         if json is None:
             raise ImproperlyConfigured(
                 'JSONType needs anyjson package installed.'
             )
+        super(JSONType, self).__init__(*args, **kwargs)
 
     def load_dialect_impl(self, dialect):
         if dialect.name == 'postgresql':
