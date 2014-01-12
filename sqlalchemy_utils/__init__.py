@@ -101,7 +101,7 @@ __all__ = (
     ScalarListType,
     TimezoneType,
     TSVectorType,
-    URLType
+    URLType,
     UUIDType,
     database_exists,
     create_database,
