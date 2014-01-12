@@ -46,6 +46,7 @@ from .types import (
     ScalarListException,
     TimezoneType,
     TSVectorType,
+    URLType,
     UUIDType,
 )
 
@@ -100,6 +101,7 @@ __all__ = (
     ScalarListType,
     TimezoneType,
     TSVectorType,
+    URLType
     UUIDType,
     database_exists,
     create_database,
