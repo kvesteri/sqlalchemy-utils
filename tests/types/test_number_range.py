@@ -6,6 +6,7 @@ try:
 except ImportError:
     pass
 from tests import TestCase
+from infinity import inf
 from sqlalchemy_utils import IntRangeType
 
 
@@ -43,28 +44,28 @@ class NumberRangeTestCase(TestCase):
 
     def test_infinite_upper_bound(self):
         building = self.Building(
-            persons_at_night=intervals.IntInterval(1, float('inf'))
+            persons_at_night=intervals.IntInterval([1, inf])
         )
         self.session.add(building)
         self.session.commit()
 
         building = self.session.query(self.Building).first()
         assert building.persons_at_night.lower == 1
-        assert building.persons_at_night.upper == float('inf')
+        assert building.persons_at_night.upper == inf
 
     def test_infinite_lower_bound(self):
         building = self.Building(
-            persons_at_night=intervals.IntInterval(-float('inf'), 1)
+            persons_at_night=intervals.IntInterval([-inf, 1])
         )
         self.session.add(building)
         self.session.commit()
         building = self.session.query(self.Building).first()
-        assert building.persons_at_night.lower == -float('inf')
+        assert building.persons_at_night.lower == -inf
         assert building.persons_at_night.upper == 1
 
     def test_nullify_number_range(self):
         building = self.Building(
-            persons_at_night=intervals.IntInterval(1, 3)
+            persons_at_night=intervals.IntInterval([1, 3])
         )
 
         self.session.add(building)

@@ -82,8 +82,13 @@ class IntRangeType(types.TypeDecorator, ScalarCoercible):
 
     def process_result_value(self, value, dialect):
         if value:
-            return intervals.IntInterval(value)
+            return self.canonicalize_result_value(
+                intervals.IntInterval(value)
+            )
         return value
+
+    def canonicalize_result_value(self, value):
+        return intervals.canonicalize(value, True, True)
 
     def _coerce(self, value):
         if value is not None:
