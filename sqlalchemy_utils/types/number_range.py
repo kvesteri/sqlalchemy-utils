@@ -1,10 +1,13 @@
-import six
+intervals = None
+try:
+    import intervals
+except ImportError:
+    pass
 from sqlalchemy import types
-from sqlalchemy_utils.primitives import NumberRange
 from .scalar_coercible import ScalarCoercible
 
 
-class NumberRangeRawType(types.UserDefinedType):
+class INT4RANGE(types.UserDefinedType):
     """
     Raw number range type, only supports PostgreSQL for now.
     """
@@ -12,40 +15,55 @@ class NumberRangeRawType(types.UserDefinedType):
         return 'int4range'
 
 
-class NumberRangeType(types.TypeDecorator, ScalarCoercible):
+class INT8RANGE(types.UserDefinedType):
+    def get_col_spec(self):
+        return 'int8range'
+
+
+class NUMRANGE(types.UserDefinedType):
+    def get_col_spec(self):
+        return 'numrange'
+
+
+class DATERANGE(types.UserDefinedType):
+    def get_col_spec(self):
+        return 'daterange'
+
+
+class IntRangeType(types.TypeDecorator, ScalarCoercible):
     """
-    NumberRangeType provides way for saving range of numbers into database.
+    IntRangeType provides way for saving range of numbers into database.
 
     Example ::
 
 
-        from sqlalchemy_utils import NumberRangeType, NumberRange
+        from sqlalchemy_utils import IntRangeType
 
 
         class Event(Base):
             __tablename__ = 'user'
             id = sa.Column(sa.Integer, autoincrement=True)
             name = sa.Column(sa.Unicode(255))
-            estimated_number_of_persons = sa.Column(NumberRangeType)
+            estimated_number_of_persons = sa.Column(IntRangeType)
 
 
         party = Event(name=u'party')
 
         # we estimate the party to contain minium of 10 persons and at max
         # 100 persons
-        party.estimated_number_of_persons = NumberRange(10, 100)
+        party.estimated_number_of_persons = [10, 100]
 
         print party.estimated_number_of_persons
         # '10-100'
 
 
-    NumberRange supports some arithmetic operators:
+    IntRange returns the values as IntInterval objects. These objects support many arithmetic operators:
     ::
 
 
         meeting = Event(name=u'meeting')
 
-        meeting.estimated_number_of_persons = NumberRange(20, 40)
+        meeting.estimated_number_of_persons = [20, 40]
 
         total = (
             meeting.estimated_number_of_persons +
@@ -55,19 +73,19 @@ class NumberRangeType(types.TypeDecorator, ScalarCoercible):
         # '30-140'
     """
 
-    impl = NumberRangeRawType
+    impl = INT4RANGE
 
     def process_bind_param(self, value, dialect):
         if value is not None:
-            return value.normalized
+            return str(value)
         return value
 
     def process_result_value(self, value, dialect):
         if value:
-            return NumberRange(value)
+            return intervals.IntInterval(value)
         return value
 
     def _coerce(self, value):
         if value is not None:
-            value = NumberRange(value)
+            value = intervals.IntInterval(value)
         return value

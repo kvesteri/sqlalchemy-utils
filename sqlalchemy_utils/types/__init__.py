@@ -9,8 +9,11 @@ from .ip_address import IPAddressType
 from .json import JSONType
 from .locale import LocaleType
 from .number_range import (
-    NumberRangeRawType,
-    NumberRangeType,
+    INT4RANGE,
+    INT8RANGE,
+    DATERANGE,
+    NUMRANGE,
+    IntRangeType,
 )
 from .password import Password, PasswordType
 from .phone_number import PhoneNumber, PhoneNumberType
@@ -33,8 +36,7 @@ __all__ = (
     IPAddressType,
     JSONType,
     LocaleType,
-    NumberRangeRawType,
-    NumberRangeType,
+    IntRangeType,
     Password,
     PasswordType,
     PhoneNumber,
@@ -47,7 +49,11 @@ __all__ = (
     UUIDType,
     WeekDay,
     WeekDays,
-    WeekDaysType
+    WeekDaysType,
+    INT4RANGE,
+    INT8RANGE,
+    DATERANGE,
+    NUMRANGE,
 )
 
 

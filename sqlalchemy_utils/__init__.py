@@ -21,7 +21,6 @@ from .functions import (
 from .listeners import coercion_listener
 from .merge import merge, Merger
 from .generic import generic_relationship
-from .primitives import NumberRange, NumberRangeException
 from .proxy_dict import ProxyDict, proxy_dict
 from .types import (
     ArrowType,
@@ -33,6 +32,7 @@ from .types import (
     EmailType,
     instrumented_list,
     InstrumentedList,
+    IntRangeType,
     IPAddressType,
     JSONType,
     LocaleType,
@@ -40,14 +40,16 @@ from .types import (
     PasswordType,
     PhoneNumber,
     PhoneNumberType,
-    NumberRangeRawType,
-    NumberRangeType,
     ScalarListType,
     ScalarListException,
     TimezoneType,
     TSVectorType,
     URLType,
     UUIDType,
+    INT4RANGE,
+    INT8RANGE,
+    DATERANGE,
+    NUMRANGE,
 )
 
 
@@ -88,10 +90,7 @@ __all__ = (
     JSONType,
     LocaleType,
     Merger,
-    NumberRange,
-    NumberRangeException,
-    NumberRangeRawType,
-    NumberRangeType,
+    IntRangeType,
     Password,
     PasswordType,
     PhoneNumber,
@@ -105,5 +104,9 @@ __all__ = (
     UUIDType,
     database_exists,
     create_database,
-    drop_database
+    drop_database,
+    INT4RANGE,
+    INT8RANGE,
+    DATERANGE,
+    NUMRANGE,
 )

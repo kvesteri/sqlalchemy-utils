@@ -24,6 +24,7 @@ extras_require = {
     'anyjson': ['anyjson>=0.3.3'],
     'babel': ['Babel>=1.3'],
     'arrow': ['arrow>=0.3.4'],
+    'intervals': ['intervals>=0.2.0'],
     'phone': [
         # The phonenumbers library has a split for 2.x and 3.x support.
         'phonenumbers3k==5.6b1' if PY3 else 'phonenumbers<5.6b1'
