@@ -8,7 +8,7 @@ from .email import EmailType
 from .ip_address import IPAddressType
 from .json import JSONType
 from .locale import LocaleType
-from .number_range import (
+from .range import (
     INT4RANGE,
     INT8RANGE,
     DATERANGE,
