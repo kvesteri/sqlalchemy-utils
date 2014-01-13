@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-import sys
-from sqlalchemy import types
-from sqlalchemy.dialects.postgresql import BIT
-import six
-
 try:
     from functools import total_ordering
 except ImportError:
