@@ -79,7 +79,6 @@ class NumberRangeTestCase(TestCase):
         assert building.persons_at_night.upper == 15
 
 
-
 class TestIntRangeTypeOnPostgres(NumberRangeTestCase):
     dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
 
@@ -133,6 +132,39 @@ class TestIntRangeTypeOnPostgres(NumberRangeTestCase):
             .filter(self.Building.persons_at_night > number_range)
         )
         assert query.count()
+
+    @mark.parametrize(
+        'number_range',
+        (
+            [1, 4],
+            4,
+            [2, inf]
+        )
+    )
+    def test_le_operator(self, number_range):
+        self.create_building([1, 3])
+        query = (
+            self.session.query(self.Building)
+            .filter(self.Building.persons_at_night <= number_range)
+        )
+        assert query.count()
+
+    @mark.parametrize(
+        'number_range',
+        (
+            [2, 4],
+            4,
+            [1, inf]
+        )
+    )
+    def test_lt_operator(self, number_range):
+        self.create_building([1, 3])
+        query = (
+            self.session.query(self.Building)
+            .filter(self.Building.persons_at_night < number_range)
+        )
+        assert query.count()
+
 
 class TestNumberRangeTypeOnSqlite(NumberRangeTestCase):
     pass
