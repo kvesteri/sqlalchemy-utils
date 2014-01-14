@@ -16,11 +16,32 @@ Some good reading for practical interval implementations:
 http://wiki.postgresql.org/images/f/f0/Range-types.pdf
 
 
-RangeType operators
--------------------
+Range type operators
+--------------------
+
+SQLAlchemy-Utils supports many range type operators. These operators follow the `intervals` package interval coercion rules.
+
+So for example when we make a query such as:
+
+::
+
+    session.query(Car).filter(Car.price_range == 300)
+
+
+It is essentially the same as:
+
+::
+
+    session.query(Car).filter(Car.price_range == DecimalInterval([300, 300]))
+
+
+The coercion is provided for convenience.
+
 
 Comparison operators
 ^^^^^^^^^^^^^^^^^^^^
+
+All range types support all comparison operators (>, >=, ==, !=, <=, <).
 
 ::
 
