@@ -36,12 +36,18 @@ class RangeComparator(types.TypeEngine.Comparator):
     @classmethod
     def coerce_arg(cls, func):
         def operation(self, other, **kwargs):
-            if other is None:
-                return getattr(types.TypeEngine.Comparator, func)(
-                    self, other, **kwargs
-                )
+            coerced_types = (
+                self.type.interval_class.type,
+                tuple,
+                list,
+                str,
+                unicode
+            )
+
+            if isinstance(other, coerced_types):
+                other = self.type.interval_class(other)
             return getattr(types.TypeEngine.Comparator, func)(
-                self, self.type.interval_class(other), **kwargs
+                self, other, **kwargs
             )
         return operation
 
@@ -144,6 +150,10 @@ class IntRangeType(RangeType):
         )
         print total
         # '30-140'
+
+    Good reading:
+
+    http://wiki.postgresql.org/images/f/f0/Range-types.pdf
     """
 
     impl = INT4RANGE

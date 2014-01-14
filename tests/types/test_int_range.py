@@ -98,6 +98,18 @@ class TestIntRangeTypeOnPostgres(NumberRangeTestCase):
         )
         assert query.count()
 
+    def test_eq_with_query_arg(self):
+        self.create_building([1, 3])
+        query = (
+            self.session.query(self.Building)
+            .filter(
+                self.Building.persons_at_night ==
+                self.session.query(
+                    self.Building.persons_at_night)
+                ).order_by(self.Building.persons_at_night).limit(1)
+        )
+        assert query.count()
+
     @mark.parametrize(
         'number_range',
         (
