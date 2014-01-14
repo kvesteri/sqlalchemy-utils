@@ -18,6 +18,7 @@ http://wiki.postgresql.org/images/f/f0/Range-types.pdf
 
 .. _intervals: https://github.com/kvesteri/intervals
 """
+from collections import Iterable
 intervals = None
 try:
     import intervals
@@ -74,20 +75,41 @@ ischema_names['tstzrange'] = TSTZRANGE
 
 class RangeComparator(types.TypeEngine.Comparator):
     @classmethod
-    def coerce_arg(cls, func):
+    def coerced_func(cls, func):
         def operation(self, other, **kwargs):
-            coerced_types = (
-                self.type.interval_class.type,
-                tuple,
-                list,
-            ) + six.string_types
-
-            if isinstance(other, coerced_types):
-                other = self.type.interval_class(other)
+            other = self.coerce_arg(other)
             return getattr(types.TypeEngine.Comparator, func)(
                 self, other, **kwargs
             )
         return operation
+
+    def coerce_arg(self, other):
+        coerced_types = (
+            self.type.interval_class.type,
+            tuple,
+            list,
+        ) + six.string_types
+
+        if isinstance(other, coerced_types):
+            return self.type.interval_class(other)
+        return other
+
+    def in_(self, other):
+        if (
+            isinstance(other, Iterable) and
+            not isinstance(other, six.string_types)
+        ):
+            other = map(self.coerce_arg, other)
+        return super(RangeComparator, self).in_(other)
+
+    def notin_(self, other):
+        if (
+            isinstance(other, Iterable) and
+            not isinstance(other, six.string_types)
+        ):
+            other = map(self.coerce_arg, other)
+        return super(RangeComparator, self).notin_(other)
+
 
 
 funcs = [
@@ -104,7 +126,7 @@ for func in funcs:
     setattr(
         RangeComparator,
         func,
-        RangeComparator.coerce_arg(func)
+        RangeComparator.coerced_func(func)
     )
 
 
