@@ -3,7 +3,9 @@ try:
     import intervals
 except ImportError:
     pass
+import sqlalchemy as sa
 from sqlalchemy import types
+from ..exceptions import ImproperlyConfigured
 from .scalar_coercible import ScalarCoercible
 
 
@@ -30,7 +32,23 @@ class DATERANGE(types.UserDefinedType):
         return 'daterange'
 
 
-class IntRangeType(types.TypeDecorator, ScalarCoercible):
+class RangeType(types.TypeDecorator, ScalarCoercible):
+    def __init__(self, *args, **kwargs):
+        if intervals is None:
+            raise ImproperlyConfigured(
+                'RangeType needs intervals package installed.'
+            )
+        super(RangeType, self).__init__(*args, **kwargs)
+
+    def load_dialect_impl(self, dialect):
+        if dialect.name == 'postgresql':
+            # Use the native JSON type.
+            return dialect.type_descriptor(self.impl)
+        else:
+            return dialect.type_descriptor(sa.String(255))
+
+
+class IntRangeType(RangeType):
     """
     IntRangeType provides way for saving range of numbers into database.
 
