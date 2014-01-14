@@ -32,6 +32,16 @@ class DATERANGE(types.UserDefinedType):
         return 'daterange'
 
 
+class TSRANGE(types.UserDefinedType):
+    def get_col_spec(self):
+        return 'tsrange'
+
+
+class TSTZRANGE(types.UserDefinedType):
+    def get_col_spec(self):
+        return 'tstzrange'
+
+
 class RangeComparator(types.TypeEngine.Comparator):
     @classmethod
     def coerce_arg(cls, func):
@@ -158,3 +168,18 @@ class IntRangeType(RangeType):
 
     impl = INT4RANGE
     interval_class = intervals.IntInterval
+
+
+
+class DateRangeType(RangeType):
+    impl = DATERANGE
+    interval_class = intervals.DateInterval
+
+
+class NumericRangeType(RangeType):
+    impl = NUMRANGE
+    interval_class = intervals.DecimalInterval
+
+
+class DateTimeRangeType(RangeType):
+    impl = TIMESTAMPRANGE
