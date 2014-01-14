@@ -182,4 +182,5 @@ class NumericRangeType(RangeType):
 
 
 class DateTimeRangeType(RangeType):
-    impl = TIMESTAMPRANGE
+    impl = TSRANGE
+    interval_class = intervals.DateTimeRange
