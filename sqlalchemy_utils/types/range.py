@@ -16,6 +16,25 @@ Some good reading for practical interval implementations:
 http://wiki.postgresql.org/images/f/f0/Range-types.pdf
 
 
+RangeType operators
+-------------------
+
+Comparison operators
+^^^^^^^^^^^^^^^^^^^^
+
+::
+
+    Car.price_range < [12, 300]
+
+    Car.price_range == [12, 300]
+
+    Car.price_range < 300
+
+    Car.price_range > (300, 500)
+
+    Car.price_range.in_([[300, 500]])
+
+
 .. _intervals: https://github.com/kvesteri/intervals
 """
 from collections import Iterable
