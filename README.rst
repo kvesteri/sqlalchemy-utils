@@ -1,7 +1,7 @@
 SQLAlchemy-Utils
 ================
 
-Various utility functions that I use alongside SQLAlchemy.
+Various utility functions, new data types and helpers for SQLAlchemy.
 
 
 Resources
