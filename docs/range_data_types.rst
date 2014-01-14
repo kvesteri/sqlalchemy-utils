@@ -14,7 +14,7 @@ DateRangeType
 DateTimeRangeType
 ^^^^^^^^^^^^^^^^^
 
-.. autoclass:: DateRangeType
+.. autoclass:: DateTimeRangeType
 
 
 IntRangeType

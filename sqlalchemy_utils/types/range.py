@@ -213,6 +213,7 @@ class DateRangeType(RangeType):
         super(DateRangeType, self).__init__(*args, **kwargs)
         self.interval_class = intervals.DateInterval
 
+
 class NumericRangeType(RangeType):
     impl = NUMRANGE
 
