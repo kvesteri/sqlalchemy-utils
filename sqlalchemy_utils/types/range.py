@@ -59,7 +59,11 @@ Membership operators
 
 ::
 
-    Car.price_range.in_([[300, 500]])
+    Car.price_range.contains([300, 500])
+
+    Car.price_range.contained_by([300, 500])
+
+    Car.price_range.in_([[300, 500], [800, 900]])
 
     ~ Car.price_range.in_([[300, 400], [700, 800]])
 
@@ -158,6 +162,13 @@ class RangeComparator(types.TypeEngine.Comparator):
             other = map(self.coerce_arg, other)
         return super(RangeComparator, self).notin_(other)
 
+    def contains(self, other, **kwargs):
+        other = self.coerce_arg(other)
+        return self.op('@>')(other)
+
+    def contained_by(self, other, **kwargs):
+        other = self.coerce_arg(other)
+        return self.op('<@')(other)
 
 
 funcs = [

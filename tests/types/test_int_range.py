@@ -101,16 +101,50 @@ class TestIntRangeTypeOnPostgres(NumberRangeTestCase):
     @mark.parametrize(
         'number_range',
         (
-            [1, 3],
-            '1 - 3',
-            (0, 4)
+            [[1, 3]],
+            ['1 - 3'],
+            [(0, 4)],
         )
     )
     def test_in_operator(self, number_range):
         self.create_building([1, 3])
         query = (
             self.session.query(self.Building)
-            .filter(self.Building.persons_at_night.in_([number_range]))
+            .filter(self.Building.persons_at_night.in_(number_range))
+        )
+        assert query.count()
+
+    @mark.parametrize(
+        'number_range',
+        (
+            [1, 3],
+            '1 - 3',
+            (1, 3),
+            2
+        )
+    )
+    def test_contains_operator(self, number_range):
+        self.create_building([1, 3])
+        query = (
+            self.session.query(self.Building)
+            .filter(self.Building.persons_at_night.contains(number_range))
+        )
+        assert query.count()
+
+    @mark.parametrize(
+        'number_range',
+        (
+            [1, 3],
+            '1 - 3',
+            (0, 8),
+            (-inf, inf)
+        )
+    )
+    def test_contained_by_operator(self, number_range):
+        self.create_building([1, 3])
+        query = (
+            self.session.query(self.Building)
+            .filter(self.Building.persons_at_night.contained_by(number_range))
         )
         assert query.count()
 
