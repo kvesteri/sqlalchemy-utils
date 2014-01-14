@@ -1,6 +1,8 @@
 SQLAlchemy-Utils
 ================
 
+.. image:: https://travis-ci.org/kvesteri/sqlalchemy-utils.png?branch=master   :target: https://travis-ci.org/kvesteri/sqlalchemy-utils
+
 Various utility functions, new data types and helpers for SQLAlchemy.
 
 
