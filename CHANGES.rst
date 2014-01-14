@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.23.1 (2014-01-14)
+^^^^^^^^^^^^^^^^^^^
+
+- Added support for membership operators 'in' and 'not in' for range types
+- Added range types to main module import
+
+
 0.23.0 (2014-01-14)
 ^^^^^^^^^^^^^^^^^^^
 
