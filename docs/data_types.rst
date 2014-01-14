@@ -95,15 +95,3 @@ UUIDType
 
 .. autoclass:: UUIDType
 
-
-Range types
-^^^^^^^^^^^
-
-
-
-IntRangeType
-------------
-
-.. module:: sqlalchemy_utils.types.range
-
-.. autoclass:: IntRangeType

@@ -1,3 +1,23 @@
+"""
+SQLAlchemy-Utils provides wide variety of range data types. All range data types return
+Interval objects of intervals_ package. In order to use range data types you need to install intervals_ with:
+
+::
+
+    pip install intervals
+
+
+Intervals package provides good chunk of additional interval operators that for example psycopg2 range objects do not support.
+
+
+
+Some good reading for practical interval implementations:
+
+http://wiki.postgresql.org/images/f/f0/Range-types.pdf
+
+
+.. _intervals: https://github.com/kvesteri/intervals
+"""
 intervals = None
 try:
     import intervals
@@ -119,7 +139,9 @@ class RangeType(types.TypeDecorator, ScalarCoercible):
 
 class IntRangeType(RangeType):
     """
-    IntRangeType provides way for saving range of numbers into database.
+    IntRangeType provides way for saving ranges of integers into database. On
+    PostgreSQL this type maps to native INT4RANGE type while on other drivers
+    this maps to simple string column.
 
     Example::
 
@@ -158,12 +180,7 @@ class IntRangeType(RangeType):
         )
         print total
         # '30-140'
-
-    Good reading:
-
-    http://wiki.postgresql.org/images/f/f0/Range-types.pdf
     """
-
     impl = INT4RANGE
 
     def __init__(self, *args, **kwargs):
@@ -173,6 +190,23 @@ class IntRangeType(RangeType):
 
 
 class DateRangeType(RangeType):
+    """
+    DateRangeType provides way for saving ranges of dates into database. On
+    PostgreSQL this type maps to native DATERANGE type while on other drivers
+    this maps to simple string column.
+
+    Example::
+
+
+        from sqlalchemy_utils import DateRangeType
+
+
+        class Reservation(Base):
+            __tablename__ = 'user'
+            id = sa.Column(sa.Integer, autoincrement=True)
+            room_id = sa.Column(sa.Integer))
+            during = sa.Column(DateRangeType)
+    """
     impl = DATERANGE
 
     def __init__(self, *args, **kwargs):
