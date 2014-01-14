@@ -32,7 +32,15 @@ Comparison operators
 
     Car.price_range > (300, 500)
 
+
+Membership operators
+^^^^^^^^^^^^^^^^^^^^
+
+::
+
     Car.price_range.in_([[300, 500]])
+
+    ~ Car.price_range.in_([[300, 400], [700, 800]])
 
 
 .. _intervals: https://github.com/kvesteri/intervals
