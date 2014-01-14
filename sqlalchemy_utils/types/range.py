@@ -25,6 +25,7 @@ except ImportError:
     pass
 import six
 import sqlalchemy as sa
+from sqlalchemy.dialects.postgresql.base import ischema_names
 from sqlalchemy import types
 from ..exceptions import ImproperlyConfigured
 from .scalar_coercible import ScalarCoercible
@@ -61,6 +62,14 @@ class TSRANGE(types.UserDefinedType):
 class TSTZRANGE(types.UserDefinedType):
     def get_col_spec(self):
         return 'tstzrange'
+
+
+ischema_names['int4range'] = INT4RANGE
+ischema_names['int8range'] = INT8RANGE
+ischema_names['numrange'] = NUMRANGE
+ischema_names['daterange'] = DATERANGE
+ischema_names['tsrange'] = TSRANGE
+ischema_names['tstzrange'] = TSTZRANGE
 
 
 class RangeComparator(types.TypeEngine.Comparator):
