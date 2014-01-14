@@ -3,6 +3,7 @@ try:
     import intervals
 except ImportError:
     pass
+import six
 import sqlalchemy as sa
 from sqlalchemy import types
 from ..exceptions import ImproperlyConfigured
@@ -50,9 +51,7 @@ class RangeComparator(types.TypeEngine.Comparator):
                 self.type.interval_class.type,
                 tuple,
                 list,
-                str,
-                unicode
-            )
+            ) + six.string_types
 
             if isinstance(other, coerced_types):
                 other = self.type.interval_class(other)
@@ -122,7 +121,7 @@ class IntRangeType(RangeType):
     """
     IntRangeType provides way for saving range of numbers into database.
 
-    Example ::
+    Example::
 
 
         from sqlalchemy_utils import IntRangeType
@@ -146,8 +145,7 @@ class IntRangeType(RangeType):
 
 
     IntRangeType returns the values as IntInterval objects. These objects
-    support many arithmetic operators:
-    ::
+    support many arithmetic operators::
 
 
         meeting = Event(name=u'meeting')
