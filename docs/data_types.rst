@@ -46,14 +46,6 @@ LocaleType
 .. autoclass:: LocaleType
 
 
-NumberRangeType
-^^^^^^^^^^^^^^^
-
-.. module:: sqlalchemy_utils.types.number_range
-
-.. autoclass:: NumberRangeType
-
-
 PasswordType
 ^^^^^^^^^^^^
 
@@ -102,3 +94,16 @@ UUIDType
 .. module:: sqlalchemy_utils.types.uuid
 
 .. autoclass:: UUIDType
+
+
+Range types
+^^^^^^^^^^^
+
+
+
+IntRangeType
+------------
+
+.. module:: sqlalchemy_utils.types.range
+
+.. autoclass:: IntRangeType

@@ -45,8 +45,7 @@ class ColorType(types.TypeDecorator, ScalarCoercible):
         # '#f5f5f5'
 
 
-    For more information about colour package and Color object, see:
-    https://github.com/vaab/colour
+    .. _colour: https://github.com/vaab/colour
     """
     STORE_FORMAT = u'hex'
     impl = types.Unicode(20)
