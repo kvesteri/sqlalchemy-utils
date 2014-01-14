@@ -23,6 +23,15 @@ class NumberRangeTestCase(TestCase):
 
         self.Building = Building
 
+    def create_building(self, number_range):
+        building = self.Building(
+            persons_at_night=number_range
+        )
+
+        self.session.add(building)
+        self.session.commit()
+        return self.session.query(self.Building).first()
+
     @mark.parametrize(
         'number_range',
         (
@@ -31,35 +40,17 @@ class NumberRangeTestCase(TestCase):
         )
     )
     def test_save_number_range(self, number_range):
-        building = self.Building(
-            persons_at_night=number_range
-        )
-
-        self.session.add(building)
-        self.session.commit()
-        self.session.expire(building)
-        building = self.session.query(self.Building).first()
+        building = self.create_building(number_range)
         assert building.persons_at_night.lower == 1
         assert building.persons_at_night.upper == 3
 
     def test_infinite_upper_bound(self):
-        building = self.Building(
-            persons_at_night=intervals.IntInterval([1, inf])
-        )
-        self.session.add(building)
-        self.session.commit()
-
-        building = self.session.query(self.Building).first()
+        building = self.create_building([1, inf])
         assert building.persons_at_night.lower == 1
         assert building.persons_at_night.upper == inf
 
     def test_infinite_lower_bound(self):
-        building = self.Building(
-            persons_at_night=intervals.IntInterval([-inf, 1])
-        )
-        self.session.add(building)
-        self.session.commit()
-        building = self.session.query(self.Building).first()
+        building = self.create_building([-inf, 1])
         assert building.persons_at_night.lower == -inf
         assert building.persons_at_night.upper == 1
 
@@ -80,7 +71,6 @@ class NumberRangeTestCase(TestCase):
 
     def test_string_coercion(self):
         building = self.Building(persons_at_night='[12, 18]')
-
         assert isinstance(building.persons_at_night, intervals.IntInterval)
 
     def test_integer_coercion(self):
@@ -90,9 +80,59 @@ class NumberRangeTestCase(TestCase):
 
 
 
-class TestNumberRangeTypeOnPostgres(NumberRangeTestCase):
+class TestIntRangeTypeOnPostgres(NumberRangeTestCase):
     dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
 
+    @mark.parametrize(
+        'number_range',
+        (
+            [1, 3],
+            '1 - 3',
+            (0, 4)
+        )
+    )
+    def test_eq_operator(self, number_range):
+        self.create_building([1, 3])
+        query = (
+            self.session.query(self.Building)
+            .filter(self.Building.persons_at_night == number_range)
+        )
+        assert query.count()
+
+    @mark.parametrize(
+        'number_range',
+        (
+            [1, 2],
+            '1 - 3',
+            (0, 4),
+            [0, 3],
+            0,
+            1,
+        )
+    )
+    def test_ge_operator(self, number_range):
+        self.create_building([1, 3])
+        query = (
+            self.session.query(self.Building)
+            .filter(self.Building.persons_at_night >= number_range)
+        )
+        assert query.count()
+
+    @mark.parametrize(
+        'number_range',
+        (
+            [0, 2],
+            0,
+            [-inf, 2]
+        )
+    )
+    def test_gt_operator(self, number_range):
+        self.create_building([1, 3])
+        query = (
+            self.session.query(self.Building)
+            .filter(self.Building.persons_at_night > number_range)
+        )
+        assert query.count()
 
 class TestNumberRangeTypeOnSqlite(NumberRangeTestCase):
     pass

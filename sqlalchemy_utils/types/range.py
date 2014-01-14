@@ -32,7 +32,41 @@ class DATERANGE(types.UserDefinedType):
         return 'daterange'
 
 
+class RangeComparator(types.TypeEngine.Comparator):
+    @classmethod
+    def coerce_arg(cls, func):
+        def operation(self, other, **kwargs):
+            if other is None:
+                return getattr(types.TypeEngine.Comparator, func)(
+                    self, other, **kwargs
+                )
+            return getattr(types.TypeEngine.Comparator, func)(
+                self, self.type.interval_class(other), **kwargs
+            )
+        return operation
+
+
+funcs = [
+    '__eq__',
+    '__ne__',
+    '__lt__',
+    '__le__',
+    '__gt__',
+    '__ge__',
+]
+
+
+for func in funcs:
+    setattr(
+        RangeComparator,
+        func,
+        RangeComparator.coerce_arg(func)
+    )
+
+
 class RangeType(types.TypeDecorator, ScalarCoercible):
+    comparator_factory = RangeComparator
+
     def __init__(self, *args, **kwargs):
         if intervals is None:
             raise ImproperlyConfigured(
@@ -46,6 +80,26 @@ class RangeType(types.TypeDecorator, ScalarCoercible):
             return dialect.type_descriptor(self.impl)
         else:
             return dialect.type_descriptor(sa.String(255))
+
+    def process_bind_param(self, value, dialect):
+        if value is not None:
+            return str(value)
+        return value
+
+    def process_result_value(self, value, dialect):
+        if value:
+            return self.canonicalize_result_value(
+                self.interval_class(value)
+            )
+        return value
+
+    def canonicalize_result_value(self, value):
+        return intervals.canonicalize(value, True, True)
+
+    def _coerce(self, value):
+        if value is not None:
+            value = self.interval_class(value)
+        return value
 
 
 class IntRangeType(RangeType):
@@ -75,7 +129,8 @@ class IntRangeType(RangeType):
         # '10-100'
 
 
-    IntRange returns the values as IntInterval objects. These objects support many arithmetic operators:
+    IntRange returns the values as IntInterval objects. These objects support
+    many arithmetic operators:
     ::
 
 
@@ -92,23 +147,4 @@ class IntRangeType(RangeType):
     """
 
     impl = INT4RANGE
-
-    def process_bind_param(self, value, dialect):
-        if value is not None:
-            return str(value)
-        return value
-
-    def process_result_value(self, value, dialect):
-        if value:
-            return self.canonicalize_result_value(
-                intervals.IntInterval(value)
-            )
-        return value
-
-    def canonicalize_result_value(self, value):
-        return intervals.canonicalize(value, True, True)
-
-    def _coerce(self, value):
-        if value is not None:
-            value = intervals.IntInterval(value)
-        return value
+    interval_class = intervals.IntInterval
