@@ -145,8 +145,8 @@ class IntRangeType(RangeType):
         # '10-100'
 
 
-    IntRange returns the values as IntInterval objects. These objects support
-    many arithmetic operators:
+    IntRangeType returns the values as IntInterval objects. These objects
+    support many arithmetic operators:
     ::
 
 
@@ -183,4 +183,4 @@ class NumericRangeType(RangeType):
 
 class DateTimeRangeType(RangeType):
     impl = TSRANGE
-    interval_class = intervals.DateTimeRange
+    interval_class = intervals.DateTimeInterval
