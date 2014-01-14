@@ -4,6 +4,14 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.23.0 (2014-01-14)
+^^^^^^^^^^^^^^^^^^^
+
+- Deprecated NumberRangeType, NumberRange
+- Added IntRangeType, NumericRangeType, DateRangeType, DateTimeRangeType
+- Moved NumberRange functionality to intervals package
+
+
 0.22.1 (2014-01-06)
 ^^^^^^^^^^^^^^^^^^^
 
