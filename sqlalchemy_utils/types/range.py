@@ -165,20 +165,31 @@ class IntRangeType(RangeType):
     """
 
     impl = INT4RANGE
-    interval_class = intervals.IntInterval
+
+    def __init__(self, *args, **kwargs):
+        super(IntRangeType, self).__init__(*args, **kwargs)
+        self.interval_class = intervals.IntInterval
 
 
 
 class DateRangeType(RangeType):
     impl = DATERANGE
-    interval_class = intervals.DateInterval
 
+    def __init__(self, *args, **kwargs):
+        super(DateRangeType, self).__init__(*args, **kwargs)
+        self.interval_class = intervals.DateInterval
 
 class NumericRangeType(RangeType):
     impl = NUMRANGE
-    interval_class = intervals.DecimalInterval
+
+    def __init__(self, *args, **kwargs):
+        super(DateRangeType, self).__init__(*args, **kwargs)
+        self.interval_class = intervals.DecimalInterval
 
 
 class DateTimeRangeType(RangeType):
     impl = TSRANGE
-    interval_class = intervals.DateTimeInterval
+
+    def __init__(self, *args, **kwargs):
+        super(DateRangeType, self).__init__(*args, **kwargs)
+        self.interval_class = intervals.DateTimeInterval
