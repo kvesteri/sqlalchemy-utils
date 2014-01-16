@@ -162,6 +162,14 @@ class RangeComparator(types.TypeEngine.Comparator):
             other = map(self.coerce_arg, other)
         return super(RangeComparator, self).notin_(other)
 
+    def __rshift__(self, other, **kwargs):
+        other = self.coerce_arg(other)
+        return self.op('>>')(other)
+
+    def __lshift__(self, other, **kwargs):
+        other = self.coerce_arg(other)
+        return self.op('<<')(other)
+
     def contains(self, other, **kwargs):
         other = self.coerce_arg(other)
         return self.op('@>')(other)

@@ -119,6 +119,38 @@ class TestIntRangeTypeOnPostgres(NumberRangeTestCase):
         (
             [1, 3],
             '1 - 3',
+            (0, 4),
+        )
+    )
+    def test_rshift_operator(self, number_range):
+        self.create_building([5, 6])
+        query = (
+            self.session.query(self.Building)
+            .filter(self.Building.persons_at_night >> number_range)
+        )
+        assert query.count()
+
+    @mark.parametrize(
+        'number_range',
+        (
+            [1, 3],
+            '1 - 3',
+            (0, 4),
+        )
+    )
+    def test_lshift_operator(self, number_range):
+        self.create_building([-1, 0])
+        query = (
+            self.session.query(self.Building)
+            .filter(self.Building.persons_at_night << number_range)
+        )
+        assert query.count()
+
+    @mark.parametrize(
+        'number_range',
+        (
+            [1, 3],
+            '1 - 3',
             (1, 3),
             2
         )
