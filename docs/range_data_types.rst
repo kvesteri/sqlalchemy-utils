@@ -5,6 +5,7 @@ Range data types
 
 
 
+
 DateRangeType
 ^^^^^^^^^^^^^
 
@@ -28,3 +29,9 @@ NumericRangeType
 
 .. autoclass:: NumericRangeType
 
+
+RangeComparator
+^^^^^^^^^^^^^^^
+
+.. autoclass:: RangeComparator
+    :members:

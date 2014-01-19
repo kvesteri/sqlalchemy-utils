@@ -49,10 +49,6 @@ from .types import (
     TSVectorType,
     URLType,
     UUIDType,
-    INT4RANGE,
-    INT8RANGE,
-    DATERANGE,
-    NUMRANGE,
 )
 
 
@@ -111,8 +107,4 @@ __all__ = (
     TSVectorType,
     URLType,
     UUIDType,
-    INT4RANGE,
-    INT8RANGE,
-    DATERANGE,
-    NUMRANGE,
 )

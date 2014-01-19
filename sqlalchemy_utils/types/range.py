@@ -35,9 +35,6 @@ It is essentially the same as:
     session.query(Car).filter(Car.price_range == DecimalInterval([300, 300]))
 
 
-The coercion is provided for convenience.
-
-
 Comparison operators
 ^^^^^^^^^^^^^^^^^^^^
 
@@ -78,51 +75,15 @@ except ImportError:
     pass
 import six
 import sqlalchemy as sa
-from sqlalchemy.dialects.postgresql.base import ischema_names
+from sqlalchemy.dialects.postgresql import (
+    INT4RANGE,
+    DATERANGE,
+    NUMRANGE,
+    TSRANGE,
+)
 from sqlalchemy import types
 from ..exceptions import ImproperlyConfigured
 from .scalar_coercible import ScalarCoercible
-
-
-class INT4RANGE(types.UserDefinedType):
-    """
-    Raw number range type, only supports PostgreSQL for now.
-    """
-    def get_col_spec(self):
-        return 'int4range'
-
-
-class INT8RANGE(types.UserDefinedType):
-    def get_col_spec(self):
-        return 'int8range'
-
-
-class NUMRANGE(types.UserDefinedType):
-    def get_col_spec(self):
-        return 'numrange'
-
-
-class DATERANGE(types.UserDefinedType):
-    def get_col_spec(self):
-        return 'daterange'
-
-
-class TSRANGE(types.UserDefinedType):
-    def get_col_spec(self):
-        return 'tsrange'
-
-
-class TSTZRANGE(types.UserDefinedType):
-    def get_col_spec(self):
-        return 'tstzrange'
-
-
-ischema_names['int4range'] = INT4RANGE
-ischema_names['int8range'] = INT8RANGE
-ischema_names['numrange'] = NUMRANGE
-ischema_names['daterange'] = DATERANGE
-ischema_names['tsrange'] = TSRANGE
-ischema_names['tstzrange'] = TSTZRANGE
 
 
 class RangeComparator(types.TypeEngine.Comparator):
@@ -163,10 +124,22 @@ class RangeComparator(types.TypeEngine.Comparator):
         return super(RangeComparator, self).notin_(other)
 
     def __rshift__(self, other, **kwargs):
+        """
+        Returns whether or not given interval is strictly right of another
+        interval.
+
+        [a, b] >> [c, d]        True, if a > d
+        """
         other = self.coerce_arg(other)
         return self.op('>>')(other)
 
     def __lshift__(self, other, **kwargs):
+        """
+        Returns whether or not given interval is strictly left of another
+        interval.
+
+        [a, b] << [c, d]        True, if b < c
+        """
         other = self.coerce_arg(other)
         return self.op('<<')(other)
 

@@ -9,10 +9,6 @@ from .ip_address import IPAddressType
 from .json import JSONType
 from .locale import LocaleType
 from .range import (
-    INT4RANGE,
-    INT8RANGE,
-    DATERANGE,
-    NUMRANGE,
     DateRangeType,
     DateTimeRangeType,
     IntRangeType,
@@ -56,10 +52,6 @@ __all__ = (
     WeekDay,
     WeekDays,
     WeekDaysType,
-    INT4RANGE,
-    INT8RANGE,
-    DATERANGE,
-    NUMRANGE,
 )
 
 
