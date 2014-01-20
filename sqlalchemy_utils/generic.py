@@ -50,20 +50,25 @@ class GenericAttributeImpl(attributes.ScalarAttributeImpl):
         # Set us on the state.
         dict_[self.key] = initiator
 
-        # Get the primary key of the initiator and ensure we
-        # can support this assignment.
-        mapper = class_mapper(type(initiator))
-        if len(mapper.primary_key) > 1:
-            raise sa_exc.InvalidRequestError(
-                'Generic relationships against tables with composite '
-                'primary keys are not supported.')
+        if initiator is None:
+            # Nullify relationship args
+            dict_[self.parent_token.id.key] = None
+            dict_[self.parent_token.discriminator.key] = None
+        else:
+            # Get the primary key of the initiator and ensure we
+            # can support this assignment.
+            mapper = class_mapper(type(initiator))
+            if len(mapper.primary_key) > 1:
+                raise sa_exc.InvalidRequestError(
+                    'Generic relationships against tables with composite '
+                    'primary keys are not supported.')
 
-        pk = mapper.identity_key_from_instance(initiator)[1][0]
+            pk = mapper.identity_key_from_instance(initiator)[1][0]
 
-        # Set the identifier and the discriminator.
-        discriminator = table_name(initiator)
-        dict_[self.parent_token.id.key] = pk
-        dict_[self.parent_token.discriminator.key] = discriminator
+            # Set the identifier and the discriminator.
+            discriminator = table_name(initiator)
+            dict_[self.parent_token.id.key] = pk
+            dict_[self.parent_token.discriminator.key] = discriminator
 
 
 class GenericRelationshipProperty(MapperProperty):

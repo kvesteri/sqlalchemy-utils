@@ -28,6 +28,10 @@ class TestGenericForiegnKey(TestCase):
         self.User = User
         self.Event = Event
 
+    def test_set_as_none(self):
+        event = self.Event()
+        event.object = None
+
     def test_set_manual_and_get(self):
         user = self.User()
 
