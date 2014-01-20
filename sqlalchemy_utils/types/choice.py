@@ -103,7 +103,7 @@ class ChoiceType(types.TypeDecorator, ScalarCoercible):
         return Choice(value, self.choices_dict[value])
 
     def process_bind_param(self, value, dialect):
-        if value:
+        if value and isinstance(value, Choice):
             return value.code
         return value
 
