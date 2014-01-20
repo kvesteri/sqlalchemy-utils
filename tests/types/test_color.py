@@ -1,3 +1,4 @@
+from flexmock import flexmock
 from pytest import mark
 import sqlalchemy as sa
 from sqlalchemy_utils import ColorType
@@ -17,6 +18,22 @@ class TestColorType(TestCase):
                 return 'Document(%r)' % self.id
 
         self.Document = Document
+
+    def test_string_parameter_processing(self):
+        from colour import Color
+
+        flexmock(ColorType).should_receive('_coerce').and_return(
+            u'white'
+        )
+        document = self.Document(
+            bg_color='white'
+        )
+
+        self.session.add(document)
+        self.session.commit()
+
+        document = self.session.query(self.Document).first()
+        assert document.bg_color.hex == Color(u'white').hex
 
     def test_color_parameter_processing(self):
         from colour import Color

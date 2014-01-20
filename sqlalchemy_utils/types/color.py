@@ -61,7 +61,7 @@ class ColorType(types.TypeDecorator, ScalarCoercible):
         self.impl = types.Unicode(max_length)
 
     def process_bind_param(self, value, dialect):
-        if value:
+        if value and isinstance(value, colour.Color):
             return six.text_type(getattr(value, self.STORE_FORMAT))
         return value
 
