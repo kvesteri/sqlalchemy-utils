@@ -70,6 +70,15 @@ Simple aggregates
         thread_id = sa.Column(sa.Integer, sa.ForeignKey(Thread.id))
 
 
+    thread = Thread(name=u'SQLAlchemy development')
+    thread.comments.append(Comment(u'Going good!'))
+    thread.comments.append(Comment(u'Great new features!'))
+
+    session.add(thread)
+    session.commit()
+
+    thread.comment_count  # 2
+
 
 
 Custom aggregate expressions
