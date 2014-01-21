@@ -4,6 +4,14 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.23.2 (2014-01-21)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed issues with ColorType and ChoiceType string bound parameter processing
+- Fixed inheritance handling with aggregates
+- Fixed generic relationship nullifying
+
+
 0.23.1 (2014-01-14)
 ^^^^^^^^^^^^^^^^^^^
 
