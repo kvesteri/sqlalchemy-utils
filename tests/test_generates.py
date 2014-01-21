@@ -1,6 +1,5 @@
 import sqlalchemy as sa
 from sqlalchemy_utils import generates
-from sqlalchemy_utils.decorators import generator
 from tests import TestCase
 
 
