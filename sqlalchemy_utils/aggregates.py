@@ -281,7 +281,7 @@ class AggregatedAttribute(declared_attr):
         self.relationship = relationship
 
     def __get__(desc, self, cls):
-        if not hasattr(cls, '__aggregates__'):
+        if '__aggregates__' not in cls.__dict__:
             cls.__aggregates__ = {}
         cls.__aggregates__[desc.fget.__name__] = {
             'expression': desc.fget,
@@ -413,7 +413,7 @@ class AggregationManager(object):
         )
 
     def update_generator_registry(self, mapper, class_):
-        if hasattr(class_, '__aggregates__'):
+        if '__aggregates__' in class_.__dict__:
             for key, value in six.iteritems(class_.__aggregates__):
                 relationships = []
                 rel_class = class_
