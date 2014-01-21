@@ -198,6 +198,9 @@ to define lots of relationships pointing to same class, remember to define the r
 Multi-level aggregates
 ----------------------
 
+Aggregates can span accross multiple relationships. In the following example each
+Catalog has a net_worth which is the sum of all products in all categories.
+
 
 ::
 
@@ -234,6 +237,7 @@ Multi-level aggregates
         price = sa.Column(sa.Numeric)
 
         category_id = sa.Column(sa.Integer, sa.ForeignKey(Category.id))
+
 
 
 TODO
