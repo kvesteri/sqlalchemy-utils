@@ -53,7 +53,16 @@ class TestLazyEvaluatedSelectExpressionsForAggregates(TestCase):
             catalog_id = sa.Column(sa.Integer, sa.ForeignKey('catalog.id'))
 
         self.Catalog = Catalog
+        self.CostumeCatalog = CostumeCatalog
+        self.CarCatalog = CarCatalog
         self.Product = Product
+
+    def test_columns_inherited_from_parent(self):
+        assert self.CarCatalog.net_worth
+        assert self.CostumeCatalog.net_worth
+        assert self.Catalog.net_worth
+        assert not hasattr(self.CarCatalog.__table__.c, 'net_worth')
+        assert not hasattr(self.CostumeCatalog.__table__.c, 'net_worth')
 
     def test_assigns_aggregates_on_insert(self):
         catalog = self.Catalog(
