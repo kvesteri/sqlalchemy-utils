@@ -239,6 +239,48 @@ Catalog has a net_worth which is the sum of all products in all categories.
         category_id = sa.Column(sa.Integer, sa.ForeignKey(Category.id))
 
 
+Examples
+--------
+
+Average movie rating
+^^^^^^^^^^^^^^^^^^^^
+
+::
+
+
+    from sqlalchemy_utils import aggregated
+
+
+    class Movie(Base):
+        __tablename__ = 'movie'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
+
+        @aggregated('ratings', sa.Column(sa.Numeric))
+        def avg_rating(self):
+            return sa.func.sum(Product.price)
+
+        ratings = sa.orm.relationship('Rating')
+
+
+    class Rating(Base):
+        __tablename__ = 'rating'
+        id = sa.Column(sa.Integer, primary_key=True)
+        stars = sa.Column(sa.Integer)
+
+        movie_id = sa.Column(sa.Integer, sa.ForeignKey(Movie.id))
+
+
+    movie = Movie('Terminator 2')
+    movie.ratings.append(Rating(stars=5))
+    movie.ratings.append(Rating(stars=4))
+    movie.ratings.append(Rating(stars=3))
+    session.add(movie)
+    session.commit()
+
+    movie.avg_rating  # 4
+
+
 
 TODO
 ----
