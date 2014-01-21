@@ -386,13 +386,9 @@ class AggregatedValue(object):
             {self.attr: self.aggregate_query}
         )
         if len(self.relationships) == 1:
-            remote_pairs = self.relationships[-1].property.local_remote_pairs
+            prop = self.relationships[-1].property
 
-            return query.where(
-                remote_pairs[0][0].in_(
-                    getattr(obj, remote_pairs[0][1].key) for obj in objects
-                )
-            )
+            return query.where(self.local_condition(prop, objects))
         else:
             # Builds query such as:
             #
