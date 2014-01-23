@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.23.3 (2014-01-21)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed backref handling for aggregates
+- Added support for many-to-many aggregates
+
+
 0.23.2 (2014-01-21)
 ^^^^^^^^^^^^^^^^^^^
 
