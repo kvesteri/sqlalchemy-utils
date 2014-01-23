@@ -84,6 +84,9 @@ Simple aggregates
 Custom aggregate expressions
 ----------------------------
 
+Aggregate expression can be virtually any SQL expression not just a simple function taking one parameter. You can try things such as subqueries and different kinds of functions.
+
+In the following example we have a Catalog of products where each catalog knows the net worth of its products.
 
 ::
 
@@ -294,7 +297,6 @@ Average movie rating
 TODO
 ----
 
-* Support calculation of many-to-many aggregates
 * Special consideration should be given to `deadlocks`_.
 
 
