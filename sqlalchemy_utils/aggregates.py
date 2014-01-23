@@ -432,13 +432,22 @@ class AggregatedValue(object):
         return from_
 
     def local_condition(self, prop, objects):
-        return prop.local_remote_pairs[0][0].in_(
-            getattr(
-                obj,
-                prop.local_remote_pairs[0][1].key
+        if prop.secondary is not None:
+            return prop.local_remote_pairs[1][0].in_(
+                getattr(
+                    obj,
+                    prop.local_remote_pairs[1][0].key
+                )
+                for obj in objects
             )
-            for obj in objects
-        )
+        else:
+            return prop.local_remote_pairs[0][0].in_(
+                getattr(
+                    obj,
+                    prop.local_remote_pairs[0][1].key
+                )
+                for obj in objects
+            )
 
 
 class AggregationManager(object):
