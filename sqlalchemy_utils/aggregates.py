@@ -205,6 +205,54 @@ to define lots of relationships pointing to same class, remember to define the r
         customer_id = sa.Column(sa.Integer, sa.ForeignKey(Customer.id))
 
 
+Many-to-Many aggregates
+-----------------------
+
+Aggregate expressions also support many-to-many relationships. The usual use scenarios includes things such as:
+
+1. Friend count of a user
+2. Group count where given user belongs to
+
+::
+
+
+        user_group = sa.Table('user_group', Base.metadata,
+            sa.Column('user_id', sa.Integer, sa.ForeignKey('user.id')),
+            sa.Column('group_id', sa.Integer, sa.ForeignKey('group.id'))
+        )
+
+
+        class User(Base):
+            __tablename__ = 'user'
+            id = sa.Column(sa.Integer, primary_key=True)
+            name = sa.Column(sa.Unicode(255))
+
+            @aggregated('groups', sa.Column(sa.Integer, default=0))
+            def group_count(self):
+                return sa.func.count('1')
+
+            groups = sa.orm.relationship(
+                'Group',
+                backref='users',
+                secondary=user_group
+            )
+
+
+        class Group(Base):
+            __tablename__ = 'group'
+            id = sa.Column(sa.Integer, primary_key=True)
+            name = sa.Column(sa.Unicode(255))
+
+
+
+        user = User(name=u'John Matrix')
+        user.groups = [Group(name=u'Group A'), Group(name=u'Group B')]
+
+        session.add(user)
+        session.commit()
+
+        session.refresh(user)
+        user.group_count  # 2
 
 
 Multi-level aggregates
