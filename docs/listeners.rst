@@ -4,6 +4,13 @@ Listeners
 
 .. module:: sqlalchemy_utils.listeners
 
+Automatic data coercion
+-----------------------
+
 .. autofunction:: force_auto_coercion
+
+
+Instant defaults
+----------------
 
 .. autofunction:: force_instant_defaults
