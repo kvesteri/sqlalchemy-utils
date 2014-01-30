@@ -28,7 +28,45 @@ def instant_defaults_listener(target, args, kwargs):
                 setattr(target, key, column.default.arg)
 
 
-def coerce_data_types(mapper=sa.orm.mapper):
+def force_auto_coercion(mapper=sa.orm.mapper):
+    """
+    Function that assigns automatic data type coercion for all classes which
+    are of type of given mapper. The coercion is applied to all coercion
+    capable properties. By default coercion is applied to all SQLAlchemy
+    mappers.
+
+    Before initializing your models you need to call force_auto_coercion.
+
+    ::
+
+        from sqlalchemy_utils import force_auto_coercion
+
+
+        force_auto_coercion()
+
+
+    Then define your models the usual way::
+
+
+        class Document(Base):
+            __tablename__ = 'document'
+            id = sa.Column(sa.Integer, autoincrement=True)
+            name = sa.Column(sa.Unicode(50))
+            background_color = sa.Column(ColorType)
+
+
+    Now scalar values for coercion capable data types will convert to
+    appropriate value objects::
+
+        document = Document()
+        document.background_color = 'F5F5F5'
+        document.background_color  # Color object
+        session.commit()
+
+
+    :param mapper: The mapper which the automatic data type coercion should be
+                   applied to
+    """
     sa.event.listen(mapper, 'mapper_configured', coercion_listener)
 
 
