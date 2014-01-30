@@ -103,7 +103,7 @@ class TestGeneratesWithSourcePath(TestCase):
         self.Section = Section
         self.SubSection = SubSection
 
-    def test_simple_source_paths(self):
+    def test_simple_dotted_source_path(self):
         document = self.Document(name=u'Document 1', locale='en')
         section = self.Section(name=u'Section 1', document=document)
 
@@ -112,3 +112,13 @@ class TestGeneratesWithSourcePath(TestCase):
         self.session.commit()
 
         assert section.locale == 'en'
+
+    def test_deep_dotted_source_path(self):
+        document = self.Document(name=u'Document 1', locale='en')
+        section = self.Section(name=u'Section 1', document=document)
+        subsection = self.SubSection(name=u'Section 1', section=section)
+
+        self.session.add(subsection)
+        self.session.commit()
+
+        assert subsection.locale == 'en'
