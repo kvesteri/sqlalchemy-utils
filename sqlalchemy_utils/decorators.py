@@ -4,6 +4,13 @@ import sqlalchemy as sa
 import six
 
 
+def getdotattr(obj, dot_path):
+    """
+    Allows dot-notated strings to be passed to `getattr`
+    """
+    return reduce(getattr, dot_path.split('.'), obj)
+
+
 class AttributeValueGenerator(object):
     def __init__(self):
         self.listener_args = [
@@ -31,15 +38,15 @@ class AttributeValueGenerator(object):
         self.listeners_registered = False
         self.generator_registry = defaultdict(list)
 
-    def generator_wrapper(self, func, attr):
+    def generator_wrapper(self, func, attr, source):
         def wrapper(self, *args, **kwargs):
             return func(self, *args, **kwargs)
 
         if isinstance(attr, sa.orm.attributes.InstrumentedAttribute):
             self.generator_registry[attr.class_].append(wrapper)
-            wrapper.__generates__ = attr
+            wrapper.__generates__ = attr, source
         else:
-            wrapper.__generates__ = attr
+            wrapper.__generates__ = attr, source
         return wrapper
 
     def register_listeners(self):
@@ -61,17 +68,23 @@ class AttributeValueGenerator(object):
             class_ = obj.__class__
             if class_ in self.generator_registry:
                 for func in self.generator_registry[class_]:
-                    attr = func.__generates__
+                    attr, source = func.__generates__
                     if not isinstance(attr, six.string_types):
                         attr = attr.name
-                    setattr(obj, attr, func(obj))
+
+                    if source is None:
+                        setattr(obj, attr, func(obj))
+                    else:
+                        setattr(obj, attr, func(obj, getdotattr(obj, source)))
 
 
 generator = AttributeValueGenerator()
 
 
-def generates(attr, generator=generator):
+def generates(attr, source=None, generator=generator):
     """
+    Decorator that marks given function as attribute value generator.
+
     Many times you may have generated property values. Usual cases include
     slugs from names or resized thumbnails from images.
 
@@ -131,5 +144,5 @@ def generates(attr, generator=generator):
     generator.register_listeners()
 
     def wraps(func):
-        return generator.generator_wrapper(func, attr)
+        return generator.generator_wrapper(func, attr, source)
     return wraps
