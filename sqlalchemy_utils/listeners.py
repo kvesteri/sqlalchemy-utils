@@ -73,4 +73,34 @@ def force_auto_coercion(mapper=None):
 
 
 def force_instant_defaults(mapper=sa.orm.mapper):
+    """
+    Function that assigns object column defaults on object initialization
+    time. By default calling this function applies instant defaults to all
+    your models.
+
+    Setting up instant defaults::
+
+
+        from sqlalchemy_utils import force_instant_defaults
+
+
+        force_instant_defaults()
+
+    Example usage::
+
+
+        class Document(Base):
+            __tablename__ = 'document'
+            id = sa.Column(sa.Integer, autoincrement=True)
+            name = sa.Column(sa.Unicode(50))
+            created_at = sa.Column(sa.DateTime, default=datetime.now)
+
+
+        document = Document()
+        document.created_at  # datetime object
+
+
+    :param mapper: The mapper which the automatic instant defaults forcing
+                   should be applied to
+    """
     sa.event.listen(mapper, 'init', instant_defaults_listener)
