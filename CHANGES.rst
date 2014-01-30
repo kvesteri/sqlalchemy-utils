@@ -9,6 +9,7 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 - Added force_instant_defaults function
 - Added force_auto_coercion function
+- Added source paramater for generates function
 
 
 0.23.3 (2014-01-21)
