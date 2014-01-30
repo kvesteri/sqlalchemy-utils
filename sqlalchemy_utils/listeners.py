@@ -28,7 +28,7 @@ def instant_defaults_listener(target, args, kwargs):
                 setattr(target, key, column.default.arg)
 
 
-def force_auto_coercion(mapper=sa.orm.mapper):
+def force_auto_coercion(mapper=None):
     """
     Function that assigns automatic data type coercion for all classes which
     are of type of given mapper. The coercion is applied to all coercion
@@ -67,6 +67,8 @@ def force_auto_coercion(mapper=sa.orm.mapper):
     :param mapper: The mapper which the automatic data type coercion should be
                    applied to
     """
+    if mapper is None:
+        mapper = sa.orm.mapper
     sa.event.listen(mapper, 'mapper_configured', coercion_listener)
 
 
