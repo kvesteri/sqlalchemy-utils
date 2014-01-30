@@ -1,7 +1,8 @@
 Data types
 ==========
 
-SQLAlchemy-Utils provides various new data types for SQLAlchemy.
+SQLAlchemy-Utils provides various new data types for SQLAlchemy. In order to gain full
+advantage of these datatypes you should use automatic data coercion. See :func:`force_auto_coercion` for how to set up this feature.
 
 .. module:: sqlalchemy_utils.types
 
