@@ -72,7 +72,7 @@ def force_auto_coercion(mapper=None):
     sa.event.listen(mapper, 'mapper_configured', coercion_listener)
 
 
-def force_instant_defaults(mapper=sa.orm.mapper):
+def force_instant_defaults(mapper=None):
     """
     Function that assigns object column defaults on object initialization
     time. By default calling this function applies instant defaults to all
@@ -103,4 +103,6 @@ def force_instant_defaults(mapper=sa.orm.mapper):
     :param mapper: The mapper which the automatic instant defaults forcing
                    should be applied to
     """
+    if mapper is None:
+        mapper = sa.orm.mapper
     sa.event.listen(mapper, 'init', instant_defaults_listener)
