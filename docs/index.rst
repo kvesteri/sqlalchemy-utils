@@ -8,6 +8,7 @@ SQLAlchemy-Utils provides custom data types and various utility functions for SQ
 .. toctree::
    :maxdepth: 2
 
+   installation
    listeners
    data_types
    range_data_types
