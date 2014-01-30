@@ -18,7 +18,11 @@ from .functions import (
     create_database,
     drop_database
 )
-from .listeners import coercion_listener
+from .listeners import (
+    coercion_listener,
+    force_auto_coercion,
+    force_instant_defaults
+)
 from .merge import merge, Merger
 from .generic import generic_relationship
 from .proxy_dict import ProxyDict, proxy_dict
@@ -65,6 +69,8 @@ __all__ = (
     defer_except,
     drop_database,
     escape_like,
+    force_auto_coercion,
+    force_instant_defaults,
     generates,
     generic_relationship,
     identity,
