@@ -139,6 +139,58 @@ def generates(attr, source=None, generator=generator):
         @generates(Article.slug)
         def _create_article_slug(article):
             return article.name.lower().replace(' ', '-')
+
+
+    Property generators can have sources outside:
+
+    ::
+
+
+        class Document(self.Base):
+            __tablename__ = 'document'
+            id = sa.Column(sa.Integer, primary_key=True)
+            name = sa.Column(sa.Unicode(255))
+            locale = sa.Column(sa.String(10))
+
+
+        class Section(self.Base):
+            __tablename__ = 'section'
+            id = sa.Column(sa.Integer, primary_key=True)
+            name = sa.Column(sa.Unicode(255))
+            locale = sa.Column(sa.String(10))
+
+            document_id = sa.Column(
+                sa.Integer, sa.ForeignKey(Document.id)
+            )
+
+            document = sa.orm.relationship(Document)
+
+            @generates(locale, source='document')
+            def copy_locale(self, document):
+                return document.locale
+
+
+    You can also use dotted attribute paths for deep relationship paths:
+
+    ::
+
+
+        class SubSection(self.Base):
+            __tablename__ = 'subsection'
+            id = sa.Column(sa.Integer, primary_key=True)
+            name = sa.Column(sa.Unicode(255))
+            locale = sa.Column(sa.String(10))
+
+            section_id = sa.Column(
+                sa.Integer, sa.ForeignKey(Section.id)
+            )
+
+            section = sa.orm.relationship(Section)
+
+            @generates(locale, source='section.document')
+            def copy_locale(self, document):
+                return document.locale
+
     """
 
     generator.register_listeners()
