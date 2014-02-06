@@ -8,7 +8,7 @@ def getdotattr(obj, dot_path):
     """
     Allows dot-notated strings to be passed to `getattr`
     """
-    return reduce(getattr, dot_path.split('.'), obj)
+    return six.moves.reduce(getattr, dot_path.split('.'), obj)
 
 
 class AttributeValueGenerator(object):
