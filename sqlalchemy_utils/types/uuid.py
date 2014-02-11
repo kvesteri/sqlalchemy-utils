@@ -59,7 +59,7 @@ class UUIDType(types.TypeDecorator, ScalarCoercible):
         if not isinstance(value, uuid.UUID):
             value = self._coerce(value)
 
-        if dialect == 'postgresql':
+        if dialect.name == 'postgresql':
             return str(value)
 
         return value.bytes if self.binary else value.hex
@@ -68,7 +68,7 @@ class UUIDType(types.TypeDecorator, ScalarCoercible):
         if value is None:
             return value
 
-        if dialect == 'postgresql':
+        if dialect.name == 'postgresql':
             return uuid.UUID(value)
 
         return uuid.UUID(bytes=value) if self.binary else uuid.UUID(value)
