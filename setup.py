@@ -25,10 +25,7 @@ extras_require = {
     'babel': ['Babel>=1.3'],
     'arrow': ['arrow>=0.3.4'],
     'intervals': ['intervals>=0.2.0'],
-    'phone': [
-        # The phonenumbers library has a split for 2.x and 3.x support.
-        'phonenumbers>=5.9.2'
-    ],
+    'phone': ['phonenumbers>=5.9.2'],
     'password': ['passlib >= 1.6, < 2.0'],
     'color': ['colour>=0.0.4'],
     'ipaddress': ['ipaddr'] if not PY3 else [],
