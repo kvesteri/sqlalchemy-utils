@@ -27,7 +27,7 @@ extras_require = {
     'intervals': ['intervals>=0.2.0'],
     'phone': [
         # The phonenumbers library has a split for 2.x and 3.x support.
-        'phonenumbers3k==5.6b1' if PY3 else 'phonenumbers<5.6b1'
+        'phonenumbers>=5.9.2'
     ],
     'password': ['passlib >= 1.6, < 2.0'],
     'color': ['colour>=0.0.4'],
