@@ -31,3 +31,20 @@ class TestArrowDateTimeType(TestCase):
             created_at='1367900664'
         )
         assert article.created_at.year == 2013
+
+    def test_utc(self):
+        time = arrow.arrow.utcnow()
+        article = self.Article(created_at=time)
+        self.session.add(article)
+        assert article.created_at == time
+        self.session.commit()
+        assert article.created_at == time
+
+    def test_other_tz(self):
+        time = arrow.arrow.utcnow()
+        local = time.to('US/Pacific')
+        article = self.Article(created_at=local)
+        self.session.add(article)
+        assert article.created_at == time == local
+        self.session.commit()
+        assert article.created_at == time
