@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.23.5 (2014-02-15)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed ArrowType timezone handling
+
+
 0.23.4 (2014-01-30)
 ^^^^^^^^^^^^^^^^^^^
 
