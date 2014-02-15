@@ -63,7 +63,7 @@ class ArrowType(types.TypeDecorator, ScalarCoercible):
 
     def process_bind_param(self, value, dialect):
         if value:
-            return self._coerce(value).datetime
+            return self._coerce(value).to('UTC').naive
         return value
 
     def process_result_value(self, value, dialect):
