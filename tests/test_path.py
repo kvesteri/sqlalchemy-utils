@@ -70,6 +70,11 @@ class TestAttrPath(TestCase):
             "'section.document')"
         )
 
+    def test_index(self):
+        path = AttrPath(self.SubSection, 'section.document')
+        assert path.index(self.Section.document) == 1
+        assert path.index(self.SubSection.section) == 0
+
     def test_getitem(self):
         path = AttrPath(self.SubSection, 'section.document')
         assert path[0] is self.SubSection.section
@@ -138,6 +143,9 @@ class TestPath(object):
 
     def test_str(self):
         assert str(Path('s.s2')) == 's.s2'
+
+    def test_index(self):
+        assert Path('s.s2.s3').index('s2') == 1
 
     def test_unicode(self):
         assert unicode(Path('s.s2')) == u's.s2'

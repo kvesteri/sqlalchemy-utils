@@ -11,18 +11,25 @@ class Path(object):
             self.path = path
         self.separator = separator
 
+    @property
+    def parts(self):
+        return self.path.split(self.separator)
+
     def __iter__(self):
-        for part in self.path.split(self.separator):
+        for part in self.parts:
             yield part
 
     def __len__(self):
-        return len(self.path.split(self.separator))
+        return len(self.parts)
 
     def __repr__(self):
         return "%s('%s')" % (self.__class__.__name__, self.path)
 
+    def index(self, element):
+        return self.parts.index(element)
+
     def __getitem__(self, slice):
-        result = self.path.split(self.separator)[slice]
+        result = self.parts[slice]
         if isinstance(result, list):
             return self.__class__(
                 self.separator.join(result),
@@ -83,6 +90,11 @@ class AttrPath(object):
             self.parts[-1].mapper.class_,
             '.'.join(map(get_backref, reversed(self.parts)))
         )
+
+    def index(self, element):
+        for index, el in enumerate(self.parts):
+            if el is element:
+                return index
 
     def __getitem__(self, slice):
         result = self.parts[slice]
