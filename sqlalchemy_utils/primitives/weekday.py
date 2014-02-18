@@ -5,7 +5,7 @@ except ImportError:
     # Python 2.6 port
     from total_ordering import total_ordering
 from sqlalchemy_utils import i18n
-from .utils import str_coercible
+from sqlalchemy_utils.utils import str_coercible
 
 
 @str_coercible

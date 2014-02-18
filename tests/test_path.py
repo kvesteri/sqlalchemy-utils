@@ -133,6 +133,12 @@ class TestPath(object):
         assert path[0] == 's'
         assert path[1] == 's2'
 
+    def test_str(self):
+        assert str(Path('s.s2')) == 's.s2'
+
+    def test_unicode(self):
+        assert unicode(Path('s.s2')) == u's.s2'
+
     def test_getitem_with_slice(self):
         path = Path('s.s2.s3')
         assert path[1:] == Path('s2.s3')

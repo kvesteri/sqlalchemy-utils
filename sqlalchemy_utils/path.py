@@ -1,6 +1,8 @@
 from sqlalchemy.orm.attributes import InstrumentedAttribute
+from .utils import str_coercible
 
 
+@str_coercible
 class Path(object):
     def __init__(self, path, separator='.'):
         if isinstance(path, Path):
@@ -34,6 +36,9 @@ class Path(object):
     def __ne__(self, other):
         return not (self == other)
 
+    def __unicode__(self):
+        return self.path
+
 
 def get_attr(mixed, attr):
     if isinstance(mixed, InstrumentedAttribute):
@@ -45,6 +50,7 @@ def get_attr(mixed, attr):
         return getattr(mixed, attr)
 
 
+@str_coercible
 class AttrPath(object):
     def __init__(self, class_, path):
         self.class_ = class_
@@ -107,3 +113,6 @@ class AttrPath(object):
 
     def __ne__(self, other):
         return not (self == other)
+
+    def __unicode__(self):
+        return str(self.path)
