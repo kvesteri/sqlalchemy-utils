@@ -251,6 +251,8 @@ def getdotattr(obj_or_class, dot_path):
             last = tmp
         elif isinstance(last, InstrumentedAttribute):
             last = getter(last.property.mapper.class_)
+        elif last is None:
+            return None
         else:
             last = getter(last)
     return last

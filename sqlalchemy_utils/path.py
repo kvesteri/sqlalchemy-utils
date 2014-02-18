@@ -85,7 +85,10 @@ class AttrPath(object):
                         prop.parent.class_.__name__
                     )
                 )
-            return backref
+            if isinstance(backref, tuple):
+                return backref[0]
+            else:
+                return backref
 
         if isinstance(self.parts[-1].property, sa.orm.ColumnProperty):
             class_ = self.parts[-1].class_

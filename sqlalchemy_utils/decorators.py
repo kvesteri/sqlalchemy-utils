@@ -90,40 +90,42 @@ class AttributeValueGenerator(object):
                 )
             elif index == len(path) - 1:
                 inversed_path = ~path[0:-1]
-                entities = list(
-                    getdotattr(
-                        target,
-                        str(inversed_path)
-                    )
+                entities = getdotattr(
+                    target,
+                    str(inversed_path)
                 )
-                for entity in entities:
-                    if isinstance(entity, list):
-                        for e in entity:
+                if entities:
+                    if not isinstance(entities, list):
+                        entities = [entities]
+                    for entity in entities:
+                        if isinstance(entity, list):
+                            for e in entity:
+                                setattr(
+                                    e,
+                                    property_key,
+                                    value
+                                )
+                        else:
                             setattr(
-                                e,
+                                entity,
                                 property_key,
                                 value
                             )
-                    else:
+            else:
+                inversed_path = ~path[0:-1]
+                entities = getdotattr(
+                    target,
+                    str(inversed_path[index:])
+                )
+                if entities:
+                    if not isinstance(entities, list):
+                        entities = [entities]
+                    for entity in entities:
                         setattr(
                             entity,
                             property_key,
-                            value
+                            getdotattr(value, str(path[(index + 1):]))
                         )
-            else:
-                inversed_path = ~path[0:-1]
-                entities = list(
-                    getdotattr(
-                        target,
-                        str(inversed_path[index:])
-                    )
-                )
-                for entity in entities:
-                    setattr(
-                        entity,
-                        property_key,
-                        getdotattr(value, str(path[(index + 1):]))
-                    )
 
 
     def update_generated_properties(self, session, ctx, instances):
