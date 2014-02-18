@@ -3,8 +3,7 @@ from sqlalchemy_utils.functions import getdotattr
 from tests import TestCase
 
 
-
-class TestTwoWayAttributeValueGeneration(TestCase):
+class TestGetDotAttr(TestCase):
     def create_models(self):
         class Document(self.Base):
             __tablename__ = 'document'
@@ -22,7 +21,7 @@ class TestTwoWayAttributeValueGeneration(TestCase):
                 sa.Integer, sa.ForeignKey(Document.id)
             )
 
-            document = sa.orm.relationship(Document)
+            document = sa.orm.relationship(Document, backref='sections')
 
         class SubSection(self.Base):
             __tablename__ = 'subsection'
@@ -34,7 +33,7 @@ class TestTwoWayAttributeValueGeneration(TestCase):
                 sa.Integer, sa.ForeignKey(Section.id)
             )
 
-            section = sa.orm.relationship(Section)
+            section = sa.orm.relationship(Section, backref='subsections')
 
         self.Document = Document
         self.Section = Section
