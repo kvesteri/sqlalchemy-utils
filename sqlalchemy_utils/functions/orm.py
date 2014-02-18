@@ -1,7 +1,9 @@
 from functools import partial
 from toolz import curry, first
+import six
 import sqlalchemy as sa
 from sqlalchemy import inspect
+from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.orm.query import _ColumnEntity
 from sqlalchemy.orm.mapper import Mapper
 from sqlalchemy.orm.util import AliasedInsp
@@ -216,6 +218,32 @@ def declarative_base(model):
         except AttributeError:
             pass
     return model
+
+
+def getdotattr(obj_or_class, dot_path):
+    """
+    Allow dot-notated strings to be passed to `getattr`.
+
+    ::
+
+        getdotattr(SubSection, 'section.document')
+
+        getdotattr(subsection, 'section.document')
+
+
+    :param obj_or_class: Any object or class
+    :param dot_path: Attribute path with dot mark as separator
+    """
+    def get_attr(mixed, attr):
+        if isinstance(mixed, InstrumentedAttribute):
+            return getattr(
+                mixed.property.mapper.class_,
+                attr
+            )
+        else:
+            return getattr(mixed, attr)
+
+    return six.moves.reduce(get_attr, dot_path.split('.'), obj_or_class)
 
 
 def has_changes(obj, attr):
