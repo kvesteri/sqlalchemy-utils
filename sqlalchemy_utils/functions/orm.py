@@ -220,6 +220,9 @@ def declarative_base(model):
     return model
 
 
+from operator import attrgetter
+
+
 def getdotattr(obj_or_class, dot_path):
     """
     Allow dot-notated strings to be passed to `getattr`.
@@ -234,16 +237,23 @@ def getdotattr(obj_or_class, dot_path):
     :param obj_or_class: Any object or class
     :param dot_path: Attribute path with dot mark as separator
     """
-    def get_attr(mixed, attr):
-        if isinstance(mixed, InstrumentedAttribute):
-            return getattr(
-                mixed.property.mapper.class_,
-                attr
-            )
-        else:
-            return getattr(mixed, attr)
+    last = obj_or_class
 
-    return six.moves.reduce(get_attr, dot_path.split('.'), obj_or_class)
+    for path in dot_path.split('.'):
+        getter = attrgetter(path)
+        if isinstance(last, list):
+            tmp = []
+            for el in last:
+                if isinstance(el, list):
+                    tmp.extend(map(getter, el))
+                else:
+                    tmp.append(getter(el))
+            last = tmp
+        elif isinstance(last, InstrumentedAttribute):
+            last = getter(last.property.mapper.class_)
+        else:
+            last = getter(last)
+    return last
 
 
 def has_changes(obj, attr):
