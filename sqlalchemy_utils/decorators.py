@@ -2,13 +2,8 @@ from collections import defaultdict
 import itertools
 import sqlalchemy as sa
 import six
-
-
-def getdotattr(obj, dot_path):
-    """
-    Allows dot-notated strings to be passed to `getattr`
-    """
-    return six.moves.reduce(getattr, dot_path.split('.'), obj)
+from .functions import getdotattr
+from .path import AttrPath
 
 
 class AttributeValueGenerator(object):
@@ -59,9 +54,27 @@ class AttributeValueGenerator(object):
         """
         Adds generator functions to generator_registry.
         """
-        for value in class_.__dict__.values():
-            if hasattr(value, '__generates__'):
-                self.generator_registry[class_].append(value)
+        for generator in class_.__dict__.values():
+            if hasattr(generator, '__generates__'):
+                self.generator_registry[class_].append(generator)
+
+                path = generator.__generates__[1]
+                column_key = generator.__generates__[0]
+                if not isinstance(column_key, six.string_types):
+                    column_key = column_key.key
+                if path:
+                    path = AttrPath(class_, path)
+                    attr = getdotattr(class_, str(path))
+
+                    if isinstance(attr.property, sa.orm.ColumnProperty):
+                        for attr in path[0:-1]:
+                            @sa.event.listens_for(attr, 'set')
+                            def receive_attr_set(target, value, oldvalue, initiator):
+                                setattr(
+                                    target,
+                                    column_key,
+                                    getattr(value, path[-1].key)
+                                )
 
     def update_generated_properties(self, session, ctx, instances):
         for obj in itertools.chain(session.new, session.dirty):

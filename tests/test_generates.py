@@ -57,8 +57,29 @@ class TestGeneratesWithFunctionAndClassVariableArg(GeneratesTestCase):
         self.Article = Article
 
 
+class DeepPathGeneratesTestCase(TestCase):
+    def test_simple_dotted_source_path(self):
+        document = self.Document(name=u'Document 1', locale='en')
+        section = self.Section(name=u'Section 1', document=document)
 
-class TestGeneratesWithSourcePath(TestCase):
+        self.session.add(document)
+        self.session.add(section)
+        self.session.commit()
+
+        assert section.locale == 'en'
+
+    def test_deep_dotted_source_path(self):
+        document = self.Document(name=u'Document 1', locale='en')
+        section = self.Section(name=u'Section 1', document=document)
+        subsection = self.SubSection(name=u'Section 1', section=section)
+
+        self.session.add(subsection)
+        self.session.commit()
+
+        assert subsection.locale == 'en'
+
+
+class TestGeneratesWithSourcePath(DeepPathGeneratesTestCase):
     def create_models(self):
         class Document(self.Base):
             __tablename__ = 'document'
@@ -103,22 +124,51 @@ class TestGeneratesWithSourcePath(TestCase):
         self.Section = Section
         self.SubSection = SubSection
 
-    def test_simple_dotted_source_path(self):
+
+
+class TestTwoWayAttributeValueGeneration(DeepPathGeneratesTestCase):
+    def create_models(self):
+        class Document(self.Base):
+            __tablename__ = 'document'
+            id = sa.Column(sa.Integer, primary_key=True)
+            name = sa.Column(sa.Unicode(255))
+            locale = sa.Column(sa.String(10))
+
+        class Section(self.Base):
+            __tablename__ = 'section'
+            id = sa.Column(sa.Integer, primary_key=True)
+            name = sa.Column(sa.Unicode(255))
+            locale = sa.Column(sa.String(10))
+
+            document_id = sa.Column(
+                sa.Integer, sa.ForeignKey(Document.id)
+            )
+
+            document = sa.orm.relationship(Document)
+
+        class SubSection(self.Base):
+            __tablename__ = 'subsection'
+            id = sa.Column(sa.Integer, primary_key=True)
+            name = sa.Column(sa.Unicode(255))
+            locale = sa.Column(sa.String(10))
+
+            section_id = sa.Column(
+                sa.Integer, sa.ForeignKey(Section.id)
+            )
+
+            section = sa.orm.relationship(Section)
+
+            @generates(locale, source='section.document.locale')
+            def copy_locale(self, value):
+                return value
+
+        self.Document = Document
+        self.Section = Section
+        self.SubSection = SubSection
+
+    def test_change_parent_attribute(self):
         document = self.Document(name=u'Document 1', locale='en')
         section = self.Section(name=u'Section 1', document=document)
-
-        self.session.add(document)
-        self.session.add(section)
-        self.session.commit()
-
         assert section.locale == 'en'
-
-    def test_deep_dotted_source_path(self):
-        document = self.Document(name=u'Document 1', locale='en')
-        section = self.Section(name=u'Section 1', document=document)
         subsection = self.SubSection(name=u'Section 1', section=section)
-
-        self.session.add(subsection)
-        self.session.commit()
-
         assert subsection.locale == 'en'
