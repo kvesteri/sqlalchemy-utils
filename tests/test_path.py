@@ -46,6 +46,7 @@ class TestAttrPath(TestCase):
             self.Document.sections,
             self.Section.subsections
         ]
+        assert str(path.path) == 'sections.subsections'
 
     def test_len(self):
         len(AttrPath(self.SubSection, 'section.document')) == 2
@@ -77,6 +78,8 @@ class TestAttrPath(TestCase):
     def test_getitem_with_slice(self):
         path = AttrPath(self.SubSection, 'section.document')
         assert path[:] == AttrPath(self.SubSection, 'section.document')
+        assert path[:-1] == AttrPath(self.SubSection, 'section')
+        assert path[1:] == AttrPath(self.Section, 'document')
 
     def test_eq(self):
         assert (

@@ -74,7 +74,7 @@ class AttrPath(object):
                     "Invert failed because property '%s' of class "
                     "%s has no backref." % (
                         prop.key,
-                        prop.mapper.class_.__name__
+                        prop.parent.class_.__name__
                     )
                 )
             return backref
@@ -90,7 +90,7 @@ class AttrPath(object):
             if result[0] is self.parts[0]:
                 class_ = self.class_
             else:
-                class_ = result[0].mapper.class_
+                class_ = result[0].parent.class_
             return self.__class__(
                 class_,
                 self.path[slice]
