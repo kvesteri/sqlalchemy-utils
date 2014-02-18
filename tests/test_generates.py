@@ -126,7 +126,7 @@ class TestGeneratesWithSourcePath(DeepPathGeneratesTestCase):
 
 
 
-class TestTwoWayAttributeValueGeneration(DeepPathGeneratesTestCase):
+class TestInstantAttributeValueGeneration(TestCase):
     def create_models(self):
         class Document(self.Base):
             __tablename__ = 'document'
@@ -144,7 +144,7 @@ class TestTwoWayAttributeValueGeneration(DeepPathGeneratesTestCase):
                 sa.Integer, sa.ForeignKey(Document.id)
             )
 
-            document = sa.orm.relationship(Document)
+            document = sa.orm.relationship(Document, backref='sections')
 
         class SubSection(self.Base):
             __tablename__ = 'subsection'
@@ -156,7 +156,7 @@ class TestTwoWayAttributeValueGeneration(DeepPathGeneratesTestCase):
                 sa.Integer, sa.ForeignKey(Section.id)
             )
 
-            section = sa.orm.relationship(Section)
+            section = sa.orm.relationship(Section, backref='subsections')
 
             @generates(locale, source='section.document.locale')
             def copy_locale(self, value):
@@ -169,6 +169,10 @@ class TestTwoWayAttributeValueGeneration(DeepPathGeneratesTestCase):
     def test_change_parent_attribute(self):
         document = self.Document(name=u'Document 1', locale='en')
         section = self.Section(name=u'Section 1', document=document)
-        assert section.locale == 'en'
         subsection = self.SubSection(name=u'Section 1', section=section)
         assert subsection.locale == 'en'
+        document.locale = 'fi'
+        assert subsection.locale == 'fi'
+        section.document = self.Document(name=u'Document 2', locale='sv')
+        assert subsection.locale == 'sv'
+

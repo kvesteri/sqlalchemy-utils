@@ -1,3 +1,4 @@
+import sqlalchemy as sa
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from .utils import str_coercible
 
@@ -86,8 +87,13 @@ class AttrPath(object):
                 )
             return backref
 
+        if isinstance(self.parts[-1].property, sa.orm.ColumnProperty):
+            class_ = self.parts[-1].class_
+        else:
+            class_ = self.parts[-1].mapper.class_
+
         return self.__class__(
-            self.parts[-1].mapper.class_,
+            class_,
             '.'.join(map(get_backref, reversed(self.parts)))
         )
 

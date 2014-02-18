@@ -67,14 +67,64 @@ class AttributeValueGenerator(object):
                     attr = getdotattr(class_, str(path))
 
                     if isinstance(attr.property, sa.orm.ColumnProperty):
-                        for attr in path[0:-1]:
-                            @sa.event.listens_for(attr, 'set')
-                            def receive_attr_set(target, value, oldvalue, initiator):
-                                setattr(
-                                    target,
-                                    column_key,
-                                    getattr(value, path[-1].key)
-                                )
+                        for attr in path:
+                            self.generate_property_observer(
+                                path,
+                                attr,
+                                column_key
+                            )
+
+    def generate_property_observer(self, path, attr, property_key):
+        """
+        Generate SQLAlchemy listener that observes given attr within given
+        path space.
+        """
+        @sa.event.listens_for(attr, 'set')
+        def receive_attr_set(target, value, oldvalue, initiator):
+            index = path.index(attr)
+            if not index:
+                setattr(
+                    target,
+                    property_key,
+                    getdotattr(value, str(path[1:]))
+                )
+            elif index == len(path) - 1:
+                inversed_path = ~path[0:-1]
+                entities = list(
+                    getdotattr(
+                        target,
+                        str(inversed_path)
+                    )
+                )
+                for entity in entities:
+                    if isinstance(entity, list):
+                        for e in entity:
+                            setattr(
+                                e,
+                                property_key,
+                                value
+                            )
+                    else:
+                        setattr(
+                            entity,
+                            property_key,
+                            value
+                        )
+            else:
+                inversed_path = ~path[0:-1]
+                entities = list(
+                    getdotattr(
+                        target,
+                        str(inversed_path[index:])
+                    )
+                )
+                for entity in entities:
+                    setattr(
+                        entity,
+                        property_key,
+                        getdotattr(value, str(path[(index + 1):]))
+                    )
+
 
     def update_generated_properties(self, session, ctx, instances):
         for obj in itertools.chain(session.new, session.dirty):
