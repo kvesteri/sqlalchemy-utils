@@ -88,12 +88,20 @@ class AttributeValueGenerator(object):
                     property_key,
                     getdotattr(value, str(path[1:]))
                 )
-            elif index == len(path) - 1:
+            else:
                 inversed_path = ~path[0:-1]
-                entities = getdotattr(
-                    target,
-                    str(inversed_path)
-                )
+                if index == len(path) - 1:
+                    entities = getdotattr(
+                        target,
+                        str(inversed_path)
+                    )
+                    assigned_value = value
+                else:
+                    entities = getdotattr(
+                        target,
+                        str(inversed_path[index:])
+                    )
+                    assigned_value = getdotattr(value, str(path[(index + 1):]))
                 if entities:
                     if not isinstance(entities, list):
                         entities = [entities]
@@ -103,30 +111,14 @@ class AttributeValueGenerator(object):
                                 setattr(
                                     e,
                                     property_key,
-                                    value
+                                    assigned_value
                                 )
                         else:
                             setattr(
                                 entity,
                                 property_key,
-                                value
+                                assigned_value
                             )
-            else:
-                inversed_path = ~path[0:-1]
-                entities = getdotattr(
-                    target,
-                    str(inversed_path[index:])
-                )
-                if entities:
-                    if not isinstance(entities, list):
-                        entities = [entities]
-                    for entity in entities:
-                        setattr(
-                            entity,
-                            property_key,
-                            getdotattr(value, str(path[(index + 1):]))
-                        )
-
 
     def update_generated_properties(self, session, ctx, instances):
         for obj in itertools.chain(session.new, session.dirty):
@@ -141,6 +133,12 @@ class AttributeValueGenerator(object):
                         setattr(obj, attr, func(obj))
                     else:
                         setattr(obj, attr, func(obj, getdotattr(obj, source)))
+
+
+
+class PropertyObserver(object):
+    def __init__(property, observed_property_path):
+        pass
 
 
 generator = AttributeValueGenerator()
