@@ -76,7 +76,7 @@ class AttrPath(object):
     def __invert__(self):
         def get_backref(part):
             prop = part.property
-            backref = prop.backref
+            backref = prop.backref or prop.back_populates
             if backref is None:
                 raise Exception(
                     "Invert failed because property '%s' of class "

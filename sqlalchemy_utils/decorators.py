@@ -54,71 +54,10 @@ class AttributeValueGenerator(object):
         """
         Adds generator functions to generator_registry.
         """
+
         for generator in class_.__dict__.values():
             if hasattr(generator, '__generates__'):
                 self.generator_registry[class_].append(generator)
-
-                path = generator.__generates__[1]
-                column_key = generator.__generates__[0]
-                if not isinstance(column_key, six.string_types):
-                    column_key = column_key.key
-                if path:
-                    path = AttrPath(class_, path)
-                    attr = getdotattr(class_, str(path))
-
-                    if isinstance(attr.property, sa.orm.ColumnProperty):
-                        for attr in path:
-                            self.generate_property_observer(
-                                path,
-                                attr,
-                                column_key
-                            )
-
-    def generate_property_observer(self, path, attr, property_key):
-        """
-        Generate SQLAlchemy listener that observes given attr within given
-        path space.
-        """
-        @sa.event.listens_for(attr, 'set')
-        def receive_attr_set(target, value, oldvalue, initiator):
-            index = path.index(attr)
-            if not index:
-                setattr(
-                    target,
-                    property_key,
-                    getdotattr(value, str(path[1:]))
-                )
-            else:
-                inversed_path = ~path[0:-1]
-                if index == len(path) - 1:
-                    entities = getdotattr(
-                        target,
-                        str(inversed_path)
-                    )
-                    assigned_value = value
-                else:
-                    entities = getdotattr(
-                        target,
-                        str(inversed_path[index:])
-                    )
-                    assigned_value = getdotattr(value, str(path[(index + 1):]))
-                if entities:
-                    if not isinstance(entities, list):
-                        entities = [entities]
-                    for entity in entities:
-                        if isinstance(entity, list):
-                            for e in entity:
-                                setattr(
-                                    e,
-                                    property_key,
-                                    assigned_value
-                                )
-                        else:
-                            setattr(
-                                entity,
-                                property_key,
-                                assigned_value
-                            )
 
     def update_generated_properties(self, session, ctx, instances):
         for obj in itertools.chain(session.new, session.dirty):
@@ -133,12 +72,6 @@ class AttributeValueGenerator(object):
                         setattr(obj, attr, func(obj))
                     else:
                         setattr(obj, attr, func(obj, getdotattr(obj, source)))
-
-
-
-class PropertyObserver(object):
-    def __init__(property, observed_property_path):
-        pass
 
 
 generator = AttributeValueGenerator()

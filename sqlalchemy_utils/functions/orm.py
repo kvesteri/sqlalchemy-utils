@@ -238,6 +238,8 @@ def getdotattr(obj_or_class, dot_path):
     :param dot_path: Attribute path with dot mark as separator
     """
     last = obj_or_class
+    # Coerce object style paths to strings.
+    path = str(dot_path)
 
     for path in dot_path.split('.'):
         getter = attrgetter(path)
