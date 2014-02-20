@@ -194,9 +194,12 @@ class RangeType(types.TypeDecorator, ScalarCoercible):
 
     def process_result_value(self, value, dialect):
         if value:
-            return self.canonicalize_result_value(
-                self.interval_class(value)
-            )
+            if self.interval_class.step is not None:
+                return self.canonicalize_result_value(
+                    self.interval_class(value)
+                )
+            else:
+                return self.interval_class(value)
         return value
 
     def canonicalize_result_value(self, value):
@@ -289,7 +292,7 @@ class NumericRangeType(RangeType):
     impl = NUMRANGE
 
     def __init__(self, *args, **kwargs):
-        super(DateRangeType, self).__init__(*args, **kwargs)
+        super(NumericRangeType, self).__init__(*args, **kwargs)
         self.interval_class = intervals.DecimalInterval
 
 
@@ -297,5 +300,5 @@ class DateTimeRangeType(RangeType):
     impl = TSRANGE
 
     def __init__(self, *args, **kwargs):
-        super(DateRangeType, self).__init__(*args, **kwargs)
+        super(DateTimeRangeType, self).__init__(*args, **kwargs)
         self.interval_class = intervals.DateTimeInterval
