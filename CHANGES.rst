@@ -9,6 +9,8 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 - Added getdotattr
 - Added Path and AttrPath classes
+- SQLAlchemy dependency updated to 0.9.3
+- Optional intervals dependency updated to 0.2.2
 
 
 0.23.5 (2014-02-15)
