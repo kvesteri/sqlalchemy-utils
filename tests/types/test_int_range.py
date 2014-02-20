@@ -32,6 +32,18 @@ class NumberRangeTestCase(TestCase):
         self.session.commit()
         return self.session.query(self.Building).first()
 
+    def test_nullify_range(self):
+        building = self.create_building(None)
+        assert building.persons_at_night == None
+
+    def test_update_with_none(self):
+        interval = intervals.IntInterval('(,)')
+        building = self.create_building(interval)
+        building.persons_at_night = None
+        assert building.persons_at_night is None
+        self.session.commit()
+        assert building.persons_at_night is None
+
     @mark.parametrize(
         'number_range',
         (

@@ -182,9 +182,10 @@ class RangeType(types.TypeDecorator, ScalarCoercible):
 
     def load_dialect_impl(self, dialect):
         if dialect.name == 'postgresql':
-            # Use the native JSON type.
+            # Use the native range type for postgres.
             return dialect.type_descriptor(self.impl)
         else:
+            # Other drivers don't have native types.
             return dialect.type_descriptor(sa.String(255))
 
     def process_bind_param(self, value, dialect):
@@ -193,7 +194,7 @@ class RangeType(types.TypeDecorator, ScalarCoercible):
         return value
 
     def process_result_value(self, value, dialect):
-        if value:
+        if value is not None:
             if self.interval_class.step is not None:
                 return self.canonicalize_result_value(
                     self.interval_class(value)
@@ -206,9 +207,9 @@ class RangeType(types.TypeDecorator, ScalarCoercible):
         return intervals.canonicalize(value, True, True)
 
     def _coerce(self, value):
-        if value is not None:
-            value = self.interval_class(value)
-        return value
+        if value is None:
+            return None
+        return self.interval_class(value)
 
 
 class IntRangeType(RangeType):

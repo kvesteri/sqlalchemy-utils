@@ -29,6 +29,10 @@ class NumericRangeTestCase(TestCase):
         self.session.commit()
         return self.session.query(self.Car).first()
 
+    def test_nullify_range(self):
+        building = self.create_car(None)
+        assert building.price_range == None
+
     @mark.parametrize(
         'number_range',
         (
