@@ -1,3 +1,4 @@
+import six
 from pytest import mark
 import sqlalchemy as sa
 from sqlalchemy_utils.path import Path, AttrPath
@@ -66,8 +67,7 @@ class TestAttrPath(TestCase):
     def test_repr(self):
         path = AttrPath(self.SubSection, 'section.document')
         assert repr(path) == (
-            "AttrPath(<class 'tests.test_path.SubSection'>, "
-            "'section.document')"
+            "AttrPath(SubSection, 'section.document')"
         )
 
     def test_index(self):
@@ -148,7 +148,7 @@ class TestPath(object):
         assert Path('s.s2.s3').index('s2') == 1
 
     def test_unicode(self):
-        assert unicode(Path('s.s2')) == u's.s2'
+        assert six.text_type(Path('s.s2')) == u's.s2'
 
     def test_getitem_with_slice(self):
         path = Path('s.s2.s3')

@@ -123,9 +123,9 @@ class AttrPath(object):
         return len(self.path)
 
     def __repr__(self):
-        return "%s(%r, %r)" % (
+        return "%s(%s, %r)" % (
             self.__class__.__name__,
-            self.class_,
+            self.class_.__name__,
             self.path.path
         )
 
