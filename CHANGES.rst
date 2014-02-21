@@ -4,6 +4,14 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+
+0.24.1 (2014-02-21)
+^^^^^^^^^^^^^^^^^^^
+
+- Made identity return a tuple in all cases
+- Added support for declarative model classes as identity function's first argument
+
+
 0.24.0 (2014-02-18)
 ^^^^^^^^^^^^^^^^^^^
 

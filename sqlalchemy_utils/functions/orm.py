@@ -1,4 +1,5 @@
 from functools import partial
+from operator import attrgetter
 from toolz import curry, first
 import six
 import sqlalchemy as sa
@@ -220,9 +221,6 @@ def declarative_base(model):
     return model
 
 
-from operator import attrgetter
-
-
 def getdotattr(obj_or_class, dot_path):
     """
     Allow dot-notated strings to be passed to `getattr`.
@@ -293,12 +291,13 @@ def has_changes(obj, attr):
     )
 
 
-def identity(obj):
+def identity(obj_or_class):
     """
-    Return the identity of given sqlalchemy declarative model instance as a
-    tuple. This differs from obj._sa_instance_state.identity in a way that it
-    always returns the identity even if object is still in transient state (
-    new object that is not yet persisted into database).
+    Return the identity of given sqlalchemy declarative model class or instance
+    as a tuple. This differs from obj._sa_instance_state.identity in a way that
+    it always returns the identity even if object is still in transient state (
+    new object that is not yet persisted into database). Also for classes it
+    returns the identity attributes.
 
     ::
 
@@ -322,19 +321,19 @@ def identity(obj):
         inspect(user).identity  # (1, )
 
 
+    You can also use identity for classes::
+
+
+        identity(User)  # (User.id, )
+
     .. versionadded: 0.21.0
 
     :param obj: SQLAlchemy declarative model object
     """
-    id_ = []
-    for column in sa.inspect(obj.__class__).columns:
-        if column.primary_key:
-            id_.append(getattr(obj, column.name))
-
-    if all(value is None for value in id_):
-        return None
-    else:
-        return tuple(id_)
+    return tuple(
+        getattr(obj_or_class, column.name)
+        for column in primary_keys(obj_or_class)
+    )
 
 
 def naturally_equivalent(obj, obj2):
