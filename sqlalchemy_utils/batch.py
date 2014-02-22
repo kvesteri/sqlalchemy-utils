@@ -16,7 +16,6 @@ from sqlalchemy_utils.functions.orm import (
     local_values,
     local_column_names,
     local_remote_expr,
-    mapfirst,
     remote_column_names,
     remote_values,
     remote
@@ -295,7 +294,7 @@ class Fetcher(object):
         if len(names) == 1:
             attr = getattr(remote(self.prop), names[0])
             return attr.in_(
-                mapfirst(list_local_values(self.prop, self.path.entities))
+                v[0] for v in list_local_values(self.prop, self.path.entities)
             )
         elif len(names) > 1:
             return sa.or_(

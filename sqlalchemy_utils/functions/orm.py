@@ -1,6 +1,6 @@
 from functools import partial
 from operator import attrgetter
-from toolz import curry, first
+from toolz import first
 import six
 import sqlalchemy as sa
 from sqlalchemy import inspect
@@ -41,24 +41,18 @@ def getattrs(obj, attrs):
     return map(partial(getattr, obj), attrs)
 
 
-def mapfirst(iterable):
-    return map(first, iterable)
-
-
-@curry
 def local_values(prop, entity):
     return tuple(getattrs(entity, local_column_names(prop)))
 
 
 def list_local_values(prop, entities):
-    return map(local_values(prop), entities)
+    return map(partial(local_values, prop), entities)
 
 
 def remote_values(prop, entity):
     return tuple(getattrs(entity, remote_column_names(prop)))
 
 
-@curry
 def local_remote_expr(prop, entity):
     return sa.and_(
         *[
@@ -72,7 +66,7 @@ def local_remote_expr(prop, entity):
 
 
 def list_local_remote_exprs(prop, entities):
-    return map(local_remote_expr(prop), entities)
+    return map(partial(local_remote_expr, prop), entities)
 
 
 def remote(prop):
