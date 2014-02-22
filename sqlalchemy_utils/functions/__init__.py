@@ -18,7 +18,6 @@ from .orm import (
     identity,
     naturally_equivalent,
     primary_keys,
-    remove_property,
     table_name,
 )
 
@@ -40,7 +39,6 @@ __all__ = (
     non_indexed_foreign_keys,
     primary_keys,
     QuerySorterException,
-    remove_property,
     render_expression,
     render_statement,
     sort_query,
