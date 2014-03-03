@@ -1,7 +1,5 @@
 from functools import partial
 from operator import attrgetter
-from toolz import first
-import six
 import sqlalchemy as sa
 from sqlalchemy import inspect
 from sqlalchemy.orm.attributes import InstrumentedAttribute
@@ -105,7 +103,6 @@ def remote_column_names(prop):
                     yield remote.name
 
 
-
 def query_labels(query):
     """
     Return all labels for given SQLAlchemy query object.
@@ -155,7 +152,7 @@ def query_entities(query):
 def get_query_entity_by_alias(query, alias):
     entities = query_entities(query)
     if not alias:
-        return first(entities)
+        return list(entities)[0]
 
     for entity in entities:
         if isinstance(entity, AliasedInsp):
