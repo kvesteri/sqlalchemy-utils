@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.24.2 (2014-02-21)
+^^^^^^^^^^^^^^^^^^^
+
+- Remove toolz from dependencies
+- Add step argument support for all range types
+- Optional intervals dependency updated to 0.2.4
+
 
 0.24.1 (2014-02-21)
 ^^^^^^^^^^^^^^^^^^^
