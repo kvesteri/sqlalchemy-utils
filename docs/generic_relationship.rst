@@ -104,7 +104,6 @@ Now same as before we can add some objects::
 We can even test super types::
 
 
-    # Find any events that are bound to users.
     session.query(Activity).filter(Event.object.is_type(Employee)).all()
 
 
