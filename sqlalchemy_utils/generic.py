@@ -1,3 +1,5 @@
+import six
+
 from sqlalchemy.orm.interfaces import MapperProperty, PropComparator
 from sqlalchemy.orm.session import _state_session
 from sqlalchemy.orm import attributes, class_mapper
@@ -86,6 +88,8 @@ class GenericRelationshipProperty(MapperProperty):
     def __init__(self, discriminator, id, doc=None):
         self._discriminator_col = discriminator
         self._id_col = id
+        self._id = None
+        self._discriminator = None
         self.doc = doc
 
         set_creation_order(self)
@@ -98,6 +102,16 @@ class GenericRelationshipProperty(MapperProperty):
 
     def init(self):
         # Resolve columns to attributes.
+        if isinstance(self._discriminator_col, six.string_types):
+            self._discriminator_col = self.parent.columns[
+                self._discriminator_col
+            ]
+
+        if isinstance(self._id_col, six.string_types):
+            self._id_col = self.parent.columns[
+                self._id_col
+            ]
+
         self.discriminator = self._column_to_property(self._discriminator_col)
         self.id = self._column_to_property(self._id_col)
 

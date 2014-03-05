@@ -47,4 +47,34 @@ Generic relationship is a form of relationship that supports creating a 1 to man
     # Find any events that are bound to users.
     session.query(Event).filter(Event.object.is_type(User)).all()
 
-.. _colour: https://github.com/vaab/colour
+
+Using generic_relationship with abstract base classes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Generic relationships also allows using string arguments. When using generic_relationship with abstract base classes you need to set up the relationship using declared_attr decorator and string arguments.
+
+
+::
+
+
+    class Building(self.Base):
+        __tablename__ = 'building'
+        id = sa.Column(sa.Integer, primary_key=True)
+
+    class User(self.Base):
+        __tablename__ = 'user'
+        id = sa.Column(sa.Integer, primary_key=True)
+
+    class EventBase(self.Base):
+        __abstract__ = True
+
+        object_type = sa.Column(sa.Unicode(255))
+        object_id = sa.Column(sa.Integer, nullable=False)
+
+        @declared_attr
+        def object(cls):
+            return generic_relationship('object_type', 'object_id')
+
+    class Event(EventBase):
+        __tablename__ = 'event'
+        id = sa.Column(sa.Integer, primary_key=True)
