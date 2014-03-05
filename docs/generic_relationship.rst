@@ -48,8 +48,8 @@ Generic relationship is a form of relationship that supports creating a 1 to man
     session.query(Event).filter(Event.object.is_type(User)).all()
 
 
-Using generic_relationship with abstract base classes
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Abstract base classes
+^^^^^^^^^^^^^^^^^^^^^
 
 Generic relationships also allows using string arguments. When using generic_relationship with abstract base classes you need to set up the relationship using declared_attr decorator and string arguments.
 
@@ -78,3 +78,35 @@ Generic relationships also allows using string arguments. When using generic_rel
     class Event(EventBase):
         __tablename__ = 'event'
         id = sa.Column(sa.Integer, primary_key=True)
+
+
+Composite keys
+^^^^^^^^^^^^^^
+
+For some very rare cases you may need to use generic_relationships with composite primary keys. There is a limitation here though: you can only set up generic_relationship for similar composite primary key types. In other words you can't mix generic relationship to both composite keyed objects and single keyed objects.
+
+::
+
+    from sqlalchemy_utils import generic_relationship
+
+
+    class Customer(Base):
+        __tablename__ = 'customer'
+        code1 = sa.Column(sa.Integer, primary_key=True)
+        code2 = sa.Column(sa.Integer, primary_key=True)
+
+
+    class Event(Base):
+        __tablename__ = 'event'
+        id = sa.Column(sa.Integer, primary_key=True)
+
+        # This is used to discriminate between the linked tables.
+        object_type = sa.Column(sa.Unicode(255))
+
+        object_code1 = sa.Column(sa.Integer)
+
+        object_code2 = sa.Column(sa.Integer)
+
+        object = generic_relationship(
+            object_type, (object_code1, object_code2)
+        )
