@@ -1,6 +1,7 @@
 from collections import Iterable
 
 import six
+import sqlalchemy as sa
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import attributes, class_mapper
 from sqlalchemy.orm import ColumnProperty
@@ -154,8 +155,16 @@ class GenericRelationshipProperty(MapperProperty):
             return ~(self == other)
 
         def is_type(self, other):
-            discriminator = unicode(other.__name__)
-            return self.property._discriminator_col == discriminator
+            mapper = sa.inspect(other)
+            # Iterate through the weak sequence in order to get the actual
+            # mappers
+            class_names = [unicode(other.__name__)]
+            class_names.extend([
+                unicode(submapper.class_.__name__)
+                for submapper in mapper._inheriting_mappers
+            ])
+
+            return self.property._discriminator_col.in_(class_names)
 
     def instrument_class(self, mapper):
         attributes.register_attribute(

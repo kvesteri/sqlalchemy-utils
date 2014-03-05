@@ -4,6 +4,14 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.25.0 (2014-03-05)
+^^^^^^^^^^^^^^^^^^^
+
+- Added single table inheritance support for generic_relationship
+- Added support for comparing class super types with generic relationships
+- BC break: In order to support different inheritance strategies generic_relationship now uses class names as discriminators instead of table names.
+
+
 0.24.4 (2014-03-05)
 ^^^^^^^^^^^^^^^^^^^
 

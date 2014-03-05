@@ -29,23 +29,83 @@ Generic relationship is a form of relationship that supports creating a 1 to man
 
 
     # Some general usage to attach an event to a user.
-    us_1 = User()
-    cu_1 = Customer()
+    user = User()
+    customer = Customer()
 
-    session.add_all([us_1, cu_1])
+    session.add_all([user, customer])
     session.commit()
 
     ev = Event()
-    ev.object = us_1
+    ev.object = user
 
     session.add(ev)
     session.commit()
 
     # Find the event we just made.
-    session.query(Event).filter_by(object=us_1).first()
+    session.query(Event).filter_by(object=user).first()
 
     # Find any events that are bound to users.
     session.query(Event).filter(Event.object.is_type(User)).all()
+
+
+Inheritance
+^^^^^^^^^^^
+
+::
+
+    class Employee(self.Base):
+        __tablename__ = 'employee'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.String(50))
+        type = sa.Column(sa.String(20))
+
+        __mapper_args__ = {
+            'polymorphic_on': type,
+            'polymorphic_identity': 'employee'
+        }
+
+    class Manager(Employee):
+        __mapper_args__ = {
+            'polymorphic_identity': 'manager'
+        }
+
+    class Engineer(Employee):
+        __mapper_args__ = {
+            'polymorphic_identity': 'engineer'
+        }
+
+    class Activity(self.Base):
+        __tablename__ = 'event'
+        id = sa.Column(sa.Integer, primary_key=True)
+
+        object_type = sa.Column(sa.Unicode(255))
+        object_id = sa.Column(sa.Integer, nullable=False)
+
+        object = generic_relationship(object_type, object_id)
+
+
+Now same as before we can add some objects::
+
+    manager = Manager()
+
+    session.add(manager)
+    session.commit()
+
+    activity = Activity()
+    activity.object = manager
+
+    session.add(activity)
+    session.commit()
+
+    # Find the activity we just made.
+    session.query(Event).filter_by(object=manager).first()
+
+
+We can even test super types::
+
+
+    # Find any events that are bound to users.
+    session.query(Activity).filter(Event.object.is_type(Employee)).all()
 
 
 Abstract base classes

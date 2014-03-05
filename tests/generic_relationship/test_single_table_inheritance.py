@@ -142,3 +142,20 @@ class TestGenericRelationship(TestCase):
         statement = self.Event.object.is_type(self.Manager)
         q = self.session.query(self.Event).filter(statement)
         assert q.first() is not None
+
+    def test_compare_super_type(self):
+        manager1 = self.Manager()
+        manager2 = self.Manager()
+
+        self.session.add_all([manager1, manager2])
+        self.session.commit()
+
+        event1 = self.Event(object=manager1)
+        event2 = self.Event(object=manager2)
+
+        self.session.add_all([event1, event2])
+        self.session.commit()
+
+        statement = self.Event.object.is_type(self.Employee)
+        q = self.session.query(self.Event).filter(statement)
+        assert q.first() is not None
