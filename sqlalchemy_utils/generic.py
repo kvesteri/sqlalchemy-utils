@@ -1,12 +1,15 @@
 from collections import Iterable
 
 import six
-
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import attributes, class_mapper
+from sqlalchemy.orm import ColumnProperty
 from sqlalchemy.orm.interfaces import MapperProperty, PropComparator
 from sqlalchemy.orm.session import _state_session
-from sqlalchemy.orm import attributes, class_mapper
 from sqlalchemy.util import set_creation_order
 from sqlalchemy_utils.functions import table_name, identity
+
+from .exceptions import ImproperlyConfigured
 
 
 def class_from_table_name(state, table):
@@ -31,7 +34,7 @@ class GenericAttributeImpl(attributes.ScalarAttributeImpl):
 
         # Find class for discriminator.
         # TODO: Perhaps optimize with some sort of lookup?
-        discriminator = state.attrs[self.parent_token.discriminator.key].value
+        discriminator = self.get_state_discriminator(state)
         target_class = class_from_table_name(state, discriminator)
 
         if target_class is None:
@@ -39,10 +42,18 @@ class GenericAttributeImpl(attributes.ScalarAttributeImpl):
             return None
 
         id = self.get_state_id(state)
+
         target = session.query(target_class).get(id)
 
         # Return found (or not found) target.
         return target
+
+    def get_state_discriminator(self, state):
+        discriminator = self.parent_token.discriminator
+        if isinstance(discriminator, hybrid_property):
+            return getattr(state.obj(), discriminator.__name__)
+        else:
+            return state.attrs[discriminator.key].value
 
     def get_state_id(self, state):
         # Lookup row with the discriminator and id.
@@ -98,10 +109,16 @@ class GenericRelationshipProperty(MapperProperty):
         set_creation_order(self)
 
     def _column_to_property(self, column):
-        for name, attr in self.parent.attrs.items():
-            other = self.parent.columns.get(name)
-            if other is not None and column.name == other.name:
-                return attr
+        if isinstance(column, hybrid_property):
+            attr_key = column.__name__
+            for key, attr in self.parent.all_orm_descriptors.items():
+                if key == attr_key:
+                    return attr
+        else:
+            for key, attr in self.parent.attrs.items():
+                if isinstance(attr, ColumnProperty):
+                    if attr.columns[0].name == column.name:
+                        return attr
 
     def init(self):
         def convert_strings(column):
@@ -118,6 +135,12 @@ class GenericRelationshipProperty(MapperProperty):
             self._id_cols = [self._id_cols]
 
         self.discriminator = self._column_to_property(self._discriminator_col)
+
+        if self.discriminator is None:
+            raise ImproperlyConfigured(
+                'Could not find discriminator descriptor.'
+            )
+
         self.id = list(map(self._column_to_property, self._id_cols))
 
     class Comparator(PropComparator):
