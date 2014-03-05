@@ -1,11 +1,12 @@
+from collections import Iterable
+
 import six
 
 from sqlalchemy.orm.interfaces import MapperProperty, PropComparator
 from sqlalchemy.orm.session import _state_session
 from sqlalchemy.orm import attributes, class_mapper
 from sqlalchemy.util import set_creation_order
-from sqlalchemy import exc as sa_exc
-from sqlalchemy_utils.functions import table_name
+from sqlalchemy_utils.functions import table_name, identity
 
 
 def class_from_table_name(state, table):
@@ -37,12 +38,15 @@ class GenericAttributeImpl(attributes.ScalarAttributeImpl):
             # Unknown discriminator; return nothing.
             return None
 
-        # Lookup row with the discriminator and id.
-        id = state.attrs[self.parent_token.id.key].value
+        id = self.get_state_id(state)
         target = session.query(target_class).get(id)
 
         # Return found (or not found) target.
         return target
+
+    def get_state_id(self, state):
+        # Lookup row with the discriminator and id.
+        return tuple(state.attrs[id.key].value for id in self.parent_token.id)
 
     def set(self, state, dict_, initiator,
             passive=attributes.PASSIVE_OFF,
@@ -54,22 +58,21 @@ class GenericAttributeImpl(attributes.ScalarAttributeImpl):
 
         if initiator is None:
             # Nullify relationship args
-            dict_[self.parent_token.id.key] = None
+            for id in self.parent_token.id:
+                dict_[id.key] = None
             dict_[self.parent_token.discriminator.key] = None
         else:
             # Get the primary key of the initiator and ensure we
             # can support this assignment.
             mapper = class_mapper(type(initiator))
-            if len(mapper.primary_key) > 1:
-                raise sa_exc.InvalidRequestError(
-                    'Generic relationships against tables with composite '
-                    'primary keys are not supported.')
 
-            pk = mapper.identity_key_from_instance(initiator)[1][0]
+            pk = mapper.identity_key_from_instance(initiator)[1]
 
             # Set the identifier and the discriminator.
             discriminator = table_name(initiator)
-            dict_[self.parent_token.id.key] = pk
+
+            for index, id in enumerate(self.parent_token.id):
+                dict_[id.key] = pk[index]
             dict_[self.parent_token.discriminator.key] = discriminator
 
 
@@ -87,7 +90,7 @@ class GenericRelationshipProperty(MapperProperty):
 
     def __init__(self, discriminator, id, doc=None):
         self._discriminator_col = discriminator
-        self._id_col = id
+        self._id_cols = id
         self._id = None
         self._discriminator = None
         self.doc = doc
@@ -101,19 +104,21 @@ class GenericRelationshipProperty(MapperProperty):
                 return attr
 
     def init(self):
-        # Resolve columns to attributes.
-        if isinstance(self._discriminator_col, six.string_types):
-            self._discriminator_col = self.parent.columns[
-                self._discriminator_col
-            ]
+        def convert_strings(column):
+            if isinstance(column, six.string_types):
+                return self.parent.columns[column]
+            return column
 
-        if isinstance(self._id_col, six.string_types):
-            self._id_col = self.parent.columns[
-                self._id_col
-            ]
+        self._discriminator_col = convert_strings(self._discriminator_col)
+        self._id_cols = convert_strings(self._id_cols)
+
+        if isinstance(self._id_cols, Iterable):
+            self._id_cols = list(map(convert_strings, self._id_cols))
+        else:
+            self._id_cols = [self._id_cols]
 
         self.discriminator = self._column_to_property(self._discriminator_col)
-        self.id = self._column_to_property(self._id_col)
+        self.id = list(map(self._column_to_property, self._id_cols))
 
     class Comparator(PropComparator):
 
@@ -124,7 +129,9 @@ class GenericRelationshipProperty(MapperProperty):
         def __eq__(self, other):
             discriminator = table_name(other)
             q = self.property._discriminator_col == discriminator
-            q &= self.property._id_col == other.id
+            other_id = identity(other)
+            for index, id in enumerate(self.property._id_cols):
+                q &= id == other_id[index]
             return q
 
         def __ne__(self, other):

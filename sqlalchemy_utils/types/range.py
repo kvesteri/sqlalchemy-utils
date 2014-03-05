@@ -97,7 +97,7 @@ All range types support all comparison operators (>, >=, ==, !=, <=, <).
     Car.price_range << [300, 500]
 
     # Whether or not range is strictly right of another range
-    Car.price_range << [300, 500]
+    Car.price_range >> [300, 500]
 
 
 

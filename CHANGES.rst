@@ -3,8 +3,13 @@ Changelog
 
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
+0.24.3 (2014-02-xx)
+^^^^^^^^^^^^^^^^^^^
 
-0.24.2 (2014-02-21)
+- Added string argument support for generic_relationship
+
+
+0.24.2 (2014-03-05)
 ^^^^^^^^^^^^^^^^^^^
 
 - Remove toolz from dependencies

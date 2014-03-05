@@ -1,8 +1,5 @@
 from __future__ import unicode_literals
-import sqlalchemy as sa
 from tests import TestCase
-from sqlalchemy_utils import generic_relationship
-from sqlalchemy.ext.declarative import declared_attr
 
 
 class GenericRelationshipTestCase(TestCase):
@@ -107,56 +104,3 @@ class GenericRelationshipTestCase(TestCase):
         statement = self.Event.object.is_type(self.User)
         q = self.session.query(self.Event).filter(statement)
         assert q.first() is not None
-
-
-class TestGenericRelationship(GenericRelationshipTestCase):
-    def create_models(self):
-        class Building(self.Base):
-            __tablename__ = 'building'
-            id = sa.Column(sa.Integer, primary_key=True)
-
-        class User(self.Base):
-            __tablename__ = 'user'
-            id = sa.Column(sa.Integer, primary_key=True)
-
-        class Event(self.Base):
-            __tablename__ = 'event'
-            id = sa.Column(sa.Integer, primary_key=True)
-
-            object_type = sa.Column(sa.Unicode(255), name="objectType")
-            object_id = sa.Column(sa.Integer, nullable=False)
-
-            object = generic_relationship(object_type, object_id)
-
-        self.Building = Building
-        self.User = User
-        self.Event = Event
-
-
-class TestGenericRelationshipWithAbstractBase(GenericRelationshipTestCase):
-    def create_models(self):
-        class Building(self.Base):
-            __tablename__ = 'building'
-            id = sa.Column(sa.Integer, primary_key=True)
-
-        class User(self.Base):
-            __tablename__ = 'user'
-            id = sa.Column(sa.Integer, primary_key=True)
-
-        class EventBase(self.Base):
-            __abstract__ = True
-
-            object_type = sa.Column(sa.Unicode(255))
-            object_id = sa.Column(sa.Integer, nullable=False)
-
-            @declared_attr
-            def object(cls):
-                return generic_relationship('object_type', 'object_id')
-
-        class Event(EventBase):
-            __tablename__ = 'event'
-            id = sa.Column(sa.Integer, primary_key=True)
-
-        self.Building = Building
-        self.User = User
-        self.Event = Event
