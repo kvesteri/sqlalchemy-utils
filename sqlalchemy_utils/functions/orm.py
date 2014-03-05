@@ -179,7 +179,6 @@ def get_expr_attr(expr, attr_name):
         return getattr(expr, attr_name)
 
 
-
 def declarative_base(model):
     """
     Returns the declarative base for given model class.
