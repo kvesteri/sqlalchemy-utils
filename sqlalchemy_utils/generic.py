@@ -7,17 +7,9 @@ from sqlalchemy.orm import ColumnProperty
 from sqlalchemy.orm.interfaces import MapperProperty, PropComparator
 from sqlalchemy.orm.session import _state_session
 from sqlalchemy.util import set_creation_order
-from sqlalchemy_utils.functions import table_name, identity
+from sqlalchemy_utils.functions import identity
 
 from .exceptions import ImproperlyConfigured
-
-
-def class_from_table_name(state, table):
-    for class_ in state.class_._decl_class_registry.values():
-        name = table_name(class_)
-        if name and name == table:
-            return class_
-    return None
 
 
 class GenericAttributeImpl(attributes.ScalarAttributeImpl):
@@ -35,7 +27,7 @@ class GenericAttributeImpl(attributes.ScalarAttributeImpl):
         # Find class for discriminator.
         # TODO: Perhaps optimize with some sort of lookup?
         discriminator = self.get_state_discriminator(state)
-        target_class = class_from_table_name(state, discriminator)
+        target_class = state.class_._decl_class_registry.get(discriminator)
 
         if target_class is None:
             # Unknown discriminator; return nothing.
@@ -75,12 +67,13 @@ class GenericAttributeImpl(attributes.ScalarAttributeImpl):
         else:
             # Get the primary key of the initiator and ensure we
             # can support this assignment.
-            mapper = class_mapper(type(initiator))
+            class_ = type(initiator)
+            mapper = class_mapper(class_)
 
             pk = mapper.identity_key_from_instance(initiator)[1]
 
             # Set the identifier and the discriminator.
-            discriminator = table_name(initiator)
+            discriminator = unicode(class_.__name__)
 
             for index, id in enumerate(self.parent_token.id):
                 dict_[id.key] = pk[index]
@@ -150,7 +143,7 @@ class GenericRelationshipProperty(MapperProperty):
             self._parentmapper = parentmapper
 
         def __eq__(self, other):
-            discriminator = table_name(other)
+            discriminator = unicode(type(other).__name__)
             q = self.property._discriminator_col == discriminator
             other_id = identity(other)
             for index, id in enumerate(self.property._id_cols):
@@ -161,7 +154,7 @@ class GenericRelationshipProperty(MapperProperty):
             return ~(self == other)
 
         def is_type(self, other):
-            discriminator = table_name(other)
+            discriminator = unicode(other.__name__)
             return self.property._discriminator_col == discriminator
 
     def instrument_class(self, mapper):

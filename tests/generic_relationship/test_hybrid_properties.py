@@ -32,11 +32,11 @@ class TestGenericRelationship(TestCase):
 
             @hybrid_property
             def object_version_type(self):
-                return self.object_type + '_history'
+                return self.object_type + 'History'
 
             @object_version_type.expression
             def object_version_type(cls):
-                return sa.func.concat(cls.object_type, '_history')
+                return sa.func.concat(cls.object_type, 'History')
 
             object_version = generic_relationship(
                 object_version_type, (object_id, transaction_id)
@@ -55,7 +55,7 @@ class TestGenericRelationship(TestCase):
 
         event = self.Event(transaction_id=1)
         event.object_id = user.id
-        event.object_type = type(user).__tablename__
+        event.object_type = unicode(type(user).__name__)
         assert event.object is None
 
         self.session.add(event)

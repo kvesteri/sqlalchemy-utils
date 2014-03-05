@@ -7,9 +7,7 @@ from sqlalchemy.orm.attributes import (
     set_committed_value, InstrumentedAttribute
 )
 from sqlalchemy.orm.session import object_session
-from sqlalchemy_utils.generic import (
-    GenericRelationshipProperty, class_from_table_name
-)
+from sqlalchemy_utils.generic import GenericRelationshipProperty
 from sqlalchemy_utils.functions.orm import (
     list_local_values,
     list_local_remote_exprs,
@@ -345,9 +343,7 @@ class GenericRelationshipFetcher(object):
 
     def _queries(self, state, id_dict):
         for discriminator, ids in six.iteritems(id_dict):
-            class_ = class_from_table_name(
-                state, discriminator
-            )
+            class_ = state.class_._decl_class_registry.get(discriminator)
             yield self.path.session.query(
                 class_
             ).filter(

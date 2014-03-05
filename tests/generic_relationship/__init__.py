@@ -16,7 +16,7 @@ class GenericRelationshipTestCase(TestCase):
 
         event = self.Event()
         event.object_id = user.id
-        event.object_type = type(user).__tablename__
+        event.object_type = unicode(type(user).__name__)
 
         assert event.object is None
 
@@ -34,7 +34,7 @@ class GenericRelationshipTestCase(TestCase):
         event = self.Event(object=user)
 
         assert event.object_id == user.id
-        assert event.object_type == type(user).__tablename__
+        assert event.object_type == type(user).__name__
 
         self.session.add(event)
         self.session.commit()

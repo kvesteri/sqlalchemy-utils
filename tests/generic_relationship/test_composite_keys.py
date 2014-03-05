@@ -52,7 +52,7 @@ class TestGenericRelationship(GenericRelationshipTestCase):
 
         event = self.Event()
         event.object_id = user.id
-        event.object_type = type(user).__tablename__
+        event.object_type = unicode(type(user).__name__)
         event.object_code = user.code
 
         assert event.object is None
