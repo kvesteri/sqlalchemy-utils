@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+import six
 import sqlalchemy as sa
 from sqlalchemy_utils import generic_relationship
 from tests.generic_relationship import GenericRelationshipTestCase
@@ -52,7 +53,7 @@ class TestGenericRelationship(GenericRelationshipTestCase):
 
         event = self.Event()
         event.object_id = user.id
-        event.object_type = unicode(type(user).__name__)
+        event.object_type = six.text_type(type(user).__name__)
         event.object_code = user.code
 
         assert event.object is None

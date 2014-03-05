@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+import six
 from tests import TestCase
 
 
@@ -16,7 +17,7 @@ class GenericRelationshipTestCase(TestCase):
 
         event = self.Event()
         event.object_id = user.id
-        event.object_type = unicode(type(user).__name__)
+        event.object_type = six.text_type(type(user).__name__)
 
         assert event.object is None
 

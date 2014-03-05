@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+import six
 import sqlalchemy as sa
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_utils import generic_relationship
@@ -55,7 +56,7 @@ class TestGenericRelationship(TestCase):
 
         event = self.Event(transaction_id=1)
         event.object_id = user.id
-        event.object_type = unicode(type(user).__name__)
+        event.object_type = six.text_type(type(user).__name__)
         assert event.object is None
 
         self.session.add(event)

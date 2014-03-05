@@ -74,7 +74,7 @@ class GenericAttributeImpl(attributes.ScalarAttributeImpl):
             pk = mapper.identity_key_from_instance(initiator)[1]
 
             # Set the identifier and the discriminator.
-            discriminator = unicode(class_.__name__)
+            discriminator = six.text_type(class_.__name__)
 
             for index, id in enumerate(self.parent_token.id):
                 dict_[id.key] = pk[index]
@@ -144,7 +144,7 @@ class GenericRelationshipProperty(MapperProperty):
             self._parentmapper = parentmapper
 
         def __eq__(self, other):
-            discriminator = unicode(type(other).__name__)
+            discriminator = six.text_type(type(other).__name__)
             q = self.property._discriminator_col == discriminator
             other_id = identity(other)
             for index, id in enumerate(self.property._id_cols):
@@ -158,9 +158,9 @@ class GenericRelationshipProperty(MapperProperty):
             mapper = sa.inspect(other)
             # Iterate through the weak sequence in order to get the actual
             # mappers
-            class_names = [unicode(other.__name__)]
+            class_names = [six.text_type(other.__name__)]
             class_names.extend([
-                unicode(submapper.class_.__name__)
+                six.text_type(submapper.class_.__name__)
                 for submapper in mapper._inheriting_mappers
             ])
 
