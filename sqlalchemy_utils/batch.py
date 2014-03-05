@@ -14,8 +14,6 @@ from sqlalchemy_utils.functions.orm import (
     list_local_values,
     list_local_remote_exprs,
     local_values,
-    local_column_names,
-    local_remote_expr,
     remote_column_names,
     remote_values,
     remote
@@ -339,9 +337,10 @@ class GenericRelationshipFetcher(object):
         id_dict = defaultdict(list)
         for entity in self.path.entities:
             discriminator = getattr(entity, self.prop._discriminator_col.key)
-            id_dict[discriminator].append(
-                getattr(entity, self.prop._id_col.key)
-            )
+            for id_col in self.prop._id_cols:
+                id_dict[discriminator].append(
+                    getattr(entity, id_col.key)
+                )
         return chain(*self._queries(sa.inspect(entity), id_dict))
 
     def _queries(self, state, id_dict):

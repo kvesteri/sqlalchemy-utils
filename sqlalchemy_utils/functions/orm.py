@@ -77,7 +77,8 @@ def remote(prop):
 def local_column_names(prop):
     if not hasattr(prop, 'secondary'):
         yield prop._discriminator_col.key
-        yield prop._id_col.key
+        for id_col in prop._id_cols:
+            yield id_col.key
     elif prop.secondary is None:
         for local, _ in prop.local_remote_pairs:
             yield local.name
