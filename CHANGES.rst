@@ -4,13 +4,13 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
-0.24.4 (2014-02-05)
+0.24.4 (2014-03-05)
 ^^^^^^^^^^^^^^^^^^^
 
 - Added hybrid_property support for generic_relationship
 
 
-0.24.3 (2014-02-05)
+0.24.3 (2014-03-05)
 ^^^^^^^^^^^^^^^^^^^
 
 - Added string argument support for generic_relationship
