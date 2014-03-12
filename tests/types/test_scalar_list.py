@@ -49,7 +49,6 @@ class TestScalarUnicodeList(TestCase):
         self.session.add(user)
         with raises(sa.exc.StatementError) as db_err:
             self.session.commit()
-        print db_err.value.message
         assert (
             "List values can't contain string ',' (its being used as "
             "separator. If you wish for scalar list values to contain "
