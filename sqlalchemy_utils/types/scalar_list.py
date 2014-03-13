@@ -67,6 +67,7 @@ class ScalarListType(types.TypeDecorator):
                     "List values can't contain string '%s' (its being used as "
                     "separator. If you wish for scalar list values to contain "
                     "these strings, use a different separator string.)"
+                    % self.separator
                 )
             return self.separator.join(
                 map(six.text_type, value)
