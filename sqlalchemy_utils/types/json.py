@@ -4,7 +4,7 @@ json = None
 try:
     import anyjson as json
 except ImportError:
-    pass
+    import json as json
 
 import six
 from sqlalchemy.dialects.postgresql.base import ischema_names
