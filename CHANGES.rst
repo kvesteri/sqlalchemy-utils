@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.25.x (2014-xx-xx)
+^^^^^^^^^^^^^^^^^^^
+
+- Added more import json as a fallback if anyjson package is not installed for JSONType
+
+
 0.25.0 (2014-03-05)
 ^^^^^^^^^^^^^^^^^^^
 
