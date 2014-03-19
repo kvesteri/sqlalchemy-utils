@@ -26,27 +26,27 @@ class TestPhoneNumber(object):
 
     def test_valid_phone_numbers(self):
         for raw_number in self.valid_phone_numbers:
-            phone_number = PhoneNumber(raw_number, 'FI')
-            assert phone_number.is_valid_number()
+            number = PhoneNumber(raw_number, 'FI')
+            assert number.is_valid_number()
 
     def test_invalid_phone_numbers(self):
         for raw_number in self.invalid_phone_numbers:
             try:
-                phone_number = PhoneNumber(raw_number, 'FI')
-                assert not phone_number.is_valid_number()
+                number = PhoneNumber(raw_number, 'FI')
+                assert not number.is_valid_number()
             except:
                 pass
 
     def test_phone_number_attributes(self):
-        phone_number = PhoneNumber('+358401234567')
-        assert phone_number.e164 == u'+358401234567'
-        assert phone_number.international == u'+358 40 1234567'
-        assert phone_number.national == u'040 1234567'
+        number = PhoneNumber('+358401234567')
+        assert number.e164 == u'+358401234567'
+        assert number.international == u'+358 40 1234567'
+        assert number.national == u'040 1234567'
 
     def test_phone_number_str_repr(self):
-        phone_number = PhoneNumber('+358401234567')
-        assert phone_number.__unicode__() == phone_number.national
-        assert phone_number.__str__() == phone_number.national.encode('utf-8')
+        number = PhoneNumber('+358401234567')
+        assert number.__unicode__() == number.national
+        assert number.__str__() == number.national.encode('utf-8')
 
 
 @mark.skipif('phone_number.phonenumbers is None')
