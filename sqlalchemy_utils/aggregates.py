@@ -31,10 +31,12 @@ Features
 * Automatically updates aggregate columns when aggregated values change
 * Supports aggregate values through arbitrary number levels of relations
 * Highly optimized: uses single query per transaction per aggregate column
-* Aggregated columns can be of any data type and use any selectable scalar expression
+* Aggregated columns can be of any data type and use any selectable scalar
+  expression
 
 
-.. _column_property: http://docs.sqlalchemy.org/en/latest/orm/mapper_config.html#using-column-property
+.. _column_property:
+    http://docs.sqlalchemy.org/en/latest/orm/mapper_config.html#using-column-property
 .. _counter_culture: https://github.com/magnusvk/counter_culture
 .. _stackoverflow reply by Michael Bayer:
     http://stackoverflow.com/questions/13693872/
@@ -84,9 +86,12 @@ Simple aggregates
 Custom aggregate expressions
 ----------------------------
 
-Aggregate expression can be virtually any SQL expression not just a simple function taking one parameter. You can try things such as subqueries and different kinds of functions.
+Aggregate expression can be virtually any SQL expression not just a simple
+function taking one parameter. You can try things such as subqueries and
+different kinds of functions.
 
-In the following example we have a Catalog of products where each catalog knows the net worth of its products.
+In the following example we have a Catalog of products where each catalog
+knows the net worth of its products.
 
 ::
 
@@ -163,8 +168,9 @@ Now the net_worth column of Catalog model will be automatically whenever:
 Multiple aggregates per class
 -----------------------------
 
-Sometimes you may need to define multiple aggregate values for same class. If you need
-to define lots of relationships pointing to same class, remember to define the relationships as viewonly when possible.
+Sometimes you may need to define multiple aggregate values for same class. If
+you need to define lots of relationships pointing to same class, remember to
+define the relationships as viewonly when possible.
 
 
 ::
@@ -208,7 +214,8 @@ to define lots of relationships pointing to same class, remember to define the r
 Many-to-Many aggregates
 -----------------------
 
-Aggregate expressions also support many-to-many relationships. The usual use scenarios includes things such as:
+Aggregate expressions also support many-to-many relationships. The usual use
+scenarios includes things such as:
 
 1. Friend count of a user
 2. Group count where given user belongs to
@@ -258,8 +265,9 @@ Aggregate expressions also support many-to-many relationships. The usual use sce
 Multi-level aggregates
 ----------------------
 
-Aggregates can span accross multiple relationships. In the following example each
-Catalog has a net_worth which is the sum of all products in all categories.
+Aggregates can span accross multiple relationships. In the following example
+each Catalog has a net_worth which is the sum of all products in all
+categories.
 
 
 ::
