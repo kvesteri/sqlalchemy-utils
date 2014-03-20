@@ -1,12 +1,6 @@
 import sqlalchemy as sa
-from sqlalchemy_utils import escape_like
 from tests import TestCase
 from sqlalchemy_utils.functions import non_indexed_foreign_keys
-
-
-class TestEscapeLike(TestCase):
-    def test_escapes_wildcards(self):
-        assert escape_like('_*%') == '*_***%'
 
 
 class TestFindNonIndexedForeignKeys(TestCase):
@@ -53,4 +47,3 @@ class TestFindNonIndexedForeignKeys(TestCase):
         ]
         assert 'category_id' in column_names
         assert 'author_id' not in column_names
-
