@@ -127,9 +127,10 @@ def query_labels(query):
 
 def query_entities(query):
     """
-    Return all entities for given SQLAlchemy query object.
+    Return a generator that iterates through all entities for given SQLAlchemy
+    query object.
 
-    Example::
+    Examples::
 
 
         query = session.query(Category)
@@ -140,6 +141,14 @@ def query_entities(query):
         query = session.query(Category.id)
 
         query_entities(query)  # <Category>
+
+
+    This function also supports queries with joins:
+
+
+        query = session.query(Category).join(Article)
+
+        query_entities(query)  # (<Category>, <Article>)
 
 
     :param query: SQLAlchemy Query object

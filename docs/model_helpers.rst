@@ -16,6 +16,12 @@ escape_like
 .. autofunction:: escape_like
 
 
+query_entities
+^^^^^^^^^^^^^^
+
+.. autofunction:: query_entities
+
+
 has_changes
 ^^^^^^^^^^^
 
