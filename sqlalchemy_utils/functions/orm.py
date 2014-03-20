@@ -132,16 +132,21 @@ def query_entities(query):
     Example::
 
 
-        query = session.query(
-            Category
-        )
+        query = session.query(Category)
 
-        query_entities(query)  # ('Category', )
+        query_entities(query)  # <Category>
+
+
+        query = session.query(Category.id)
+
+        query_entities(query)  # <Category>
+
 
     :param query: SQLAlchemy Query object
     """
     for entity in query._entities:
-        yield entity.entity_zero.class_
+        if entity.entity_zero:
+            yield entity.entity_zero.class_
 
     for entity in query._join_entities:
         if isinstance(entity, Mapper):
