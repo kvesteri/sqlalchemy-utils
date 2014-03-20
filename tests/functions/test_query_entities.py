@@ -68,3 +68,7 @@ class TestQueryEntities(TestCase):
     def test_joins(self):
         query = self.session.query(self.User.__mapper__).join(self.Article)
         assert list(query_entities(query)) == [self.User, self.Article]
+
+    def test_aliased_entity(self):
+        query = self.session.query(sa.orm.aliased(self.User))
+        assert list(query_entities(query)) == [self.User]
