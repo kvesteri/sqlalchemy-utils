@@ -17,6 +17,7 @@ from .orm import (
     has_changes,
     identity,
     naturally_equivalent,
+    query_entities,
     primary_keys,
     table_name,
 )
