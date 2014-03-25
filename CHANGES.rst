@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.25.2 (2014-03-25)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed sort_query handling of regular properties (no longer throws exceptions)
+
+
 0.25.1 (2014-03-20)
 ^^^^^^^^^^^^^^^^^^^
 
