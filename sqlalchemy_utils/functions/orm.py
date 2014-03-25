@@ -2,9 +2,10 @@ from functools import partial
 from operator import attrgetter
 import sqlalchemy as sa
 from sqlalchemy import inspect
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm.attributes import InstrumentedAttribute
-from sqlalchemy.orm.query import _ColumnEntity
 from sqlalchemy.orm.mapper import Mapper
+from sqlalchemy.orm.query import _ColumnEntity
 from sqlalchemy.orm.util import AliasedInsp
 
 
@@ -179,11 +180,17 @@ def get_query_entity_by_alias(query, alias):
             return entity
 
 
-def attrs(expr):
+def get_attrs(expr):
     if isinstance(expr, AliasedInsp):
         return expr.mapper.attrs
     else:
         return inspect(expr).attrs
+
+
+def get_hybrid_properties(class_):
+    for prop in sa.inspect(class_).all_orm_descriptors:
+        if isinstance(prop, hybrid_property):
+            yield prop
 
 
 def get_expr_attr(expr, attr_name):

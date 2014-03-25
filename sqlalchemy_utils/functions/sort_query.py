@@ -1,12 +1,14 @@
+import sqlalchemy as sa
 from sqlalchemy.orm.properties import ColumnProperty
 from sqlalchemy.sql.expression import desc, asc, Label
 from sqlalchemy.orm.util import AliasedInsp
 from .orm import (
-    attrs,
-    query_labels,
-    query_entities,
+    get_attrs,
+    get_expr_attr,
+    get_hybrid_properties,
     get_query_entity_by_alias,
-    get_expr_attr
+    query_entities,
+    query_labels,
 )
 
 
@@ -39,7 +41,7 @@ class QuerySorter(object):
         return self.query
 
     def order_by_attr(self, entity, attr):
-        properties = attrs(entity)
+        properties = get_attrs(entity)
         if attr in properties:
             property_ = properties[attr]
             if isinstance(property_, ColumnProperty):
@@ -51,10 +53,15 @@ class QuerySorter(object):
             else:
                 return
 
-        if isinstance(entity, AliasedInsp):
-            entity = entity.entity
-        if hasattr(entity, attr):
-            return getattr(entity, attr)
+        mapper = sa.inspect(entity)
+
+        if isinstance(mapper, AliasedInsp):
+            mapper = mapper.mapper
+            entity = mapper.entity
+
+        for prop in get_hybrid_properties(mapper):
+            if attr == prop.__name__:
+                return getattr(entity, attr)
 
     def parse_sort_arg(self, arg):
         if arg[0] == self.separator:
@@ -136,7 +143,7 @@ def sort_query(query, *args, **kwargs):
     3. Applying sort to custom calculated label
 
         >>> query = session.query(
-        ...     Category, db.func.count(Article.id).label('articles')
+        ...     Category, sa.func.count(Article.id).label('articles')
         ... )
         >>> query = sort_query(query, 'articles')
 

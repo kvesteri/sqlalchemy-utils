@@ -114,6 +114,16 @@ class TestSortQuery(TestCase):
         query = sort_query(query, 'articles')
         assert 'ORDER BY' not in str(query)
 
+    def test_regular_property(self):
+        query = self.session.query(self.Category)
+        query = sort_query(query, 'name_alias')
+        assert 'ORDER BY' not in str(query)
+
+    def test_synonym_property(self):
+        query = self.session.query(self.Category)
+        query = sort_query(query, 'name_synonym')
+        assert 'ORDER BY name DESC'
+
     def test_hybrid_property(self):
         query = self.session.query(self.Category)
         query = sort_query(query, 'articles_count')

@@ -3,7 +3,7 @@ import sqlalchemy as sa
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.declarative import declarative_base, synonym_for
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from sqlalchemy_utils import (
@@ -80,6 +80,15 @@ class TestCase(object):
                     .correlate(self.Article.__table__)
                     .label('article_count')
                 )
+
+            @property
+            def name_alias(self):
+                return self.name
+
+            @synonym_for('name')
+            @property
+            def name_synonym(self):
+                return self.name
 
         class Article(self.Base):
             __tablename__ = 'article'
