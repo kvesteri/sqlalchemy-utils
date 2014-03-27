@@ -21,7 +21,7 @@ from .timezone import TimezoneType
 from .ts_vector import TSVectorType
 from .url import URLType
 from .uuid import UUIDType
-from .weekdays import WeekDay, WeekDays, WeekDaysType
+from .weekdays import WeekDaysType
 
 
 __all__ = (
@@ -49,8 +49,6 @@ __all__ = (
     TSVectorType,
     URLType,
     UUIDType,
-    WeekDay,
-    WeekDays,
     WeekDaysType,
 )
 

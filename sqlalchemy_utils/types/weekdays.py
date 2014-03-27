@@ -1,11 +1,12 @@
 import six
 from sqlalchemy import types
-from sqlalchemy.dialects.postgresql import BIT
 from sqlalchemy_utils.primitives import WeekDay, WeekDays
+from .scalar_coercible import ScalarCoercible
+from .bit import BitType
 
 
-class WeekDaysType(types.TypeDecorator):
-    impl = BIT(WeekDay.NUM_WEEK_DAYS)
+class WeekDaysType(types.TypeDecorator, ScalarCoercible):
+    impl = BitType(WeekDay.NUM_WEEK_DAYS)
 
     def process_bind_param(self, value, dialect):
         if isinstance(value, WeekDays):
@@ -17,3 +18,8 @@ class WeekDaysType(types.TypeDecorator):
     def process_result_value(self, value, dialect):
         if value is not None:
             return WeekDays(value)
+
+    def _coerce(self, value):
+        if value is not None and not isinstance(value, WeekDays):
+            return WeekDays(value)
+        return value

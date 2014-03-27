@@ -53,6 +53,7 @@ from .types import (
     TSVectorType,
     URLType,
     UUIDType,
+    WeekDaysType
 )
 
 
@@ -113,4 +114,5 @@ __all__ = (
     TSVectorType,
     URLType,
     UUIDType,
+    WeekDaysType
 )

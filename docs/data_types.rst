@@ -96,3 +96,12 @@ UUIDType
 
 .. autoclass:: UUIDType
 
+
+
+WeekDaysType
+^^^^^^^^^^^^
+
+.. module:: sqlalchemy_utils.types.weekdays
+
+.. autoclass:: WeekDaysType
+
