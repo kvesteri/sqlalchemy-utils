@@ -1,11 +1,17 @@
+from babel import Locale
 import sqlalchemy as sa
 from sqlalchemy_utils.types import WeekDaysType
 from sqlalchemy_utils.primitives import WeekDays
+from sqlalchemy_utils import i18n
 
 from tests import TestCase
 
 
 class WeekDaysTypeTestCase(TestCase):
+    def setup_method(self, method):
+        TestCase.setup_method(self, method)
+        i18n.get_locale = lambda: Locale('en')
+
     def create_models(self):
         class Schedule(self.Base):
             __tablename__ = 'schedule'

@@ -14,6 +14,7 @@ ArrowType
 
 .. autoclass:: ArrowType
 
+
 ChoiceType
 ^^^^^^^^^^
 

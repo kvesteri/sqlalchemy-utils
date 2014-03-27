@@ -34,6 +34,7 @@ class LocaleType(types.TypeDecorator, ScalarCoercible):
 
         user = User()
         user.locale = Locale('en_US')
+        session.add(user)
         session.commit()
 
 
