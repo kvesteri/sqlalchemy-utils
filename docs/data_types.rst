@@ -56,6 +56,14 @@ LocaleType
 .. autoclass:: LocaleType
 
 
+IPAddressType
+^^^^^^^^^^^^^
+
+.. module:: sqlalchemy_utils.types.ip_addresss
+
+.. autoclass:: IPAddressType
+
+
 PasswordType
 ^^^^^^^^^^^^
 
