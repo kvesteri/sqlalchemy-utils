@@ -37,8 +37,34 @@ class CountryType(types.TypeDecorator, ScalarCoercible):
     """
     Changes Country objects to a string representation on the way in and
     changes them back to Country objects on the way out.
-    """
 
+    In order to use CountryType you need to install Babel_ first.
+
+    .. _Babel: http://babel.pocoo.org/
+
+    ::
+
+
+        from sqlalchemy_utils import CountryType, Country
+
+
+        class User(Base):
+            __tablename__ = 'user'
+            id = sa.Column(sa.Integer, autoincrement=True)
+            name = sa.Column(sa.Unicode(255))
+            country = sa.Column(CountryType)
+
+
+        user = User()
+        user.working_days = Country('FI')
+        session.add(user)
+        session.commit()
+
+        user.country  # Country('FI')
+        user.country.name  # Finland
+
+        print user.country  # Finland
+    """
     impl = types.String(2)
     python_type = Country
 

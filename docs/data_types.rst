@@ -31,6 +31,14 @@ ColorType
 .. autoclass:: ColorType
 
 
+CountryType
+^^^^^^^^^^^
+
+.. module:: sqlalchemy_utils.types.country
+
+.. autoclass:: CountryType
+
+
 JSONType
 ^^^^^^^^
 
