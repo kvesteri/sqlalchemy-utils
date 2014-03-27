@@ -19,6 +19,32 @@ class IPAddressType(types.TypeDecorator, ScalarCoercible):
     """
     Changes IPAddress objects to a string representation on the way in and
     changes them back to IPAddress objects on the way out.
+
+    IPAddressType uses ipaddress package on Python >= 3 and ipaddr_ package on
+    Python 2. In order to use IPAddressType with python you need to install
+    ipaddr_ first.
+
+    .. _ipaddr: https://pypi.python.org/pypi/ipaddr
+
+    ::
+
+
+        from sqlalchemy_utils import IPAddressType
+
+
+        class User(Base):
+            __tablename__ = 'user'
+            id = sa.Column(sa.Integer, autoincrement=True)
+            name = sa.Column(sa.Unicode(255))
+            ip_address = sa.Column(IPAddressType)
+
+
+        user = User()
+        user.ip_address = '123.123.123.123'
+        session.add(user)
+        session.commit()
+
+        user.ip_address  # IPAddress object
     """
 
     impl = types.Unicode(50)

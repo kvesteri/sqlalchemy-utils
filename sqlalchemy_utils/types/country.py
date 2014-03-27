@@ -56,7 +56,7 @@ class CountryType(types.TypeDecorator, ScalarCoercible):
 
 
         user = User()
-        user.working_days = Country('FI')
+        user.country = Country('FI')
         session.add(user)
         session.commit()
 
@@ -64,6 +64,13 @@ class CountryType(types.TypeDecorator, ScalarCoercible):
         user.country.name  # Finland
 
         print user.country  # Finland
+
+
+    CountryType is scalar coercible::
+
+
+        user.country = 'US'
+        user.country  # Country('US')
     """
     impl = types.String(2)
     python_type = Country
