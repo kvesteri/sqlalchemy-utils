@@ -7,7 +7,7 @@ from flexmock import flexmock
 import pytest
 
 import six
-from sqlalchemy_utils.types import WeekDay, WeekDays
+from sqlalchemy_utils.primitives import WeekDay, WeekDays
 from sqlalchemy_utils import i18n
 
 
