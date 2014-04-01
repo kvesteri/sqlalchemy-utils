@@ -16,10 +16,11 @@ class TestPasswordType(TestCase):
                 schemes=[
                     'pbkdf2_sha512',
                     'pbkdf2_sha256',
-                    'md5_crypt'
+                    'md5_crypt',
+                    'hex_md5'
                 ],
 
-                deprecated=['md5_crypt']
+                deprecated=['md5_crypt', 'hex_md5']
             ))
 
             def __repr__(self):
