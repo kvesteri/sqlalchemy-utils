@@ -101,16 +101,18 @@ def database_exists(url):
             return False
 
 
-def create_database(url, encoding='utf8'):
+def create_database(url, encoding='utf8', pg_template=None):
     """Issue the appropriate CREATE DATABASE statement.
 
     :param url: A SQLAlchemy engine URL.
     :param encoding: The encoding to create the database as.
+    :param pg_template: A postgresql database template name.
 
     To create a database, you can pass a simple URL that would have
     been passed to ``create_engine``. ::
 
         create_database('postgres://postgres@localhost/name')
+        create_database('postgres://postgres@localhost/name', pg_template='postgis_template')
 
     You may also pass the url from an existing engine. ::
 
@@ -135,6 +137,8 @@ def create_database(url, encoding='utf8'):
                 ISOLATION_LEVEL_AUTOCOMMIT)
 
         text = "CREATE DATABASE %s ENCODING = '%s'" % (database, encoding)
+        if pg_template:
+            text = "%s TEMPLATE %s" % (text, pg_template)
         engine.execute(text)
 
     elif engine.dialect.name == 'mysql':
