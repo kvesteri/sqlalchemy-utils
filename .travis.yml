@@ -3,7 +3,7 @@ addons:
 
 before_script:
   - psql -c 'create database sqlalchemy_utils_test;' -U postgres
-  - mysql -e 'create database sqlalchemy_continuum_test;'
+  - mysql -e 'create database sqlalchemy_utils_test;'
 
 
 language: python
