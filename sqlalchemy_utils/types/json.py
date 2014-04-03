@@ -62,7 +62,7 @@ class JSONType(sa.types.TypeDecorator):
         super(JSONType, self).__init__(*args, **kwargs)
 
     def load_dialect_impl(self, dialect):
-        if dialect.name == 'postgresql':
+        if dialect.name == 'postgresql' and dialect._has_native_json:
             # Use the native JSON type.
             if has_postgres_json:
                 return dialect.type_descriptor(JSON())
@@ -72,7 +72,7 @@ class JSONType(sa.types.TypeDecorator):
             return dialect.type_descriptor(self.impl)
 
     def process_bind_param(self, value, dialect):
-        if dialect.name == 'postgresql' and has_postgres_json:
+        if dialect.name == 'postgresql' and dialect._has_native_json:
             return value
         if value is not None:
             value = six.text_type(json.dumps(value))
