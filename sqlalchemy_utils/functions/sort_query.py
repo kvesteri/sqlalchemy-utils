@@ -153,10 +153,13 @@ def sort_query(query, *args, **kwargs):
         >>> query = sort_query(query, 'category-name')
 
 
-    :param query: query to be modified
-    :param sort: string that defines the label or column to sort the query by
-    :param errors: whether or not to raise exceptions if unknown sort column
-                   is passed
+    :param query:
+        query to be modified
+    :param sort:
+        string that defines the label or column to sort the query by
+    :param silent:
+        Whether or not to raise exceptions if unknown sort column
+        is passed. By default this is `True` indicating that no errors should
+        be raised for unknown columns.
     """
-
     return QuerySorter(**kwargs)(query, *args)
