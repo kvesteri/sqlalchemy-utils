@@ -19,6 +19,8 @@ extras_require = {
         'docutils>=0.10',
         'flexmock>=0.9.7',
         'psycopg2>=2.5.1',
+        'pytz>=2014.2',
+        'python-dateutil>=2.2',
         'pymysql'
     ],
     'anyjson': ['anyjson>=0.3.3'],
