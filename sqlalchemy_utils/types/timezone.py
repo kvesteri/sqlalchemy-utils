@@ -19,7 +19,8 @@ class TimezoneType(types.TypeDecorator, ScalarCoercible):
         class User(Base):
             __tablename__ = 'user'
 
-            # Pass backend='pytz' to change it to use pytz (dateutil by default)
+            # Pass backend='pytz' to change it to use pytz (dateutil by
+            # default)
             timezone = sa.Column(TimezoneType(backend='pytz'))
     """
 
@@ -40,7 +41,7 @@ class TimezoneType(types.TypeDecorator, ScalarCoercible):
 
                 self.python_type = tzfile
                 self._to = gettz
-                self._from = lambda x: x._filename
+                self._from = lambda x: six.text_type(x._filename)
 
             except ImportError:
                 raise ImproperlyConfigured(
