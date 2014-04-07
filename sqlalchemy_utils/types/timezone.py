@@ -23,7 +23,7 @@ class TimezoneType(types.TypeDecorator, ScalarCoercible):
             timezone = sa.Column(TimezoneType(backend='pytz'))
     """
 
-    impl = types.CHAR(50)
+    impl = types.Unicode(50)
 
     python_type = None
 
