@@ -30,3 +30,14 @@ class TestPrimaryKeys(TestCase):
         assert primary_keys(self.Building()) == OrderedDict({
             'id': self.Building.__table__.c._id
         })
+
+    def test_class_alias(self):
+        assert primary_keys(sa.orm.aliased(self.Building())) == OrderedDict({
+            'id': self.Building.__table__.c._id
+        })
+
+    def test_table_alias(self):
+        alias = sa.orm.aliased(self.Building.__table__)
+        assert primary_keys(alias) == OrderedDict({
+            '_id': alias.c._id
+        })

@@ -29,3 +29,22 @@ class TestGetColumns(TestCase):
             get_columns(self.Building()),
             sa.util._collections.OrderedProperties
         )
+
+    def test_mapper(self):
+        assert isinstance(
+            get_columns(self.Building.__mapper__),
+            sa.util._collections.OrderedProperties
+        )
+
+    def test_class_alias(self):
+        assert isinstance(
+            get_columns(sa.orm.aliased(self.Building)),
+            sa.util._collections.OrderedProperties
+        )
+
+    def test_table_alias(self):
+        alias = sa.orm.aliased(self.Building.__table__)
+        assert isinstance(
+            get_columns(alias),
+            sa.sql.base.ImmutableColumnCollection
+        )
