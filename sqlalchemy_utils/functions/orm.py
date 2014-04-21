@@ -30,6 +30,12 @@ def primary_keys(mixed):
 
         primary_keys(User.__table__)
 
+        primary_keys(User.__mapper__)
+
+        primary_keys(sa.orm.aliased(User))
+
+        primary_keys(sa.orm.alised(User.__table__))
+
 
     .. versionchanged: 0.25.3
         Made the function return an ordered dictionary instead of generator.
