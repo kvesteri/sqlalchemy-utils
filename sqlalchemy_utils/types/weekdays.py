@@ -48,6 +48,10 @@ class WeekDaysType(types.TypeDecorator, ScalarCoercible):
 
     impl = BitType(WeekDay.NUM_WEEK_DAYS)
 
+    @property
+    def comparator_factory(self):
+        return self.impl.comparator_factory
+
     def process_bind_param(self, value, dialect):
         if isinstance(value, WeekDays):
             return value.as_bit_string()

@@ -16,5 +16,7 @@ class BitType(sa.types.TypeDecorator):
         # Use the native BIT type for drivers that has it.
         if dialect.name == 'postgresql':
             return dialect.type_descriptor(BIT(self.length))
+        elif dialect.name == 'sqlite':
+            return dialect.type_descriptor(sa.String(self.length))
         else:
             return dialect.type_descriptor(type(self.impl)(self.length))
