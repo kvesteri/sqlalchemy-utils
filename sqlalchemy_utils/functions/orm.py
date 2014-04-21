@@ -1,4 +1,9 @@
+try:
+    from collections import OrderedDict
+except ImportError:
+    from ordereddict import OrderedDict
 from functools import partial
+from inspect import isclass
 from operator import attrgetter
 import sqlalchemy as sa
 from sqlalchemy import inspect
@@ -9,13 +14,19 @@ from sqlalchemy.orm.query import _ColumnEntity
 from sqlalchemy.orm.util import AliasedInsp
 
 
-def primary_keys(class_):
+def primary_keys(obj_or_class):
     """
-    Returns all primary keys for given declarative class.
+    Return an OrderedDict of all primary keys for given declarative class or
+    object.
     """
-    for column in class_.__table__.c:
+    if not isclass(obj_or_class):
+        obj_or_class = obj_or_class.__class__
+
+    columns = OrderedDict()
+    for key, column in sa.inspect(obj_or_class).columns.items():
         if column.primary_key:
-            yield column
+            columns[key] = column
+    return columns
 
 
 def table_name(obj):
@@ -325,8 +336,8 @@ def identity(obj_or_class):
     :param obj: SQLAlchemy declarative model object
     """
     return tuple(
-        getattr(obj_or_class, column.name)
-        for column in primary_keys(obj_or_class)
+        getattr(obj_or_class, column_key)
+        for column_key in primary_keys(obj_or_class).keys()
     )
 
 
