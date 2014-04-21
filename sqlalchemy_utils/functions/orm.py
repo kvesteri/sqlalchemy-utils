@@ -62,7 +62,7 @@ def get_columns(mixed):
 
         get_columns(User.__mapper__)
 
-        get_column(sa.orm.aliased(User))
+        get_columns(sa.orm.aliased(User))
 
         get_columns(sa.orm.alised(User.__table__))
 
