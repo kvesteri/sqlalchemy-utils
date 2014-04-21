@@ -22,6 +22,15 @@ def primary_keys(mixed):
     :param mixed:
         SA Table object, SA declarative class or SA declarative class instance
 
+    ::
+
+        primary_keys(User)
+
+        primary_keys(User())
+
+        primary_keys(User.__table__)
+
+
     .. versionchanged: 0.25.3
         Made the function return an ordered dictionary instead of generator.
         This change was made to support primary key aliases.
@@ -39,6 +48,18 @@ def get_columns(mixed):
     """
     Return a collection of all Column objects for given SQLAlchemy
     Table object, declarative class or declarative class instance.
+
+    The type of the collection depends on the type of the object to return the
+    columns from.
+
+    ::
+
+        get_columns(User)
+
+        get_columns(User())
+
+        get_columns(User.__table__)
+
 
     :param mixed:
         SA Table object, SA declarative class or SA declarative class instance
