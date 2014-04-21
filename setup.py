@@ -66,7 +66,9 @@ setup(
         'six',
         'SQLAlchemy>=0.9.3',
         'total_ordering>=0.1'
-        if sys.version_info[0] == 2 and sys.version_info[1] < 7 else ''
+        if sys.version_info[0] == 2 and sys.version_info[1] < 7 else '',
+        'ordereddict>=1.1'
+        if sys.version_info[0] == 2 and sys.version_info[1] < 7 else '',
     ],
     extras_require=extras_require,
     classifiers=[
