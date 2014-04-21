@@ -12,14 +12,14 @@ from .database import (
     non_indexed_foreign_keys,
 )
 from .orm import (
-    declarative_base,
     get_columns,
+    get_declarative_base,
+    get_primary_keys,
     getdotattr,
     has_changes,
     identity,
     naturally_equivalent,
     query_entities,
-    primary_keys,
     table_name,
 )
 
@@ -27,11 +27,12 @@ __all__ = (
     'create_database',
     'create_mock_engine',
     'database_exists',
-    'declarative_base',
     'defer_except',
     'drop_database',
     'escape_like',
     'get_columns',
+    'get_declarative_base',
+    'get_primary_keys',
     'getdotattr',
     'has_changes',
     'identity',
@@ -40,7 +41,6 @@ __all__ = (
     'mock_engine',
     'naturally_equivalent',
     'non_indexed_foreign_keys',
-    'primary_keys',
     'QuerySorterException',
     'render_expression',
     'render_statement',

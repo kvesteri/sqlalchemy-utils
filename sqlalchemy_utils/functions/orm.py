@@ -14,7 +14,7 @@ from sqlalchemy.orm.query import _ColumnEntity
 from sqlalchemy.orm.util import AliasedInsp
 
 
-def primary_keys(mixed):
+def get_primary_keys(mixed):
     """
     Return an OrderedDict of all primary keys for given Table object,
     declarative class or declarative class instance.
@@ -24,22 +24,24 @@ def primary_keys(mixed):
 
     ::
 
-        primary_keys(User)
+        get_primary_keys(User)
 
-        primary_keys(User())
+        get_primary_keys(User())
 
-        primary_keys(User.__table__)
+        get_primary_keys(User.__table__)
 
-        primary_keys(User.__mapper__)
+        get_primary_keys(User.__mapper__)
 
-        primary_keys(sa.orm.aliased(User))
+        get_primary_keys(sa.orm.aliased(User))
 
-        primary_keys(sa.orm.alised(User.__table__))
+        get_primary_keys(sa.orm.alised(User.__table__))
 
 
     .. versionchanged: 0.25.3
         Made the function return an ordered dictionary instead of generator.
         This change was made to support primary key aliases.
+
+        Renamed this function to 'get_primary_keys', formerly 'primary_keys'
 
     .. seealso:: :func:`get_columns`
     """
@@ -272,7 +274,7 @@ def get_expr_attr(expr, attr_name):
         return getattr(expr, attr_name)
 
 
-def declarative_base(model):
+def get_declarative_base(model):
     """
     Returns the declarative base for given model class.
 
@@ -281,7 +283,7 @@ def declarative_base(model):
     for parent in model.__bases__:
         try:
             parent.metadata
-            return declarative_base(parent)
+            return get_declarative_base(parent)
         except AttributeError:
             pass
     return model
@@ -398,7 +400,7 @@ def identity(obj_or_class):
     """
     return tuple(
         getattr(obj_or_class, column_key)
-        for column_key in primary_keys(obj_or_class).keys()
+        for column_key in get_primary_keys(obj_or_class).keys()
     )
 
 

@@ -4,12 +4,6 @@ Model helpers
 .. module:: sqlalchemy_utils.functions
 
 
-declarative_base
-^^^^^^^^^^^^^^^^
-
-.. autofunction:: declarative_base
-
-
 escape_like
 ^^^^^^^^^^^
 
@@ -20,6 +14,18 @@ get_columns
 ^^^^^^^^^^^
 
 .. autofunction:: get_columns
+
+
+get_declarative_base
+^^^^^^^^^^^^^^^^^^^^
+
+.. autofunction:: get_declarative_base
+
+
+get_primary_keys
+^^^^^^^^^^^^^^^^
+
+.. autofunction:: primary_keys
 
 
 query_entities
@@ -44,12 +50,6 @@ naturally_equivalent
 ^^^^^^^^^^^^^^^^^^^^
 
 .. autofunction:: naturally_equivalent
-
-
-primary_keys
-^^^^^^^^^^^^
-
-.. autofunction:: primary_keys
 
 
 sort_query
