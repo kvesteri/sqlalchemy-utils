@@ -31,6 +31,7 @@ class AttributeValueGenerator(object):
                 sa.event.remove(*args)
 
         self.listeners_registered = False
+        # TODO: make the registry a WeakKey dict
         self.generator_registry = defaultdict(list)
 
     def generator_wrapper(self, func, attr, source):
