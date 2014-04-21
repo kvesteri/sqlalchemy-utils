@@ -14,19 +14,40 @@ from sqlalchemy.orm.query import _ColumnEntity
 from sqlalchemy.orm.util import AliasedInsp
 
 
-def primary_keys(obj_or_class):
+def primary_keys(mixed):
     """
-    Return an OrderedDict of all primary keys for given declarative class or
-    object.
-    """
-    if not isclass(obj_or_class):
-        obj_or_class = obj_or_class.__class__
+    Return an OrderedDict of all primary keys for given Table object,
+    declarative class or declarative class instance.
 
+    :param mixed:
+        SA Table object, SA declarative class or SA declarative class instance
+
+    .. versionchanged: 0.25.3
+        Made the function return an ordered dictionary instead of generator.
+        This change was made to support primary key aliases.
+
+    .. seealso:: :func:`get_columns`
+    """
     columns = OrderedDict()
-    for key, column in sa.inspect(obj_or_class).columns.items():
+    for key, column in get_columns(mixed).items():
         if column.primary_key:
             columns[key] = column
     return columns
+
+
+def get_columns(mixed):
+    """
+    Return a collection of all Column objects for given SQLAlchemy
+    Table object, declarative class or declarative class instance.
+
+    :param mixed:
+        SA Table object, SA declarative class or SA declarative class instance
+    """
+    if isinstance(mixed, sa.Table):
+        return mixed.c
+    if not isclass(mixed):
+        mixed = mixed.__class__
+    return sa.inspect(mixed).columns
 
 
 def table_name(obj):

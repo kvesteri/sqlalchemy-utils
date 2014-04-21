@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.25.3 (2014-04-21)
+^^^^^^^^^^^^^^^^^^^
+
+- Added support for primary key aliases in primary_keys function
+- Added get_columns utility function
+
+
 0.25.2 (2014-03-25)
 ^^^^^^^^^^^^^^^^^^^
 

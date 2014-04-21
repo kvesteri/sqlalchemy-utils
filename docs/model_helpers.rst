@@ -16,6 +16,12 @@ escape_like
 .. autofunction:: escape_like
 
 
+get_columns
+^^^^^^^^^^^
+
+.. autofunction:: get_columns
+
+
 query_entities
 ^^^^^^^^^^^^^^
 
@@ -38,6 +44,12 @@ naturally_equivalent
 ^^^^^^^^^^^^^^^^^^^^
 
 .. autofunction:: naturally_equivalent
+
+
+primary_keys
+^^^^^^^^^^^^
+
+.. autofunction:: primary_keys
 
 
 sort_query
