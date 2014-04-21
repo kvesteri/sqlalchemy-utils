@@ -1,5 +1,5 @@
 import sqlalchemy as sa
-from sqlalchemy_utils.functions.orm import get_columns
+from sqlalchemy_utils.functions import get_columns
 from tests import TestCase
 
 

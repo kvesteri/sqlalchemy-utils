@@ -13,6 +13,7 @@ from .database import (
 )
 from .orm import (
     declarative_base,
+    get_columns,
     getdotattr,
     has_changes,
     identity,
@@ -30,6 +31,7 @@ __all__ = (
     'defer_except',
     'drop_database',
     'escape_like',
+    'get_columns',
     'getdotattr',
     'has_changes',
     'identity',
