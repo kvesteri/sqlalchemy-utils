@@ -5,6 +5,7 @@ from .exceptions import ImproperlyConfigured
 from .functions import (
     defer_except,
     escape_like,
+    get_columns,
     identity,
     primary_keys,
     naturally_equivalent,
@@ -57,7 +58,7 @@ from .types import (
 )
 
 
-__version__ = '0.25.2'
+__version__ = '0.25.3'
 
 
 __all__ = (
@@ -74,6 +75,7 @@ __all__ = (
     force_instant_defaults,
     generates,
     generic_relationship,
+    get_columns,
     identity,
     instrumented_list,
     merge,
