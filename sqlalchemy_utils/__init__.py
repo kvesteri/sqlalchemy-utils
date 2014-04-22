@@ -2,6 +2,7 @@ from .aggregates import aggregated
 from .batch import batch_fetch, with_backrefs
 from .decorators import generates
 from .exceptions import ImproperlyConfigured
+from .expression_parser import ExpressionParser
 from .functions import (
     create_database,
     create_mock_engine,
