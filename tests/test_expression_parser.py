@@ -14,6 +14,8 @@ class MyExpressionParser(ExpressionParser):
 
 
 class TestExpressionParser(TestCase):
+    create_tables = False
+
     def setup_method(self, method):
         TestCase.setup_method(self, method)
         self.parser = MyExpressionParser(self.Category)

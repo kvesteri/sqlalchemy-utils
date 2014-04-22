@@ -34,16 +34,18 @@ def get_locale():
 
 class TestCase(object):
     dns = 'sqlite:///:memory:'
+    create_tables = True
 
     def setup_method(self, method):
         self.engine = create_engine(self.dns)
-        # self.engine.echo = True
+        self.engine.echo = True
         self.connection = self.engine.connect()
         self.Base = declarative_base()
 
         self.create_models()
         sa.orm.configure_mappers()
-        self.Base.metadata.create_all(self.connection)
+        if self.create_tables:
+            self.Base.metadata.create_all(self.connection)
 
         Session = sessionmaker(bind=self.connection)
         self.session = Session()
@@ -53,7 +55,8 @@ class TestCase(object):
     def teardown_method(self, method):
         aggregates.manager.reset()
         self.session.close_all()
-        self.Base.metadata.drop_all(self.connection)
+        if self.create_tables:
+            self.Base.metadata.drop_all(self.connection)
         self.connection.close()
         self.engine.dispose()
 
