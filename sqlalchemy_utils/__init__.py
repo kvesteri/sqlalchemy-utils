@@ -60,7 +60,7 @@ from .types import (
 )
 
 
-__version__ = '0.25.3'
+__version__ = '0.25.4'
 
 
 __all__ = (
@@ -100,6 +100,7 @@ __all__ = (
     DateRangeType,
     DateTimeRangeType,
     EmailType,
+    ExpressionParser,
     ImproperlyConfigured,
     InstrumentedList,
     IntRangeType,
