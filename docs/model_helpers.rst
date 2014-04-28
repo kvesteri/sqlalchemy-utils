@@ -25,7 +25,7 @@ get_declarative_base
 get_primary_keys
 ^^^^^^^^^^^^^^^^
 
-.. autofunction:: primary_keys
+.. autofunction:: get_primary_keys
 
 
 get_referencing_foreign_keys
