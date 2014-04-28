@@ -38,7 +38,7 @@ class TestCase(object):
 
     def setup_method(self, method):
         self.engine = create_engine(self.dns)
-        self.engine.echo = True
+        # self.engine.echo = True
         self.connection = self.engine.connect()
         self.Base = declarative_base()
 

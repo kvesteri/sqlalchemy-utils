@@ -28,6 +28,12 @@ get_primary_keys
 .. autofunction:: primary_keys
 
 
+get_referencing_foreign_keys
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autofunction:: get_referencing_foreign_keys
+
+
 query_entities
 ^^^^^^^^^^^^^^
 

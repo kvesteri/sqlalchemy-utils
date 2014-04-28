@@ -14,6 +14,35 @@ from sqlalchemy.orm.query import _ColumnEntity
 from sqlalchemy.orm.util import AliasedInsp
 
 
+def get_referencing_foreign_keys(mixed):
+    """
+    Returns referencing foreign keys for given Table object or declarative
+    class.
+
+    :param mixed:
+        SA Table object or SA declarative class
+
+    ::
+
+        get_foreign_keys(User)  # set([ForeignKey('user.id')])
+    """
+    if isinstance(mixed, sa.Table):
+        tables = [mixed]
+    else:
+        # TODO: make this support joined table inheritance
+        tables = [mixed.__table__]
+
+    referencing_foreign_keys = set()
+
+    for table in mixed.metadata.tables.values():
+        for constraint in table.constraints:
+            if isinstance(constraint, sa.sql.schema.ForeignKeyConstraint):
+                for fk in constraint.elements:
+                    if any(fk.references(t) for t in tables):
+                        referencing_foreign_keys.add(fk)
+    return referencing_foreign_keys
+
+
 def get_primary_keys(mixed):
     """
     Return an OrderedDict of all primary keys for given Table object,
