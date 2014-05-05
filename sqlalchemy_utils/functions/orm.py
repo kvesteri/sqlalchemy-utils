@@ -24,7 +24,9 @@ def get_referencing_foreign_keys(mixed):
 
     ::
 
-        get_foreign_keys(User)  # set([ForeignKey('user.id')])
+        get_foreign_keys(User)              # set([ForeignKey('user.id')])
+
+        get_foreign_keys(User.__table__)    # set([ForeignKey('user.id')])
     """
     if isinstance(mixed, sa.Table):
         tables = [mixed]

@@ -79,3 +79,7 @@ class TestExpressionParser(TestCase):
     def test_null(self):
         expr = self.parser(self.User.name == Null())
         assert str(expr) == 'category.name IS NULL'
+
+    def test_instrumented_attribute(self):
+        expr = self.parser(self.User.name)
+        assert str(expr) == 'category.name'
