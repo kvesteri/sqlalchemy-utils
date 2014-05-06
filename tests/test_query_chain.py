@@ -80,3 +80,12 @@ class TestQueryChain(TestCase):
 
     def test_repr(self):
         assert repr(self.chain) == '<QueryChain at 0x%x>' % id(self.chain)
+
+    def test_getitem_with_slice(self):
+        chain = self.chain[1:]
+        assert chain.offset == 1
+        assert chain.limit is None
+
+    def test_getitem_with_single_key(self):
+        article = self.chain[2]
+        assert article == self.articles[0]

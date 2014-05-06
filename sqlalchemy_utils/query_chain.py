@@ -44,5 +44,16 @@ class QueryChain(object):
             else:
                 skipped += obj_count
 
+    def __getitem__(self, key):
+        if isinstance(key, slice):
+            return self.__class__(
+                queries=self.queries,
+                limit=key.stop,
+                offset=key.start
+            )
+        else:
+            for obj in self[key:1]:
+                return obj
+
     def __repr__(self):
         return '<QueryChain at 0x%x>' % id(self)
