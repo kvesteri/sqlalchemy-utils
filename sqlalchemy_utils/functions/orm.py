@@ -76,11 +76,12 @@ def get_primary_keys(mixed):
 
     .. seealso:: :func:`get_columns`
     """
-    columns = OrderedDict()
-    for key, column in get_columns(mixed).items():
-        if column.primary_key:
-            columns[key] = column
-    return columns
+    return OrderedDict(
+        (
+            (key, column) for key, column in get_columns(mixed).items()
+            if column.primary_key
+        )
+    )
 
 
 def get_columns(mixed):
