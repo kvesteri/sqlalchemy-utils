@@ -27,6 +27,21 @@ def get_referencing_foreign_keys(mixed):
         get_foreign_keys(User)              # set([ForeignKey('user.id')])
 
         get_foreign_keys(User.__table__)    # set([ForeignKey('user.id')])
+
+
+    This function also understands inheritance. This means it returns
+    all foreign keys that reference any table in the class inheritance tree.
+
+    Let's say you have three classes which use joined table inheritance,
+    namely TextItem, Article and BlogPost with Article and BlogPost inheriting
+    TextItem.
+
+    ::
+
+        # This will check all foreign keys that reference either article table
+        # or textitem table.
+        get_foreign_key(Article)
+
     """
     if isinstance(mixed, sa.Table):
         tables = [mixed]
