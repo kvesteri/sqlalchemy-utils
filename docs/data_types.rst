@@ -59,7 +59,7 @@ LocaleType
 IPAddressType
 ^^^^^^^^^^^^^
 
-.. module:: sqlalchemy_utils.types.ip_addresss
+.. module:: sqlalchemy_utils.types.ip_address
 
 .. autoclass:: IPAddressType
 

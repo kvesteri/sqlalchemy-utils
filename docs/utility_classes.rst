@@ -4,7 +4,10 @@ Utility classes
 QueryChain
 ----------
 
-.. module:: sqlalchemy_utils.query_chain
+.. automodule:: sqlalchemy_utils.query_chain
+
+API
+^^^
 
 .. autoclass:: QueryChain
     :members:
