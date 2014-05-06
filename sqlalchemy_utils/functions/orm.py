@@ -22,6 +22,38 @@ def dependencies(obj, foreign_keys=None):
     Return a QueryChain that iterates through all dependent objects for given
     SQLAlchemy object.
 
+    Consider a User object is referenced in various articles and also in
+    various orders. Getting all these dependent objects is as easy as:
+
+    ::
+
+        dependencies(user)
+
+
+    If you expect an object to have lots of dependencies it might be good to
+    limit the results::
+
+
+        dependencies(user).limit(5)
+
+
+    The common use case is checking for all dependent objects before delete
+    operation occurs on parent object and inform the user if there are
+    dependent objects with ondelete='RESTRICT' foreign keys. This can be
+    achieved as follows::
+
+
+        dependencies(
+            user,
+            (
+                fk for fk in get_referencing_foreign_keys(obj)
+                # On most databases RESTRICT is the default mode hence we check
+                # for None values also
+                if fk.ondelete='RESTRICT' or fk.ondelete is None
+            )
+        )
+
+
     :param obj: SQLAlchemy declarative model object
     :param foreign_keys:
         A sequence of foreign keys to use for searching the dependencies for
