@@ -1,5 +1,5 @@
-The generates decorator
-=======================
+Generates decorator
+===================
 
 .. module:: sqlalchemy_utils.decorators
 
