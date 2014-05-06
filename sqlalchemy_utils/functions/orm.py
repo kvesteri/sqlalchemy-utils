@@ -12,7 +12,64 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.orm.mapper import Mapper
 from sqlalchemy.orm.query import _ColumnEntity
+from sqlalchemy.orm.session import object_session
 from sqlalchemy.orm.util import AliasedInsp
+from ..query_chain import QueryChain
+
+
+def dependencies(obj, foreign_keys=None):
+    """
+    Return a QueryChain that iterates through all dependent objects for given
+    SQLAlchemy object.
+
+    :param obj: SQLAlchemy declarative model object
+    :param foreign_keys:
+        A sequence of foreign keys to use for searching the dependencies for
+        given object. By default this is None, indicating that all foreign keys
+        referencing the object will be used.
+
+    .. note::
+        This function does not support exotic mappers that use multiple tables
+
+    .. versionadded: 0.26.0
+    """
+    if foreign_keys is None:
+        foreign_keys = get_referencing_foreign_keys(obj)
+
+    session = object_session(obj)
+
+    foreign_keys = sorted(
+        foreign_keys, key=lambda key: key.constraint.table.name
+    )
+    chain = QueryChain([])
+    classes = obj.__class__._decl_class_registry
+
+    for table, keys in groupby(foreign_keys, lambda key: key.constraint.table):
+        for class_ in classes.values():
+            if hasattr(class_, '__table__') and class_.__table__ == table:
+                criteria = []
+                visited_constraints = []
+                for key in keys:
+                    if key.constraint not in visited_constraints:
+                        visited_constraints.append(key.constraint)
+                        subcriteria = [
+                            getattr(class_, column.key) ==
+                            getattr(
+                                obj,
+                                key.constraint.elements[index].column.key
+                            )
+                            for index, column
+                            in enumerate(key.constraint.columns)
+                        ]
+                        criteria.append(sa.and_(*subcriteria))
+
+                query = session.query(class_).filter(
+                    sa.or_(
+                        *criteria
+                    )
+                )
+                chain.queries.append(query)
+        return chain
 
 
 def get_referencing_foreign_keys(mixed):
