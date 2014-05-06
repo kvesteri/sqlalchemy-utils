@@ -31,6 +31,7 @@ from .listeners import (
 from .merge import merge, Merger
 from .generic import generic_relationship
 from .proxy_dict import ProxyDict, proxy_dict
+from .query_chain import QueryChain
 from .types import (
     ArrowType,
     Choice,
@@ -118,6 +119,7 @@ __all__ = (
     PhoneNumber,
     PhoneNumberType,
     ProxyDict,
+    QueryChain,
     ScalarListException,
     ScalarListType,
     TimezoneType,

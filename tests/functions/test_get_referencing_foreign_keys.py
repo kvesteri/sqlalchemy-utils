@@ -40,8 +40,8 @@ class TestGetReferencingFksWithInheritance(TestCase):
             __tablename__ = 'user'
             id = sa.Column(sa.Integer, primary_key=True)
             type = sa.Column(sa.Unicode)
-            first_name = sa.Column(sa.Unicode(255), primary_key=True)
-            last_name = sa.Column(sa.Unicode(255), primary_key=True)
+            first_name = sa.Column(sa.Unicode(255))
+            last_name = sa.Column(sa.Unicode(255))
 
             __mapper_args__ = {
                 'polymorphic_on': 'type'

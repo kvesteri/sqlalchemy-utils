@@ -3,6 +3,7 @@ try:
 except ImportError:
     from ordereddict import OrderedDict
 from functools import partial
+from itertools import groupby
 from inspect import isclass
 from operator import attrgetter
 import sqlalchemy as sa
@@ -115,7 +116,7 @@ def get_tables(mixed):
         get_tables(Article.__mapper__)
 
 
-    .. versionadded: 0.25.5
+    .. versionadded: 0.26.0
 
     :param mixed:
         SQLAlchemy Mapper / Declarative class or a SA Alias object wrapping
