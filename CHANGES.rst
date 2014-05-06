@@ -8,6 +8,7 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 ^^^^^^^^^^^^^^^^^^^
 
 - Added get_referencing_foreign_keys
+- Added get_tables
 
 
 0.25.4 (2014-04-22)

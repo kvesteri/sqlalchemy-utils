@@ -34,6 +34,12 @@ get_referencing_foreign_keys
 .. autofunction:: get_referencing_foreign_keys
 
 
+get_tables
+^^^^^^^^^^
+
+.. autofunction:: get_tables
+
+
 query_entities
 ^^^^^^^^^^^^^^
 

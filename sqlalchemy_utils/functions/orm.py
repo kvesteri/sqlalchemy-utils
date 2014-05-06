@@ -31,17 +31,17 @@ def get_referencing_foreign_keys(mixed):
     if isinstance(mixed, sa.Table):
         tables = [mixed]
     else:
-        # TODO: make this support joined table inheritance
-        tables = [mixed.__table__]
+        tables = get_tables(mixed)
 
     referencing_foreign_keys = set()
 
     for table in mixed.metadata.tables.values():
-        for constraint in table.constraints:
-            if isinstance(constraint, sa.sql.schema.ForeignKeyConstraint):
-                for fk in constraint.elements:
-                    if any(fk.references(t) for t in tables):
-                        referencing_foreign_keys.add(fk)
+        if table not in tables:
+            for constraint in table.constraints:
+                if isinstance(constraint, sa.sql.schema.ForeignKeyConstraint):
+                    for fk in constraint.elements:
+                        if any(fk.references(t) for t in tables):
+                            referencing_foreign_keys.add(fk)
     return referencing_foreign_keys
 
 
@@ -65,7 +65,7 @@ def get_primary_keys(mixed):
 
         get_primary_keys(sa.orm.aliased(User))
 
-        get_primary_keys(sa.orm.alised(User.__table__))
+        get_primary_keys(sa.orm.aliased(User.__table__))
 
 
     .. versionchanged: 0.25.3
@@ -82,6 +82,37 @@ def get_primary_keys(mixed):
             if column.primary_key
         )
     )
+
+
+def get_tables(mixed):
+    """
+    Return a list of tables associated with given SQLAlchemy object.
+
+    Let's say we have three classes which use joined table inheritance
+    TextItem, Article and BlogPost. Article and BlogPost inherit TextItem.
+
+    ::
+
+        get_tables(Article)  # [Table('article', ...), Table('text_item')]
+
+        get_tables(Article())
+
+        get_tables(Article.__mapper__)
+
+
+    .. versionadded: 0.25.5
+
+    :param mixed:
+        SQLAlchemy Mapper / Declarative class or a SA Alias object wrapping
+        any of these objects.
+    """
+    if isinstance(mixed, sa.orm.util.AliasedClass):
+        mapper = sa.inspect(mixed).mapper
+    else:
+        if not isclass(mixed):
+            mixed = mixed.__class__
+        mapper = sa.inspect(mixed)
+    return mapper.tables
 
 
 def get_columns(mixed):
