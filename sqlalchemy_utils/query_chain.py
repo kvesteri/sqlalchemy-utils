@@ -55,8 +55,16 @@ database.
     list(chain)  # all blog posts but not articles and news items
 
 
-    chain.offset = 4
+    chain = chain.offset(4)
     list(chain)  # last blog post, and first four articles
+
+
+Just like with original query object the limit and offset can be chained to
+return a new QueryChain.
+
+::
+
+    chain = chain.limit(5).offset(7)
 
 
 Chain slicing
@@ -91,18 +99,18 @@ class QueryChain(object):
     """
     def __init__(self, queries, limit=None, offset=None):
         self.queries = queries
-        self.limit = limit
-        self.offset = offset
+        self._limit = limit
+        self._offset = offset
 
     def __iter__(self):
         consumed = 0
         skipped = 0
         for query in self.queries:
             query_copy = copy(query)
-            if self.limit:
-                query = query.limit(self.limit - consumed)
-            if self.offset:
-                query = query.offset(self.offset - skipped)
+            if self._limit:
+                query = query.limit(self._limit - consumed)
+            if self._offset:
+                query = query.offset(self._offset - skipped)
 
             obj_count = 0
             for obj in query:
@@ -115,12 +123,18 @@ class QueryChain(object):
             else:
                 skipped += obj_count
 
+    def limit(self, value):
+        return self[:value]
+
+    def offset(self, value):
+        return self[value:]
+
     def __getitem__(self, key):
         if isinstance(key, slice):
             return self.__class__(
                 queries=self.queries,
-                limit=key.stop,
-                offset=key.start
+                limit=key.stop if key.stop is not None else self._limit,
+                offset=key.start if key.start is not None else self._offset
             )
         else:
             for obj in self[key:1]:
