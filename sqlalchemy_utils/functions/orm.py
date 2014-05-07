@@ -10,11 +10,45 @@ import sqlalchemy as sa
 from sqlalchemy import inspect
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm.attributes import InstrumentedAttribute
+from sqlalchemy.orm.exc import UnmappedInstanceError
 from sqlalchemy.orm.mapper import Mapper
 from sqlalchemy.orm.query import _ColumnEntity
 from sqlalchemy.orm.session import object_session
 from sqlalchemy.orm.util import AliasedInsp
 from ..query_chain import QueryChain
+
+
+def get_bind(obj):
+    """
+    Return the bind for given SQLAlchemy Engine / Connection / declarative
+    model object.
+
+    :param obj: SQLAlchemy Engine / Connection / declarative model object
+
+    ::
+
+        from sqlalchemy_utils import get_bind
+
+
+        get_bind(session)  # Connection object
+
+        get_bind(user)
+
+    """
+    if hasattr(obj, 'bind'):
+        conn = obj.bind
+    else:
+        try:
+            conn = object_session(obj).bind
+        except UnmappedInstanceError:
+            conn = obj
+
+    if not hasattr(conn, 'execute'):
+        raise TypeError(
+            'This method accepts only Session, Engine, Connection and '
+            'declarative model objects.'
+        )
+    return conn
 
 
 def dependent_objects(obj, foreign_keys=None):

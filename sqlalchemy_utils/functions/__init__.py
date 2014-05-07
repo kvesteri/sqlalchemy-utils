@@ -13,6 +13,7 @@ from .database import (
 )
 from .orm import (
     dependent_objects,
+    get_bind,
     get_columns,
     get_declarative_base,
     get_primary_keys,
@@ -34,6 +35,7 @@ __all__ = (
     'dependent_objects',
     'drop_database',
     'escape_like',
+    'get_bind',
     'get_columns',
     'get_declarative_base',
     'get_primary_keys',

@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.26.0 (2014-05-xx)
+^^^^^^^^^^^^^^^^^^^
+
+- Added get_bind
+
+
 0.26.0 (2014-05-07)
 ^^^^^^^^^^^^^^^^^^^
 

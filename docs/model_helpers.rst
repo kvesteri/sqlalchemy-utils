@@ -16,6 +16,12 @@ escape_like
 .. autofunction:: escape_like
 
 
+get_bind
+^^^^^^^^
+
+.. autofunction:: get_bind
+
+
 get_columns
 ^^^^^^^^^^^
 
