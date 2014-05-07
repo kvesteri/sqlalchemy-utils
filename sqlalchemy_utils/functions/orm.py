@@ -114,9 +114,9 @@ def get_referencing_foreign_keys(mixed):
 
     ::
 
-        get_foreign_keys(User)              # set([ForeignKey('user.id')])
+        get_referencing_foreign_keys(User)  # set([ForeignKey('user.id')])
 
-        get_foreign_keys(User.__table__)    # set([ForeignKey('user.id')])
+        get_referencing_foreign_keys(User.__table__)
 
 
     This function also understands inheritance. This means it returns
@@ -130,7 +130,7 @@ def get_referencing_foreign_keys(mixed):
 
         # This will check all foreign keys that reference either article table
         # or textitem table.
-        get_foreign_key(Article)
+        get_referencing_foreign_keys(Article)
 
     """
     if isinstance(mixed, sa.Table):
