@@ -1,9 +1,9 @@
 import sqlalchemy as sa
-from sqlalchemy_utils import dependencies, get_referencing_foreign_keys
+from sqlalchemy_utils import dependent_objects, get_referencing_foreign_keys
 from tests import TestCase
 
 
-class TestDependencies(TestCase):
+class TestDependentObjects(TestCase):
     def create_models(self):
         class User(self.Base):
             __tablename__ = 'user'
@@ -46,7 +46,7 @@ class TestDependencies(TestCase):
         self.session.add_all(articles)
         self.session.commit()
 
-        deps = list(dependencies(user))
+        deps = list(dependent_objects(user))
         assert len(deps) == 3
         assert articles[0] in deps
         assert articles[2] in deps
@@ -65,7 +65,7 @@ class TestDependencies(TestCase):
         self.session.commit()
 
         deps = list(
-            dependencies(
+            dependent_objects(
                 user,
                 (
                     fk for fk in get_referencing_foreign_keys(self.User)
@@ -78,7 +78,7 @@ class TestDependencies(TestCase):
         assert objects[3] in deps
 
 
-class TestDependenciesWithCompositeKeys(TestCase):
+class TestDependentObjectsWithCompositeKeys(TestCase):
     def create_models(self):
         class User(self.Base):
             __tablename__ = 'user'
@@ -113,7 +113,7 @@ class TestDependenciesWithCompositeKeys(TestCase):
         self.session.add_all(articles)
         self.session.commit()
 
-        deps = list(dependencies(user))
+        deps = list(dependent_objects(user))
         assert len(deps) == 2
         assert articles[0] in deps
         assert articles[3] in deps

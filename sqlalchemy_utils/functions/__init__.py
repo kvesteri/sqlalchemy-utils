@@ -12,7 +12,7 @@ from .database import (
     non_indexed_foreign_keys,
 )
 from .orm import (
-    dependencies,
+    dependent_objects,
     get_columns,
     get_declarative_base,
     get_primary_keys,
@@ -31,6 +31,7 @@ __all__ = (
     'create_mock_engine',
     'database_exists',
     'defer_except',
+    'dependent_objects',
     'drop_database',
     'escape_like',
     'get_columns',

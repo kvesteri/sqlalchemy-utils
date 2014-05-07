@@ -17,7 +17,7 @@ from sqlalchemy.orm.util import AliasedInsp
 from ..query_chain import QueryChain
 
 
-def dependencies(obj, foreign_keys=None):
+def dependent_objects(obj, foreign_keys=None):
     """
     Return a QueryChain that iterates through all dependent objects for given
     SQLAlchemy object.
@@ -27,17 +27,17 @@ def dependencies(obj, foreign_keys=None):
 
     ::
 
-        from sqlalchemy_utils import dependencies
+        from sqlalchemy_utils import dependent_objects
 
 
-        dependencies(user)
+        dependent_objects(user)
 
 
-    If you expect an object to have lots of dependencies it might be good to
+    If you expect an object to have lots of dependent_objects it might be good to
     limit the results::
 
 
-        dependencies(user).limit(5)
+        dependent_objects(user).limit(5)
 
 
     The common use case is checking for all dependent objects before deleting
@@ -46,7 +46,7 @@ def dependencies(obj, foreign_keys=None):
     it will lead to nasty IntegrityErrors being raised.
 
     In the following example we delete given user if it doesn't have any
-    foreign key restricted dependencies.
+    foreign key restricted dependent_objects.
 
     ::
 
@@ -58,7 +58,7 @@ def dependencies(obj, foreign_keys=None):
 
 
         deps = list(
-            dependencies(
+            dependent_objects(
                 user,
                 (
                     fk for fk in get_referencing_foreign_keys(User)
@@ -78,7 +78,7 @@ def dependencies(obj, foreign_keys=None):
 
     :param obj: SQLAlchemy declarative model object
     :param foreign_keys:
-        A sequence of foreign keys to use for searching the dependencies for
+        A sequence of foreign keys to use for searching the dependent_objects for
         given object. By default this is None, indicating that all foreign keys
         referencing the object will be used.
 
