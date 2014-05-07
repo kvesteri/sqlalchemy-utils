@@ -40,13 +40,14 @@ def dependent_objects(obj, foreign_keys=None):
         dependent_objects(user).limit(5)
 
 
-    The common use case is checking for all dependent objects before deleting
-    parent object and inform the user if there are dependent objects with
-    ondelete='RESTRICT' foreign keys. If this kind of checking is not used
+
+    The common use case is checking for all restrict dependent objects before
+    deleting parent object and inform the user if there are dependent objects
+    with ondelete='RESTRICT' foreign keys. If this kind of checking is not used
     it will lead to nasty IntegrityErrors being raised.
 
     In the following example we delete given user if it doesn't have any
-    foreign key restricted dependent_objects.
+    foreign key restricted dependent objects.
 
     ::
 

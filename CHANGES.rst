@@ -4,12 +4,13 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
-0.26.0 (2014-xx-xx)
+0.26.0 (2014-05-07)
 ^^^^^^^^^^^^^^^^^^^
 
 - Added get_referencing_foreign_keys
 - Added get_tables
 - Added QueryChain
+- Added dependent_objects
 
 
 0.25.4 (2014-04-22)

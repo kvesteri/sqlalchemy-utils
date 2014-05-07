@@ -44,7 +44,7 @@ for name, requirements in extras_require.items():
 
 setup(
     name='SQLAlchemy-Utils',
-    version='0.25.4',
+    version='0.26.0',
     url='https://github.com/kvesteri/sqlalchemy-utils',
     license='BSD',
     author='Konsta Vesterinen, Ryan Leckey, Janne Vanhala, Vesa Uimonen',
