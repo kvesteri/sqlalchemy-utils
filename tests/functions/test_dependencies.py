@@ -1,5 +1,5 @@
 import sqlalchemy as sa
-from sqlalchemy_utils.functions.orm import dependencies
+from sqlalchemy_utils import dependencies, get_referencing_foreign_keys
 from tests import TestCase
 
 
@@ -15,7 +15,9 @@ class TestDependencies(TestCase):
             __tablename__ = 'article'
             id = sa.Column(sa.Integer, primary_key=True)
             author_id = sa.Column(sa.Integer, sa.ForeignKey('user.id'))
-            owner_id = sa.Column(sa.Integer, sa.ForeignKey('user.id'))
+            owner_id = sa.Column(
+                sa.Integer, sa.ForeignKey('user.id', ondelete='SET NULL')
+            )
 
             author = sa.orm.relationship(User, foreign_keys=[author_id])
             owner = sa.orm.relationship(User, foreign_keys=[owner_id])
@@ -23,15 +25,17 @@ class TestDependencies(TestCase):
         class BlogPost(self.Base):
             __tablename__ = 'blog_post'
             id = sa.Column(sa.Integer, primary_key=True)
-            author_id = sa.Column(sa.Integer, sa.ForeignKey('user.id'))
+            owner_id = sa.Column(
+                sa.Integer, sa.ForeignKey('user.id', ondelete='CASCADE')
+            )
 
-            author = sa.orm.relationship(User)
+            owner = sa.orm.relationship(User)
 
         self.User = User
         self.Article = Article
         self.BlogPost = BlogPost
 
-    def test_multiple_refs(self):
+    def test_returns_all_dependent_objects(self):
         user = self.User(first_name=u'John')
         articles = [
             self.Article(author=user),
@@ -47,6 +51,31 @@ class TestDependencies(TestCase):
         assert articles[0] in deps
         assert articles[2] in deps
         assert articles[3] in deps
+
+    def test_with_foreign_keys_parameter(self):
+        user = self.User(first_name=u'John')
+        objects = [
+            self.Article(author=user),
+            self.Article(),
+            self.Article(owner=user),
+            self.Article(author=user, owner=user),
+            self.BlogPost(owner=user)
+        ]
+        self.session.add_all(objects)
+        self.session.commit()
+
+        deps = list(
+            dependencies(
+                user,
+                (
+                    fk for fk in get_referencing_foreign_keys(self.User)
+                    if fk.ondelete == 'RESTRICT' or fk.ondelete is None
+                )
+            ).limit(5)
+        )
+        assert len(deps) == 2
+        assert objects[0] in deps
+        assert objects[3] in deps
 
 
 class TestDependenciesWithCompositeKeys(TestCase):

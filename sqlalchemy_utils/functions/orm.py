@@ -43,18 +43,28 @@ def dependencies(obj, foreign_keys=None):
     The common use case is checking for all dependent objects before deleting
     parent object and inform the user if there are dependent objects with
     ondelete='RESTRICT' foreign keys. If this kind of checking is not used
-    it will lead to nasty IntegrityErrors being raised. This can be achieved
-    as follows::
+    it will lead to nasty IntegrityErrors being raised.
+
+    In the following example we delete given user if it doesn't have any
+    foreign key restricted dependencies.
+
+    ::
+
+
+        from sqlalchemy_utils import get_referencing_foreign_keys
+
+
+        user = session.query(User).get(some_user_id)
 
 
         deps = list(
             dependencies(
                 user,
                 (
-                    fk for fk in get_referencing_foreign_keys(obj)
+                    fk for fk in get_referencing_foreign_keys(User)
                     # On most databases RESTRICT is the default mode hence we
                     # check for None values also
-                    if fk.ondelete='RESTRICT' or fk.ondelete is None
+                    if fk.ondelete == 'RESTRICT' or fk.ondelete is None
                 )
             ).limit(5)
         )
@@ -62,6 +72,8 @@ def dependencies(obj, foreign_keys=None):
         if deps:
             # Do something to inform the user
             pass
+        else:
+            session.delete(user)
 
 
     :param obj: SQLAlchemy declarative model object
@@ -72,6 +84,8 @@ def dependencies(obj, foreign_keys=None):
 
     .. note::
         This function does not support exotic mappers that use multiple tables
+
+    .. seealso:: :func:`get_referencing_foreign_keys`
 
     .. versionadded: 0.26.0
     """
@@ -142,6 +156,7 @@ def get_referencing_foreign_keys(mixed):
         # or textitem table.
         get_referencing_foreign_keys(Article)
 
+    .. seealso:: :func:`get_tables`
     """
     if isinstance(mixed, sa.Table):
         tables = [mixed]
