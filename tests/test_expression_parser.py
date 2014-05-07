@@ -12,6 +12,9 @@ class MyExpressionParser(ExpressionParser):
     def column(self, column):
         return getattr(self.parent, column.key)
 
+    def instrumented_attribute(self, column):
+        return getattr(self.parent, column.key)
+
 
 class TestExpressionParser(TestCase):
     create_tables = False
@@ -82,4 +85,4 @@ class TestExpressionParser(TestCase):
 
     def test_instrumented_attribute(self):
         expr = self.parser(self.User.name)
-        assert str(expr) == 'category.name'
+        assert str(expr) == 'Category.name'

@@ -1,5 +1,11 @@
+try:
+    from collections import OrderedDict
+except ImportError:
+    from ordereddict import OrderedDict
+
 import six
 import sqlalchemy as sa
+from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.sql.annotation import AnnotatedColumn
 from sqlalchemy.sql.expression import (
     BooleanClauseList,
@@ -21,42 +27,37 @@ from sqlalchemy.sql.elements import (
 
 
 class ExpressionParser(object):
+    parsers = OrderedDict((
+        (BinaryExpression, 'binary_expression'),
+        (BooleanClauseList, 'boolean_expression'),
+        (UnaryExpression, 'unary_expression'),
+        (sa.Column, 'column'),
+        (AnnotatedColumn, 'column'),
+        (BindParameter, 'bind_parameter'),
+        (False_, 'false'),
+        (True_, 'true'),
+        (Grouping, 'grouping'),
+        (ClauseList, 'clause_list'),
+        (Label, 'label'),
+        (Cast, 'cast'),
+        (Case, 'case'),
+        (Tuple, 'tuple'),
+        (Null, 'null'),
+        (InstrumentedAttribute, 'instrumented_attribute')
+    ))
+
     def expression(self, expr):
         if expr is None:
             return
-        if isinstance(expr, BinaryExpression):
-            return self.binary_expression(expr)
-        elif isinstance(expr, BooleanClauseList):
-            return self.boolean_expression(expr)
-        elif isinstance(expr, UnaryExpression):
-            return self.unary_expression(expr)
-        elif isinstance(expr, sa.Column):
-            return self.column(expr)
-        elif isinstance(expr, AnnotatedColumn):
-            return self.column(expr)
-        elif isinstance(expr, BindParameter):
-            return self.bind_parameter(expr)
-        elif isinstance(expr, False_):
-            return self.false(expr)
-        elif isinstance(expr, True_):
-            return self.true(expr)
-        elif isinstance(expr, Grouping):
-            return self.grouping(expr)
-        elif isinstance(expr, ClauseList):
-            return self.clause_list(expr)
-        elif isinstance(expr, Label):
-            return self.label(expr)
-        elif isinstance(expr, Cast):
-            return self.cast(expr)
-        elif isinstance(expr, Case):
-            return self.case(expr)
-        elif isinstance(expr, Tuple):
-            return self.tuple(expr)
-        elif isinstance(expr, Null):
-            return self.null(expr)
+        for class_, parser in self.parsers.items():
+            if isinstance(expr, class_):
+                return getattr(self, parser)(expr)
         raise Exception(
             'Unknown expression type %s' % expr.__class__.__name__
         )
+
+    def instrumented_attribute(self, expr):
+        return expr
 
     def null(self, expr):
         return expr
