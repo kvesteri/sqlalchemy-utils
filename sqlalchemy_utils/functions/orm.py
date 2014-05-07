@@ -33,8 +33,8 @@ def dependent_objects(obj, foreign_keys=None):
         dependent_objects(user)
 
 
-    If you expect an object to have lots of dependent_objects it might be good to
-    limit the results::
+    If you expect an object to have lots of dependent_objects it might be good
+    to limit the results::
 
 
         dependent_objects(user).limit(5)
@@ -79,9 +79,9 @@ def dependent_objects(obj, foreign_keys=None):
 
     :param obj: SQLAlchemy declarative model object
     :param foreign_keys:
-        A sequence of foreign keys to use for searching the dependent_objects for
-        given object. By default this is None, indicating that all foreign keys
-        referencing the object will be used.
+        A sequence of foreign keys to use for searching the dependent_objects
+        for given object. By default this is None, indicating that all foreign
+        keys referencing the object will be used.
 
     .. note::
         This function does not support exotic mappers that use multiple tables
@@ -412,7 +412,9 @@ def query_entities(query):
         query_entities(query)  # <Category>
 
 
-    This function also supports queries with joins:
+    This function also supports queries with joins.
+
+    ::
 
 
         query = session.query(Category).join(Article)
