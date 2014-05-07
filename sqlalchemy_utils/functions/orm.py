@@ -27,6 +27,9 @@ def dependencies(obj, foreign_keys=None):
 
     ::
 
+        from sqlalchemy_utils import dependencies
+
+
         dependencies(user)
 
 
@@ -37,21 +40,28 @@ def dependencies(obj, foreign_keys=None):
         dependencies(user).limit(5)
 
 
-    The common use case is checking for all dependent objects before delete
-    operation occurs on parent object and inform the user if there are
-    dependent objects with ondelete='RESTRICT' foreign keys. This can be
-    achieved as follows::
+    The common use case is checking for all dependent objects before deleting
+    parent object and inform the user if there are dependent objects with
+    ondelete='RESTRICT' foreign keys. If this kind of checking is not used
+    it will lead to nasty IntegrityErrors being raised. This can be achieved
+    as follows::
 
 
-        dependencies(
-            user,
-            (
-                fk for fk in get_referencing_foreign_keys(obj)
-                # On most databases RESTRICT is the default mode hence we check
-                # for None values also
-                if fk.ondelete='RESTRICT' or fk.ondelete is None
-            )
+        deps = list(
+            dependencies(
+                user,
+                (
+                    fk for fk in get_referencing_foreign_keys(obj)
+                    # On most databases RESTRICT is the default mode hence we
+                    # check for None values also
+                    if fk.ondelete='RESTRICT' or fk.ondelete is None
+                )
+            ).limit(5)
         )
+
+        if deps:
+            # Do something to inform the user
+            pass
 
 
     :param obj: SQLAlchemy declarative model object

@@ -4,6 +4,12 @@ Model helpers
 .. module:: sqlalchemy_utils.functions
 
 
+dependencies
+^^^^^^^^^^^^
+
+.. autofunction:: dependencies
+
+
 escape_like
 ^^^^^^^^^^^
 

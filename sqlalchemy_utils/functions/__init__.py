@@ -12,6 +12,7 @@ from .database import (
     non_indexed_foreign_keys,
 )
 from .orm import (
+    dependencies,
     get_columns,
     get_declarative_base,
     get_primary_keys,
