@@ -53,8 +53,8 @@ def get_bind(obj):
 
 def dependent_objects(obj, foreign_keys=None):
     """
-    Return a QueryChain that iterates through all dependent objects for given
-    SQLAlchemy object.
+    Return a :class:`~sqlalchemy_utils.query_chain.QueryChain` that iterates
+    through all dependent objects for given SQLAlchemy object.
 
     Consider a User object is referenced in various articles and also in
     various orders. Getting all these dependent objects is as easy as:
