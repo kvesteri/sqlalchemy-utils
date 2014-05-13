@@ -17,6 +17,6 @@ Resources
 .. |Build Status| image:: https://travis-ci.org/kvesteri/sqlalchemy-utils.png?branch=master
    :target: https://travis-ci.org/kvesteri/sqlalchemy-utils
 .. |Version Status| image:: https://pypip.in/v/SQLAlchemy-Utils/badge.png
-   :target: https://crate.io/packages/SQLAlchemy-Utils/
+   :target: https://pypi.python.org/pypi/SQLAlchemy-Utils/
 .. |Downloads| image:: https://pypip.in/d/SQLAlchemy-Utils/badge.png
-   :target: https://crate.io/packages/SQLAlchemy-Utils/
+   :target: https://pypi.python.org/pypi/SQLAlchemy-Utils/
