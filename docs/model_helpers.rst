@@ -52,6 +52,12 @@ get_tables
 .. autofunction:: get_tables
 
 
+group_foreign_keys
+^^^^^^^^^^^^^^^^^^
+
+.. autofunction:: group_foreign_keys
+
+
 query_entities
 ^^^^^^^^^^^^^^
 

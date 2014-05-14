@@ -129,13 +129,10 @@ def dependent_objects(obj, foreign_keys=None):
 
     session = object_session(obj)
 
-    foreign_keys = sorted(
-        foreign_keys, key=lambda key: key.constraint.table.name
-    )
     chain = QueryChain([])
     classes = obj.__class__._decl_class_registry
 
-    for table, keys in groupby(foreign_keys, lambda key: key.constraint.table):
+    for table, keys in group_foreign_keys(foreign_keys):
         for class_ in classes.values():
             if hasattr(class_, '__table__') and class_.__table__ == table:
                 criteria = []
@@ -161,6 +158,32 @@ def dependent_objects(obj, foreign_keys=None):
                 )
                 chain.queries.append(query)
         return chain
+
+
+def group_foreign_keys(foreign_keys):
+    """
+    Return a groupby iterator that groups given foreign keys by table.
+
+    :param foreign_keys: a sequence of foreign keys
+
+
+    ::
+
+        foreign_keys = get_referencing_foreign_keys(User)
+
+        for table, fks in group_foreign_keys(foreign_keys):
+            # do something
+            pass
+
+
+    .. also:: :func:`get_referencing_foreign_keys`
+
+    .. versionadded: 0.26.1
+    """
+    foreign_keys = sorted(
+        foreign_keys, key=lambda key: key.constraint.table.name
+    )
+    return groupby(foreign_keys, lambda key: key.constraint.table)
 
 
 def get_referencing_foreign_keys(mixed):
