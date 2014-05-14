@@ -12,14 +12,16 @@ from ..query_chain import QueryChain
 
 
 def get_foreign_key_values(fk, obj):
-    return {
-        fk.constraint.columns[index].key:
-        getattr(obj, element.column.key)
+    return dict(
+        (
+            fk.constraint.columns[index].key,
+            getattr(obj, element.column.key)
+        )
         for
         index, element
         in
         enumerate(fk.constraint.elements)
-    }
+    )
 
 
 def group_foreign_keys(foreign_keys):
@@ -104,7 +106,7 @@ def merge_references(from_, to, foreign_keys=None):
         class User(self.Base):
             __tablename__ = 'user'
             id = sa.Column(sa.Integer, primary_key=True)
-            name = sa.Column(sa.Unicode(255))
+            name = sa.Column(sa.String(255))
 
             def __repr__(self):
                 return 'User(name=%r)' % self.name
@@ -112,7 +114,7 @@ def merge_references(from_, to, foreign_keys=None):
         class BlogPost(self.Base):
             __tablename__ = 'blog_post'
             id = sa.Column(sa.Integer, primary_key=True)
-            title = sa.Column(sa.Unicode(255))
+            title = sa.Column(sa.String(255))
             author_id = sa.Column(sa.Integer, sa.ForeignKey('user.id'))
 
             author = sa.orm.relationship(User)
@@ -120,10 +122,10 @@ def merge_references(from_, to, foreign_keys=None):
 
     Now lets add some data::
 
-        john = self.User(name=u'John')
-        jack = self.User(name=u'Jack')
-        post = self.BlogPost(title=u'Some title', author=john)
-        post2 = self.BlogPost(title=u'Other title', author=jack)
+        john = self.User(name='John')
+        jack = self.User(name='Jack')
+        post = self.BlogPost(title='Some title', author=john)
+        post2 = self.BlogPost(title='Other title', author=jack)
         self.session.add_all([
             john,
             jack,
@@ -177,7 +179,6 @@ def merge_references(from_, to, foreign_keys=None):
             )
             session.execute(query)
         else:
-            print old_values, new_values
             (
                 session.query(mapper.class_)
                 .filter_by(**old_values)
