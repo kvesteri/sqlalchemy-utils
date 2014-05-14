@@ -34,6 +34,12 @@ get_declarative_base
 .. autofunction:: get_declarative_base
 
 
+get_mapper
+^^^^^^^^^^
+
+.. autofunction:: get_mapper
+
+
 get_primary_keys
 ^^^^^^^^^^^^^^^^
 

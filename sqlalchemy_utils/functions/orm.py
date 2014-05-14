@@ -23,7 +23,28 @@ def get_mapper(mixed):
     """
     Return related SQLAlchemy Mapper for given SQLAlchemy object.
 
-    :param mixed: SQLAlchemy Table object
+    :param mixed: SQLAlchemy Table / Alias / Mapper / declarative model object
+
+    ::
+
+        from sqlalchemy_utils import get_mapper
+
+
+        get_mapper(User)
+
+        get_mapper(User())
+
+        get_mapper(User.__table__)
+
+        get_mapper(User.__mapper__)
+
+        get_mapper(sa.orm.aliased(User))
+
+        get_mapper(sa.orm.aliased(User.__table__))
+
+
+    Raises:
+        ValueError: if multiple mappers were found for given argument
 
     .. versionadded: 0.26.1
     """
