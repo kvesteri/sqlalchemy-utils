@@ -8,20 +8,23 @@ from .database import (
     drop_database,
     escape_like,
     is_auto_assigned_date_column,
+)
+from .foreign_keys import (
+    dependent_objects,
+    get_referencing_foreign_keys,
+    group_foreign_keys,
     is_indexed_foreign_key,
+    merge_references,
     non_indexed_foreign_keys,
 )
 from .orm import (
-    dependent_objects,
     get_bind,
     get_columns,
     get_declarative_base,
     get_mapper,
     get_primary_keys,
-    get_referencing_foreign_keys,
     get_tables,
     getdotattr,
-    group_foreign_keys,
     has_changes,
     identity,
     naturally_equivalent,

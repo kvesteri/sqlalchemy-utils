@@ -1,10 +1,10 @@
 import sqlalchemy as sa
-from sqlalchemy_utils import merge
+from sqlalchemy_utils import merge_references
 
 from tests import TestCase
 
 
-class TestMerge(TestCase):
+class TestMergeReferences(TestCase):
     def create_models(self):
         class User(self.Base):
             __tablename__ = 'user'
@@ -36,21 +36,29 @@ class TestMerge(TestCase):
         self.session.add(post)
         self.session.add(post2)
         self.session.commit()
-        merge(john, jack)
+        merge_references(john, jack)
+        self.session.commit()
         assert post.author == jack
         assert post2.author == jack
 
-    def test_deletes_from_entity(self):
+    def test_object_merging_whenever_possible(self):
         john = self.User(name=u'John')
         jack = self.User(name=u'Jack')
+        post = self.BlogPost(title=u'Some title', author=john)
+        post2 = self.BlogPost(title=u'Other title', author=jack)
         self.session.add(john)
         self.session.add(jack)
+        self.session.add(post)
+        self.session.add(post2)
         self.session.commit()
-        merge(john, jack)
-        assert john in self.session.deleted
+        # Load the author for post
+        assert post.author_id == john.id
+        merge_references(john, jack)
+        assert post.author_id == jack.id
+        assert post2.author_id == jack.id
 
 
-class TestMergeManyToManyAssociations(TestCase):
+class TestMergeReferencesWithManyToManyAssociations(TestCase):
     def create_models(self):
         class User(self.Base):
             __tablename__ = 'user'
@@ -88,7 +96,7 @@ class TestMergeManyToManyAssociations(TestCase):
         self.User = User
         self.Team = Team
 
-    def test_when_association_only_exists_in_from_entity(self):
+    def test_supports_associations(self):
         john = self.User(name=u'John')
         jack = self.User(name=u'Jack')
         team = self.Team(name=u'Team')
@@ -96,29 +104,12 @@ class TestMergeManyToManyAssociations(TestCase):
         self.session.add(john)
         self.session.add(jack)
         self.session.commit()
-        merge(john, jack)
+        merge_references(john, jack)
         assert john not in team.members
         assert jack in team.members
 
-    # def test_when_association_exists_in_both(self):
-    #     john = self.User(name=u'John')
-    #     jack = self.User(name=u'Jack')
-    #     team = self.Team(name=u'Team')
-    #     team.members.append(john)
-    #     team.members.append(jack)
-    #     self.session.add(john)
-    #     self.session.add(jack)
-    #     self.session.commit()
-    #     merge(john, jack)
-    #     assert john not in team.members
-    #     assert jack in team.members
-    #     count = self.session.execute(
-    #         'SELECT COUNT(1) FROM team_member'
-    #     ).fetchone()[0]
-    #     assert count == 1
 
-
-class TestMergeManyToManyAssociationObjects(TestCase):
+class TestMergeReferencesWithManyToManyAssociationObjects(TestCase):
     def create_models(self):
         class Team(self.Base):
             __tablename__ = 'team'
@@ -164,7 +155,7 @@ class TestMergeManyToManyAssociationObjects(TestCase):
         self.TeamMember = TeamMember
         self.Team = Team
 
-    def test_when_association_only_exists_in_from_entity(self):
+    def test_supports_associations(self):
         john = self.User(name=u'John')
         jack = self.User(name=u'Jack')
         team = self.Team(name=u'Team')
@@ -173,24 +164,8 @@ class TestMergeManyToManyAssociationObjects(TestCase):
         self.session.add(jack)
         self.session.add(team)
         self.session.commit()
-        merge(john, jack)
+        merge_references(john, jack)
         self.session.commit()
         users = [member.user for member in team.members]
         assert john not in users
         assert jack in users
-
-    # def test_when_association_exists_in_both(self):
-    #     john = self.User(name=u'John')
-    #     jack = self.User(name=u'Jack')
-    #     team = self.Team(name=u'Team')
-    #     team.members.append(self.TeamMember(user=john))
-    #     team.members.append(self.TeamMember(user=jack))
-    #     self.session.add(john)
-    #     self.session.add(jack)
-    #     self.session.add(team)
-    #     self.session.commit()
-    #     merge(john, jack)
-    #     users = [member.user for member in team.members]
-    #     assert john not in users
-    #     assert jack in users
-    #     assert self.session.query(self.TeamMember).count() == 1

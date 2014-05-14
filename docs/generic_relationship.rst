@@ -1,5 +1,5 @@
-Generic relationship
-====================
+Generic relationships
+=====================
 
 Generic relationship is a form of relationship that supports creating a 1 to many relationship to any target model.
 

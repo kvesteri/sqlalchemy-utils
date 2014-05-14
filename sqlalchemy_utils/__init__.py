@@ -20,6 +20,7 @@ from .functions import (
     get_tables,
     group_foreign_keys,
     identity,
+    merge_references,
     mock_engine,
     naturally_equivalent,
     render_expression,
@@ -32,7 +33,6 @@ from .listeners import (
     force_auto_coercion,
     force_instant_defaults
 )
-from .merge import merge, Merger
 from .generic import generic_relationship
 from .proxy_dict import ProxyDict, proxy_dict
 from .query_chain import QueryChain
@@ -67,7 +67,7 @@ from .types import (
 )
 
 
-__version__ = '0.26.0'
+__version__ = '0.26.1'
 
 
 __all__ = (
@@ -95,7 +95,7 @@ __all__ = (
     group_foreign_keys,
     identity,
     instrumented_list,
-    merge,
+    merge_references,
     mock_engine,
     naturally_equivalent,
     proxy_dict,
@@ -120,7 +120,6 @@ __all__ = (
     IPAddressType,
     JSONType,
     LocaleType,
-    Merger,
     NumericRangeType,
     Password,
     PasswordType,

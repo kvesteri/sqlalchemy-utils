@@ -1,13 +1,7 @@
-Model helpers
-=============
+ORM helpers
+===========
 
 .. module:: sqlalchemy_utils.functions
-
-
-dependent_objects
-^^^^^^^^^^^^^^^^^
-
-.. autofunction:: dependent_objects
 
 
 escape_like
@@ -46,22 +40,10 @@ get_primary_keys
 .. autofunction:: get_primary_keys
 
 
-get_referencing_foreign_keys
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. autofunction:: get_referencing_foreign_keys
-
-
 get_tables
 ^^^^^^^^^^
 
 .. autofunction:: get_tables
-
-
-group_foreign_keys
-^^^^^^^^^^^^^^^^^^
-
-.. autofunction:: group_foreign_keys
 
 
 query_entities

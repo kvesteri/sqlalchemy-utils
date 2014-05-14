@@ -71,3 +71,18 @@ class TestGetMapperWithMultipleMappersFound(object):
         alias = sa.orm.aliased(self.Building.__table__)
         with raises(ValueError):
             get_mapper(alias)
+
+
+class TestGetMapperForTableWithoutMapper(object):
+    def setup_method(self, method):
+        metadata = sa.MetaData()
+        self.building = sa.Table('building', metadata)
+
+    def test_table(self):
+        with raises(ValueError):
+            get_mapper(self.building)
+
+    def test_table_alias(self):
+        alias = sa.orm.aliased(self.building)
+        with raises(ValueError):
+            get_mapper(alias)
