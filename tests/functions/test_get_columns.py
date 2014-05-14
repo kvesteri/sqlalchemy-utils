@@ -1,11 +1,14 @@
 import sqlalchemy as sa
+from sqlalchemy.ext.declarative import declarative_base
+
 from sqlalchemy_utils import get_columns
-from tests import TestCase
 
 
-class TestGetColumns(TestCase):
-    def create_models(self):
-        class Building(self.Base):
+class TestGetColumns(object):
+    def setup_method(self, method):
+        Base = declarative_base()
+
+        class Building(Base):
             __tablename__ = 'building'
             id = sa.Column('_id', sa.Integer, primary_key=True)
             name = sa.Column('_name', sa.Unicode(255))
