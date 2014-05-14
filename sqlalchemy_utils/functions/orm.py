@@ -9,6 +9,7 @@ from operator import attrgetter
 import sqlalchemy as sa
 from sqlalchemy import inspect
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import mapperlib
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.orm.exc import UnmappedInstanceError
 from sqlalchemy.orm.mapper import Mapper
@@ -16,6 +17,37 @@ from sqlalchemy.orm.query import _ColumnEntity
 from sqlalchemy.orm.session import object_session
 from sqlalchemy.orm.util import AliasedInsp
 from ..query_chain import QueryChain
+
+
+def get_mapper(mixed):
+    """
+    Return related SQLAlchemy Mapper for given SQLAlchemy object.
+
+    :param mixed: SQLAlchemy Table object
+
+    .. versionadded: 0.26.1
+    """
+    if isinstance(mixed, sa.orm.Mapper):
+        return mixed
+    if isinstance(mixed, sa.orm.util.AliasedClass):
+        return sa.inspect(mixed).mapper
+    if isinstance(mixed, sa.sql.selectable.Alias):
+        mixed = mixed.element
+    if isinstance(mixed, sa.Table):
+        mappers = [
+            mapper for mapper in mapperlib._mapper_registry
+            if mixed in mapper.tables
+        ]
+        if len(mappers) > 1:
+            raise ValueError(
+                "Could not get mapper for '%r'. Multiple mappers found."
+                % mixed
+            )
+        else:
+            return mappers[0]
+    if not isclass(mixed):
+        mixed = type(mixed)
+    return sa.inspect(mixed)
 
 
 def get_bind(obj):

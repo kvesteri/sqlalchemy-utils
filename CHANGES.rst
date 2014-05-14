@@ -4,10 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
-0.26.0 (2014-05-xx)
+0.26.1 (2014-05-xx)
 ^^^^^^^^^^^^^^^^^^^
 
 - Added get_bind
+- Added group_foreign_keys
+- Added get_mapper
 
 
 0.26.0 (2014-05-07)
