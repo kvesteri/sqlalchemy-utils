@@ -143,7 +143,7 @@ class PasswordType(types.TypeDecorator, ScalarCoercible):
             scheme = getattr(__import__('passlib.hash').hash, name)
             length = 4 + len(scheme.name)
             length += len(str(getattr(scheme, 'max_rounds', '')))
-            length += getattr(scheme, 'max_salt_size', 0)
+            length += (getattr(scheme, 'max_salt_size', 0) or 0)
             length += getattr(
                 scheme,
                 'encoded_checksum_size',
