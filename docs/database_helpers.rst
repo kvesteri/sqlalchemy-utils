@@ -18,9 +18,15 @@ create_database
 
 
 drop_database
-^^^^^^^^^^^^^^
+^^^^^^^^^^^^^
 
 .. autofunction:: drop_database
+
+
+has_index
+^^^^^^^^^
+
+.. autofunction:: has_index
 
 
 render_expression
