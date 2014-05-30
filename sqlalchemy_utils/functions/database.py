@@ -138,7 +138,10 @@ def database_exists(url):
 
     url = copy(make_url(url))
     database = url.database
-    url.database = None
+    if url.drivername.startswith('postgresql'):
+        url.database = 'template1'
+    else:
+        url.database = None
 
     engine = sa.create_engine(url)
 
@@ -188,7 +191,10 @@ def create_database(url, encoding='utf8'):
     url = copy(make_url(url))
 
     database = url.database
-    if not url.drivername.startswith('sqlite'):
+
+    if url.drivername.startswith('postgresql'):
+        url.database = 'template1'
+    elif not url.drivername.startswith('sqlite'):
         url.database = None
 
     engine = sa.create_engine(url)
@@ -199,7 +205,8 @@ def create_database(url, encoding='utf8'):
             engine.raw_connection().set_isolation_level(
                 ISOLATION_LEVEL_AUTOCOMMIT)
 
-        text = "CREATE DATABASE %s ENCODING = '%s'" % (database, encoding)
+        text = "CREATE DATABASE %s ENCODING '%s' TEMPLATE template0" % (
+            database, encoding)
         engine.execute(text)
 
     elif engine.dialect.name == 'mysql':
@@ -230,7 +237,10 @@ def drop_database(url):
     url = copy(make_url(url))
 
     database = url.database
-    if not url.drivername.startswith('sqlite'):
+
+    if url.drivername.startswith('postgresql'):
+        url.database = 'template1'
+    elif not url.drivername.startswith('sqlite'):
         url.database = None
 
     engine = sa.create_engine(url)
@@ -241,6 +251,17 @@ def drop_database(url):
     elif engine.dialect.name == 'postgresql' and engine.driver == 'psycopg2':
         from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
         engine.raw_connection().set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+
+        # Disconnect all users from the database we are dropping.
+        text = '''
+        SELECT pg_terminate_backend(pg_stat_activity.pid)
+        FROM pg_stat_activity
+        WHERE pg_stat_activity.datname = '%s'
+          AND pid <> pg_backend_pid()
+        ''' % database
+        engine.execute(text)
+
+        # Drop the database.
         text = "DROP DATABASE %s" % database
         engine.execute(text)
 

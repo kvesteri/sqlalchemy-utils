@@ -25,14 +25,15 @@ class UUIDType(types.TypeDecorator, ScalarCoercible):
 
     python_type = uuid.UUID
 
-    def __init__(self, binary=True):
+    def __init__(self, binary=True, native=True):
         """
         :param binary: Whether to use a BINARY(16) or CHAR(32) fallback.
         """
         self.binary = binary
+        self.native = native
 
     def load_dialect_impl(self, dialect):
-        if dialect.name == 'postgresql':
+        if dialect.name == 'postgresql' and self.native:
             # Use the native UUID type.
             return dialect.type_descriptor(postgresql.UUID())
 
@@ -59,7 +60,7 @@ class UUIDType(types.TypeDecorator, ScalarCoercible):
         if not isinstance(value, uuid.UUID):
             value = self._coerce(value)
 
-        if dialect.name == 'postgresql':
+        if self.native and dialect.name == 'postgresql':
             return str(value)
 
         return value.bytes if self.binary else value.hex
@@ -68,7 +69,7 @@ class UUIDType(types.TypeDecorator, ScalarCoercible):
         if value is None:
             return value
 
-        if dialect.name == 'postgresql':
+        if self.native and dialect.name == 'postgresql':
             return uuid.UUID(value)
 
         return uuid.UUID(bytes=value) if self.binary else uuid.UUID(value)
