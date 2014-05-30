@@ -3,7 +3,6 @@ try:
 except ImportError:
     from ordereddict import OrderedDict
 from functools import partial
-from itertools import groupby
 from inspect import isclass
 from operator import attrgetter
 import sqlalchemy as sa
@@ -16,7 +15,6 @@ from sqlalchemy.orm.mapper import Mapper
 from sqlalchemy.orm.query import _ColumnEntity
 from sqlalchemy.orm.session import object_session
 from sqlalchemy.orm.util import AliasedInsp
-from ..query_chain import QueryChain
 
 
 def get_mapper(mixed):

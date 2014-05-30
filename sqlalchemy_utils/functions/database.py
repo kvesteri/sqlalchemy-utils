@@ -1,6 +1,5 @@
 from sqlalchemy.engine.url import make_url
 import sqlalchemy as sa
-from sqlalchemy.schema import MetaData, Table, ForeignKeyConstraint
 from sqlalchemy.exc import ProgrammingError, OperationalError
 import os
 from copy import copy
@@ -28,6 +27,69 @@ def escape_like(string, escape_char='*'):
         .replace(escape_char, escape_char * 2)
         .replace('%', escape_char + '%')
         .replace('_', escape_char + '_')
+    )
+
+
+def has_index(column):
+    """
+    Return whether or not given column has an index. A column has an index if
+    it has a single column index or it is the first column in compound column
+    index.
+
+    :param column: SQLAlchemy Column object
+
+    .. versionadded: 0.26.2
+
+    ::
+
+        from sqlalchemy_utils import has_index
+
+
+        class Article(Base):
+            __tablename__ = 'article_translation'
+            id = sa.Column(sa.Integer, primary_key=True)
+            title = sa.Column(sa.String(100))
+            is_published = sa.Column(sa.Boolean)
+            is_deleted = sa.Column(sa.Boolean)
+            is_archived = sa.Column(sa.Boolean)
+
+            __table_args__ = (
+            )
+
+
+        table = Article.__table__
+
+        has_index(table.c.is_published) # True
+        has_index(table.c.is_deleted)   # True
+        has_index(table.c.is_archived)  # False
+
+
+    Also supports primary key indexes
+
+    ::
+
+        from sqlalchemy_utils import has_index
+
+
+        class ArticleTranslation(Base):
+            __tablename__ = 'article_translation'
+            id = sa.Column(sa.Integer, primary_key=True)
+            locale = sa.Column(sa.String(10), primary_key=True)
+            title = sa.Column(sa.String(100))
+
+
+        table = ArticleTranslation.__table__
+
+        has_index(table.c.locale)   # False
+        has_index(table.c.id)       # True
+    """
+    return (
+        column is column.table.primary_key.columns.values()[0]
+        or
+        any(
+            index.columns.values()[0] is column
+            for index in column.table.indexes
+        )
     )
 
 
