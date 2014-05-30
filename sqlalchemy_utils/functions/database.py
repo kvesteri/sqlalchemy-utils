@@ -46,14 +46,15 @@ def has_index(column):
 
 
         class Article(Base):
-            __tablename__ = 'article_translation'
+            __tablename__ = 'article'
             id = sa.Column(sa.Integer, primary_key=True)
             title = sa.Column(sa.String(100))
-            is_published = sa.Column(sa.Boolean)
+            is_published = sa.Column(sa.Boolean, index=True)
             is_deleted = sa.Column(sa.Boolean)
             is_archived = sa.Column(sa.Boolean)
 
             __table_args__ = (
+                sa.Index('my_index', is_deleted, is_archived),
             )
 
 
