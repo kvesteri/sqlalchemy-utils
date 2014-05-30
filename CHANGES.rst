@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.26.2 (2014-05-29)
+^^^^^^^^^^^^^^^^^^^
+
+- Added various fixes for bugs found in use of psycopg2
+- Added has_index
+
+
 0.26.1 (2014-05-14)
 ^^^^^^^^^^^^^^^^^^^
 
