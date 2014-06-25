@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.26.4 (2014-06-25)
+^^^^^^^^^^^^^^^^^^^
+
+- Added auto_delete_orphans
+
+
 0.26.3 (2014-06-25)
 ^^^^^^^^^^^^^^^^^^^
 
