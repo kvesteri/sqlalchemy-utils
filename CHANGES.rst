@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.26.3 (2014-06-25)
+^^^^^^^^^^^^^^^^^^^
+
+- Added has_any_changes
+
+
 0.26.2 (2014-05-29)
 ^^^^^^^^^^^^^^^^^^^
 

@@ -475,6 +475,7 @@ def has_changes(obj, attr):
 
     :param obj: SQLAlchemy declarative model object
     :param attr: Name of the attribute
+    .. seealso:: :func:`has_any_changes`
     """
     return (
         sa.inspect(obj)
@@ -483,6 +484,33 @@ def has_changes(obj, attr):
         .history
         .has_changes()
     )
+
+
+def has_any_changes(model, columns):
+    """
+    Simple shortcut function for checking if any of the given attributes of
+    given declarative model object have changes.
+
+
+    ::
+
+
+        from sqlalchemy_utils import has_any_changes
+
+
+        user = User()
+
+        has_any_changes(user, ('name', ))  # False
+
+        user.name = u'someone'
+
+        has_any_changes(user, ('name', 'age'))  # True
+
+
+    :param obj: SQLAlchemy declarative model object
+    :param attrs: Names of the attributes
+    """
+    return any(has_changes(model, column) for column in columns)
 
 
 def identity(obj_or_class):
