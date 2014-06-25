@@ -14,3 +14,9 @@ Instant defaults
 ----------------
 
 .. autofunction:: force_instant_defaults
+
+
+Many-to-many orphan deletion
+----------------------------
+
+.. autofunction:: auto_delete_orphans

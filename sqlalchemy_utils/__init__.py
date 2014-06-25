@@ -32,6 +32,7 @@ from .functions import (
     table_name,
 )
 from .listeners import (
+    auto_delete_orphans,
     coercion_listener,
     force_auto_coercion,
     force_instant_defaults
@@ -75,6 +76,7 @@ __version__ = '0.26.3'
 
 __all__ = (
     aggregated,
+    auto_delete_orphans,
     batch_fetch,
     coercion_listener,
     create_database,

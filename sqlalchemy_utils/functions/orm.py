@@ -507,6 +507,8 @@ def has_any_changes(model, columns):
         has_any_changes(user, ('name', 'age'))  # True
 
 
+    .. versionadded: 0.26.3
+
     :param obj: SQLAlchemy declarative model object
     :param attrs: Names of the attributes
     """
