@@ -69,6 +69,7 @@ from .types import (
     UUIDType,
     WeekDaysType
 )
+from .models import Timestamp
 
 
 __version__ = '0.26.4'
@@ -137,9 +138,10 @@ __all__ = (
     QueryChain,
     ScalarListException,
     ScalarListType,
+    Timestamp,
     TimezoneType,
     TSVectorType,
     URLType,
     UUIDType,
-    WeekDaysType
+    WeekDaysType,
 )
