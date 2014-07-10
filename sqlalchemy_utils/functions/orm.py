@@ -17,6 +17,33 @@ from sqlalchemy.orm.session import object_session
 from sqlalchemy.orm.util import AliasedInsp
 
 
+def get_column_key(model, column):
+    """
+    Return the key for given column in given model.
+
+    :param model: SQLAlchemy declarative model object
+
+    ::
+
+        class User(Base):
+            __tablename__ = 'user'
+            id = sa.Column(sa.Integer, primary_key=True)
+            name = sa.Column('_name', sa.String)
+
+
+        get_column_key(User, User.__table__.c.name)  # 'name'
+
+    .. versionadded: 0.26.5
+    """
+    for key, c in sa.inspect(model).columns.items():
+        if c is column:
+            return key
+    raise ValueError(
+        "Class %s doesn't have a column 'column.key'",
+        model.__name__
+    )
+
+
 def get_mapper(mixed):
     """
     Return related SQLAlchemy Mapper for given SQLAlchemy object.

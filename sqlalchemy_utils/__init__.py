@@ -12,6 +12,7 @@ from .functions import (
     drop_database,
     escape_like,
     get_bind,
+    get_column_key,
     get_columns,
     get_declarative_base,
     get_mapper,
@@ -71,7 +72,7 @@ from .types import (
 )
 
 
-__version__ = '0.26.4'
+__version__ = '0.26.5'
 
 
 __all__ = (
@@ -91,6 +92,7 @@ __all__ = (
     generates,
     generic_relationship,
     get_bind,
+    get_column_key,
     get_columns,
     get_declarative_base,
     get_mapper,

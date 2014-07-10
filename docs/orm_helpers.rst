@@ -16,6 +16,12 @@ get_bind
 .. autofunction:: get_bind
 
 
+get_column_key
+^^^^^^^^^^^^^^
+
+.. autofunction:: get_column_key
+
+
 get_columns
 ^^^^^^^^^^^
 

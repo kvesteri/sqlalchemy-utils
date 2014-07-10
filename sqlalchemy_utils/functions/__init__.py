@@ -20,6 +20,7 @@ from .foreign_keys import (
 )
 from .orm import (
     get_bind,
+    get_column_key,
     get_columns,
     get_declarative_base,
     get_mapper,
