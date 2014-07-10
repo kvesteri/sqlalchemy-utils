@@ -8,6 +8,7 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 ^^^^^^^^^^^^^^^^^^^
 
 - Added get_column_key
+- Added Timestamp model mixin
 
 
 0.26.4 (2014-06-25)

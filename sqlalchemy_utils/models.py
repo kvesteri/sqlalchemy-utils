@@ -10,8 +10,11 @@ class Timestamp(object):
     for all derived declarative models.
 
     ::
+
+
         import sqlalchemy as sa
         from sqlalchemy_utils import Timestamp
+
 
         class SomeModel(Base, Timestamp):
             __tablename__ = 'somemodel'
