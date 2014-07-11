@@ -4,7 +4,7 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
-0.26.5 (2014-07-xx)
+0.26.5 (2014-07-11)
 ^^^^^^^^^^^^^^^^^^^
 
 - Added get_column_key
