@@ -39,8 +39,9 @@ def get_column_key(model, column):
         if c is column:
             return key
     raise ValueError(
-        "Class %s doesn't have a column 'column.key'",
-        model.__name__
+        "Class %s doesn't have a column '%s'",
+        model.__name__,
+        column
     )
 
 
