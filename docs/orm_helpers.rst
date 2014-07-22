@@ -58,12 +58,6 @@ query_entities
 .. autofunction:: query_entities
 
 
-has_any_changes
-^^^^^^^^^^^^^^^
-
-.. autofunction:: has_any_changes
-
-
 has_changes
 ^^^^^^^^^^^
 
