@@ -530,8 +530,6 @@ def has_changes(obj, attrs=None, exclude=None):
     :param obj: SQLAlchemy declarative model object
     :param attrs: Names of the attributes
     :param exclude: Names of the attributes to exclude
-
-    .. seealso:: :func:`has_any_changes`
     """
     if attrs:
         if isinstance(attrs, six.string_types):
