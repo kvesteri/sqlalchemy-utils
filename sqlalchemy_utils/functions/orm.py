@@ -528,7 +528,9 @@ def has_changes(obj, attrs=None, exclude=None):
         Added support for multiple attributes and exclude parameter.
 
     :param obj: SQLAlchemy declarative model object
-    :param attrs: Name(s) of the attribute
+    :param attrs: Names of the attributes
+    :param exclude: Names of the attributes to exclude
+
     .. seealso:: :func:`has_any_changes`
     """
     if attrs:
