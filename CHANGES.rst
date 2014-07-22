@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.26.6 (2014-07-22)
+^^^^^^^^^^^^^^^^^^^
+
+- Added exclude parameter to has_changes
+- Made has_changes accept multiple attributes as second parameter
+
+
 0.26.5 (2014-07-11)
 ^^^^^^^^^^^^^^^^^^^
 
