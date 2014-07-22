@@ -5,6 +5,7 @@ except ImportError:
 from functools import partial
 from inspect import isclass
 from operator import attrgetter
+import six
 import sqlalchemy as sa
 from sqlalchemy import inspect
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -480,10 +481,13 @@ def getdotattr(obj_or_class, dot_path):
     return last
 
 
-def has_changes(obj, attr):
+def has_changes(obj, attrs=None, exclude=None):
     """
-    Simple shortcut function for checking if given attribute of given
-    declarative model object has changed during the transaction.
+    Simple shortcut function for checking if given attribute(s) of given
+    declarative model object has changed during the transaction. Without
+    parameters this checks if given object has any modificiations. Additionally
+    exclude parameter can be given which check if given object has any changes
+    in any attributes other than the ones given in exclude.
 
 
     ::
@@ -500,18 +504,52 @@ def has_changes(obj, attr):
 
         has_changes(user, 'name')  # True
 
+        has_changes(user)  # True
+
+
+    You can check multiple attributes as well.
+    ::
+
+
+        has_changes(user, ['age'])  # True
+
+        has_changes(user, ['name', 'age'])  # True
+
+
+    This function also supports excluding certain attributes.
+
+    ::
+
+        has_changes(user, exclude=['name'])  # False
+
+        has_changes(user, exclude=['age'])  # True
+
+    .. versionchanged: 0.26.6
+        Added support for multiple attributes and exclude parameter.
 
     :param obj: SQLAlchemy declarative model object
-    :param attr: Name of the attribute
+    :param attrs: Name(s) of the attribute
     .. seealso:: :func:`has_any_changes`
     """
-    return (
-        sa.inspect(obj)
-        .attrs
-        .get(attr)
-        .history
-        .has_changes()
-    )
+    if attrs:
+        if isinstance(attrs, six.string_types):
+            return (
+                sa.inspect(obj)
+                .attrs
+                .get(attrs)
+                .history
+                .has_changes()
+            )
+        else:
+            return any(has_changes(obj, attr) for attr in attrs)
+    else:
+        if exclude is None:
+            exclude = []
+        return any(
+            attr.history.has_changes()
+            for key, attr in sa.inspect(obj).attrs.items()
+            if key not in exclude
+        )
 
 
 def has_any_changes(model, columns):
@@ -536,6 +574,8 @@ def has_any_changes(model, columns):
 
 
     .. versionadded: 0.26.3
+    .. deprecated:: 0.26.6
+        User :func:`has_changes` instead.
 
     :param obj: SQLAlchemy declarative model object
     :param attrs: Names of the attributes

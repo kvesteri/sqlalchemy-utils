@@ -4,7 +4,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy_utils import has_changes
 
 
-class TestHasChanges(object):
+class HasChangesTestCase(object):
     def setup_method(self, method):
         Base = declarative_base()
 
@@ -15,6 +15,8 @@ class TestHasChanges(object):
 
         self.Article = Article
 
+
+class TestHasChangesWithStringAttr(HasChangesTestCase):
     def test_without_changed_attr(self):
         article = self.Article()
         assert not has_changes(article, 'title')
@@ -22,3 +24,24 @@ class TestHasChanges(object):
     def test_with_changed_attr(self):
         article = self.Article(title='Some title')
         assert has_changes(article, 'title')
+
+
+class TestHasChangesWithMultipleAttrs(HasChangesTestCase):
+    def test_without_changed_attr(self):
+        article = self.Article()
+        assert not has_changes(article, ['title'])
+
+    def test_with_changed_attr(self):
+        article = self.Article(title='Some title')
+        assert has_changes(article, ['title', 'id'])
+
+
+class TestHasChangesWithExclude(HasChangesTestCase):
+    def test_without_changed_attr(self):
+        article = self.Article()
+        assert not has_changes(article, exclude=['id'])
+
+    def test_with_changed_attr(self):
+        article = self.Article(title='Some title')
+        assert has_changes(article, exclude=['id'])
+        assert not has_changes(article, exclude=['title'])
