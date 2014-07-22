@@ -5,3 +5,5 @@
     https://github.com/jpvanhal/silo
 * Query to Postgres JSON converter
     http://hashrocket.com/blog/posts/faster-json-generation-with-postgresql
+* Postgres Cube datatype:
+    http://www.postgresql.org/docs/9.4/static/cube.html
