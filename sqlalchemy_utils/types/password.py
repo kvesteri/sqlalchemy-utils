@@ -115,6 +115,7 @@ class PasswordType(types.TypeDecorator, ScalarCoercible):
 
     """
 
+    impl = types.VARBINARY(1024)
     python_type = Password
 
     def __init__(self, max_length=None, **kwargs):
