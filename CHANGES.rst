@@ -8,6 +8,8 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 ^^^^^^^^^^^^^^^^^^^
 
 - Made sort_query support hybrid properties where function name != property name
+- Made get_hybrid_properties return a dictionary of property keys and hybrid properties
+- Added documentation for get_hybrid_properties
 
 
 0.26.6 (2014-07-22)

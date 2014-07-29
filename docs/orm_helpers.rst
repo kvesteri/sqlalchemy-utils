@@ -34,6 +34,12 @@ get_declarative_base
 .. autofunction:: get_declarative_base
 
 
+get_hybrid_properties
+^^^^^^^^^^^^^^^^^^^^^
+
+.. autofunction:: get_hybrid_properties
+
+
 get_mapper
 ^^^^^^^^^^
 
