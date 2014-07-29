@@ -416,10 +416,55 @@ def get_attrs(expr):
         return inspect(expr).attrs
 
 
-def get_hybrid_properties(class_):
-    for prop in sa.inspect(class_).all_orm_descriptors:
-        if isinstance(prop, hybrid_property):
-            yield prop
+def get_hybrid_properties(model):
+    """
+    Returns a dictionary of hybrid property keys and hybrid properties for
+    given SQLAlchemy declarative model / mapper.
+
+
+    Consider the following model
+
+    ::
+
+
+        from sqlalchemy.ext.hybrid import hybrid_property
+
+
+        class Category(Base):
+            __tablename__ = 'category'
+            id = sa.Column(sa.Integer, primary_key=True)
+            name = sa.Column(sa.Unicode(255))
+
+            @hybrid_property
+            def lowercase_name(self):
+                return self.name.lower()
+
+            @lowercase_name.expression
+            def lowercase_name(cls):
+                return sa.func.lower(cls.name)
+
+
+    You can now easily get a list of all hybrid property names
+
+    ::
+
+
+        from sqlalchemy_utils import get_hybrid_properties
+
+
+        get_hybrid_properties(Category).keys()  # ['lowercase_name']
+
+
+    .. versionchanged: 0.26.7
+        This function now returns a dictionary instead of generator
+
+    :param model: SQLAlchemy declarative model or mapper
+    """
+    return dict(
+        (key, prop)
+        for key, prop in sa.inspect(model).all_orm_descriptors.items()
+        if isinstance(prop, hybrid_property)
+    )
 
 
 def get_expr_attr(expr, attr_name):
@@ -483,10 +528,10 @@ def getdotattr(obj_or_class, dot_path):
 
 def has_changes(obj, attrs=None, exclude=None):
     """
-    Simple shortcut function for checking if given attribute(s) of given
-    declarative model object has changed during the transaction. Without
+    Simple shortcut function for checking if given attributes of given
+    declarative model object have changed during the session. Without
     parameters this checks if given object has any modificiations. Additionally
-    exclude parameter can be given which check if given object has any changes
+    exclude parameter can be given to check if given object has any changes
     in any attributes other than the ones given in exclude.
 
 
@@ -552,7 +597,7 @@ def has_changes(obj, attrs=None, exclude=None):
         )
 
 
-def has_any_changes(model, columns):
+def has_any_changes(obj, columns):
     """
     Simple shortcut function for checking if any of the given attributes of
     given declarative model object have changes.
@@ -580,7 +625,7 @@ def has_any_changes(model, columns):
     :param obj: SQLAlchemy declarative model object
     :param attrs: Names of the attributes
     """
-    return any(has_changes(model, column) for column in columns)
+    return any(has_changes(obj, column) for column in columns)
 
 
 def identity(obj_or_class):

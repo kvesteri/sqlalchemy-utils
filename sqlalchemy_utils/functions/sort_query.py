@@ -59,8 +59,8 @@ class QuerySorter(object):
             mapper = mapper.mapper
             entity = mapper.entity
 
-        for prop in get_hybrid_properties(mapper):
-            if attr == prop.__name__:
+        for key in get_hybrid_properties(mapper).keys():
+            if attr == key:
                 return getattr(entity, attr)
 
     def parse_sort_arg(self, arg):

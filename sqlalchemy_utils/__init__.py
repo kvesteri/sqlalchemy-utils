@@ -15,6 +15,7 @@ from .functions import (
     get_column_key,
     get_columns,
     get_declarative_base,
+    get_hybrid_properties,
     get_mapper,
     get_primary_keys,
     get_referencing_foreign_keys,
@@ -73,7 +74,7 @@ from .types import (
 from .models import Timestamp
 
 
-__version__ = '0.26.6'
+__version__ = '0.26.7'
 
 
 __all__ = (
@@ -96,6 +97,7 @@ __all__ = (
     get_column_key,
     get_columns,
     get_declarative_base,
+    get_hybrid_properties,
     get_mapper,
     get_primary_keys,
     get_referencing_foreign_keys,

@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.26.7 (2014-07-29)
+^^^^^^^^^^^^^^^^^^^
+
+- Made sort_query support hybrid properties where function name != property name
+
+
 0.26.6 (2014-07-22)
 ^^^^^^^^^^^^^^^^^^^
 

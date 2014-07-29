@@ -137,6 +137,17 @@ class TestSortQuery(TestCase):
         ) in str(query)
         assert ' DESC' in str(query)
 
+    def test_assigned_hybrid_property(self):
+        def getter(self):
+            return self.name
+
+        self.Article.some_hybrid = sa.ext.hybrid.hybrid_property(
+            fget=getter
+        )
+        query = self.session.query(self.Article)
+        query = sort_query(query, 'some_hybrid')
+        assert 'ORDER BY article.name ASC' in str(query)
+
     def test_relation_hybrid_property(self):
         query = (
             self.session.query(self.Article)
