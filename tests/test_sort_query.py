@@ -129,7 +129,7 @@ class TestSortQuery(TestCase):
     def test_synonym_property(self):
         query = self.session.query(self.Category)
         query = sort_query(query, 'name_synonym')
-        assert_contains('ORDER BY name DESC', query)
+        assert_contains('ORDER BY category.name ASC', query)
 
     def test_hybrid_property(self):
         query = self.session.query(self.Category)

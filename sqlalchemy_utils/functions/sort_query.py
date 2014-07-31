@@ -1,5 +1,5 @@
 import sqlalchemy as sa
-from sqlalchemy.orm.properties import ColumnProperty
+from sqlalchemy.orm.properties import ColumnProperty, SynonymProperty
 from sqlalchemy.sql.expression import desc, asc, Label
 from sqlalchemy.orm.util import AliasedInsp
 from .orm import (
@@ -49,6 +49,8 @@ class QuerySorter(object):
                     return getattr(entity, property_.key)
                 else:
                     return get_expr_attr(entity, property_.key)
+            elif isinstance(property_, SynonymProperty):
+                return get_expr_attr(entity, property_.key)
             return
 
         mapper = sa.inspect(entity)

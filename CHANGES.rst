@@ -8,6 +8,7 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 ^^^^^^^^^^^^^^^^^^^
 
 - Fixed order by column property handling in sort_query when using polymorphic inheritance
+- Added support for synonym properties in sort_query
 
 
 0.26.7 (2014-07-29)
