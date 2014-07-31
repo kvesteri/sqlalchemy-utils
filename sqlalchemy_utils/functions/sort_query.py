@@ -46,12 +46,10 @@ class QuerySorter(object):
             property_ = properties[attr]
             if isinstance(property_, ColumnProperty):
                 if isinstance(property_.columns[0], Label):
-                    expr = property_.columns[0].name
+                    return getattr(entity, property_.key)
                 else:
-                    expr = get_expr_attr(entity, property_.key)
-                return expr
-            else:
-                return
+                    return get_expr_attr(entity, property_.key)
+            return
 
         mapper = sa.inspect(entity)
 
@@ -81,6 +79,7 @@ class QuerySorter(object):
         self.query = query
         self.labels = query_labels(query)
         self.entities = query_entities(query)
+
         for sort in args:
             if not sort:
                 continue

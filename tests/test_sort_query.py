@@ -5,24 +5,31 @@ from sqlalchemy_utils.functions import QuerySorterException
 from tests import TestCase
 
 
+def assert_contains(clause, query):
+    # Test that query executes
+    query.all()
+    assert clause in str(query)
+
+
 class TestSortQuery(TestCase):
+
     def test_without_sort_param_returns_the_query_object_untouched(self):
         query = self.session.query(self.Article)
-        sorted_query = sort_query(query, '')
-        assert query == sorted_query
+        query = sort_query(query, '')
+        assert query == query
 
     def test_column_ascending(self):
         query = sort_query(self.session.query(self.Article), 'name')
-        assert 'ORDER BY article.name ASC' in str(query)
+        assert_contains('ORDER BY article.name ASC', query)
 
     def test_column_descending(self):
         query = sort_query(self.session.query(self.Article), '-name')
-        assert 'ORDER BY article.name DESC' in str(query)
+        assert_contains('ORDER BY article.name DESC', query)
 
     def test_skips_unknown_columns(self):
         query = self.session.query(self.Article)
-        sorted_query = sort_query(query, '-unknown')
-        assert query == sorted_query
+        query = sort_query(query, '-unknown')
+        assert query == query
 
     def test_non_silent_mode(self):
         query = self.session.query(self.Article)
@@ -35,21 +42,21 @@ class TestSortQuery(TestCase):
             .join(self.Article.category)
         )
         query = sort_query(query, 'name', silent=False)
-        assert 'ORDER BY article.name ASC' in str(query)
+        assert_contains('ORDER BY article.name ASC', query)
 
     def test_calculated_value_ascending(self):
         query = self.session.query(
             self.Category, sa.func.count(self.Article.id).label('articles')
         )
         query = sort_query(query, 'articles')
-        assert 'ORDER BY articles ASC' in str(query)
+        assert_contains('ORDER BY articles ASC', query)
 
     def test_calculated_value_descending(self):
         query = self.session.query(
             self.Category, sa.func.count(self.Article.id).label('articles')
         )
         query = sort_query(query, '-articles')
-        assert 'ORDER BY articles DESC' in str(query)
+        assert_contains('ORDER BY articles DESC', query)
 
     def test_subqueried_scalar(self):
         article_count = (
@@ -65,7 +72,7 @@ class TestSortQuery(TestCase):
             self.Category, article_count.label('articles')
         )
         query = sort_query(query, '-articles')
-        assert 'ORDER BY articles DESC' in str(query)
+        assert_contains('ORDER BY articles DESC', query)
 
     def test_aliased_joined_entity(self):
         alias = sa.orm.aliased(self.Category, name='categories')
@@ -75,17 +82,17 @@ class TestSortQuery(TestCase):
             alias, self.Article.category
         )
         query = sort_query(query, '-categories-name')
-        assert 'ORDER BY categories.name DESC' in str(query)
+        assert_contains('ORDER BY categories.name DESC', query)
 
     def test_joined_table_column(self):
         query = self.session.query(self.Article).join(self.Article.category)
-        sorted_query = sort_query(query, 'category-name')
-        assert 'category.name ASC' in str(sorted_query)
+        query = sort_query(query, 'category-name')
+        assert_contains('category.name ASC', query)
 
     def test_multiple_columns(self):
         query = self.session.query(self.Article)
-        sorted_query = sort_query(query, 'name', 'id')
-        assert 'article.name ASC, article.id ASC' in str(sorted_query)
+        query = sort_query(query, 'name', 'id')
+        assert_contains('article.name ASC, article.id ASC', query)
 
     def test_column_property(self):
         self.Category.article_count = sa.orm.column_property(
@@ -95,8 +102,8 @@ class TestSortQuery(TestCase):
         )
 
         query = self.session.query(self.Category)
-        sorted_query = sort_query(query, 'article_count')
-        assert 'article_count ASC' in str(sorted_query)
+        query = sort_query(query, 'article_count')
+        assert_contains('article_count ASC', query)
 
     def test_column_property_descending(self):
         self.Category.article_count = sa.orm.column_property(
@@ -106,8 +113,8 @@ class TestSortQuery(TestCase):
         )
 
         query = self.session.query(self.Category)
-        sorted_query = sort_query(query, '-article_count')
-        assert 'article_count DESC' in str(sorted_query)
+        query = sort_query(query, '-article_count')
+        assert_contains('article_count DESC', query)
 
     def test_relationship_property(self):
         query = self.session.query(self.Category)
@@ -122,19 +129,20 @@ class TestSortQuery(TestCase):
     def test_synonym_property(self):
         query = self.session.query(self.Category)
         query = sort_query(query, 'name_synonym')
-        assert 'ORDER BY name DESC'
+        assert_contains('ORDER BY name DESC', query)
 
     def test_hybrid_property(self):
         query = self.session.query(self.Category)
         query = sort_query(query, 'articles_count')
-        assert 'ORDER BY (SELECT count(article.id) AS count_1' in str(query)
+        assert_contains('ORDER BY (SELECT count(article.id) AS count_1', query)
 
     def test_hybrid_property_descending(self):
         query = self.session.query(self.Category)
         query = sort_query(query, '-articles_count')
-        assert (
-            'ORDER BY (SELECT count(article.id) AS count_1'
-        ) in str(query)
+        assert_contains(
+            'ORDER BY (SELECT count(article.id) AS count_1',
+            query
+        )
         assert ' DESC' in str(query)
 
     def test_assigned_hybrid_property(self):
@@ -146,16 +154,22 @@ class TestSortQuery(TestCase):
         )
         query = self.session.query(self.Article)
         query = sort_query(query, 'some_hybrid')
-        assert 'ORDER BY article.name ASC' in str(query)
+        assert_contains('ORDER BY article.name ASC', query)
+
+
+class TestSortQueryRelationshipCounts(TestCase):
+    """
+    Currently this doesn't work with SQLite
+    """
+    dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
 
     def test_relation_hybrid_property(self):
         query = (
             self.session.query(self.Article)
             .join(self.Article.category)
-            .correlate(self.Article.__table__)
-        )
+        ).group_by(self.Article.id)
         query = sort_query(query, '-category-articles_count')
-        assert 'ORDER BY (SELECT count(article.id) AS count_1' in str(query)
+        assert_contains('ORDER BY (SELECT count(article.id) AS count_1', query)
 
     def test_aliased_hybrid_property(self):
         alias = sa.orm.aliased(
@@ -168,6 +182,54 @@ class TestSortQuery(TestCase):
             .options(
                 sa.orm.contains_eager(self.Article.category, alias=alias)
             )
-        )
+        ).group_by(alias.id, self.Article.id)
         query = sort_query(query, '-categories-articles_count')
-        assert 'ORDER BY (SELECT count(article.id) AS count_1' in str(query)
+        assert_contains('ORDER BY (SELECT count(article.id) AS count_1', query)
+
+
+class TestSortQueryWithPolymorphicInheritance(TestCase):
+    """
+    Currently this doesn't work with SQLite
+    """
+    dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
+
+    def create_models(self):
+        class TextItem(self.Base):
+            __tablename__ = 'text_item'
+            id = sa.Column(sa.Integer, primary_key=True)
+
+            type = sa.Column(sa.Unicode(255))
+
+            __mapper_args__ = {
+                'polymorphic_on': type,
+                'with_polymorphic': '*'
+            }
+
+        class Article(TextItem):
+            __tablename__ = 'article'
+            id = sa.Column(
+                sa.Integer, sa.ForeignKey(TextItem.id), primary_key=True
+            )
+            __mapper_args__ = {
+                'polymorphic_identity': u'article'
+            }
+
+        self.TextItem = TextItem
+        self.Article = Article
+
+    def test_column_property(self):
+        self.TextItem.item_count = sa.orm.column_property(
+            sa.select(
+                [
+                    sa.func.count('1')
+                ],
+            )
+            .select_from(self.TextItem.__table__)
+            .label('item_count')
+        )
+
+        query = sort_query(
+            self.session.query(self.TextItem),
+            'item_count'
+        )
+        assert_contains('ORDER BY (SELECT count(:param_2) AS count_2', query)

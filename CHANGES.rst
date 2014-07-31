@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.26.8 (2014-07-30)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed order by column property handling in sort_query when using polymorphic inheritance
+
+
 0.26.7 (2014-07-29)
 ^^^^^^^^^^^^^^^^^^^
 
