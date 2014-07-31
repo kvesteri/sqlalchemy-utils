@@ -62,3 +62,26 @@ class tsvector_concat(expression.FunctionElement):
 @compiles(tsvector_concat)
 def compile_tsvector_concat(element, compiler, **kw):
     return ' || '.join(map(compiler.process, element.clauses))
+
+
+class array_get(expression.FunctionElement):
+    name = 'array_get'
+
+
+@compiles(array_get)
+def compile_array_get(element, compiler, **kw):
+    args = list(element.clauses)
+    if len(args) != 2:
+        raise Exception(
+            "Function 'array_get' expects two arguments (%d given)." %
+            len(args)
+        )
+
+    if not hasattr(args[1], 'value') or not isinstance(args[1].value, int):
+        raise Exception(
+            "Second argument should be an integer."
+        )
+    return '(%s)[%s]' % (
+        compiler.process(args[0]),
+        sa.text(str(args[1].value + 1))
+    )
