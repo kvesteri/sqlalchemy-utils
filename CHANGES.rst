@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.26.9 (2014-08-xx)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed PasswordType with Oracle dialect
+
+
 0.26.8 (2014-07-30)
 ^^^^^^^^^^^^^^^^^^^
 
