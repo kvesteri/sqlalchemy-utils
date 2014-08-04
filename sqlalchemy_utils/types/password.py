@@ -2,7 +2,7 @@ import six
 import weakref
 from sqlalchemy_utils import ImproperlyConfigured
 from sqlalchemy import types
-from sqlalchemy.dialects import postgresql
+from sqlalchemy.dialects import postgresql, oracle
 from .scalar_coercible import ScalarCoercible
 from sqlalchemy.ext.mutable import Mutable
 
@@ -116,7 +116,6 @@ class PasswordType(types.TypeDecorator, ScalarCoercible):
     """
 
     impl = types.VARBINARY(1024)
-
     python_type = Password
 
     def __init__(self, max_length=None, **kwargs):
@@ -158,6 +157,10 @@ class PasswordType(types.TypeDecorator, ScalarCoercible):
         if dialect.name == 'postgresql':
             # Use a BYTEA type for postgresql.
             impl = postgresql.BYTEA(self.length)
+            return dialect.type_descriptor(impl)
+        if dialect.name == 'oracle':
+            # Use a RAW type for oracle.
+            impl = oracle.RAW(self.length)
             return dialect.type_descriptor(impl)
 
         # Use a VARBINARY for all other dialects.
