@@ -7,7 +7,7 @@ from .orm import (
     get_expr_attr,
     get_hybrid_properties,
     get_query_entity_by_alias,
-    query_entities,
+    get_query_entities,
     query_labels,
 )
 
@@ -18,7 +18,6 @@ class QuerySorterException(Exception):
 
 class QuerySorter(object):
     def __init__(self, silent=True, separator='-'):
-        self.entities = []
         self.labels = []
         self.separator = separator
         self.silent = silent
@@ -44,20 +43,21 @@ class QuerySorter(object):
         properties = get_attrs(entity)
         if attr in properties:
             property_ = properties[attr]
+
             if isinstance(property_, ColumnProperty):
                 if isinstance(property_.columns[0], Label):
                     return getattr(entity, property_.key)
                 else:
-                    return get_expr_attr(entity, property_.key)
+                    return get_expr_attr(entity, property_)
             elif isinstance(property_, SynonymProperty):
-                return get_expr_attr(entity, property_.key)
+                return get_expr_attr(entity, property_)
             return
 
         mapper = sa.inspect(entity)
+        entity = mapper.entity
 
         if isinstance(mapper, AliasedInsp):
             mapper = mapper.mapper
-            entity = mapper.entity
 
         for key in get_hybrid_properties(mapper).keys():
             if attr == key:
@@ -80,7 +80,6 @@ class QuerySorter(object):
     def __call__(self, query, *args):
         self.query = query
         self.labels = query_labels(query)
-        self.entities = query_entities(query)
 
         for sort in args:
             if not sort:

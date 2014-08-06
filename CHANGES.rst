@@ -4,10 +4,11 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
-0.26.9 (2014-08-xx)
+0.26.9 (2014-08-06)
 ^^^^^^^^^^^^^^^^^^^
 
 - Fixed PasswordType with Oracle dialect
+- Added support for sort_query and attributes on mappers using with_polymorphic
 
 
 0.26.8 (2014-07-30)

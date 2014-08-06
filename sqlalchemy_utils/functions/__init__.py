@@ -26,13 +26,13 @@ from .orm import (
     get_hybrid_properties,
     get_mapper,
     get_primary_keys,
+    get_query_entities,
     get_tables,
     getdotattr,
     has_any_changes,
     has_changes,
     identity,
     naturally_equivalent,
-    query_entities,
     table_name,
 )
 
@@ -49,6 +49,7 @@ __all__ = (
     'get_declarative_base',
     'get_hybrid_properties',
     'get_mapper',
+    'get_query_entities',
     'get_primary_keys',
     'get_referencing_foreign_keys',
     'get_tables',

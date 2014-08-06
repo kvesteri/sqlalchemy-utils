@@ -4,15 +4,14 @@ except ImportError:
     from ordereddict import OrderedDict
 from functools import partial
 from inspect import isclass
+from itertools import chain
 from operator import attrgetter
 import six
 import sqlalchemy as sa
-from sqlalchemy import inspect
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapperlib
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.orm.exc import UnmappedInstanceError
-from sqlalchemy.orm.mapper import Mapper
 from sqlalchemy.orm.query import _ColumnEntity
 from sqlalchemy.orm.session import object_session
 from sqlalchemy.orm.util import AliasedInsp
@@ -81,6 +80,8 @@ def get_mapper(mixed):
         return sa.inspect(mixed).mapper
     if isinstance(mixed, sa.sql.selectable.Alias):
         mixed = mixed.element
+    if isinstance(mixed, AliasedInsp):
+        return mixed.mapper
     if isinstance(mixed, sa.Table):
         mappers = [
             mapper for mapper in mapperlib._mapper_registry
@@ -344,31 +345,31 @@ def query_labels(query):
             db.func.count(Article.id).label('articles')
         )
 
-        query_labels(query)  # ('articles', )
+        query_labels(query)  # ['articles']
 
     :param query: SQLAlchemy Query object
     """
-    for entity in query._entities:
-        if isinstance(entity, _ColumnEntity) and entity._label_name:
-            yield entity._label_name
+    return [
+        entity._label_name for entity in query._entities
+        if isinstance(entity, _ColumnEntity) and entity._label_name
+    ]
 
 
-def query_entities(query):
+def get_query_entities(query):
     """
-    Return a generator that iterates through all entities for given SQLAlchemy
-    query object.
+    Return a list of all entities present in given SQLAlchemy query object.
 
     Examples::
 
 
         query = session.query(Category)
 
-        query_entities(query)  # <Category>
+        query_entities(query)  # [<Category>]
 
 
         query = session.query(Category.id)
 
-        query_entities(query)  # <Category>
+        query_entities(query)  # [<Category>]
 
 
     This function also supports queries with joins.
@@ -378,42 +379,66 @@ def query_entities(query):
 
         query = session.query(Category).join(Article)
 
-        query_entities(query)  # (<Category>, <Article>)
+        query_entities(query)  # [<Category>, <Article>]
 
+    .. versionchanged: 0.26.7
+        This function now returns a list instead of generator
 
     :param query: SQLAlchemy Query object
     """
-    for entity in query._entities:
-        if entity.entity_zero:
-            yield entity.entity_zero.class_
-
-    for entity in query._join_entities:
-        if isinstance(entity, Mapper):
-            yield entity.class_
-        else:
-            yield entity
+    def get_expr(mixed):
+        if isinstance(mixed, (sa.orm.Mapper, AliasedInsp)):
+            return mixed
+        expr = mixed.expr
+        if isinstance(expr, sa.orm.attributes.InstrumentedAttribute):
+            expr = expr.parent
+        elif isinstance(expr, sa.Column):
+            expr = expr.table
+        elif isinstance(expr, sa.sql.expression.Label):
+            if mixed.entity_zero:
+                return mixed.entity_zero
+            else:
+                return expr
+        return expr
+    return [
+        get_expr(entity) for entity in
+        chain(query._entities, query._join_entities)
+    ]
 
 
 def get_query_entity_by_alias(query, alias):
-    entities = query_entities(query)
+    entities = get_query_entities(query)
     if not alias:
-        return list(entities)[0]
+        return entities[0]
 
     for entity in entities:
         if isinstance(entity, AliasedInsp):
             name = entity.name
         else:
-            name = entity.__table__.name
+            name = get_mapper(entity).tables[0].name
 
         if name == alias:
             return entity
 
 
-def get_attrs(expr):
-    if isinstance(expr, AliasedInsp):
-        return expr.mapper.attrs
+def get_polymorphic_mappers(mixed):
+    if isinstance(mixed, AliasedInsp):
+        return mixed.with_polymorphic_mappers
     else:
-        return inspect(expr).attrs
+        return mixed.polymorphic_map.values()
+
+
+def get_attrs(expr):
+    insp = sa.inspect(expr)
+    mapper = get_mapper(expr)
+    polymorphic_mappers = get_polymorphic_mappers(insp)
+
+    if polymorphic_mappers:
+        attrs = {}
+        for submapper in polymorphic_mappers:
+            attrs.update(submapper.attrs)
+        return attrs
+    return mapper.attrs
 
 
 def get_hybrid_properties(model):
@@ -467,11 +492,11 @@ def get_hybrid_properties(model):
     )
 
 
-def get_expr_attr(expr, attr_name):
+def get_expr_attr(expr, prop):
     if isinstance(expr, AliasedInsp):
-        return getattr(expr.selectable.c, attr_name)
+        return getattr(expr.selectable.c, prop.key)
     else:
-        return getattr(expr, attr_name)
+        return getattr(prop.parent.class_, prop.key)
 
 
 def get_declarative_base(model):

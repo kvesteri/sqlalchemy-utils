@@ -46,6 +46,12 @@ get_mapper
 .. autofunction:: get_mapper
 
 
+get_query_entities
+^^^^^^^^^^^^^^^^^^
+
+.. autofunction:: get_query_entities
+
+
 get_primary_keys
 ^^^^^^^^^^^^^^^^
 
@@ -56,12 +62,6 @@ get_tables
 ^^^^^^^^^^
 
 .. autofunction:: get_tables
-
-
-query_entities
-^^^^^^^^^^^^^^
-
-.. autofunction:: query_entities
 
 
 has_changes

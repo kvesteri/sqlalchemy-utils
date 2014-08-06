@@ -210,6 +210,7 @@ class TestSortQueryWithPolymorphicInheritance(TestCase):
             id = sa.Column(
                 sa.Integer, sa.ForeignKey(TextItem.id), primary_key=True
             )
+            category = sa.Column(sa.Unicode(255))
             __mapper_args__ = {
                 'polymorphic_identity': u'article'
             }
@@ -233,3 +234,69 @@ class TestSortQueryWithPolymorphicInheritance(TestCase):
             'item_count'
         )
         assert_contains('ORDER BY (SELECT count(:param_2) AS count_2', query)
+
+    def test_child_class_attribute(self):
+        query = sort_query(
+            self.session.query(self.TextItem),
+            'category'
+        )
+        assert_contains('ORDER BY article.category ASC', query)
+
+
+class TestSortQueryWithCustomPolymorphic(TestCase):
+    """
+    Currently this doesn't work with SQLite
+    """
+    dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
+
+    def create_models(self):
+        class TextItem(self.Base):
+            __tablename__ = 'text_item'
+            id = sa.Column(sa.Integer, primary_key=True)
+
+            type = sa.Column(sa.Unicode(255))
+
+            __mapper_args__ = {
+                'polymorphic_on': type,
+            }
+
+        class Article(TextItem):
+            __tablename__ = 'article'
+            id = sa.Column(
+                sa.Integer, sa.ForeignKey(TextItem.id), primary_key=True
+            )
+            category = sa.Column(sa.Unicode(255))
+            __mapper_args__ = {
+                'polymorphic_identity': u'article'
+            }
+
+        class BlogPost(TextItem):
+            __tablename__ = 'blog_post'
+            id = sa.Column(
+                sa.Integer, sa.ForeignKey(TextItem.id), primary_key=True
+            )
+            __mapper_args__ = {
+                'polymorphic_identity': u'blog_post'
+            }
+
+        self.TextItem = TextItem
+        self.Article = Article
+        self.BlogPost = BlogPost
+
+    def test_with_unknown_column(self):
+        query = sort_query(
+            self.session.query(
+                sa.orm.with_polymorphic(self.TextItem, [self.BlogPost])
+            ),
+            'category'
+        )
+        assert 'ORDER BY' not in str(query)
+
+    def test_with_existing_column(self):
+        query = sort_query(
+            self.session.query(
+                sa.orm.with_polymorphic(self.TextItem, [self.Article])
+            ),
+            'category'
+        )
+        assert 'ORDER BY' in str(query)
