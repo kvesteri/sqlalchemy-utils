@@ -362,14 +362,17 @@ def get_query_entities(query):
     Examples::
 
 
+        from sqlalchemy_utils import get_query_entities
+
+
         query = session.query(Category)
 
-        query_entities(query)  # [<Category>]
+        get_query_entities(query)  # [<Category>]
 
 
         query = session.query(Category.id)
 
-        query_entities(query)  # [<Category>]
+        get_query_entities(query)  # [<Category>]
 
 
     This function also supports queries with joins.
@@ -379,31 +382,32 @@ def get_query_entities(query):
 
         query = session.query(Category).join(Article)
 
-        query_entities(query)  # [<Category>, <Article>]
+        get_query_entities(query)  # [<Category>, <Article>]
 
     .. versionchanged: 0.26.7
         This function now returns a list instead of generator
 
     :param query: SQLAlchemy Query object
     """
-    def get_expr(mixed):
-        if isinstance(mixed, (sa.orm.Mapper, AliasedInsp)):
-            return mixed
-        expr = mixed.expr
-        if isinstance(expr, sa.orm.attributes.InstrumentedAttribute):
-            expr = expr.parent
-        elif isinstance(expr, sa.Column):
-            expr = expr.table
-        elif isinstance(expr, sa.sql.expression.Label):
-            if mixed.entity_zero:
-                return mixed.entity_zero
-            else:
-                return expr
-        return expr
-    return [
-        get_expr(entity) for entity in
-        chain(query._entities, query._join_entities)
-    ]
+    return list(
+        map(get_selectable, chain(query._entities, query._join_entities))
+    )
+
+
+def get_selectable(mixed):
+    if isinstance(mixed, (sa.orm.Mapper, AliasedInsp)):
+        return mixed
+    expr = mixed.expr
+    if isinstance(expr, sa.orm.attributes.InstrumentedAttribute):
+        return expr.parent
+    elif isinstance(expr, sa.Column):
+        return expr.table
+    elif isinstance(expr, sa.sql.expression.Label):
+        if mixed.entity_zero:
+            return mixed.entity_zero
+        else:
+            return expr
+    return expr
 
 
 def get_query_entity_by_alias(query, alias):
