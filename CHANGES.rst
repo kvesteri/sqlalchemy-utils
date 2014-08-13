@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.26.10 (2014-08-13)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed dependent_objects support for multiple dependencies
+
+
 0.26.9 (2014-08-06)
 ^^^^^^^^^^^^^^^^^^^
 

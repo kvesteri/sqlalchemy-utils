@@ -78,6 +78,42 @@ class TestDependentObjects(TestCase):
         assert objects[3] in deps
 
 
+class TestDependentObjectsWithManyReferences(TestCase):
+    def create_models(self):
+        class User(self.Base):
+            __tablename__ = 'user'
+            id = sa.Column(sa.Integer, primary_key=True)
+            first_name = sa.Column(sa.Unicode(255))
+            last_name = sa.Column(sa.Unicode(255))
+
+        class BlogPost(self.Base):
+            __tablename__ = 'blog_post'
+            id = sa.Column(sa.Integer, primary_key=True)
+            author_id = sa.Column(sa.Integer, sa.ForeignKey('user.id'))
+            author = sa.orm.relationship(User)
+
+        class Article(self.Base):
+            __tablename__ = 'article'
+            id = sa.Column(sa.Integer, primary_key=True)
+            author_id = sa.Column(sa.Integer, sa.ForeignKey('user.id'))
+            author = sa.orm.relationship(User)
+
+        self.User = User
+        self.Article = Article
+        self.BlogPost = BlogPost
+
+    def test_with_many_dependencies(self):
+        user = self.User(first_name=u'John')
+        objects = [
+            self.Article(author=user),
+            self.BlogPost(author=user)
+        ]
+        self.session.add_all(objects)
+        self.session.commit()
+        deps = list(dependent_objects(user))
+        assert len(deps) == 2
+
+
 class TestDependentObjectsWithCompositeKeys(TestCase):
     def create_models(self):
         class User(self.Base):

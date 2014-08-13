@@ -296,7 +296,7 @@ def dependent_objects(obj, foreign_keys=None):
                     )
                 )
                 chain.queries.append(query)
-        return chain
+    return chain
 
 
 def non_indexed_foreign_keys(metadata, engine=None):
