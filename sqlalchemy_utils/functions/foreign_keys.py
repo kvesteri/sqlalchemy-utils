@@ -4,6 +4,7 @@ from itertools import groupby
 import six
 import sqlalchemy as sa
 from sqlalchemy.engine import reflection
+from sqlalchemy.exc import NoInspectionAvailable
 from sqlalchemy.orm import object_session, mapperlib
 from sqlalchemy.schema import MetaData, Table, ForeignKeyConstraint
 
@@ -195,9 +196,7 @@ def dependent_objects(obj, foreign_keys=None):
     through all dependent objects for given SQLAlchemy object.
 
     Consider a User object is referenced in various articles and also in
-    various orders. Getting all these dependent objects is as easy as:
-
-    ::
+    various orders. Getting all these dependent objects is as easy as::
 
         from sqlalchemy_utils import dependent_objects
 
@@ -219,9 +218,7 @@ def dependent_objects(obj, foreign_keys=None):
     it will lead to nasty IntegrityErrors being raised.
 
     In the following example we delete given user if it doesn't have any
-    foreign key restricted dependent objects.
-
-    ::
+    foreign key restricted dependent objects::
 
 
         from sqlalchemy_utils import get_referencing_foreign_keys
@@ -272,8 +269,17 @@ def dependent_objects(obj, foreign_keys=None):
     classes = obj.__class__._decl_class_registry
 
     for table, keys in group_foreign_keys(foreign_keys):
+        keys = list(keys)
         for class_ in classes.values():
-            if hasattr(class_, '__table__') and class_.__table__ == table:
+            try:
+                mapper = sa.inspect(class_)
+            except NoInspectionAvailable:
+                continue
+            parent_mapper = mapper.inherits
+            if (
+                table in mapper.tables and
+                not (parent_mapper and table in parent_mapper.tables)
+            ):
                 criteria = []
                 visited_constraints = []
                 for key in keys:
