@@ -153,3 +153,64 @@ class TestDependentObjectsWithCompositeKeys(TestCase):
         assert len(deps) == 2
         assert articles[0] in deps
         assert articles[3] in deps
+
+
+class TestDependentObjectsWithSingleTableInheritance(TestCase):
+    def create_models(self):
+        class Category(self.Base):
+            __tablename__ = 'category'
+            id = sa.Column(sa.Integer, primary_key=True)
+            name = sa.Column(sa.Unicode(255))
+
+        class TextItem(self.Base):
+            __tablename__ = 'text_item'
+            id = sa.Column(sa.Integer, primary_key=True)
+            name = sa.Column(sa.Unicode(255))
+            category_id = sa.Column(
+                sa.Integer,
+                sa.ForeignKey(Category.id)
+            )
+            category = sa.orm.relationship(
+                Category,
+                backref=sa.orm.backref(
+                    'articles'
+                )
+            )
+            type = sa.Column(sa.Unicode(255))
+
+            __mapper_args__ = {
+                'polymorphic_on': type,
+            }
+
+        class Article(TextItem):
+            __mapper_args__ = {
+                'polymorphic_identity': u'article'
+            }
+
+        class BlogPost(TextItem):
+            __mapper_args__ = {
+                'polymorphic_identity': u'blog_post'
+            }
+
+
+        self.Category = Category
+        self.TextItem = TextItem
+        self.Article = Article
+        self.BlogPost = BlogPost
+
+    def test_returns_all_dependent_objects(self):
+        category1 = self.Category(name=u'Category #1')
+        category2 = self.Category(name=u'Category #2')
+        articles = [
+            self.Article(category=category1),
+            self.Article(category=category1),
+            self.Article(category=category2),
+            self.Article(category=category2),
+        ]
+        self.session.add_all(articles)
+        self.session.commit()
+
+        deps = list(dependent_objects(category1))
+        assert len(deps) == 2
+        assert articles[0] in deps
+        assert articles[1] in deps
