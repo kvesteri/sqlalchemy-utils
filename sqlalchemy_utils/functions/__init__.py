@@ -33,6 +33,7 @@ from .orm import (
     has_changes,
     identity,
     naturally_equivalent,
+    quote,
     table_name,
 )
 
@@ -64,6 +65,7 @@ __all__ = (
     'naturally_equivalent',
     'non_indexed_foreign_keys',
     'QuerySorterException',
+    'quote',
     'render_expression',
     'render_statement',
     'sort_query',

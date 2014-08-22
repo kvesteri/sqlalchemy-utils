@@ -82,6 +82,12 @@ naturally_equivalent
 .. autofunction:: naturally_equivalent
 
 
+quote
+^^^^^
+
+.. autofunction:: quote
+
+
 sort_query
 ^^^^^^^^^^
 

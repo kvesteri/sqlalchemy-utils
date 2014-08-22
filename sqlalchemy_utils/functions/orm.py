@@ -333,6 +333,31 @@ def remote_column_names(prop):
                     yield remote.name
 
 
+def quote(mixed, ident):
+    """
+    Conditionally quote an identifier.
+    ::
+
+
+        from sqlalchemy_utils import quote
+
+
+        engine = create_engine('sqlite:///:memory:')
+
+        quote(engine, 'order')
+        # '"order"'
+
+        quote(engine, 'some_other_identifier')
+        # 'some_other_identifier'
+
+
+    :param mixed: SQLAlchemy Session / Connection / Engine object.
+    :param ident: identifier to conditionally quote
+    """
+    dialect = get_bind(mixed).dialect
+    return dialect.preparer(dialect).quote(ident)
+
+
 def query_labels(query):
     """
     Return all labels for given SQLAlchemy query object.
