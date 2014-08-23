@@ -1,10 +1,14 @@
+import os
+
+import sqlalchemy as sa
+from flexmock import flexmock
 from pytest import mark
 pymysql = None
 try:
     import pymysql
 except ImportError:
     pass
-import os
+
 from tests import TestCase
 
 from sqlalchemy_utils import (
@@ -15,7 +19,6 @@ from sqlalchemy_utils import (
 
 
 class DatabaseTest(TestCase):
-
     def test_create_and_drop(self):
         assert not database_exists(self.url)
         create_database(self.url)
@@ -43,3 +46,17 @@ class TestDatabaseMySQL(DatabaseTest):
 
 class TestDatabasePostgres(DatabaseTest):
     url = 'postgres://postgres@localhost/db_test_sqlalchemy_util'
+
+    def test_template(self):
+        (
+            flexmock(sa.engine.Engine)
+            .should_receive('execute')
+            .with_args(
+                "CREATE DATABASE db_test_sqlalchemy_util ENCODING 'utf8' "
+                "TEMPLATE my_template"
+            )
+        )
+        create_database(
+            'postgres://postgres@localhost/db_test_sqlalchemy_util',
+            template='my_template'
+        )

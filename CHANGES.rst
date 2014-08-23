@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.26.13 (2014-08-23)
+^^^^^^^^^^^^^^^^^^^^
+
+- Added template parameter to create_database function
+
+
 0.26.12 (2014-08-22)
 ^^^^^^^^^^^^^^^^^^^^
 
