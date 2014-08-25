@@ -5,7 +5,7 @@ QueryChain is a wrapper for sequence of queries.
 Features:
 
     * Easy iteration for sequence of queries
-    * Limit and offset which are applied to all queries in the chain
+    * Limit, offset and count which are applied to all queries in the chain
     * Smart __getitem__ support
 
 
@@ -81,6 +81,29 @@ Chain slicing
     )
 
     chain[3:6]   # New QueryChain with offset=3 and limit=6
+
+
+Count
+^^^^^
+
+Let's assume that there are five blog posts, five articles and five news
+items in the database, and you have the following query chain::
+
+    chain = QueryChain(
+        [
+            session.query(BlogPost),
+            session.query(Article),
+            session.query(NewsItem)
+        ]
+    )
+
+You can then get the total number rows returned by the query chain
+with :meth:`~QueryChain.count`::
+
+    >>> chain.count()
+    15
+
+
 """
 from copy import copy
 
@@ -128,6 +151,12 @@ class QueryChain(object):
 
     def offset(self, value):
         return self[value:]
+
+    def count(self):
+        """
+        Return the total number of rows this QueryChain's queries would return.
+        """
+        return sum(q.count() for q in self.queries)
 
     def __getitem__(self, key):
         if isinstance(key, slice):
