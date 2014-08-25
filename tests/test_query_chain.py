@@ -88,3 +88,6 @@ class TestQueryChain(TestCase):
     def test_getitem_with_single_key(self):
         article = self.chain[2]
         assert article == self.articles[0]
+
+    def test_count(self):
+        assert self.chain.count() == 9
