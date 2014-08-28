@@ -75,7 +75,7 @@ from .types import (
 from .models import Timestamp
 
 
-__version__ = '0.26.14'
+__version__ = '0.26.15'
 
 
 __all__ = (

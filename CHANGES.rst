@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.26.15 (2014-08-28)
+^^^^^^^^^^^^^^^^^^^^
+
+- Fix sort_query support for queries using mappers (not declarative classes) with calculated column properties
+
+
 0.26.14 (2014-08-26)
 ^^^^^^^^^^^^^^^^^^^^
 
