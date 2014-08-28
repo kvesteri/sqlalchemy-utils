@@ -156,6 +156,37 @@ class TestSortQuery(TestCase):
         query = sort_query(query, 'some_hybrid')
         assert_contains('ORDER BY article.name ASC', query)
 
+    def test_with_mapper_and_column_property(self):
+        class Apple(self.Base):
+            __tablename__ = 'apple'
+            id = sa.Column(sa.Integer, primary_key=True)
+            article_id = sa.Column(sa.Integer, sa.ForeignKey(self.Article.id))
+
+        self.Article.apples = sa.orm.relationship(Apple)
+
+        self.Article.apple_count = sa.orm.column_property(
+            sa.select([sa.func.count(Apple.id)])
+            .where(Apple.article_id == self.Article.id)
+            .correlate(self.Article.__table__)
+            .label('apple_count'),
+            deferred=True
+        )
+        query = (
+            self.session.query(sa.inspect(self.Article))
+            .outerjoin(self.Article.apples)
+            .options(
+                sa.orm.undefer(self.Article.apple_count)
+            )
+            .options(sa.orm.contains_eager(self.Article.apples))
+        )
+        query = sort_query(query, 'apple_count')
+        assert 'ORDER BY apple_count' in str(query)
+
+    def test_table(self):
+        query = self.session.query(self.Article.__table__)
+        query = sort_query(query, 'name')
+        assert_contains('ORDER BY name', query)
+
 
 class TestSortQueryRelationshipCounts(TestCase):
     """

@@ -1,15 +1,5 @@
-import sqlalchemy as sa
-from sqlalchemy.orm.properties import ColumnProperty, SynonymProperty
-from sqlalchemy.sql.expression import desc, asc, Label
-from sqlalchemy.orm.util import AliasedInsp
-from .orm import (
-    get_attrs,
-    get_expr_attr,
-    get_hybrid_properties,
-    get_query_entity_by_alias,
-    get_query_entities,
-    query_labels,
-)
+from sqlalchemy.sql.expression import desc, asc
+from .orm import get_query_descriptor
 
 
 class QuerySorterException(Exception):
@@ -18,18 +8,11 @@ class QuerySorterException(Exception):
 
 class QuerySorter(object):
     def __init__(self, silent=True, separator='-'):
-        self.labels = []
         self.separator = separator
         self.silent = silent
 
     def assign_order_by(self, entity, attr, func):
-        expr = None
-        if attr in self.labels:
-            expr = attr
-        else:
-            entity = get_query_entity_by_alias(self.query, entity)
-            if entity:
-                expr = self.order_by_attr(entity, attr)
+        expr = get_query_descriptor(self.query, entity, attr)
 
         if expr is not None:
             return self.query.order_by(func(expr))
@@ -38,30 +21,6 @@ class QuerySorter(object):
                 "Could not sort query with expression '%s'" % attr
             )
         return self.query
-
-    def order_by_attr(self, entity, attr):
-        properties = get_attrs(entity)
-        if attr in properties:
-            property_ = properties[attr]
-
-            if isinstance(property_, ColumnProperty):
-                if isinstance(property_.columns[0], Label):
-                    return getattr(entity, property_.key)
-                else:
-                    return get_expr_attr(entity, property_)
-            elif isinstance(property_, SynonymProperty):
-                return get_expr_attr(entity, property_)
-            return
-
-        mapper = sa.inspect(entity)
-        entity = mapper.entity
-
-        if isinstance(mapper, AliasedInsp):
-            mapper = mapper.mapper
-
-        for key in get_hybrid_properties(mapper).keys():
-            if attr == key:
-                return getattr(entity, attr)
 
     def parse_sort_arg(self, arg):
         if arg[0] == self.separator:
@@ -79,7 +38,6 @@ class QuerySorter(object):
 
     def __call__(self, query, *args):
         self.query = query
-        self.labels = query_labels(query)
 
         for sort in args:
             if not sort:

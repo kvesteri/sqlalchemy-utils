@@ -41,7 +41,7 @@ class TestGetQueryEntities(TestCase):
 
     def test_mapper(self):
         query = self.session.query(sa.inspect(self.TextItem))
-        assert list(get_query_entities(query)) == [sa.inspect(self.TextItem)]
+        assert list(get_query_entities(query)) == [self.TextItem]
 
     def test_entity(self):
         query = self.session.query(self.TextItem)
@@ -49,7 +49,7 @@ class TestGetQueryEntities(TestCase):
 
     def test_instrumented_attribute(self):
         query = self.session.query(self.TextItem.id)
-        assert list(get_query_entities(query)) == [sa.inspect(self.TextItem)]
+        assert list(get_query_entities(query)) == [self.TextItem]
 
     def test_column(self):
         query = self.session.query(self.TextItem.__table__.c.id)
@@ -65,7 +65,7 @@ class TestGetQueryEntities(TestCase):
             self.BlogPost, self.BlogPost.id == self.TextItem.id
         )
         assert list(get_query_entities(query)) == [
-            self.TextItem, sa.inspect(self.BlogPost)
+            self.TextItem, self.BlogPost
         ]
 
     def test_joined_aliased_entity(self):
@@ -74,9 +74,7 @@ class TestGetQueryEntities(TestCase):
         query = self.session.query(self.TextItem).join(
             alias, alias.id == self.TextItem.id
         )
-        assert list(get_query_entities(query)) == [
-            self.TextItem, sa.inspect(alias)
-        ]
+        assert list(get_query_entities(query)) == [self.TextItem, alias]
 
     def test_column_entity_with_label(self):
         query = self.session.query(self.Article.id.label('id'))

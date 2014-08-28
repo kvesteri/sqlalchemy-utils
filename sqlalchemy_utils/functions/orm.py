@@ -12,6 +12,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapperlib
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.orm.exc import UnmappedInstanceError
+from sqlalchemy.orm.properties import ColumnProperty
 from sqlalchemy.orm.query import _ColumnEntity
 from sqlalchemy.orm.session import object_session
 from sqlalchemy.orm.util import AliasedInsp
@@ -197,13 +198,7 @@ def get_tables(mixed):
         SQLAlchemy Mapper / Declarative class or a SA Alias object wrapping
         any of these objects.
     """
-    if isinstance(mixed, sa.orm.util.AliasedClass):
-        mapper = sa.inspect(mixed).mapper
-    else:
-        if not isclass(mixed):
-            mixed = mixed.__class__
-        mapper = sa.inspect(mixed)
-    return mapper.tables
+    return get_mapper(mixed).tables
 
 
 def get_columns(mixed):
@@ -414,17 +409,19 @@ def get_query_entities(query):
 
     :param query: SQLAlchemy Query object
     """
-    return list(
-        map(get_selectable, chain(query._entities, query._join_entities))
-    )
+    return [
+        get_query_entity(entity) for entity in
+        chain(query._entities, query._join_entities)
+    ]
 
 
-def get_selectable(mixed):
-    if isinstance(mixed, (sa.orm.Mapper, AliasedInsp)):
-        return mixed
-    expr = mixed.expr
+def get_query_entity(mixed):
+    if hasattr(mixed, 'expr'):
+        expr = mixed.expr
+    else:
+        expr = mixed
     if isinstance(expr, sa.orm.attributes.InstrumentedAttribute):
-        return expr.parent
+        return expr.parent.class_
     elif isinstance(expr, sa.Column):
         return expr.table
     elif isinstance(expr, sa.sql.expression.Label):
@@ -432,17 +429,22 @@ def get_selectable(mixed):
             return mixed.entity_zero
         else:
             return expr
+    elif isinstance(expr, sa.orm.Mapper):
+        return expr.class_
+    elif isinstance(expr, AliasedInsp):
+        return expr.entity
     return expr
 
 
 def get_query_entity_by_alias(query, alias):
     entities = get_query_entities(query)
+
     if not alias:
         return entities[0]
 
     for entity in entities:
-        if isinstance(entity, AliasedInsp):
-            name = entity.name
+        if isinstance(entity, sa.orm.util.AliasedClass):
+            name = sa.inspect(entity).name
         else:
             name = get_mapper(entity).tables[0].name
 
@@ -457,17 +459,61 @@ def get_polymorphic_mappers(mixed):
         return mixed.polymorphic_map.values()
 
 
-def get_attrs(expr):
-    insp = sa.inspect(expr)
-    mapper = get_mapper(expr)
-    polymorphic_mappers = get_polymorphic_mappers(insp)
+def get_query_descriptor(query, entity, attr):
+    if attr in query_labels(query):
+        return attr
+    else:
+        entity = get_query_entity_by_alias(query, entity)
+        if entity:
+            descriptor = get_descriptor(entity, attr)
+            if (
+                hasattr(descriptor, 'property') and
+                isinstance(descriptor.property, sa.orm.RelationshipProperty)
+            ):
+                return
+            return descriptor
 
+
+def get_descriptor(entity, attr):
+    mapper = sa.inspect(entity)
+
+    for key, descriptor in get_all_descriptors(mapper).items():
+        if attr == key:
+            prop = (
+                descriptor.property
+                if hasattr(descriptor, 'property')
+                else None
+            )
+            if isinstance(prop, ColumnProperty):
+                if isinstance(entity, sa.orm.util.AliasedClass):
+                    for c in mapper.selectable.c:
+                        if c.key == attr:
+                            return c
+                else:
+                    # If the property belongs to a class that uses
+                    # polymorphic inheritance we have to take into account
+                    # situations where the attribute exists in child class
+                    # but not in parent class.
+                    return getattr(prop.parent.class_, attr)
+            else:
+                # Handle synonyms, relationship proeprties and hybrid
+                # properties
+                try:
+                    return getattr(entity, attr)
+                except AttributeError:
+                    pass
+
+
+def get_all_descriptors(expr):
+    insp = sa.inspect(expr)
+    polymorphic_mappers = get_polymorphic_mappers(insp)
     if polymorphic_mappers:
+
         attrs = {}
         for submapper in polymorphic_mappers:
-            attrs.update(submapper.attrs)
+            attrs.update(submapper.all_orm_descriptors)
         return attrs
-    return mapper.attrs
+    return get_mapper(expr).all_orm_descriptors
 
 
 def get_hybrid_properties(model):
@@ -519,13 +565,6 @@ def get_hybrid_properties(model):
         for key, prop in sa.inspect(model).all_orm_descriptors.items()
         if isinstance(prop, hybrid_property)
     )
-
-
-def get_expr_attr(expr, prop):
-    if isinstance(expr, AliasedInsp):
-        return getattr(expr.selectable.c, prop.key)
-    else:
-        return getattr(prop.parent.class_, prop.key)
 
 
 def get_declarative_base(model):
