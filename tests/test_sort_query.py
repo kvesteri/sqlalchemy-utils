@@ -273,6 +273,13 @@ class TestSortQueryWithPolymorphicInheritance(TestCase):
         )
         assert_contains('ORDER BY article.category ASC', query)
 
+    def test_with_ambiguous_column(self):
+        query = sort_query(
+            self.session.query(self.TextItem),
+            'id'
+        )
+        assert_contains('ORDER BY text_item.id ASC', query)
+
 
 class TestSortQueryWithCustomPolymorphic(TestCase):
     """

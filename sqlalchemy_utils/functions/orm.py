@@ -508,10 +508,11 @@ def get_all_descriptors(expr):
     insp = sa.inspect(expr)
     polymorphic_mappers = get_polymorphic_mappers(insp)
     if polymorphic_mappers:
-
-        attrs = {}
+        attrs = dict(get_mapper(expr).all_orm_descriptors)
         for submapper in polymorphic_mappers:
-            attrs.update(submapper.all_orm_descriptors)
+            for key, descriptor in submapper.all_orm_descriptors.items():
+                if key not in attrs:
+                    attrs[key] = descriptor
         return attrs
     return get_mapper(expr).all_orm_descriptors
 
