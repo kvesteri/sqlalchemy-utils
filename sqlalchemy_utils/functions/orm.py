@@ -496,7 +496,7 @@ def get_descriptor(entity, attr):
                     # but not in parent class.
                     return getattr(prop.parent.class_, attr)
             else:
-                # Handle synonyms, relationship proeprties and hybrid
+                # Handle synonyms, relationship properties and hybrid
                 # properties
                 try:
                     return getattr(entity, attr)
