@@ -5,7 +5,21 @@ SQLAlchemy-Utils
 Various utility functions and custom data types for SQLAlchemy.
 """
 from setuptools import setup, find_packages
+import os
+import re
 import sys
+
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+PY3 = sys.version_info[0] == 3
+
+
+def get_version():
+    filename = os.path.join(HERE, 'sqlalchemy_utils', '__init__.py')
+    with open(filename) as f:
+        contents = f.read()
+    pattern = r"^__version__ = '(.*?)'$"
+    return re.search(pattern, contents, re.MULTILINE).group(1)
 
 
 PY3 = sys.version_info[0] == 3
@@ -44,7 +58,7 @@ for name, requirements in extras_require.items():
 
 setup(
     name='SQLAlchemy-Utils',
-    version='0.26.15',
+    version=get_version(),
     url='https://github.com/kvesteri/sqlalchemy-utils',
     license='BSD',
     author='Konsta Vesterinen, Ryan Leckey, Janne Vanhala, Vesa Uimonen',

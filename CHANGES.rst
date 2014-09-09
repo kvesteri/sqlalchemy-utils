@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.26.16 (2014-09-09)
+^^^^^^^^^^^^^^^^^^^^
+
+- Fix aggregate value handling for cascade deleted objects
+- Fix ambiguous column sorting with join table inheritance in sort_query
+
+
 0.26.15 (2014-08-28)
 ^^^^^^^^^^^^^^^^^^^^
 
