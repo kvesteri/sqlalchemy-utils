@@ -62,6 +62,7 @@ class TestGetMapperWithMultipleMappersFound(object):
             pass
 
         self.Building = Building
+        self.BigBuilding = BigBuilding
 
     def test_table(self):
         with raises(ValueError):
