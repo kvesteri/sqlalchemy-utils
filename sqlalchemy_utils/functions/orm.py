@@ -90,12 +90,11 @@ def get_mapper(mixed):
         ]
         if len(mappers) > 1:
             raise ValueError(
-                "Multiple mappers found for table '%s'."
-                % mixed.name
+                "Multiple mappers found for table '%s'." % mixed.name
             )
         elif not mappers:
             raise ValueError(
-                "Could not get mapper for table '%s'."
+                "Could not get mapper for table '%s'." % mixed.name
             )
         else:
             return mappers[0]
