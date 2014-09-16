@@ -16,6 +16,7 @@ from .range import (
 )
 from .password import Password, PasswordType
 from .phone_number import PhoneNumber, PhoneNumberType
+from .datetime import DateTimeType
 from .scalar_list import ScalarListException, ScalarListType
 from .timezone import TimezoneType
 from .ts_vector import TSVectorType
@@ -43,6 +44,7 @@ __all__ = (
     PasswordType,
     PhoneNumber,
     PhoneNumberType,
+    DateTimeType,
     ScalarListException,
     ScalarListType,
     TimezoneType,
