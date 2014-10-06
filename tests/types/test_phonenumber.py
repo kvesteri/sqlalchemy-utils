@@ -4,6 +4,8 @@ import sqlalchemy as sa
 from sqlalchemy_utils import PhoneNumberType, PhoneNumber
 from sqlalchemy_utils.types import phone_number
 
+import six
+
 
 @mark.skipif('phone_number.phonenumbers is None')
 class TestPhoneNumber(object):
@@ -45,8 +47,12 @@ class TestPhoneNumber(object):
 
     def test_phone_number_str_repr(self):
         number = PhoneNumber('+358401234567')
-        assert number.__unicode__() == number.national
-        assert number.__str__() == number.national.encode('utf-8')
+        if six.PY2:
+            assert unicode(number) == number.national
+            assert str(number) == number.national.encode('utf-8')
+        else:
+            assert str(number) == number.national
+
 
 
 @mark.skipif('phone_number.phonenumbers is None')
