@@ -67,7 +67,9 @@ class PhoneNumber(BasePhoneNumber):
         return self.national
 
     def __str__(self):
-        return six.text_type(self.national).encode('utf-8')
+        if six.PY2:
+            return unicode(self.national).encode('utf-8')
+        return str(self.national)
 
 
 class PhoneNumberType(types.TypeDecorator, ScalarCoercible):
