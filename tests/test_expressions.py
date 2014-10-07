@@ -1,7 +1,10 @@
 from pytest import raises
 import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
 from sqlalchemy_utils.types import TSVectorType
 from sqlalchemy_utils.expressions import (
+    explain,
+    explain_analyze,
     tsvector_match,
     tsvector_concat,
     to_tsquery,
@@ -10,7 +13,7 @@ from sqlalchemy_utils.expressions import (
 from tests import TestCase
 
 
-class TSVectorTestCase(TestCase):
+class ExpressionTestCase(TestCase):
     dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
 
     def create_models(self):
@@ -25,7 +28,34 @@ class TSVectorTestCase(TestCase):
         self.Article = Article
 
 
-class TestMatchTSVector(TSVectorTestCase):
+class TestExplain(ExpressionTestCase):
+    def test_render_explain(self):
+        assert str(
+            explain(self.session.query(self.Article)).compile(
+                dialect=postgresql.dialect()
+            )
+        ).startswith('EXPLAIN SELECT')
+
+    def test_render_explain_with_analyze(self):
+        assert str(
+            explain(self.session.query(self.Article), analyze=True)
+            .compile(
+                dialect=postgresql.dialect()
+            )
+        ).startswith('EXPLAIN ANALYZE SELECT')
+
+
+class TestExplainAnalyze(ExpressionTestCase):
+    def test_render_explain_analyze(self):
+        assert str(
+            explain_analyze(self.session.query(self.Article))
+            .compile(
+                dialect=postgresql.dialect()
+            )
+        ).startswith('EXPLAIN ANALYZE SELECT')
+
+
+class TestMatchTSVector(ExpressionTestCase):
     def test_raises_exception_if_less_than_2_parameters_given(self):
         with raises(Exception):
             str(
@@ -41,7 +71,7 @@ class TestMatchTSVector(TSVectorTestCase):
         )) == '(article.search_vector) @@ to_tsquery(:to_tsquery_1)'
 
 
-class TestToTSQuery(TSVectorTestCase):
+class TestToTSQuery(ExpressionTestCase):
     def test_requires_atleast_one_parameter(self):
         with raises(Exception):
             str(to_tsquery())
@@ -50,7 +80,7 @@ class TestToTSQuery(TSVectorTestCase):
         assert str(to_tsquery('something')) == 'to_tsquery(:to_tsquery_1)'
 
 
-class TestPlainToTSQuery(TSVectorTestCase):
+class TestPlainToTSQuery(ExpressionTestCase):
     def test_requires_atleast_one_parameter(self):
         with raises(Exception):
             str(plainto_tsquery())
@@ -61,7 +91,7 @@ class TestPlainToTSQuery(TSVectorTestCase):
         )
 
 
-class TestConcatTSVector(TSVectorTestCase):
+class TestConcatTSVector(ExpressionTestCase):
     def test_concatenate_search_vectors(self):
         assert str(tsvector_match(
             tsvector_concat(

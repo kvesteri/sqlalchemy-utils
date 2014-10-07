@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.26.17 (2014-10-xx)
+^^^^^^^^^^^^^^^^^^^^
+
+- Added explain and explain_analyze expressions
+
+
 0.26.16 (2014-09-09)
 ^^^^^^^^^^^^^^^^^^^^
 

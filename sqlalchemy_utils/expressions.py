@@ -1,7 +1,28 @@
 import sqlalchemy as sa
 from sqlalchemy.sql import expression
+from sqlalchemy.sql.expression import Executable, ClauseElement, _literal_as_text
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy_utils.types import TSVectorType
+
+
+class explain(Executable, ClauseElement):
+    def __init__(self, stmt, analyze=False):
+        self.statement = _literal_as_text(stmt)
+        self.analyze = analyze
+
+
+class explain_analyze(explain):
+    def __init__(self, stmt):
+        super(explain_analyze, self).__init__(stmt, analyze=True)
+
+
+@compiles(explain, 'postgresql')
+def pg_explain(element, compiler, **kw):
+    text = "EXPLAIN "
+    if element.analyze:
+        text += "ANALYZE "
+    text += compiler.process(element.statement)
+    return text
 
 
 class tsvector_match(expression.FunctionElement):
