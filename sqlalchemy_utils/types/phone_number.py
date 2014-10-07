@@ -107,7 +107,10 @@ class PhoneNumberType(types.TypeDecorator, ScalarCoercible):
 
     def process_bind_param(self, value, dialect):
         if value:
-            return getattr(value, self.STORE_FORMAT)
+            if isinstance(value, PhoneNumber):
+                return getattr(value, self.STORE_FORMAT)
+            else:
+                return getattr(PhoneNumber(value), self.STORE_FORMAT)
         return value
 
     def process_result_value(self, value, dialect):

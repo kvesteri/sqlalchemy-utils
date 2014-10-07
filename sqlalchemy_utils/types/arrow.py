@@ -16,7 +16,7 @@ from .scalar_coercible import ScalarCoercible
 class ArrowType(types.TypeDecorator, ScalarCoercible):
     """
     ArrowType provides way of saving Arrow_ objects into database. It
-    automatically changes Arrow_ objects to datatime objects on the way in and
+    automatically changes Arrow_ objects to datetime objects on the way in and
     datetime objects back to Arrow_ objects on the way out (when querying
     database). ArrowType needs Arrow_ library installed.
 
