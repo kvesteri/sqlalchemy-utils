@@ -3,6 +3,7 @@ from .mock import create_mock_engine, mock_engine
 from .render import render_expression, render_statement
 from .sort_query import sort_query, QuerySorterException
 from .database import (
+    analyze,
     create_database,
     database_exists,
     drop_database,

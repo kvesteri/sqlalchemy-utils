@@ -8,6 +8,7 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 ^^^^^^^^^^^^^^^^^^^^
 
 - Added explain and explain_analyze expressions
+- Added analyze function
 
 
 0.26.16 (2014-09-09)

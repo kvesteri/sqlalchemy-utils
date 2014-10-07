@@ -4,6 +4,7 @@ from .decorators import generates
 from .exceptions import ImproperlyConfigured
 from .expression_parser import ExpressionParser
 from .functions import (
+    analyze,
     create_database,
     create_mock_engine,
     database_exists,
@@ -80,6 +81,7 @@ __version__ = '0.26.16'
 
 __all__ = (
     aggregated,
+    analyze,
     auto_delete_orphans,
     batch_fetch,
     coercion_listener,
