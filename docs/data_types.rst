@@ -38,6 +38,12 @@ CountryType
 
 .. autoclass:: CountryType
 
+EncryptedType
+^^^^^^^^^^^^^
+
+.. module:: sqlalchemy_utils.types.encrypted
+
+.. autoclass:: EncryptedType
 
 JSONType
 ^^^^^^^^
