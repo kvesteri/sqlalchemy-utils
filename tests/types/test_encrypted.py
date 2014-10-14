@@ -1,11 +1,18 @@
 import sqlalchemy as sa
+from pytest import mark
+cryptography = None
+try:
+    import cryptography
+except ImportError:
+    pass
+
 from tests import TestCase
 from sqlalchemy_utils import EncryptedType
-from sqlalchemy_utils.types.encrypted import AesEngine
-from sqlalchemy_utils.types.encrypted import FernetEngine
+from sqlalchemy_utils.types.encrypted import AesEngine, FernetEngine
 
+
+@mark.skipif('cryptography is None')
 class EncryptedTypeTestCase(TestCase):
-
     def setup_method(self, method):
         # set some test values
         self.test_key = 'secretkey1234'
