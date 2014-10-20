@@ -172,7 +172,7 @@ def has_index(column):
 def has_unique_index(column):
     """
     Return whether or not given column has a unique index. A column has a
-    unique index if it has a single column unique index or it is a part of
+    unique index if it has a single column primary key index or it has a
     single column UniqueConstraint.
 
     :param column: SQLAlchemy Column object
