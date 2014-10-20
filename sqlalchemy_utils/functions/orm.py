@@ -177,18 +177,27 @@ def get_primary_keys(mixed):
 
 def get_tables(mixed):
     """
-    Return a list of tables associated with given SQLAlchemy object.
+    Return a set of tables associated with given SQLAlchemy object.
 
     Let's say we have three classes which use joined table inheritance
     TextItem, Article and BlogPost. Article and BlogPost inherit TextItem.
 
     ::
 
-        get_tables(Article)  # [Table('article', ...), Table('text_item')]
+        get_tables(Article)  # set([Table('article', ...), Table('text_item')])
 
         get_tables(Article())
 
         get_tables(Article.__mapper__)
+
+
+    If the TextItem entity is using with_polymorphic='*' then this function
+    returns all child tables (article and blog_post) as well.
+
+    ::
+
+
+        get_tables(TextItem)  # set([Table('text_item', ...)], ...])
 
 
     .. versionadded: 0.26.0
@@ -197,7 +206,18 @@ def get_tables(mixed):
         SQLAlchemy Mapper / Declarative class or a SA Alias object wrapping
         any of these objects.
     """
-    return get_mapper(mixed).tables
+    if isinstance(mixed, sa.Table):
+        return [mixed]
+    elif isinstance(mixed, sa.Column):
+        return [mixed.table]
+    elif isinstance(mixed, sa.orm.query._ColumnEntity):
+        mixed = mixed.expr
+    mapper = get_mapper(mixed)
+
+    polymorphic_mappers = get_polymorphic_mappers(mapper)
+    if polymorphic_mappers:
+        return sum((m.tables for m in polymorphic_mappers), [])
+    return mapper.tables
 
 
 def get_columns(mixed):
