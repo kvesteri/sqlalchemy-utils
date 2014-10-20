@@ -9,6 +9,7 @@ from .database import (
     drop_database,
     escape_like,
     has_index,
+    has_unique_index,
     is_auto_assigned_date_column,
 )
 from .foreign_keys import (

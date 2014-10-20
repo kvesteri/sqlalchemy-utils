@@ -169,6 +169,49 @@ def has_index(column):
     )
 
 
+def has_unique_index(column):
+    """
+    Return whether or not given column has a unique index. A column has a
+    unique index if it has a single column unique index or it is a part of
+    single column UniqueConstraint.
+
+    :param column: SQLAlchemy Column object
+
+    .. versionadded: 0.27.1
+
+    ::
+
+        from sqlalchemy_utils import has_unique_index
+
+
+        class Article(Base):
+            __tablename__ = 'article'
+            id = sa.Column(sa.Integer, primary_key=True)
+            title = sa.Column(sa.String(100))
+            is_published = sa.Column(sa.Boolean, unique=True)
+            is_deleted = sa.Column(sa.Boolean)
+            is_archived = sa.Column(sa.Boolean)
+
+
+        table = Article.__table__
+
+        has_unique_index(table.c.is_published) # True
+        has_unique_index(table.c.is_deleted)   # False
+        has_unique_index(table.c.id)           # True
+    """
+    pks = column.table.primary_key.columns
+    return (
+        (column is pks.values()[0] and len(pks) == 1)
+        or
+        any(
+            constraint.columns.values()[0] is column and
+            len(constraint.columns) == 1
+            for constraint in column.table.constraints
+            if isinstance(constraint, sa.sql.schema.UniqueConstraint)
+        )
+    )
+
+
 def is_auto_assigned_date_column(column):
     """
     Returns whether or not given SQLAlchemy Column object's is auto assigned

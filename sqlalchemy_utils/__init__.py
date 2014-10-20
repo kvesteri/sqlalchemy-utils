@@ -26,6 +26,7 @@ from .functions import (
     has_any_changes,
     has_changes,
     has_index,
+    has_unique_index,
     identity,
     merge_references,
     mock_engine,

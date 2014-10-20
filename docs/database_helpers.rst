@@ -35,6 +35,12 @@ has_index
 .. autofunction:: has_index
 
 
+has_unique_index
+^^^^^^^^^^^^^^^^
+
+.. autofunction:: has_unique_index
+
+
 render_expression
 ^^^^^^^^^^^^^^^^^
 

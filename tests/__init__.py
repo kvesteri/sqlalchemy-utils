@@ -111,3 +111,10 @@ class TestCase(object):
         self.User = User
         self.Category = Category
         self.Article = Article
+
+
+def assert_contains(clause, query):
+    # Test that query executes
+    query.all()
+    assert clause in str(query)
+

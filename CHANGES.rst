@@ -8,6 +8,7 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 ^^^^^^^^^^^^^^^^^^^
 
 - Added support for more SQLAlchemy based objects and classes in get_tables function
+- Added has_unique_index utility function
 
 
 0.27.0 (2014-10-14)
