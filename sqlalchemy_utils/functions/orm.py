@@ -83,6 +83,8 @@ def get_mapper(mixed):
         mixed = mixed.element
     if isinstance(mixed, AliasedInsp):
         return mixed.mapper
+    if isinstance(mixed, sa.orm.attributes.InstrumentedAttribute):
+        mixed = mixed.class_
     if isinstance(mixed, sa.Table):
         mappers = [
             mapper for mapper in mapperlib._mapper_registry

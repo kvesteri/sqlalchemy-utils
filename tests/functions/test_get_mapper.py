@@ -42,6 +42,11 @@ class TestGetMapper(object):
             sa.inspect(self.Building)
         )
 
+    def test_instrumented_attribute(self):
+        assert (
+            get_mapper(self.Building.id) == sa.inspect(self.Building)
+        )
+
     def test_table_alias(self):
         alias = sa.orm.aliased(self.Building.__table__)
         assert (
