@@ -214,17 +214,20 @@ def get_tables(mixed):
         return [mixed]
     elif isinstance(mixed, sa.Column):
         return [mixed.table]
+    elif isinstance(mixed, sa.orm.attributes.InstrumentedAttribute):
+        return mixed.parent.tables
     elif isinstance(mixed, sa.orm.query._ColumnEntity):
         mixed = mixed.expr
+
     mapper = get_mapper(mixed)
 
     polymorphic_mappers = get_polymorphic_mappers(mapper)
     if polymorphic_mappers:
         tables = sum((m.tables for m in polymorphic_mappers), [])
-    tables = mapper.tables
+    else:
+        tables = mapper.tables
 
-    if isinstance(mixed, sa.orm.attributes.InstrumentedAttribute):
-        mixed = mixed.class_
+
     return tables
 
 
