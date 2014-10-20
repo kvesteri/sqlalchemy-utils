@@ -4,7 +4,7 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
-0.27.1 (2014-10-xx)
+0.27.1 (2014-10-20)
 ^^^^^^^^^^^^^^^^^^^
 
 - Added support for more SQLAlchemy based objects and classes in get_tables function
