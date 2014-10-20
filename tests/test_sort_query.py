@@ -2,17 +2,10 @@ from pytest import raises
 import sqlalchemy as sa
 from sqlalchemy_utils import sort_query
 from sqlalchemy_utils.functions import QuerySorterException
-from tests import TestCase
-
-
-def assert_contains(clause, query):
-    # Test that query executes
-    query.all()
-    assert clause in str(query)
+from tests import assert_contains, TestCase
 
 
 class TestSortQuery(TestCase):
-
     def test_without_sort_param_returns_the_query_object_untouched(self):
         query = self.session.query(self.Article)
         query = sort_query(query, '')

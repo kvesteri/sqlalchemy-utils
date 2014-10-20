@@ -83,6 +83,8 @@ def get_mapper(mixed):
         mixed = mixed.element
     if isinstance(mixed, AliasedInsp):
         return mixed.mapper
+    if isinstance(mixed, sa.orm.query._MapperEntity):
+        mixed = mixed.expr
     if isinstance(mixed, sa.orm.attributes.InstrumentedAttribute):
         mixed = mixed.class_
     if isinstance(mixed, sa.Table):
@@ -205,8 +207,8 @@ def get_tables(mixed):
     .. versionadded: 0.26.0
 
     :param mixed:
-        SQLAlchemy Mapper / Declarative class or a SA Alias object wrapping
-        any of these objects.
+        SQLAlchemy Mapper, Declarative class, Column, InstrumentedAttribute or
+        a SA Alias object wrapping any of these objects.
     """
     if isinstance(mixed, sa.Table):
         return [mixed]
@@ -218,8 +220,12 @@ def get_tables(mixed):
 
     polymorphic_mappers = get_polymorphic_mappers(mapper)
     if polymorphic_mappers:
-        return sum((m.tables for m in polymorphic_mappers), [])
-    return mapper.tables
+        tables = sum((m.tables for m in polymorphic_mappers), [])
+    tables = mapper.tables
+
+    if isinstance(mixed, sa.orm.attributes.InstrumentedAttribute):
+        mixed = mixed.class_
+    return tables
 
 
 def get_columns(mixed):

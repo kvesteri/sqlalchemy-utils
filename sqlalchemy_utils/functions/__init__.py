@@ -1,7 +1,11 @@
 from .defer_except import defer_except
 from .mock import create_mock_engine, mock_engine
 from .render import render_expression, render_statement
-from .sort_query import sort_query, QuerySorterException
+from .sort_query import (
+    make_order_by_deterministic,
+    sort_query,
+    QuerySorterException
+)
 from .database import (
     analyze,
     create_database,
@@ -63,6 +67,7 @@ __all__ = (
     'identity',
     'is_auto_assigned_date_column',
     'is_indexed_foreign_key',
+    'make_order_by_deterministic',
     'mock_engine',
     'naturally_equivalent',
     'non_indexed_foreign_keys',

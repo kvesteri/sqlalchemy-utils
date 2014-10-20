@@ -42,6 +42,17 @@ class TestGetTables(TestCase):
             self.Article.__table__
         ]
 
+    def test_instrumented_attribute(self):
+        assert get_tables(self.TextItem.name) == [
+            self.TextItem.__table__,
+        ]
+
+    def test_polymorphic_instrumented_attribute(self):
+        assert get_tables(self.Article.id) == [
+            self.TextItem.__table__,
+            self.Article.__table__
+        ]
+
     def test_column(self):
         assert get_tables(self.Article.__table__.c.id) == [
             self.Article.__table__
@@ -53,3 +64,8 @@ class TestGetTables(TestCase):
             self.TextItem.__table__, self.Article.__table__
         ]
 
+    def test_mapper_entity(self):
+        query = self.session.query(self.Article)
+        assert get_tables(query._entities[0]) == [
+            self.TextItem.__table__, self.Article.__table__
+        ]

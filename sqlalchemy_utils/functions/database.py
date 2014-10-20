@@ -204,12 +204,16 @@ def has_unique_index(column):
         (column is pks.values()[0] and len(pks) == 1)
         or
         any(
-            constraint.columns.values()[0] is column and
+            match_columns(constraint.columns.values()[0], column) and
             len(constraint.columns) == 1
             for constraint in column.table.constraints
             if isinstance(constraint, sa.sql.schema.UniqueConstraint)
         )
     )
+
+
+def match_columns(column, column2):
+    return column.table is column2.table and column.name == column2.name
 
 
 def is_auto_assigned_date_column(column):

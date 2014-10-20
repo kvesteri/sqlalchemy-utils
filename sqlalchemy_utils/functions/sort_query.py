@@ -1,5 +1,8 @@
+import sqlalchemy as sa
 from sqlalchemy.sql.expression import desc, asc
-from .orm import get_query_descriptor
+
+from .database import has_unique_index
+from .orm import get_query_descriptor, get_tables
 
 
 class QuerySorterException(Exception):
@@ -130,3 +133,60 @@ def sort_query(query, *args, **kwargs):
         be raised for unknown columns.
     """
     return QuerySorter(**kwargs)(query, *args)
+
+
+def make_order_by_deterministic(query):
+    """
+    Make query order by deterministic (if it isn't already). Order by is
+    considered deterministic if it contains column that is unique index (
+    either it is a primary key or has a unique index). Many times it is design
+    flaw to order by queries in nondeterministic manner.
+
+    Consider a User model with three fields: id (primary key), favorite color
+    and email (unique).::
+
+
+        from sqlalchemy_utils import make_order_by_deterministic
+
+
+        query = session.query(User).order_by(User.favorite_color)
+
+        query = make_order_by_deterministic(query)
+        print query  # 'SELECT ... ORDER BY "user".favorite_color, "user".id'
+
+
+        query = session.query(User).order_by(User.email)
+
+        query = make_order_by_deterministic(query)
+        print query  # 'SELECT ... ORDER BY "user".email'
+
+
+        query = session.query(User).order_by(User.id)
+
+        query = make_order_by_deterministic(query)
+        print query  # 'SELECT ... ORDER BY "user".id'
+
+
+    .. versionadded: 0.27.1
+    """
+    order_by = query._order_by[0]
+    if isinstance(order_by, sa.Column):
+        order_by_func = sa.asc
+        column = order_by
+    elif isinstance(order_by, sa.sql.expression.UnaryExpression):
+        if order_by.modifier == sa.sql.operators.desc_op:
+            order_by_func = sa.desc
+        else:
+            order_by_func = sa.asc
+        column = order_by.get_children()[0]
+    else:
+        raise TypeError('Only simple columns in query order by are supported.')
+
+    if has_unique_index(column):
+        return query
+
+    base_table = get_tables(query._entities[0])[0]
+    query = query.order_by(
+        *(order_by_func(c) for c in base_table.c if c.primary_key)
+    )
+    return query
