@@ -75,6 +75,9 @@ def get_mapper(mixed):
 
     .. versionadded: 0.26.1
     """
+    if isinstance(mixed, sa.orm.query._MapperEntity):
+        mixed = mixed.expr
+
     if isinstance(mixed, sa.orm.Mapper):
         return mixed
     if isinstance(mixed, sa.orm.util.AliasedClass):
@@ -83,8 +86,6 @@ def get_mapper(mixed):
         mixed = mixed.element
     if isinstance(mixed, AliasedInsp):
         return mixed.mapper
-    if isinstance(mixed, sa.orm.query._MapperEntity):
-        mixed = mixed.expr
     if isinstance(mixed, sa.orm.attributes.InstrumentedAttribute):
         mixed = mixed.class_
     if isinstance(mixed, sa.Table):

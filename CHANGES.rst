@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.27.2 (2014-10-21)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed MapperEntity handling in get_mapper and get_tables utility functions
+
+
 0.27.1 (2014-10-20)
 ^^^^^^^^^^^^^^^^^^^
 

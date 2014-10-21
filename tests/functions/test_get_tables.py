@@ -58,14 +58,20 @@ class TestGetTables(TestCase):
             self.Article.__table__
         ]
 
-    def test_column_entity(self):
-        query = self.session.query(self.Article.id)
+    def test_mapper_entity_with_class(self):
+        query = self.session.query(self.Article)
         assert get_tables(query._entities[0]) == [
             self.TextItem.__table__, self.Article.__table__
         ]
 
-    def test_mapper_entity(self):
-        query = self.session.query(self.Article)
+    def test_mapper_entity_with_mapper(self):
+        query = self.session.query(sa.inspect(self.Article))
+        assert get_tables(query._entities[0]) == [
+            self.TextItem.__table__, self.Article.__table__
+        ]
+
+    def test_column_entity(self):
+        query = self.session.query(self.Article.id)
         assert get_tables(query._entities[0]) == [
             self.TextItem.__table__, self.Article.__table__
         ]
