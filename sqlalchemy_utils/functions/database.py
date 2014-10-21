@@ -1,8 +1,83 @@
-from sqlalchemy.engine.url import make_url
-import sqlalchemy as sa
-from sqlalchemy.exc import ProgrammingError, OperationalError
 import os
 from copy import copy
+
+import sqlalchemy as sa
+from sqlalchemy.engine.url import make_url
+from sqlalchemy.exc import ProgrammingError, OperationalError
+from sqlalchemy_utils.expressions import explain_analyze
+
+
+class PlanAnalysis(object):
+    def __init__(self, plan):
+        self.plan = plan
+
+    @property
+    def node_types(self):
+        types = [self.plan['Node Type']]
+        if 'Plans' in self.plan:
+            for plan in self.plan['Plans']:
+                analysis = PlanAnalysis(plan)
+                types.extend(analysis.node_types)
+        return types
+
+
+class QueryAnalysis(object):
+    def __init__(self, result_set):
+        self.plan = result_set[0]['Plan']
+        self.runtime = result_set[0]['Total Runtime']
+
+    @property
+    def node_types(self):
+        return list(PlanAnalysis(self.plan).node_types)
+
+    def __repr__(self):
+        return '<QueryAnalysis runtime=%r>' % self.runtime
+
+
+def analyze(conn, query):
+    """
+    Analyze query using given connection and return :class:`QueryAnalysis`
+    object. Analysis is performed using database specific EXPLAIN ANALYZE
+    construct and then examining the results into structured format. Currently
+    only PostgreSQL is supported.
+
+
+    Getting query runtime (in database level) ::
+
+
+        from sqlalchemy_utils import analyze
+
+
+        analysis = analyze(conn, 'SELECT * FROM article')
+        analysis.runtime  # runtime as milliseconds
+
+
+    Analyze can be very useful when testing that query doesn't issue a
+    sequential scan (scanning all rows in table). You can for example write
+    simple performance tests this way.::
+
+
+        query = (
+            session.query(Article.name)
+            .order_by(Article.name)
+            .limit(10)
+        )
+        analysis = analyze(self.connection, query)
+        analysis.node_types  # [u'Limit', u'Index Only Scan']
+
+        assert 'Seq Scan' not in analysis.node_types
+
+
+    .. versionadded: 0.26.17
+
+    :param conn: SQLAlchemy Connection object
+    :param query: SQLAlchemy Query object or query as a string
+    """
+    return QueryAnalysis(
+        conn.execute(
+            explain_analyze(query, buffers=True, format='json')
+        ).scalar()
+    )
 
 
 def escape_like(string, escape_char='*'):
@@ -92,6 +167,53 @@ def has_index(column):
             for index in column.table.indexes
         )
     )
+
+
+def has_unique_index(column):
+    """
+    Return whether or not given column has a unique index. A column has a
+    unique index if it has a single column primary key index or it has a
+    single column UniqueConstraint.
+
+    :param column: SQLAlchemy Column object
+
+    .. versionadded: 0.27.1
+
+    ::
+
+        from sqlalchemy_utils import has_unique_index
+
+
+        class Article(Base):
+            __tablename__ = 'article'
+            id = sa.Column(sa.Integer, primary_key=True)
+            title = sa.Column(sa.String(100))
+            is_published = sa.Column(sa.Boolean, unique=True)
+            is_deleted = sa.Column(sa.Boolean)
+            is_archived = sa.Column(sa.Boolean)
+
+
+        table = Article.__table__
+
+        has_unique_index(table.c.is_published) # True
+        has_unique_index(table.c.is_deleted)   # False
+        has_unique_index(table.c.id)           # True
+    """
+    pks = column.table.primary_key.columns
+    return (
+        (column is pks.values()[0] and len(pks) == 1)
+        or
+        any(
+            match_columns(constraint.columns.values()[0], column) and
+            len(constraint.columns) == 1
+            for constraint in column.table.constraints
+            if isinstance(constraint, sa.sql.schema.UniqueConstraint)
+        )
+    )
+
+
+def match_columns(column, column2):
+    return column.table is column2.table and column.name == column2.name
 
 
 def is_auto_assigned_date_column(column):

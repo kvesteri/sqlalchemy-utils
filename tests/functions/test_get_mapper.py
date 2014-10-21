@@ -4,6 +4,8 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy_utils import get_mapper
 
+from tests import TestCase
+
 
 class TestGetMapper(object):
     def setup_method(self, method):
@@ -42,10 +44,38 @@ class TestGetMapper(object):
             sa.inspect(self.Building)
         )
 
+    def test_instrumented_attribute(self):
+        assert (
+            get_mapper(self.Building.id) == sa.inspect(self.Building)
+        )
+
     def test_table_alias(self):
         alias = sa.orm.aliased(self.Building.__table__)
         assert (
             get_mapper(alias) ==
+            sa.inspect(self.Building)
+        )
+
+
+class TestGetMapperWithQueryEntities(TestCase):
+    def create_models(self):
+        class Building(self.Base):
+            __tablename__ = 'building'
+            id = sa.Column(sa.Integer, primary_key=True)
+
+        self.Building = Building
+
+    def test_mapper_entity_with_mapper(self):
+        entity = self.session.query(self.Building.__mapper__)._entities[0]
+        assert (
+            get_mapper(entity) ==
+            sa.inspect(self.Building)
+        )
+
+    def test_mapper_entity_with_class(self):
+        entity = self.session.query(self.Building)._entities[0]
+        assert (
+            get_mapper(entity) ==
             sa.inspect(self.Building)
         )
 

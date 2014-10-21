@@ -6,7 +6,6 @@ import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy_utils import get_primary_keys
-from tests import TestCase
 
 
 class TestGetPrimaryKeys(object):

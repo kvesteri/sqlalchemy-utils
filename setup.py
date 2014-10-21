@@ -46,7 +46,8 @@ extras_require = {
     'color': ['colour>=0.0.4'],
     'ipaddress': ['ipaddr'] if not PY3 else [],
     'timezone': ['python-dateutil'],
-    'url': ['furl >= 0.3.5'] if not PY3 else []
+    'url': ['furl >= 0.3.5'] if not PY3 else [],
+    'encrypted': ['cryptography==0.6']
 }
 
 

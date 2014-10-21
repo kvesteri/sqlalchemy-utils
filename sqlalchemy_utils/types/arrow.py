@@ -9,7 +9,7 @@ try:
 except:
     pass
 from sqlalchemy import types
-from sqlalchemy_utils import ImproperlyConfigured
+from sqlalchemy_utils.exceptions import ImproperlyConfigured
 from .scalar_coercible import ScalarCoercible
 
 

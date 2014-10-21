@@ -4,6 +4,7 @@ from .decorators import generates
 from .exceptions import ImproperlyConfigured
 from .expression_parser import ExpressionParser
 from .functions import (
+    analyze,
     create_database,
     create_mock_engine,
     database_exists,
@@ -25,6 +26,7 @@ from .functions import (
     has_any_changes,
     has_changes,
     has_index,
+    has_unique_index,
     identity,
     merge_references,
     mock_engine,
@@ -53,6 +55,7 @@ from .types import (
     DateRangeType,
     DateTimeRangeType,
     EmailType,
+    EncryptedType,
     instrumented_list,
     InstrumentedList,
     IntRangeType,
@@ -75,11 +78,12 @@ from .types import (
 from .models import Timestamp
 
 
-__version__ = '0.26.16'
+__version__ = '0.27.2'
 
 
 __all__ = (
     aggregated,
+    analyze,
     auto_delete_orphans,
     batch_fetch,
     coercion_listener,
@@ -128,6 +132,7 @@ __all__ = (
     DateRangeType,
     DateTimeRangeType,
     EmailType,
+    EncryptedType,
     ExpressionParser,
     ImproperlyConfigured,
     InstrumentedList,

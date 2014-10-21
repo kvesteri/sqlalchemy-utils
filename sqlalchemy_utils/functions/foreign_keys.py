@@ -3,9 +3,8 @@ from itertools import groupby
 
 import six
 import sqlalchemy as sa
-from sqlalchemy.engine import reflection
 from sqlalchemy.exc import NoInspectionAvailable
-from sqlalchemy.orm import object_session, mapperlib
+from sqlalchemy.orm import object_session
 from sqlalchemy.schema import MetaData, Table, ForeignKeyConstraint
 
 from .orm import get_mapper, get_tables

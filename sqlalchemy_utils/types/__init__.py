@@ -5,6 +5,7 @@ from .choice import ChoiceType, Choice
 from .color import ColorType
 from .country import CountryType, Country
 from .email import EmailType
+from .encrypted import EncryptedType
 from .ip_address import IPAddressType
 from .json import JSONType
 from .locale import LocaleType
@@ -34,6 +35,7 @@ __all__ = (
     DateRangeType,
     DateTimeRangeType,
     EmailType,
+    EncryptedType,
     IntRangeType,
     IPAddressType,
     JSONType,

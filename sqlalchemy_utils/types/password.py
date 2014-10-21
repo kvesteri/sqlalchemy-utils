@@ -1,6 +1,6 @@
 import six
 import weakref
-from sqlalchemy_utils import ImproperlyConfigured
+from sqlalchemy_utils.exceptions import ImproperlyConfigured
 from sqlalchemy import types
 from sqlalchemy.dialects import postgresql, oracle
 from .scalar_coercible import ScalarCoercible

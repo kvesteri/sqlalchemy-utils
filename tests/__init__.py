@@ -96,7 +96,7 @@ class TestCase(object):
         class Article(self.Base):
             __tablename__ = 'article'
             id = sa.Column(sa.Integer, primary_key=True)
-            name = sa.Column(sa.Unicode(255))
+            name = sa.Column(sa.Unicode(255), index=True)
             category_id = sa.Column(sa.Integer, sa.ForeignKey(Category.id))
 
             category = sa.orm.relationship(
@@ -111,3 +111,10 @@ class TestCase(object):
         self.User = User
         self.Category = Category
         self.Article = Article
+
+
+def assert_contains(clause, query):
+    # Test that query executes
+    query.all()
+    assert clause in str(query)
+

@@ -4,6 +4,35 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.27.2 (2014-10-21)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed MapperEntity handling in get_mapper and get_tables utility functions
+- Fixed make_order_by_deterministic handling for queries without order by (no just silently ignores those rather than throws exception)
+- Made make_order_by_deterministic if given query uses strings as order by args
+
+
+0.27.1 (2014-10-20)
+^^^^^^^^^^^^^^^^^^^
+
+- Added support for more SQLAlchemy based objects and classes in get_tables function
+- Added has_unique_index utility function
+- Added make_order_by_deterministic utility function
+
+
+0.27.0 (2014-10-14)
+^^^^^^^^^^^^^^^^^^^
+
+- Added EncryptedType
+
+
+0.26.17 (2014-10-07)
+^^^^^^^^^^^^^^^^^^^^
+
+- Added explain and explain_analyze expressions
+- Added analyze function
+
+
 0.26.16 (2014-09-09)
 ^^^^^^^^^^^^^^^^^^^^
 

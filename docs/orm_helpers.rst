@@ -76,6 +76,12 @@ identity
 .. autofunction:: identity
 
 
+make_order_by_deterministic
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autofunction:: make_order_by_deterministic
+
+
 naturally_equivalent
 ^^^^^^^^^^^^^^^^^^^^
 
