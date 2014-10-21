@@ -1,3 +1,4 @@
+import six
 import sqlalchemy as sa
 from sqlalchemy.sql.expression import desc, asc
 
@@ -169,6 +170,9 @@ def make_order_by_deterministic(query):
 
     .. versionadded: 0.27.1
     """
+    if not query._order_by:
+        return query
+
     order_by = query._order_by[0]
     if isinstance(order_by, sa.Column):
         order_by_func = sa.asc
@@ -179,6 +183,10 @@ def make_order_by_deterministic(query):
         else:
             order_by_func = sa.asc
         column = order_by.get_children()[0]
+    elif isinstance(order_by, six.string_types):
+        raise TypeError(
+            'Order by str is not supported. Use SA Column objects instead.'
+        )
     else:
         raise TypeError('Only simple columns in query order by are supported.')
 

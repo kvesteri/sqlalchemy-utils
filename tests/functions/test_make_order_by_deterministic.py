@@ -49,3 +49,13 @@ class TestMakeOrderByDeterministic(TestCase):
         )
         query = make_order_by_deterministic(query)
         assert_contains('ORDER BY "user".name ASC, "user".id ASC', query)
+
+    def test_string_order_by(self):
+        query = self.session.query(self.User).order_by('name')
+        with raises(TypeError):
+            query = make_order_by_deterministic(query)
+
+    def test_query_without_order_by(self):
+        query = self.session.query(self.User)
+        query = make_order_by_deterministic(query)
+        assert 'ORDER BY' not in str(query)

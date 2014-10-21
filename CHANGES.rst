@@ -8,6 +8,8 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 ^^^^^^^^^^^^^^^^^^^
 
 - Fixed MapperEntity handling in get_mapper and get_tables utility functions
+- Fixed make_order_by_deterministic handling for queries without order by (no just silently ignores those rather than throws exception)
+- Made make_order_by_deterministic if given query uses strings as order by args
 
 
 0.27.1 (2014-10-20)
