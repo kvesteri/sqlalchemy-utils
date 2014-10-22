@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import base64
 import six
-from sqlalchemy.types import TypeDecorator, String
+from sqlalchemy.types import TypeDecorator, String, Binary
 from sqlalchemy_utils.exceptions import ImproperlyConfigured
 
 cryptography = None
@@ -74,7 +74,7 @@ class AesEngine(EncryptionDecryptionBaseEngine):
             value = repr(value)
         if isinstance(value, six.text_type):
             value = str(value)
-        value = six.b(value)
+        value = value.encode()
         value = self._pad(value)
         encryptor = self.cipher.encryptor()
         encrypted = encryptor.update(value) + encryptor.finalize()
@@ -113,7 +113,7 @@ class FernetEngine(EncryptionDecryptionBaseEngine):
             value = repr(value)
         if isinstance(value, six.text_type):
             value = str(value)
-        value = six.b(value)
+        value = value.encode()
         encrypted = self.fernet.encrypt(value)
         return encrypted
 
@@ -196,7 +196,7 @@ class EncryptedType(TypeDecorator):
         engine.dispose()
     """
 
-    impl = String
+    impl = Binary  # CHANGE!
 
     def __init__(self, type_in=None, key=None, engine=None, **kwargs):
         """Initialization."""
@@ -225,9 +225,11 @@ class EncryptedType(TypeDecorator):
 
     def process_bind_param(self, value, dialect):
         """Encrypt a value on the way in."""
-        return self.engine.encrypt(value)
+        if value is not None:
+            return self.engine.encrypt(value)
 
     def process_result_value(self, value, dialect):
         """Decrypt value on the way out."""
-        decrypted_value = self.engine.decrypt(value)
-        return self.underlying_type.python_type(decrypted_value)
+        if value is not None:
+            decrypted_value = self.engine.decrypt(value)
+            return self.underlying_type.python_type(decrypted_value)
