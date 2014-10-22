@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.27.3 (2014-10-22)
+^^^^^^^^^^^^^^^^^^^
+
+- Added supported for various SQLAlchemy objects in make_order_by_deterministic (previosly this function threw exceptions for other than Column objects)
+
+
 0.27.2 (2014-10-21)
 ^^^^^^^^^^^^^^^^^^^
 
