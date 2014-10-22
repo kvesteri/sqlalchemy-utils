@@ -23,14 +23,15 @@ class EncryptionDecryptionBaseEngine(object):
     This class must be sub-classed in order to create
     new engines.
     """
-
-    def __init__(self, key):
-        """Initialize a base engine."""
+ 
+    def _update_key(self, key):
         if isinstance(key, six.string_types):
             key = six.b(key)
-        self._digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
-        self._digest.update(key)
-        self._engine_key = self._digest.finalize()
+        digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
+        digest.update(key)
+        engine_key = digest.finalize()
+
+        self._initialize_engine(engine_key)
 
     def encrypt(self, value):
         raise NotImplementedError('Subclasses must implement this!')
@@ -44,14 +45,6 @@ class AesEngine(EncryptionDecryptionBaseEngine):
 
     BLOCK_SIZE = 16
     PADDING = six.b('*')
-
-    def __init__(self, key):
-        super(AesEngine, self).__init__(key)
-        self._initialize_engine(self._engine_key)
-
-    def _update_key(self, new_key):
-        parent = EncryptionDecryptionBaseEngine(new_key)
-        self._initialize_engine(parent._engine_key)
 
     def _initialize_engine(self, parent_class_key):
         self.secret_key = parent_class_key
@@ -95,14 +88,6 @@ class AesEngine(EncryptionDecryptionBaseEngine):
 
 class FernetEngine(EncryptionDecryptionBaseEngine):
     """Provide Fernet encryption and decryption methods."""
-
-    def __init__(self, key):
-        super(FernetEngine, self).__init__(key)
-        self._initialize_engine(self._engine_key)
-
-    def _update_key(self, new_key):
-        parent = EncryptionDecryptionBaseEngine(new_key)
-        self._initialize_engine(parent._engine_key)
 
     def _initialize_engine(self, parent_class_key):
         self.secret_key = base64.urlsafe_b64encode(parent_class_key)
@@ -212,7 +197,7 @@ class EncryptedType(TypeDecorator):
         self._key = key
         if not engine:
             engine = AesEngine
-        self.engine = engine(self._key)
+        self.engine = engine()
 
     @property
     def key(self):
@@ -221,15 +206,20 @@ class EncryptedType(TypeDecorator):
     @key.setter
     def key(self, value):
         self._key = value
-        self.engine._update_key(self._key)
+
+    def _update_key(self):
+        key = self._key() if callable(self._key) else self._key  
+        self.engine._update_key(key)
 
     def process_bind_param(self, value, dialect):
         """Encrypt a value on the way in."""
         if value is not None:
+            self._update_key()
             return self.engine.encrypt(value)
 
     def process_result_value(self, value, dialect):
         """Decrypt value on the way out."""
         if value is not None:
+            self._update_key()
             decrypted_value = self.engine.decrypt(value)
             return self.underlying_type.python_type(decrypted_value)
