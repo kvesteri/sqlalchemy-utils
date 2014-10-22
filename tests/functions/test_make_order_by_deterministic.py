@@ -1,4 +1,3 @@
-from pytest import raises
 import sqlalchemy as sa
 
 from sqlalchemy_utils.functions.sort_query import make_order_by_deterministic
@@ -18,12 +17,25 @@ class TestMakeOrderByDeterministic(TestCase):
                 sa.func.lower(name)
             )
 
+
+        class Article(self.Base):
+            __tablename__ = 'article'
+            id = sa.Column(sa.Integer, primary_key=True)
+            author_id = sa.Column(sa.Integer, sa.ForeignKey('user.id'))
+            author = sa.orm.relationship(User)
+
+        User.article_count = sa.orm.column_property(
+            sa.select([sa.func.count()], from_obj=Article)
+            .where(Article.author_id == User.id)
+            .label('article_count')
+        )
+
         self.User = User
 
     def test_column_property(self):
         query = self.session.query(self.User).order_by(self.User.email_lower)
-        with raises(TypeError):
-            make_order_by_deterministic(query)
+        query = make_order_by_deterministic(query)
+        assert_contains('lower("user".name), "user".id ASC', query)
 
     def test_unique_column(self):
         query = self.session.query(self.User).order_by(self.User.email)
@@ -52,8 +64,20 @@ class TestMakeOrderByDeterministic(TestCase):
 
     def test_string_order_by(self):
         query = self.session.query(self.User).order_by('name')
-        with raises(TypeError):
-            query = make_order_by_deterministic(query)
+        query = make_order_by_deterministic(query)
+        assert_contains('ORDER BY name, "user".id ASC', query)
+
+    def test_annotated_label(self):
+        query = self.session.query(self.User).order_by(self.User.article_count)
+        query = make_order_by_deterministic(query)
+        assert_contains('article_count, "user".id ASC', query)
+
+    def test_annotated_label_with_descending_order(self):
+        query = self.session.query(self.User).order_by(
+            sa.desc(self.User.article_count)
+        )
+        query = make_order_by_deterministic(query)
+        assert_contains('ORDER BY article_count DESC, "user".id DESC', query)
 
     def test_query_without_order_by(self):
         query = self.session.query(self.User)
