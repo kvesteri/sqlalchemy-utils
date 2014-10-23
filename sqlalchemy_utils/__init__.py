@@ -1,4 +1,5 @@
 from .aggregates import aggregated
+from .asserts import assert_nullable, assert_non_nullable, assert_max_length
 from .batch import batch_fetch, with_backrefs
 from .decorators import generates
 from .exceptions import ImproperlyConfigured
@@ -78,12 +79,15 @@ from .types import (
 from .models import Timestamp
 
 
-__version__ = '0.27.3'
+__version__ = '0.27.4'
 
 
 __all__ = (
     aggregated,
     analyze,
+    assert_max_length,
+    assert_non_nullable,
+    assert_nullable,
     auto_delete_orphans,
     batch_fetch,
     coercion_listener,
