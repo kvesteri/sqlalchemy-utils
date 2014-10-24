@@ -1,4 +1,5 @@
 import sqlalchemy as sa
+from pytest import raises
 from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy_utils import has_index
@@ -22,6 +23,11 @@ class TestHasIndex(object):
             )
 
         self.table = ArticleTranslation.__table__
+
+    def test_column_that_belongs_to_an_alias(self):
+        alias = sa.orm.aliased(self.table)
+        with raises(TypeError):
+            assert has_index(alias.c.id)
 
     def test_compound_primary_key(self):
         assert has_index(self.table.c.id)

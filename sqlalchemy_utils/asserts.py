@@ -57,6 +57,22 @@ def _update_field(obj, field, value):
     session.flush()
 
 
+def _expect_successful_update(obj, field, value, reraise_exc):
+    try:
+        _update_field(obj, field, value)
+    except (reraise_exc) as e:
+        session = sa.orm.object_session(obj)
+        session.rollback()
+        assert False, str(e)
+
+
+def _expect_failing_update(obj, field, value, expected_exc):
+    with raises(expected_exc):
+        _update_field(obj, field, None)
+    session = sa.orm.object_session(obj)
+    session.rollback()
+
+
 def assert_nullable(obj, column):
     """
     Assert that given column is nullable. This is checked by running an SQL
@@ -65,10 +81,7 @@ def assert_nullable(obj, column):
     :param obj: SQLAlchemy declarative model object
     :param column: Name of the column
     """
-    try:
-        _update_field(obj, column, None)
-    except (IntegrityError) as e:
-        assert False, str(e)
+    _expect_successful_update(obj, column, None, IntegrityError)
 
 
 def assert_non_nullable(obj, column):
@@ -79,8 +92,7 @@ def assert_non_nullable(obj, column):
     :param obj: SQLAlchemy declarative model object
     :param column: Name of the column
     """
-    with raises(IntegrityError):
-        _update_field(obj, column, None)
+    _expect_failing_update(obj, column, None, IntegrityError)
 
 
 def assert_max_length(obj, column, max_length):
@@ -90,10 +102,5 @@ def assert_max_length(obj, column, max_length):
     :param obj: SQLAlchemy declarative model object
     :param column: Name of the column
     """
-    try:
-        _update_field(obj, column, u'a' * max_length)
-    except (DataError) as e:
-        assert False, str(e)
-    with raises(DataError):
-        _update_field(obj, column, u'a' * (max_length + 1))
-
+    _expect_successful_update(obj, column, u'a' * max_length, DataError)
+    _expect_failing_update(obj, column, u'a' * (max_length + 1), DataError)

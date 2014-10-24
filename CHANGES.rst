@@ -4,10 +4,20 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.27.5 (2014-10-24)
+^^^^^^^^^^^^^^^^^^^
+
+- Made assert_* functions automatically rollback session
+- Changed make_order_by_deterministic attach order by primary key for queries without order by
+- Fixed alias handling in has_unique_index
+- Fixed alias handling in has_index
+- Fixed alias handling in make_order_by_deterministic
+
+
 0.27.4 (2014-10-23)
 ^^^^^^^^^^^^^^^^^^^
 
-- Added assert_non_nullable, assert_nullable and assert_max_length testing methods
+- Added assert_non_nullable, assert_nullable and assert_max_length testing functions
 
 
 0.27.3 (2014-10-22)

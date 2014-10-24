@@ -1,10 +1,11 @@
+from pytest import raises
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy_utils import has_unique_index
 
 
-class TestHasIndex(object):
+class TestHasUniqueIndex(object):
     def setup_method(self, method):
         Base = declarative_base()
 
@@ -30,6 +31,11 @@ class TestHasIndex(object):
 
     def test_primary_key(self):
         assert has_unique_index(self.articles.c.id)
+
+    def test_column_of_aliased_table(self):
+        alias = sa.orm.aliased(self.articles)
+        with raises(TypeError):
+            assert has_unique_index(alias.c.id)
 
     def test_unique_index(self):
         assert has_unique_index(self.article_translations.c.is_deleted)

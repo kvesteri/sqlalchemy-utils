@@ -17,7 +17,6 @@ class TestMakeOrderByDeterministic(TestCase):
                 sa.func.lower(name)
             )
 
-
         class Article(self.Base):
             __tablename__ = 'article'
             id = sa.Column(sa.Integer, primary_key=True)
@@ -31,6 +30,7 @@ class TestMakeOrderByDeterministic(TestCase):
         )
 
         self.User = User
+        self.Article = Article
 
     def test_column_property(self):
         query = self.session.query(self.User).order_by(self.User.email_lower)
@@ -82,4 +82,10 @@ class TestMakeOrderByDeterministic(TestCase):
     def test_query_without_order_by(self):
         query = self.session.query(self.User)
         query = make_order_by_deterministic(query)
-        assert 'ORDER BY' not in str(query)
+        assert 'ORDER BY "user".id' in str(query)
+
+    def test_alias(self):
+        alias = sa.orm.aliased(self.User.__table__)
+        query = self.session.query(alias).order_by(alias.c.name)
+        query = make_order_by_deterministic(query)
+        assert str(query).endswith('ORDER BY user_1.name')
