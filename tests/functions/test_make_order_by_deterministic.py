@@ -17,7 +17,6 @@ class TestMakeOrderByDeterministic(TestCase):
                 sa.func.lower(name)
             )
 
-
         class Article(self.Base):
             __tablename__ = 'article'
             id = sa.Column(sa.Integer, primary_key=True)
@@ -31,6 +30,7 @@ class TestMakeOrderByDeterministic(TestCase):
         )
 
         self.User = User
+        self.Article = Article
 
     def test_column_property(self):
         query = self.session.query(self.User).order_by(self.User.email_lower)

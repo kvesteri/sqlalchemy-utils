@@ -198,8 +198,17 @@ def has_unique_index(column):
         has_unique_index(table.c.is_published) # True
         has_unique_index(table.c.is_deleted)   # False
         has_unique_index(table.c.id)           # True
+
+
+    :raises TypeError: if given column does not belong to a Table object
     """
-    pks = column.table.primary_key.columns
+    table = column.table
+    if not isinstance(table, sa.Table):
+        raise TypeError(
+            'Only columns belonging to Table objects are supported. Given '
+            'column belongs to %r.' % table
+        )
+    pks = table.primary_key.columns
     return (
         (column is pks.values()[0] and len(pks) == 1)
         or
