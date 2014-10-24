@@ -169,19 +169,20 @@ def make_order_by_deterministic(query):
 
     .. versionadded: 0.27.1
     """
-    if not query._order_by:
-        return query
+    order_by_func = sa.asc
 
-    order_by = query._order_by[0]
-    if isinstance(order_by, sa.sql.expression.UnaryExpression):
-        if order_by.modifier == sa.sql.operators.desc_op:
-            order_by_func = sa.desc
-        else:
-            order_by_func = sa.asc
-        column = order_by.get_children()[0]
+    if not query._order_by:
+        column = None
     else:
-        column = order_by
-        order_by_func = sa.asc
+        order_by = query._order_by[0]
+        if isinstance(order_by, sa.sql.expression.UnaryExpression):
+            if order_by.modifier == sa.sql.operators.desc_op:
+                order_by_func = sa.desc
+            else:
+                order_by_func = sa.asc
+            column = order_by.get_children()[0]
+        else:
+            column = order_by
 
     # Queries that are ordered by an already
     if isinstance(column, sa.Column):

@@ -8,6 +8,7 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 ^^^^^^^^^^^^^^^^^^^
 
 - Made assert_* functions automatically rollback session
+- Changed make_order_by_deterministic attach order by primary key for queries without order by
 - Fixed alias handling in has_unique_index
 - Fixed alias handling in has_index
 - Fixed alias handling in make_order_by_deterministic
