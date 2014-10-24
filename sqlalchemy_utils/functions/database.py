@@ -159,12 +159,18 @@ def has_index(column):
         has_index(table.c.locale)   # False
         has_index(table.c.id)       # True
     """
+    table = column.table
+    if not isinstance(table, sa.Table):
+        raise TypeError(
+            'Only columns belonging to Table objects are supported. Given '
+            'column belongs to %r.' % table
+        )
     return (
-        column is column.table.primary_key.columns.values()[0]
+        column is table.primary_key.columns.values()[0]
         or
         any(
             index.columns.values()[0] is column
-            for index in column.table.indexes
+            for index in table.indexes
         )
     )
 
