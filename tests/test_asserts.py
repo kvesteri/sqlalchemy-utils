@@ -45,9 +45,13 @@ class AssertionTestCase(TestCase):
 
 class TestAssertNonNullable(AssertionTestCase):
     def test_non_nullable_column(self):
+        # Test everything twice so that session gets rolled back properly
+        assert_non_nullable(self.user, 'age')
         assert_non_nullable(self.user, 'age')
 
     def test_nullable_column(self):
+        with raises(AssertionError):
+            assert_non_nullable(self.user, 'name')
         with raises(AssertionError):
             assert_non_nullable(self.user, 'name')
 
@@ -55,8 +59,11 @@ class TestAssertNonNullable(AssertionTestCase):
 class TestAssertNullable(AssertionTestCase):
     def test_nullable_column(self):
         assert_nullable(self.user, 'name')
+        assert_nullable(self.user, 'name')
 
     def test_non_nullable_column(self):
+        with raises(AssertionError):
+            assert_nullable(self.user, 'age')
         with raises(AssertionError):
             assert_nullable(self.user, 'age')
 
@@ -64,11 +71,16 @@ class TestAssertNullable(AssertionTestCase):
 class TestAssertMaxLength(AssertionTestCase):
     def test_with_max_length(self):
         assert_max_length(self.user, 'name', 20)
+        assert_max_length(self.user, 'name', 20)
 
     def test_smaller_than_max_length(self):
         with raises(AssertionError):
             assert_max_length(self.user, 'name', 19)
+        with raises(AssertionError):
+            assert_max_length(self.user, 'name', 19)
 
     def test_bigger_than_max_length(self):
+        with raises(AssertionError):
+            assert_max_length(self.user, 'name', 21)
         with raises(AssertionError):
             assert_max_length(self.user, 'name', 21)
