@@ -184,8 +184,12 @@ def make_order_by_deterministic(query):
         order_by_func = sa.asc
 
     # Queries that are ordered by an already
-    if isinstance(column, sa.Column) and has_unique_index(column):
-        return query
+    if isinstance(column, sa.Column):
+        try:
+            if has_unique_index(column):
+                return query
+        except TypeError:
+            return query
 
     base_table = get_tables(query._entities[0])[0]
     query = query.order_by(
