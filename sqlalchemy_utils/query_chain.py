@@ -171,3 +171,6 @@ class QueryChain(object):
 
     def __repr__(self):
         return '<QueryChain at 0x%x>' % id(self)
+
+    def __len__(self):
+        return self.count()

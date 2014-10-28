@@ -91,3 +91,6 @@ class TestQueryChain(TestCase):
 
     def test_count(self):
         assert self.chain.count() == 9
+
+    def test_len(self):
+        assert len(self.chain) == 9
