@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.27.6 (2014-10-29)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed assert_max_length not working with non nullable columns
+
+
 0.27.5 (2014-10-24)
 ^^^^^^^^^^^^^^^^^^^
 
