@@ -8,6 +8,7 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 ^^^^^^^^^^^^^^^^^^^
 
 - Fixed assert_max_length not working with non nullable columns
+- Add PostgreSQL < 9.2 support for drop_database
 
 
 0.27.5 (2014-10-24)

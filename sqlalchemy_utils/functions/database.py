@@ -399,8 +399,15 @@ def drop_database(url):
         engine.raw_connection().set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
 
         # Disconnect all users from the database we are dropping.
-        version = list(map(int, engine.execute('SHOW server_version;').first()[0].split('.')))
-        pid_column = 'pid' if (version[0] >= 9 and version[1] >= 2) else 'procpid'
+        version = list(
+            map(
+                int,
+                engine.execute('SHOW server_version;').first()[0].split('.')
+            )
+        )
+        pid_column = (
+            'pid' if (version[0] >= 9 and version[1] >= 2) else 'procpid'
+        )
         text = '''
         SELECT pg_terminate_backend(pg_stat_activity.%(pid_column)s)
         FROM pg_stat_activity
