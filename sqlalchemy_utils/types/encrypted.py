@@ -182,7 +182,7 @@ class EncryptedType(TypeDecorator, ScalarCoercible):
         engine.dispose()
     """
 
-    impl = Binary  # CHANGE!
+    impl = Binary
 
     def __init__(self, type_in=None, key=None, engine=None, **kwargs):
         """Initialization."""
