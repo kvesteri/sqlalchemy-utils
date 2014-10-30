@@ -228,7 +228,6 @@ class EncryptedType(TypeDecorator, ScalarCoercible):
                 if issubclass(self.underlying_type.python_type, bool):
                     value = "true" if value else "false"
 
-            print("encrypt: ", value)
             return self.engine.encrypt(value)
 
     def process_result_value(self, value, dialect):
