@@ -31,13 +31,13 @@ class AssertionTestCase(TestCase):
             id = sa.Column(sa.Integer, primary_key=True)
             name = sa.Column(sa.String(20))
             age = sa.Column(sa.Integer, nullable=False)
-            email = sa.Column(sa.String(200), unique=True)
+            email = sa.Column(sa.String(200), nullable=False, unique=True)
 
         self.User = User
 
     def setup_method(self, method):
         TestCase.setup_method(self, method)
-        user = self.User(name='Someone', age=15)
+        user = self.User(name='Someone', email='someone@example.com', age=15)
         self.session.add(user)
         self.session.commit()
         self.user = user
@@ -72,6 +72,10 @@ class TestAssertMaxLength(AssertionTestCase):
     def test_with_max_length(self):
         assert_max_length(self.user, 'name', 20)
         assert_max_length(self.user, 'name', 20)
+
+    def test_with_non_nullable_column(self):
+        assert_max_length(self.user, 'email', 200)
+        assert_max_length(self.user, 'email', 200)
 
     def test_smaller_than_max_length(self):
         with raises(AssertionError):
