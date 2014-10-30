@@ -223,8 +223,12 @@ class EncryptedType(TypeDecorator, ScalarCoercible):
 
             except AttributeError:
                 # Doesn't have 'process_bind_param'
-                pass
 
+                # Handle 'boolean'
+                if issubclass(self.underlying_type.python_type, bool):
+                    value = "true" if value else "false"
+
+            print("encrypt: ", value)
             return self.engine.encrypt(value)
 
     def process_result_value(self, value, dialect):
@@ -239,6 +243,12 @@ class EncryptedType(TypeDecorator, ScalarCoercible):
 
             except AttributeError:
                 # Doesn't have 'process_result_value'
+
+                # Handle 'boolean'
+                if issubclass(self.underlying_type.python_type, bool):
+                    return decrypted_value == "true"
+
+                # Handle all others
                 return self.underlying_type.python_type(decrypted_value)
 
     def _coerce(self, value):
