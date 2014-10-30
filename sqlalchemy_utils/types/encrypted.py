@@ -3,6 +3,7 @@ import base64
 import six
 from sqlalchemy.types import TypeDecorator, String, Binary
 from sqlalchemy_utils.exceptions import ImproperlyConfigured
+from .scalar_coercible import ScalarCoercible
 
 cryptography = None
 try:
@@ -111,7 +112,7 @@ class FernetEngine(EncryptionDecryptionBaseEngine):
         return decrypted
 
 
-class EncryptedType(TypeDecorator):
+class EncryptedType(TypeDecorator, ScalarCoercible):
     """
     EncryptedType provides a way to encrypt and decrypt values,
     to and from databases, that their type is a basic SQLAlchemy type.
@@ -223,3 +224,9 @@ class EncryptedType(TypeDecorator):
             self._update_key()
             decrypted_value = self.engine.decrypt(value)
             return self.underlying_type.python_type(decrypted_value)
+
+    def _coerce(self, value):
+        if isinstance(self.underlying_type, ScalarCoercible):
+            return self.underlying_type._coerce(value)
+
+        return value
