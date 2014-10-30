@@ -23,7 +23,7 @@ class EncryptionDecryptionBaseEngine(object):
     This class must be sub-classed in order to create
     new engines.
     """
- 
+
     def _update_key(self, key):
         if isinstance(key, six.string_types):
             key = six.b(key)
@@ -208,7 +208,7 @@ class EncryptedType(TypeDecorator):
         self._key = value
 
     def _update_key(self):
-        key = self._key() if callable(self._key) else self._key  
+        key = self._key() if callable(self._key) else self._key
         self.engine._update_key(key)
 
     def process_bind_param(self, value, dialect):
