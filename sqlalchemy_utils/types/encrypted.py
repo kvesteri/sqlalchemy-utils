@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import base64
 import six
+import datetime
 from sqlalchemy.types import TypeDecorator, String, Binary
 from sqlalchemy_utils.exceptions import ImproperlyConfigured
 from .scalar_coercible import ScalarCoercible
@@ -224,9 +225,13 @@ class EncryptedType(TypeDecorator, ScalarCoercible):
             except AttributeError:
                 # Doesn't have 'process_bind_param'
 
-                # Handle 'boolean'
-                if issubclass(self.underlying_type.python_type, bool):
+                # Handle 'boolean' and 'dates'
+                type_ = self.underlying_type.python_type
+                if issubclass(type_, bool):
                     value = "true" if value else "false"
+
+                elif issubclass(type_, (datetime.date, datetime.time)):
+                    value = value.isoformat()
 
             return self.engine.encrypt(value)
 
@@ -243,9 +248,22 @@ class EncryptedType(TypeDecorator, ScalarCoercible):
             except AttributeError:
                 # Doesn't have 'process_result_value'
 
-                # Handle 'boolean'
-                if issubclass(self.underlying_type.python_type, bool):
+                # Handle 'boolean' and 'dates'
+                type_ = self.underlying_type.python_type
+                if issubclass(type_, bool):
                     return decrypted_value == "true"
+
+                elif issubclass(type_, datetime.time):
+                    return datetime.datetime.strptime(
+                        decrypted_value, "%H:%M:%S").time()
+
+                elif issubclass(type_, datetime.date):
+                    return datetime.datetime.strptime(
+                        decrypted_value, "%Y-%m-%d").date()
+
+                elif issubclass(type_, datetime.datetime):
+                    return datetime.datetime.strptime(
+                        decrypted_value, "%Y-%m-%dT%H:%M:%S")
 
                 # Handle all others
                 return self.underlying_type.python_type(decrypted_value)
