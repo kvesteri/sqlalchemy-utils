@@ -216,6 +216,15 @@ class EncryptedType(TypeDecorator, ScalarCoercible):
         """Encrypt a value on the way in."""
         if value is not None:
             self._update_key()
+
+            try:
+                value = self.underlying_type.process_bind_param(
+                    value, dialect)
+
+            except AttributeError:
+                # Doesn't have 'process_bind_param'
+                pass
+
             return self.engine.encrypt(value)
 
     def process_result_value(self, value, dialect):
@@ -223,7 +232,14 @@ class EncryptedType(TypeDecorator, ScalarCoercible):
         if value is not None:
             self._update_key()
             decrypted_value = self.engine.decrypt(value)
-            return self.underlying_type.python_type(decrypted_value)
+
+            try:
+                return self.underlying_type.process_result_value(
+                    decrypted_value, dialect)
+
+            except AttributeError:
+                # Doesn't have 'process_result_value'
+                return self.underlying_type.python_type(decrypted_value)
 
     def _coerce(self, value):
         if isinstance(self.underlying_type, ScalarCoercible):
