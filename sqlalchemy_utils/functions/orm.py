@@ -79,6 +79,8 @@ def get_mapper(mixed):
         mixed = mixed.expr
     elif isinstance(mixed, sa.Column):
         mixed = mixed.table
+    elif isinstance(mixed, sa.orm.query._ColumnEntity):
+        mixed = mixed.expr
 
     if isinstance(mixed, sa.orm.Mapper):
         return mixed

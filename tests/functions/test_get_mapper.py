@@ -91,6 +91,10 @@ class TestGetMapperWithQueryEntities(TestCase):
             sa.inspect(self.Building)
         )
 
+    def test_column_entity(self):
+        query = self.session.query(self.Building.id)
+        assert get_mapper(query._entities[0]) == sa.inspect(self.Building)
+
 
 class TestGetMapperWithMultipleMappersFound(object):
     def setup_method(self, method):
