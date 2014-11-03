@@ -8,6 +8,7 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 ^^^^^^^^^^^^^^^^^^^
 
 - Added support for Column objects in get_mapper
+- Made make_order_by_deterministic add deterministic column more aggressively
 
 
 0.27.6 (2014-10-29)

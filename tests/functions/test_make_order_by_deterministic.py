@@ -88,4 +88,4 @@ class TestMakeOrderByDeterministic(TestCase):
         alias = sa.orm.aliased(self.User.__table__)
         query = self.session.query(alias).order_by(alias.c.name)
         query = make_order_by_deterministic(query)
-        assert str(query).endswith('ORDER BY user_1.name')
+        assert str(query).endswith('ORDER BY user_1.name, "user".id ASC')
