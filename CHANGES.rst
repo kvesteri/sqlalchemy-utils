@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.27.7 (2014-11-03)
+^^^^^^^^^^^^^^^^^^^
+
+- Added support for Column objects in get_mapper
+
+
 0.27.6 (2014-10-29)
 ^^^^^^^^^^^^^^^^^^^
 

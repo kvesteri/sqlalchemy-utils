@@ -77,6 +77,8 @@ def get_mapper(mixed):
     """
     if isinstance(mixed, sa.orm.query._MapperEntity):
         mixed = mixed.expr
+    elif isinstance(mixed, sa.Column):
+        mixed = mixed.table
 
     if isinstance(mixed, sa.orm.Mapper):
         return mixed
@@ -227,8 +229,6 @@ def get_tables(mixed):
         tables = sum((m.tables for m in polymorphic_mappers), [])
     else:
         tables = mapper.tables
-
-
     return tables
 
 
