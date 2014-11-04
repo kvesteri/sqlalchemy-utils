@@ -190,7 +190,7 @@ def make_order_by_deterministic(query):
             if has_unique_index(column):
                 return query
         except TypeError:
-            return query
+            pass
 
     base_table = get_tables(query._entities[0])[0]
     query = query.order_by(
