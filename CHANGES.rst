@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.27.8 (2014-11-13)
+^^^^^^^^^^^^^^^^^^^
+
+- Added is_loaded utility function
+- Removed deprecated has_any_changes
+
+
 0.27.7 (2014-11-03)
 ^^^^^^^^^^^^^^^^^^^
 

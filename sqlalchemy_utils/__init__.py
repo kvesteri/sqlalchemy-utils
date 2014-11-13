@@ -24,11 +24,11 @@ from .functions import (
     get_referencing_foreign_keys,
     get_tables,
     group_foreign_keys,
-    has_any_changes,
     has_changes,
     has_index,
     has_unique_index,
     identity,
+    is_loaded,
     merge_references,
     mock_engine,
     naturally_equivalent,
@@ -79,7 +79,7 @@ from .types import (
 from .models import Timestamp
 
 
-__version__ = '0.27.7'
+__version__ = '0.27.8'
 
 
 __all__ = (
@@ -113,11 +113,11 @@ __all__ = (
     get_referencing_foreign_keys,
     get_tables,
     group_foreign_keys,
-    has_any_changes,
     has_changes,
     has_index,
     identity,
     instrumented_list,
+    is_loaded,
     merge_references,
     mock_engine,
     naturally_equivalent,
