@@ -724,37 +724,6 @@ def has_changes(obj, attrs=None, exclude=None):
         )
 
 
-def has_any_changes(obj, columns):
-    """
-    Simple shortcut function for checking if any of the given attributes of
-    given declarative model object have changes.
-
-
-    ::
-
-
-        from sqlalchemy_utils import has_any_changes
-
-
-        user = User()
-
-        has_any_changes(user, ('name', ))  # False
-
-        user.name = u'someone'
-
-        has_any_changes(user, ('name', 'age'))  # True
-
-
-    .. versionadded: 0.26.3
-    .. deprecated:: 0.26.6
-        User :func:`has_changes` instead.
-
-    :param obj: SQLAlchemy declarative model object
-    :param attrs: Names of the attributes
-    """
-    return any(has_changes(obj, column) for column in columns)
-
-
 def is_loaded(obj, prop):
     """
     Return whether or not given property of given object has been loaded.
