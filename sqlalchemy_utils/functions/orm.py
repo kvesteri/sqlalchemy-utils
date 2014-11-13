@@ -755,6 +755,39 @@ def has_any_changes(obj, columns):
     return any(has_changes(obj, column) for column in columns)
 
 
+def is_loaded(obj, prop):
+    """
+    Return whether or not given property of given object has been loaded.
+
+    ::
+
+        class Article(Base):
+            __tablename__ = 'article'
+            id = sa.Column(sa.Integer, primary_key=True)
+            name = sa.Column(sa.String)
+            content = sa.orm.deferred(sa.Column(sa.String))
+
+
+        article = session.query(Article).get(5)
+
+        # name gets loaded since its not a deferred property
+        assert is_loaded(article, 'name')
+
+        # content has not yet been loaded since its a deferred property
+        assert not is_loaded(article, 'content')
+
+
+    .. versionadded: 0.27.8
+
+    :param obj: SQLAlchemy declarative model object
+    :param prop: Name of the property or InstrumentedAttribute
+    """
+    return not isinstance(
+        getattr(sa.inspect(obj).attrs, prop).loaded_value,
+        sa.util.langhelpers._symbol
+    )
+
+
 def identity(obj_or_class):
     """
     Return the identity of given sqlalchemy declarative model class or instance
