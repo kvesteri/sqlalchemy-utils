@@ -37,6 +37,7 @@ from .functions import (
     sort_query,
     table_name,
 )
+from .i18n import TranslationHybrid
 from .listeners import (
     auto_delete_orphans,
     coercion_listener,
