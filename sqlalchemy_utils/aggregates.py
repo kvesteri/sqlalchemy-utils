@@ -402,6 +402,22 @@ class AggregatedAttribute(declared_attr):
 
 
 def get_aggregate_query(agg_expr, relationships):
+    """
+    Return a subquery for fetching an aggregate value of given aggregate
+    expression and given sequence of relationships.
+
+    The returned aggregate query can be used when updating denormalized column
+    value with query such as:
+
+    UPDATE table SET column = {aggregate_query}
+    WHERE {condition}
+
+    :param agg_expr:
+        an expression to be selected, for example sa.func.count('1')
+    :param relationships:
+        Sequence of relationships to be used for building the aggregate
+        query.
+    """
     from_ = relationships[0].mapper.class_.__table__
     for relationship in relationships[0:-1]:
         property_ = relationship.property
