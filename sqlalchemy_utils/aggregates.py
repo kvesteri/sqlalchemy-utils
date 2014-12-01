@@ -394,10 +394,11 @@ class AggregatedAttribute(declared_attr):
         self.relationship = relationship
 
     def __get__(desc, self, cls):
+        value = (desc.fget, desc.relationship, desc.column)
         if cls not in aggregated_attrs:
-            aggregated_attrs[cls] = [(desc.fget, desc.relationship)]
+            aggregated_attrs[cls] = [value]
         else:
-            aggregated_attrs[cls].append((desc.fget, desc.relationship))
+            aggregated_attrs[cls].append(value)
         return desc.column
 
 
@@ -577,7 +578,7 @@ class AggregationManager(object):
 
     def update_generator_registry(self):
         for class_, attrs in six.iteritems(aggregated_attrs):
-            for expr, relationship in attrs:
+            for expr, relationship, column in attrs:
                 relationships = []
                 rel_class = class_
 
@@ -589,7 +590,7 @@ class AggregationManager(object):
                 self.generator_registry[rel_class].append(
                     AggregatedValue(
                         class_=class_,
-                        attr=expr.__name__,
+                        attr=column,
                         relationships=list(reversed(relationships)),
                         expr=expr(class_)
                     )
