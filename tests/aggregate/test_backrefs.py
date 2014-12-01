@@ -3,7 +3,7 @@ from sqlalchemy_utils.aggregates import aggregated
 from tests import TestCase
 
 
-class TestAggregateValueGenerationForSimpleModelPaths(TestCase):
+class TestAggregateValueGenerationWithBackrefs(TestCase):
     def create_models(self):
         class Thread(self.Base):
             __tablename__ = 'thread'

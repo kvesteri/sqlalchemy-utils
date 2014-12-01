@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.27.9 (2014-12-01)
+^^^^^^^^^^^^^^^^^^^
+
+- Fix aggregated decorator many-to-many relationship handling
+
+
 0.27.8 (2014-11-13)
 ^^^^^^^^^^^^^^^^^^^
 
