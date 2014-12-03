@@ -279,29 +279,41 @@ def dependent_objects(obj, foreign_keys=None):
                 table in mapper.tables and
                 not (parent_mapper and table in parent_mapper.tables)
             ):
-                criteria = []
-                visited_constraints = []
-                for key in keys:
-                    if key.constraint not in visited_constraints:
-                        visited_constraints.append(key.constraint)
-                        subcriteria = [
-                            getattr(class_, column.key) ==
-                            getattr(
-                                obj,
-                                key.constraint.elements[index].column.key
-                            )
-                            for index, column
-                            in enumerate(key.constraint.columns)
-                        ]
-                        criteria.append(sa.and_(*subcriteria))
-
                 query = session.query(class_).filter(
-                    sa.or_(
-                        *criteria
-                    )
+                    sa.or_(*_get_criteria(keys, class_, obj))
                 )
                 chain.queries.append(query)
     return chain
+
+
+def _get_criteria(keys, class_, obj):
+    criteria = []
+    visited_constraints = []
+    for key in keys:
+        if key.constraint in visited_constraints:
+            continue
+        visited_constraints.append(key.constraint)
+
+        subcriteria = []
+        for index, column in enumerate(key.constraint.columns):
+            prop = sa.inspect(class_).get_property_by_column(
+                column
+            )
+            foreign_column = (
+                key.constraint.elements[index].column
+            )
+            subcriteria.append(
+                getattr(class_, prop.key) ==
+                getattr(
+                    obj,
+                    sa.inspect(type(obj))
+                    .get_property_by_column(
+                        foreign_column
+                    ).key
+                )
+            )
+        criteria.append(sa.and_(*subcriteria))
+    return criteria
 
 
 def non_indexed_foreign_keys(metadata, engine=None):
@@ -347,10 +359,10 @@ def is_indexed_foreign_key(constraint):
 
     :param constraint: ForeignKeyConstraint object to check the indexes
     """
-    for index in constraint.table.indexes:
-        index_column_names = set(
-            column.name for column in index.columns
-        )
-        if index_column_names == set(constraint.columns):
-            return True
-    return False
+    return any(
+        set(column.name for column in index.columns)
+        ==
+        set(constraint.columns)
+        for index
+        in constraint.table.indexes
+    )
