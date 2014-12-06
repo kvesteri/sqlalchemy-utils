@@ -3,6 +3,14 @@ Changelog
 
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
+
+0.27.11 (2014-12-06)
+^^^^^^^^^^^^^^^^^^^^
+
+- Added loose typed column checking support for get_column_key
+- Made get_column_key throw UnmappedColumnError to be consistent with SQLAlchemy
+
+
 0.27.10 (2014-12-03)
 ^^^^^^^^^^^^^^^^^^^^
 

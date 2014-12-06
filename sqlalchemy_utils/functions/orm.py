@@ -35,14 +35,21 @@ def get_column_key(model, column):
         get_column_key(User, User.__table__.c.name)  # 'name'
 
     .. versionadded: 0.26.5
+
+    .. versionchanged: 0.27.11
+        Throws UnmappedColumnError instead of ValueError when no property was
+        found for given column. This is consistent with how SQLAlchemy works.
     """
-    for key, c in sa.inspect(model).columns.items():
-        if c is column:
-            return key
-    raise ValueError(
-        "Class %s doesn't have a column '%s'",
-        model.__name__,
-        column
+    mapper = sa.inspect(model)
+    try:
+        return mapper.get_property_by_column(column).key
+    except sa.orm.exc.UnmappedColumnError:
+        for key, c in mapper.columns.items():
+            if c.name == column.name and c.table is column.table:
+                return key
+    raise sa.orm.exc.UnmappedColumnError(
+        'No column %s is configured on mapper %s...' %
+        (column, mapper)
     )
 
 
