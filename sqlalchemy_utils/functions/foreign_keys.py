@@ -7,7 +7,7 @@ from sqlalchemy.exc import NoInspectionAvailable
 from sqlalchemy.orm import object_session
 from sqlalchemy.schema import MetaData, Table, ForeignKeyConstraint
 
-from .orm import get_mapper, get_tables
+from .orm import get_column_key, get_mapper, get_tables
 from ..query_chain import QueryChain
 
 
@@ -296,14 +296,11 @@ def _get_criteria(keys, class_, obj):
 
         subcriteria = []
         for index, column in enumerate(key.constraint.columns):
-            prop = sa.inspect(class_).get_property_by_column(
-                column
-            )
             foreign_column = (
                 key.constraint.elements[index].column
             )
             subcriteria.append(
-                getattr(class_, prop.key) ==
+                getattr(class_, get_column_key(class_, column)) ==
                 getattr(
                     obj,
                     sa.inspect(type(obj))

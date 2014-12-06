@@ -271,7 +271,6 @@ class TestDependentObjectsWithSingleTableInheritance(TestCase):
                 'polymorphic_identity': u'blog_post'
             }
 
-
         self.Category = Category
         self.TextItem = TextItem
         self.Article = Article
