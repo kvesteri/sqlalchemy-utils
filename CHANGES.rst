@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.27.12 (2014-12-xx)
+^^^^^^^^^^^^^^^^^^^^
+
+- Fixed PhoneNumber string coercion (#93)
+
+
 0.27.11 (2014-12-06)
 ^^^^^^^^^^^^^^^^^^^^
 

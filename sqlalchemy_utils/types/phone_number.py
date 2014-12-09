@@ -1,6 +1,7 @@
 import six
 from sqlalchemy import types
 from sqlalchemy_utils.exceptions import ImproperlyConfigured
+from sqlalchemy_utils.utils import str_coercible
 from .scalar_coercible import ScalarCoercible
 
 
@@ -13,6 +14,7 @@ except ImportError:
     BasePhoneNumber = object
 
 
+@str_coercible
 class PhoneNumber(BasePhoneNumber):
     '''
     Extends a PhoneNumber class from `Python phonenumbers library`_. Adds
@@ -65,9 +67,6 @@ class PhoneNumber(BasePhoneNumber):
 
     def __unicode__(self):
         return self.national
-
-    def __str__(self):
-        return six.text_type(self.national).encode('utf-8')
 
 
 class PhoneNumberType(types.TypeDecorator, ScalarCoercible):
