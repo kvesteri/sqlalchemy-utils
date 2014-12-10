@@ -67,11 +67,12 @@ class TestGetDotAttr(TestCase):
         subsection = self.SubSection(section=section)
         subsubsection = self.SubSubSection(subsection=subsection)
 
+        assert getdotattr(document, 'sections') == [section]
         assert getdotattr(document, 'sections.subsections') == [
-            [subsection]
+            subsection
         ]
         assert getdotattr(document, 'sections.subsections.subsubsections') == [
-            [subsubsection]
+            subsubsection
         ]
 
     def test_class_paths(self):

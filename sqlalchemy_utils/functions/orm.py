@@ -644,13 +644,7 @@ def getdotattr(obj_or_class, dot_path):
     for path in dot_path.split('.'):
         getter = attrgetter(path)
         if isinstance(last, list):
-            tmp = []
-            for el in last:
-                if isinstance(el, list):
-                    tmp.extend(map(getter, el))
-                else:
-                    tmp.append(getter(el))
-            last = tmp
+            last = sum((getter(el) for el in last), [])
         elif isinstance(last, InstrumentedAttribute):
             last = getter(last.property.mapper.class_)
         elif last is None:
