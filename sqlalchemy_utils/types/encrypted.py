@@ -181,6 +181,20 @@ class EncryptedType(TypeDecorator, ScalarCoercible):
         Base.metadata.drop_all(connection)
         connection.close()
         engine.dispose()
+
+    The key parameter accepts a callable to allow for the key to change
+    per-row instead of be fixed for the whole table.
+
+    ::
+        def get_key():
+            return "dynamic-key"
+
+        class User(Base):
+            __tablename__ = "user"
+            id = sa.Column(sa.Integer, primary_key=True)
+            username = sa.Column(EncryptedType(
+                sa.Unicode, get_key))
+
     """
 
     impl = Binary
@@ -195,7 +209,9 @@ class EncryptedType(TypeDecorator, ScalarCoercible):
         # set the underlying type
         if type_in is None:
             type_in = String()
-        self.underlying_type = type_in()
+        elif isinstance(type_in, type):
+            type_in = type_in()
+        self.underlying_type = type_in
         self._key = key
         if not engine:
             engine = AesEngine
@@ -253,6 +269,10 @@ class EncryptedType(TypeDecorator, ScalarCoercible):
                 if issubclass(type_, bool):
                     return decrypted_value == "true"
 
+                elif issubclass(type_, datetime.datetime):
+                    return datetime.datetime.strptime(
+                        decrypted_value, "%Y-%m-%dT%H:%M:%S")
+
                 elif issubclass(type_, datetime.time):
                     return datetime.datetime.strptime(
                         decrypted_value, "%H:%M:%S").time()
@@ -260,10 +280,6 @@ class EncryptedType(TypeDecorator, ScalarCoercible):
                 elif issubclass(type_, datetime.date):
                     return datetime.datetime.strptime(
                         decrypted_value, "%Y-%m-%d").date()
-
-                elif issubclass(type_, datetime.datetime):
-                    return datetime.datetime.strptime(
-                        decrypted_value, "%Y-%m-%dT%H:%M:%S")
 
                 # Handle all others
                 return self.underlying_type.python_type(decrypted_value)
