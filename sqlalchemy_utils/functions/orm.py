@@ -35,14 +35,21 @@ def get_column_key(model, column):
         get_column_key(User, User.__table__.c.name)  # 'name'
 
     .. versionadded: 0.26.5
+
+    .. versionchanged: 0.27.11
+        Throws UnmappedColumnError instead of ValueError when no property was
+        found for given column. This is consistent with how SQLAlchemy works.
     """
-    for key, c in sa.inspect(model).columns.items():
-        if c is column:
-            return key
-    raise ValueError(
-        "Class %s doesn't have a column '%s'",
-        model.__name__,
-        column
+    mapper = sa.inspect(model)
+    try:
+        return mapper.get_property_by_column(column).key
+    except sa.orm.exc.UnmappedColumnError:
+        for key, c in mapper.columns.items():
+            if c.name == column.name and c.table is column.table:
+                return key
+    raise sa.orm.exc.UnmappedColumnError(
+        'No column %s is configured on mapper %s...' %
+        (column, mapper)
     )
 
 
@@ -76,6 +83,10 @@ def get_mapper(mixed):
     .. versionadded: 0.26.1
     """
     if isinstance(mixed, sa.orm.query._MapperEntity):
+        mixed = mixed.expr
+    elif isinstance(mixed, sa.Column):
+        mixed = mixed.table
+    elif isinstance(mixed, sa.orm.query._ColumnEntity):
         mixed = mixed.expr
 
     if isinstance(mixed, sa.orm.Mapper):
@@ -227,8 +238,6 @@ def get_tables(mixed):
         tables = sum((m.tables for m in polymorphic_mappers), [])
     else:
         tables = mapper.tables
-
-
     return tables
 
 
@@ -635,13 +644,7 @@ def getdotattr(obj_or_class, dot_path):
     for path in dot_path.split('.'):
         getter = attrgetter(path)
         if isinstance(last, list):
-            tmp = []
-            for el in last:
-                if isinstance(el, list):
-                    tmp.extend(map(getter, el))
-                else:
-                    tmp.append(getter(el))
-            last = tmp
+            last = sum((getter(el) for el in last), [])
         elif isinstance(last, InstrumentedAttribute):
             last = getter(last.property.mapper.class_)
         elif last is None:
@@ -722,35 +725,37 @@ def has_changes(obj, attrs=None, exclude=None):
         )
 
 
-def has_any_changes(obj, columns):
+def is_loaded(obj, prop):
     """
-    Simple shortcut function for checking if any of the given attributes of
-    given declarative model object have changes.
-
+    Return whether or not given property of given object has been loaded.
 
     ::
 
-
-        from sqlalchemy_utils import has_any_changes
-
-
-        user = User()
-
-        has_any_changes(user, ('name', ))  # False
-
-        user.name = u'someone'
-
-        has_any_changes(user, ('name', 'age'))  # True
+        class Article(Base):
+            __tablename__ = 'article'
+            id = sa.Column(sa.Integer, primary_key=True)
+            name = sa.Column(sa.String)
+            content = sa.orm.deferred(sa.Column(sa.String))
 
 
-    .. versionadded: 0.26.3
-    .. deprecated:: 0.26.6
-        User :func:`has_changes` instead.
+        article = session.query(Article).get(5)
+
+        # name gets loaded since its not a deferred property
+        assert is_loaded(article, 'name')
+
+        # content has not yet been loaded since its a deferred property
+        assert not is_loaded(article, 'content')
+
+
+    .. versionadded: 0.27.8
 
     :param obj: SQLAlchemy declarative model object
-    :param attrs: Names of the attributes
+    :param prop: Name of the property or InstrumentedAttribute
     """
-    return any(has_changes(obj, column) for column in columns)
+    return not isinstance(
+        getattr(sa.inspect(obj).attrs, prop).loaded_value,
+        sa.util.langhelpers._symbol
+    )
 
 
 def identity(obj_or_class):

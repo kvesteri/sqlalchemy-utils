@@ -1,3 +1,4 @@
+from copy import copy
 from pytest import raises
 
 import sqlalchemy as sa
@@ -15,7 +16,12 @@ class TestGetColumnKey(object):
             id = sa.Column(sa.Integer, primary_key=True)
             name = sa.Column('_name', sa.Unicode(255))
 
+        class Movie(Base):
+            __tablename__ = 'movie'
+            id = sa.Column(sa.Integer, primary_key=True)
+
         self.Building = Building
+        self.Movie = Movie
 
     def test_supports_aliases(self):
         assert (
@@ -29,6 +35,10 @@ class TestGetColumnKey(object):
             'name'
         )
 
+    def test_supports_vague_matching_of_column_objects(self):
+        column = copy(self.Building.__table__.c._name)
+        assert get_column_key(self.Building, column) == 'name'
+
     def test_throws_value_error_for_unknown_column(self):
-        with raises(ValueError):
-            get_column_key(self.Building, 'unknown')
+        with raises(sa.orm.exc.UnmappedColumnError):
+            get_column_key(self.Building, self.Movie.__table__.c.id)

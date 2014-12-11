@@ -3,33 +3,33 @@ from sqlalchemy_utils.aggregates import aggregated
 from tests import TestCase
 
 
-class TestAggregateValueGenerationWithBackrefs(TestCase):
+class TestAggregatedWithColumnAlias(TestCase):
     def create_models(self):
         class Thread(self.Base):
             __tablename__ = 'thread'
             id = sa.Column(sa.Integer, primary_key=True)
-            name = sa.Column(sa.Unicode(255))
 
-            @aggregated('comments', sa.Column(sa.Integer, default=0))
+            @aggregated(
+                'comments',
+                sa.Column('_comment_count', sa.Integer, default=0)
+            )
             def comment_count(self):
                 return sa.func.count('1')
+
+            comments = sa.orm.relationship('Comment', backref='thread')
 
         class Comment(self.Base):
             __tablename__ = 'comment'
             id = sa.Column(sa.Integer, primary_key=True)
-            content = sa.Column(sa.Unicode(255))
             thread_id = sa.Column(sa.Integer, sa.ForeignKey('thread.id'))
-
-            thread = sa.orm.relationship(Thread, backref='comments')
 
         self.Thread = Thread
         self.Comment = Comment
 
     def test_assigns_aggregates_on_insert(self):
         thread = self.Thread()
-        thread.name = u'some article name'
         self.session.add(thread)
-        comment = self.Comment(content=u'Some content', thread=thread)
+        comment = self.Comment(thread=thread)
         self.session.add(comment)
         self.session.commit()
         self.session.refresh(thread)
@@ -37,10 +37,9 @@ class TestAggregateValueGenerationWithBackrefs(TestCase):
 
     def test_assigns_aggregates_on_separate_insert(self):
         thread = self.Thread()
-        thread.name = u'some article name'
         self.session.add(thread)
         self.session.commit()
-        comment = self.Comment(content=u'Some content', thread=thread)
+        comment = self.Comment(thread=thread)
         self.session.add(comment)
         self.session.commit()
         self.session.refresh(thread)
@@ -48,10 +47,9 @@ class TestAggregateValueGenerationWithBackrefs(TestCase):
 
     def test_assigns_aggregates_on_delete(self):
         thread = self.Thread()
-        thread.name = u'some article name'
         self.session.add(thread)
         self.session.commit()
-        comment = self.Comment(content=u'Some content', thread=thread)
+        comment = self.Comment(thread=thread)
         self.session.add(comment)
         self.session.commit()
         self.session.delete(comment)

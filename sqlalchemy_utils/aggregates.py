@@ -394,11 +394,62 @@ class AggregatedAttribute(declared_attr):
         self.relationship = relationship
 
     def __get__(desc, self, cls):
+        value = (desc.fget, desc.relationship, desc.column)
         if cls not in aggregated_attrs:
-            aggregated_attrs[cls] = [(desc.fget, desc.relationship)]
+            aggregated_attrs[cls] = [value]
         else:
-            aggregated_attrs[cls].append((desc.fget, desc.relationship))
+            aggregated_attrs[cls].append(value)
         return desc.column
+
+
+def get_aggregate_query(agg_expr, relationships):
+    """
+    Return a subquery for fetching an aggregate value of given aggregate
+    expression and given sequence of relationships.
+
+    The returned aggregate query can be used when updating denormalized column
+    value with query such as:
+
+    UPDATE table SET column = {aggregate_query}
+    WHERE {condition}
+
+    :param agg_expr:
+        an expression to be selected, for example sa.func.count('1')
+    :param relationships:
+        Sequence of relationships to be used for building the aggregate
+        query.
+    """
+    from_ = relationships[0].mapper.class_.__table__
+    for relationship in relationships[0:-1]:
+        property_ = relationship.property
+        if property_.secondary is not None:
+            from_ = from_.join(
+                property_.secondary,
+                property_.secondaryjoin
+            )
+
+        from_ = (
+            from_
+            .join(
+                property_.parent.class_,
+                property_.primaryjoin
+            )
+        )
+
+    prop = relationships[-1].property
+    condition = prop.primaryjoin
+    if prop.secondary is not None:
+        from_ = from_.join(
+            prop.secondary,
+            prop.secondaryjoin
+        )
+
+    query = sa.select(
+        [agg_expr],
+        from_obj=[from_]
+    )
+
+    return query.where(condition)
 
 
 class AggregatedValue(object):
@@ -418,23 +469,7 @@ class AggregatedValue(object):
 
     @property
     def aggregate_query(self):
-        from_ = self.relationships[0].mapper.class_.__table__
-        for relationship in self.relationships[0:-1]:
-            property_ = relationship.property
-            from_ = (
-                from_
-                .join(
-                    property_.parent.class_,
-                    property_.primaryjoin
-                )
-            )
-
-        query = sa.select(
-            [self.expr],
-            from_obj=[from_]
-        )
-
-        query = query.where(self.relationships[-1])
+        query = get_aggregate_query(self.expr, self.relationships)
 
         return query.correlate(self.class_).as_scalar()
 
@@ -484,11 +519,22 @@ class AggregatedValue(object):
         property_ = self.relationships[-1].property
 
         from_ = property_.mapper.class_.__table__
-        for relationship in reversed(self.relationships[1:-1]):
+        for relationship in reversed(self.relationships[0:-1]):
             property_ = relationship.property
-            from_ = (
-                from_.join(property_.mapper.class_, property_.primaryjoin)
-            )
+            if property_.secondary is not None:
+                from_ = from_.join(
+                    property_.secondary,
+                    property_.primaryjoin
+                )
+                from_ = from_.join(
+                    property_.mapper.class_,
+                    property_.secondaryjoin
+                )
+            else:
+                from_ = from_.join(
+                    property_.mapper.class_,
+                    property_.primaryjoin
+                )
         return from_
 
     def local_condition(self, prop, objects):
@@ -532,7 +578,7 @@ class AggregationManager(object):
 
     def update_generator_registry(self):
         for class_, attrs in six.iteritems(aggregated_attrs):
-            for expr, relationship in attrs:
+            for expr, relationship, column in attrs:
                 relationships = []
                 rel_class = class_
 
@@ -544,7 +590,7 @@ class AggregationManager(object):
                 self.generator_registry[rel_class].append(
                     AggregatedValue(
                         class_=class_,
-                        attr=expr.__name__,
+                        attr=column,
                         relationships=list(reversed(relationships)),
                         expr=expr(class_)
                     )

@@ -76,6 +76,12 @@ identity
 .. autofunction:: identity
 
 
+is_loaded
+^^^^^^^^^
+
+.. autofunction:: is_loaded
+
+
 make_order_by_deterministic
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

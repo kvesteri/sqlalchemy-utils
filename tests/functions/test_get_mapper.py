@@ -56,6 +56,18 @@ class TestGetMapper(object):
             sa.inspect(self.Building)
         )
 
+    def test_column(self):
+        assert (
+            get_mapper(self.Building.__table__.c.id) ==
+            sa.inspect(self.Building)
+        )
+
+    def test_column_of_an_alias(self):
+        assert (
+            get_mapper(sa.orm.aliased(self.Building.__table__).c.id) ==
+            sa.inspect(self.Building)
+        )
+
 
 class TestGetMapperWithQueryEntities(TestCase):
     def create_models(self):
@@ -78,6 +90,10 @@ class TestGetMapperWithQueryEntities(TestCase):
             get_mapper(entity) ==
             sa.inspect(self.Building)
         )
+
+    def test_column_entity(self):
+        query = self.session.query(self.Building.id)
+        assert get_mapper(query._entities[0]) == sa.inspect(self.Building)
 
 
 class TestGetMapperWithMultipleMappersFound(object):

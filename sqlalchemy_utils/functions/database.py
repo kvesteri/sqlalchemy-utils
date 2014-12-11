@@ -159,12 +159,18 @@ def has_index(column):
         has_index(table.c.locale)   # False
         has_index(table.c.id)       # True
     """
+    table = column.table
+    if not isinstance(table, sa.Table):
+        raise TypeError(
+            'Only columns belonging to Table objects are supported. Given '
+            'column belongs to %r.' % table
+        )
     return (
-        column is column.table.primary_key.columns.values()[0]
+        column is table.primary_key.columns.values()[0]
         or
         any(
             index.columns.values()[0] is column
-            for index in column.table.indexes
+            for index in table.indexes
         )
     )
 
@@ -198,8 +204,17 @@ def has_unique_index(column):
         has_unique_index(table.c.is_published) # True
         has_unique_index(table.c.is_deleted)   # False
         has_unique_index(table.c.id)           # True
+
+
+    :raises TypeError: if given column does not belong to a Table object
     """
-    pks = column.table.primary_key.columns
+    table = column.table
+    if not isinstance(table, sa.Table):
+        raise TypeError(
+            'Only columns belonging to Table objects are supported. Given '
+            'column belongs to %r.' % table
+        )
+    pks = table.primary_key.columns
     return (
         (column is pks.values()[0] and len(pks) == 1)
         or
@@ -384,12 +399,21 @@ def drop_database(url):
         engine.raw_connection().set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
 
         # Disconnect all users from the database we are dropping.
+        version = list(
+            map(
+                int,
+                engine.execute('SHOW server_version;').first()[0].split('.')
+            )
+        )
+        pid_column = (
+            'pid' if (version[0] >= 9 and version[1] >= 2) else 'procpid'
+        )
         text = '''
-        SELECT pg_terminate_backend(pg_stat_activity.pid)
+        SELECT pg_terminate_backend(pg_stat_activity.%(pid_column)s)
         FROM pg_stat_activity
-        WHERE pg_stat_activity.datname = '%s'
-          AND pid <> pg_backend_pid()
-        ''' % database
+        WHERE pg_stat_activity.datname = '%(database)s'
+          AND %(pid_column)s <> pg_backend_pid();
+        ''' % {'pid_column': pid_column, 'database': database}
         engine.execute(text)
 
         # Drop the database.

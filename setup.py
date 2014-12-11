@@ -47,7 +47,7 @@ extras_require = {
     'ipaddress': ['ipaddr'] if not PY3 else [],
     'timezone': ['python-dateutil'],
     'url': ['furl >= 0.3.5'] if not PY3 else [],
-    'encrypted': ['cryptography==0.6']
+    'encrypted': ['cryptography>=0.6']
 }
 
 
