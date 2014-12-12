@@ -27,7 +27,7 @@ PY3 = sys.version_info[0] == 3
 
 extras_require = {
     'test': [
-        'pytest==2.2.3',
+        'pytest==2.3.5',
         'Pygments>=1.2',
         'Jinja2>=2.3',
         'docutils>=0.10',
