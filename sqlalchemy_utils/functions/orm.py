@@ -843,13 +843,10 @@ def naturally_equivalent(obj, obj2):
     :param obj: SQLAlchemy declarative model object
     :param obj2: SQLAlchemy declarative model object to compare with `obj`
     """
-    for prop in sa.inspect(obj.__class__).iterate_properties:
-        if not isinstance(prop, sa.orm.ColumnProperty):
+    for column_key, column in sa.inspect(obj.__class__).columns.items():
+        if column.primary_key:
             continue
 
-        if prop.columns[0].primary_key:
-            continue
-
-        if not (getattr(obj, prop.key) == getattr(obj2, prop.key)):
+        if not (getattr(obj, column_key) == getattr(obj2, column_key)):
             return False
     return True
