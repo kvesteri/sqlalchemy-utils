@@ -139,7 +139,7 @@ class EncryptedTypeTestCase(TestCase):
         class Team(self.Base):
             __tablename__ = 'team'
             id = sa.Column(sa.Integer, primary_key=True)
-            key = sa.Column(sa.Unicode(50))
+            key = sa.Column(sa.String(50))
             name = sa.Column(EncryptedType(
                 sa.Unicode,
                 lambda: self._team_key,
@@ -181,18 +181,17 @@ class EncryptedTypeTestCase(TestCase):
     def test_lookup_key(self):
         # Add teams
         self._team_key = 'one'
-        team = self.Team(key=self._team_key, name='One')
+        team = self.Team(key=self._team_key, name=u'One')
         self.session.add(team)
-        self.session.flush()
+        self.session.commit()
         team_1_id = team.id
 
         self._team_key = 'two'
-        team = self.Team(key=self._team_key, name='Two')
+        team = self.Team(key=self._team_key)
+        team.name = u'Two'
         self.session.add(team)
-        self.session.flush()
-        team_2_id = team.id
-
         self.session.commit()
+        team_2_id = team.id
 
         # Lookup teams
         self._team_key = self.session.query(self.Team.key).filter_by(
@@ -201,10 +200,12 @@ class EncryptedTypeTestCase(TestCase):
 
         team = self.session.query(self.Team).get(team_1_id)
 
-        assert team.name == 'One'
+        assert team.name == u'One'
 
         with pytest.raises(Exception):
             self.session.query(self.Team).get(team_2_id)
+
+        self.session.expunge_all()
 
         self._team_key = self.session.query(self.Team.key).filter_by(
             id=team_2_id
@@ -212,10 +213,12 @@ class EncryptedTypeTestCase(TestCase):
 
         team = self.session.query(self.Team).get(team_2_id)
 
-        assert team.name == 'Two'
+        assert team.name == u'Two'
 
         with pytest.raises(Exception):
             self.session.query(self.Team).get(team_1_id)
+
+        self.session.expunge_all()
 
         # Remove teams
         self.session.query(self.Team).delete()

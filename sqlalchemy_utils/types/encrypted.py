@@ -28,7 +28,7 @@ class EncryptionDecryptionBaseEngine(object):
 
     def _update_key(self, key):
         if isinstance(key, six.string_types):
-            key = six.b(key)
+            key = key.encode()
         digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
         digest.update(key)
         engine_key = digest.finalize()
