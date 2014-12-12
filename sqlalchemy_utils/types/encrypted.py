@@ -236,7 +236,8 @@ class EncryptedType(TypeDecorator, ScalarCoercible):
 
             try:
                 value = self.underlying_type.process_bind_param(
-                    value, dialect)
+                    value, dialect
+                )
 
             except AttributeError:
                 # Doesn't have 'process_bind_param'
@@ -244,7 +245,7 @@ class EncryptedType(TypeDecorator, ScalarCoercible):
                 # Handle 'boolean' and 'dates'
                 type_ = self.underlying_type.python_type
                 if issubclass(type_, bool):
-                    value = "true" if value else "false"
+                    value = 'true' if value else 'false'
 
                 elif issubclass(type_, (datetime.date, datetime.time)):
                     value = value.isoformat()
@@ -259,7 +260,8 @@ class EncryptedType(TypeDecorator, ScalarCoercible):
 
             try:
                 return self.underlying_type.process_result_value(
-                    decrypted_value, dialect)
+                    decrypted_value, dialect
+                )
 
             except AttributeError:
                 # Doesn't have 'process_result_value'
@@ -267,19 +269,22 @@ class EncryptedType(TypeDecorator, ScalarCoercible):
                 # Handle 'boolean' and 'dates'
                 type_ = self.underlying_type.python_type
                 if issubclass(type_, bool):
-                    return decrypted_value == "true"
+                    return decrypted_value == 'true'
 
                 elif issubclass(type_, datetime.datetime):
                     return datetime.datetime.strptime(
-                        decrypted_value, "%Y-%m-%dT%H:%M:%S")
+                        decrypted_value, '%Y-%m-%dT%H:%M:%S'
+                    )
 
                 elif issubclass(type_, datetime.time):
                     return datetime.datetime.strptime(
-                        decrypted_value, "%H:%M:%S").time()
+                        decrypted_value, '%H:%M:%S'
+                    ).time()
 
                 elif issubclass(type_, datetime.date):
                     return datetime.datetime.strptime(
-                        decrypted_value, "%Y-%m-%d").date()
+                        decrypted_value, '%Y-%m-%d'
+                    ).date()
 
                 # Handle all others
                 return self.underlying_type.python_type(decrypted_value)
