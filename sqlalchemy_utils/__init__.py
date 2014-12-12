@@ -46,6 +46,7 @@ from .listeners import (
 )
 from .generic import generic_relationship
 from .proxy_dict import ProxyDict, proxy_dict
+from .observer import observes
 from .query_chain import QueryChain
 from .types import (
     ArrowType,
@@ -80,7 +81,7 @@ from .types import (
 from .models import Timestamp
 
 
-__version__ = '0.27.11'
+__version__ = '0.28.0'
 
 
 __all__ = (
