@@ -1,6 +1,7 @@
 import six
-from pytest import mark
 import sqlalchemy as sa
+from pytest import mark
+from sqlalchemy.util.langhelpers import symbol
 from sqlalchemy_utils.path import Path, AttrPath
 from tests import TestCase
 
@@ -40,6 +41,17 @@ class TestAttrPath(TestCase):
         self.Document = Document
         self.Section = Section
         self.SubSection = SubSection
+
+    @mark.parametrize(
+        ('class_', 'path', 'direction'),
+        (
+            ('SubSection', 'section', symbol('MANYTOONE')),
+        )
+    )
+    def test_direction(self, class_, path, direction):
+        assert (
+            AttrPath(getattr(self, class_), path).direction == direction
+        )
 
     def test_invert(self):
         path = ~ AttrPath(self.SubSection, 'section.document')

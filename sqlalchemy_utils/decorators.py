@@ -3,7 +3,6 @@ import itertools
 import sqlalchemy as sa
 import six
 from .functions import getdotattr
-from .path import AttrPath
 
 
 class AttributeValueGenerator(object):
@@ -80,6 +79,9 @@ generator = AttributeValueGenerator()
 
 def generates(attr, source=None, generator=generator):
     """
+    .. deprecated:: 0.28.0
+        Use :func:`.observer.observes` instead.
+
     Decorator that marks given function as attribute value generator.
 
     Many times you may have generated property values. Usual cases include
