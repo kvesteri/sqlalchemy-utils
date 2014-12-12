@@ -80,7 +80,7 @@ generator = AttributeValueGenerator()
 def generates(attr, source=None, generator=generator):
     """
     .. deprecated:: 0.28.0
-        Use :meth:`.observer.observes` instead.
+        Use :func:`.observer.observes` instead.
 
     Decorator that marks given function as attribute value generator.
 
