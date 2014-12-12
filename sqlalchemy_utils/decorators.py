@@ -3,7 +3,6 @@ import itertools
 import sqlalchemy as sa
 import six
 from .functions import getdotattr
-from .path import AttrPath
 
 
 class AttributeValueGenerator(object):

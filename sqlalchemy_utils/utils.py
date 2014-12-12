@@ -1,4 +1,7 @@
 import sys
+from collections import Iterable
+
+import six
 
 
 def str_coercible(cls):
@@ -11,3 +14,9 @@ def str_coercible(cls):
 
     cls.__str__ = __str__
     return cls
+
+
+def is_sequence(value):
+    return (
+        isinstance(value, Iterable) and not isinstance(value, six.string_types)
+    )
