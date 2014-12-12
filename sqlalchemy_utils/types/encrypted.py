@@ -187,10 +187,10 @@ class EncryptedType(TypeDecorator, ScalarCoercible):
 
     ::
         def get_key():
-            return "dynamic-key"
+            return 'dynamic-key'
 
         class User(Base):
-            __tablename__ = "user"
+            __tablename__ = 'user'
             id = sa.Column(sa.Integer, primary_key=True)
             username = sa.Column(EncryptedType(
                 sa.Unicode, get_key))
