@@ -1,5 +1,6 @@
 import sqlalchemy as sa
 from sqlalchemy.orm.attributes import InstrumentedAttribute
+from sqlalchemy.util.langhelpers import symbol
 from .utils import str_coercible
 
 
@@ -105,9 +106,22 @@ class AttrPath(object):
             if el is element:
                 return index
 
+    @property
+    def direction(self):
+        symbols = [part.property.direction for part in self.parts]
+        if symbol('MANYTOMANY') in symbols:
+            return symbol('MANYTOMANY')
+        elif symbol('MANYTOONE') in symbols and symbol('ONETOMANY') in symbols:
+            return symbol('MANYTOMANY')
+        return symbols[0]
+
+    @property
+    def uselist(self):
+        return any(part.property.uselist for part in self.parts)
+
     def __getitem__(self, slice):
         result = self.parts[slice]
-        if isinstance(result, list):
+        if isinstance(result, list) and result:
             if result[0] is self.parts[0]:
                 class_ = self.class_
             else:

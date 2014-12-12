@@ -16,6 +16,7 @@ from sqlalchemy.orm.properties import ColumnProperty
 from sqlalchemy.orm.query import _ColumnEntity
 from sqlalchemy.orm.session import object_session
 from sqlalchemy.orm.util import AliasedInsp
+from sqlalchemy_utils.utils import is_sequence
 
 
 def get_column_key(model, column):
@@ -623,7 +624,7 @@ def get_declarative_base(model):
     return model
 
 
-def getdotattr(obj_or_class, dot_path):
+def getdotattr(obj_or_class, dot_path, condition=None):
     """
     Allow dot-notated strings to be passed to `getattr`.
 
@@ -638,20 +639,37 @@ def getdotattr(obj_or_class, dot_path):
     :param dot_path: Attribute path with dot mark as separator
     """
     last = obj_or_class
-    # Coerce object style paths to strings.
-    path = str(dot_path)
 
-    for path in dot_path.split('.'):
+    for path in str(dot_path).split('.'):
         getter = attrgetter(path)
-        if isinstance(last, list):
-            last = sum((getter(el) for el in last), [])
+
+        if is_sequence(last):
+            tmp = []
+            for element in last:
+                value = getter(element)
+                if is_sequence(value):
+                    tmp.extend(value)
+                else:
+                    tmp.append(value)
+            last = tmp
         elif isinstance(last, InstrumentedAttribute):
             last = getter(last.property.mapper.class_)
         elif last is None:
             return None
         else:
             last = getter(last)
+        if condition is not None:
+            if is_sequence(last):
+                last = [v for v in last if condition(v)]
+            else:
+                if not condition(last):
+                    return None
+
     return last
+
+
+def is_deleted(obj):
+    return obj in sa.orm.object_session(obj).deleted
 
 
 def has_changes(obj, attrs=None, exclude=None):
@@ -825,13 +843,10 @@ def naturally_equivalent(obj, obj2):
     :param obj: SQLAlchemy declarative model object
     :param obj2: SQLAlchemy declarative model object to compare with `obj`
     """
-    for prop in sa.inspect(obj.__class__).iterate_properties:
-        if not isinstance(prop, sa.orm.ColumnProperty):
+    for column_key, column in sa.inspect(obj.__class__).columns.items():
+        if column.primary_key:
             continue
 
-        if prop.columns[0].primary_key:
-            continue
-
-        if not (getattr(obj, prop.key) == getattr(obj2, prop.key)):
+        if not (getattr(obj, column_key) == getattr(obj2, column_key)):
             return False
     return True
