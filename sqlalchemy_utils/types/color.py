@@ -6,8 +6,9 @@ from .scalar_coercible import ScalarCoercible
 colour = None
 try:
     import colour
+    python_colour_type = colour.Color
 except ImportError:
-    pass
+    python_colour_type = None
 
 
 class ColorType(types.TypeDecorator, ScalarCoercible):
@@ -49,7 +50,7 @@ class ColorType(types.TypeDecorator, ScalarCoercible):
     """
     STORE_FORMAT = u'hex'
     impl = types.Unicode(20)
-    python_type = colour.Color
+    python_type = python_colour_type
 
     def __init__(self, max_length=20, *args, **kwargs):
         # Fail if colour is not found.
