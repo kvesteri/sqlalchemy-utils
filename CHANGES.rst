@@ -3,6 +3,13 @@ Changelog
 
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
+
+0.28.2 (2014-12-13)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed issue with Color importing (#104)
+
+
 0.28.1 (2014-12-13)
 ^^^^^^^^^^^^^^^^^^^
 
