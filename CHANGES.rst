@@ -3,15 +3,15 @@ Changelog
 
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
-0.28.1 (2014-12-xx)
-^^^^^^^^^^^^^^^^^^^^
+0.28.1 (2014-12-13)
+^^^^^^^^^^^^^^^^^^^
 
 - Improved EncryptedType to support more underlying_type's; now supports: Integer, Boolean, Date, Time, DateTime, ColorType, PhoneNumberType, Unicode(Text), String(Text), Enum
 - Allow a callable to be used to lookup the key for EncryptedType
 
 
 0.28.0 (2014-12-12)
-^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^
 
 - Fixed PhoneNumber string coercion (#93)
 - Added observes decorator (generates decorator will be deprecated later)
