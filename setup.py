@@ -35,7 +35,8 @@ extras_require = {
         'psycopg2>=2.5.1',
         'pytz>=2014.2',
         'python-dateutil>=2.2',
-        'pymysql'
+        'pymysql',
+        'colour>=0.0.4'
     ],
     'anyjson': ['anyjson>=0.3.3'],
     'babel': ['Babel>=1.3'],
