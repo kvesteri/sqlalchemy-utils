@@ -6,7 +6,6 @@ from sqlalchemy_utils.types import color
 from tests import TestCase
 
 
-@mark.skipif('color.colour is None')
 class TestColorType(TestCase):
     def create_models(self):
         class Document(self.Base):
