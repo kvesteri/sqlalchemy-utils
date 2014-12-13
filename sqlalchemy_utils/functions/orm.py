@@ -33,7 +33,7 @@ def get_column_key(model, column):
             name = sa.Column('_name', sa.String)
 
 
-        get_column_key(User, User.__table__.c.name)  # 'name'
+        get_column_key(User, User.__table__.c._name)  # 'name'
 
     .. versionadded: 0.26.5
 
