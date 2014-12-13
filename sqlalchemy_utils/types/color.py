@@ -5,7 +5,8 @@ from .scalar_coercible import ScalarCoercible
 
 colour = None
 try:
-    from colour import Colour as python_colour_type
+    import colour
+    python_colour_type = colour.Color
 except ImportError:
     python_colour_type = None
 
