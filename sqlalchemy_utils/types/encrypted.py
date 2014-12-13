@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 import base64
 import six
-from sqlalchemy.types import TypeDecorator, String
+import datetime
+from sqlalchemy.types import TypeDecorator, String, Binary
 from sqlalchemy_utils.exceptions import ImproperlyConfigured
+from .scalar_coercible import ScalarCoercible
 
 cryptography = None
 try:
@@ -24,13 +26,14 @@ class EncryptionDecryptionBaseEngine(object):
     new engines.
     """
 
-    def __init__(self, key):
-        """Initialize a base engine."""
+    def _update_key(self, key):
         if isinstance(key, six.string_types):
-            key = six.b(key)
-        self._digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
-        self._digest.update(key)
-        self._engine_key = self._digest.finalize()
+            key = key.encode()
+        digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
+        digest.update(key)
+        engine_key = digest.finalize()
+
+        self._initialize_engine(engine_key)
 
     def encrypt(self, value):
         raise NotImplementedError('Subclasses must implement this!')
@@ -44,14 +47,6 @@ class AesEngine(EncryptionDecryptionBaseEngine):
 
     BLOCK_SIZE = 16
     PADDING = six.b('*')
-
-    def __init__(self, key):
-        super(AesEngine, self).__init__(key)
-        self._initialize_engine(self._engine_key)
-
-    def _update_key(self, new_key):
-        parent = EncryptionDecryptionBaseEngine(new_key)
-        self._initialize_engine(parent._engine_key)
 
     def _initialize_engine(self, parent_class_key):
         self.secret_key = parent_class_key
@@ -74,7 +69,7 @@ class AesEngine(EncryptionDecryptionBaseEngine):
             value = repr(value)
         if isinstance(value, six.text_type):
             value = str(value)
-        value = six.b(value)
+        value = value.encode()
         value = self._pad(value)
         encryptor = self.cipher.encryptor()
         encrypted = encryptor.update(value) + encryptor.finalize()
@@ -96,14 +91,6 @@ class AesEngine(EncryptionDecryptionBaseEngine):
 class FernetEngine(EncryptionDecryptionBaseEngine):
     """Provide Fernet encryption and decryption methods."""
 
-    def __init__(self, key):
-        super(FernetEngine, self).__init__(key)
-        self._initialize_engine(self._engine_key)
-
-    def _update_key(self, new_key):
-        parent = EncryptionDecryptionBaseEngine(new_key)
-        self._initialize_engine(parent._engine_key)
-
     def _initialize_engine(self, parent_class_key):
         self.secret_key = base64.urlsafe_b64encode(parent_class_key)
         self.fernet = Fernet(self.secret_key)
@@ -113,7 +100,7 @@ class FernetEngine(EncryptionDecryptionBaseEngine):
             value = repr(value)
         if isinstance(value, six.text_type):
             value = str(value)
-        value = six.b(value)
+        value = value.encode()
         encrypted = self.fernet.encrypt(value)
         return encrypted
 
@@ -126,7 +113,7 @@ class FernetEngine(EncryptionDecryptionBaseEngine):
         return decrypted
 
 
-class EncryptedType(TypeDecorator):
+class EncryptedType(TypeDecorator, ScalarCoercible):
     """
     EncryptedType provides a way to encrypt and decrypt values,
     to and from databases, that their type is a basic SQLAlchemy type.
@@ -194,9 +181,23 @@ class EncryptedType(TypeDecorator):
         Base.metadata.drop_all(connection)
         connection.close()
         engine.dispose()
+
+    The key parameter accepts a callable to allow for the key to change
+    per-row instead of be fixed for the whole table.
+
+    ::
+        def get_key():
+            return 'dynamic-key'
+
+        class User(Base):
+            __tablename__ = 'user'
+            id = sa.Column(sa.Integer, primary_key=True)
+            username = sa.Column(EncryptedType(
+                sa.Unicode, get_key))
+
     """
 
-    impl = String
+    impl = Binary
 
     def __init__(self, type_in=None, key=None, engine=None, **kwargs):
         """Initialization."""
@@ -208,11 +209,13 @@ class EncryptedType(TypeDecorator):
         # set the underlying type
         if type_in is None:
             type_in = String()
-        self.underlying_type = type_in()
+        elif isinstance(type_in, type):
+            type_in = type_in()
+        self.underlying_type = type_in
         self._key = key
         if not engine:
             engine = AesEngine
-        self.engine = engine(self._key)
+        self.engine = engine()
 
     @property
     def key(self):
@@ -221,13 +224,73 @@ class EncryptedType(TypeDecorator):
     @key.setter
     def key(self, value):
         self._key = value
-        self.engine._update_key(self._key)
+
+    def _update_key(self):
+        key = self._key() if callable(self._key) else self._key
+        self.engine._update_key(key)
 
     def process_bind_param(self, value, dialect):
         """Encrypt a value on the way in."""
-        return self.engine.encrypt(value)
+        if value is not None:
+            self._update_key()
+
+            try:
+                value = self.underlying_type.process_bind_param(
+                    value, dialect
+                )
+
+            except AttributeError:
+                # Doesn't have 'process_bind_param'
+
+                # Handle 'boolean' and 'dates'
+                type_ = self.underlying_type.python_type
+                if issubclass(type_, bool):
+                    value = 'true' if value else 'false'
+
+                elif issubclass(type_, (datetime.date, datetime.time)):
+                    value = value.isoformat()
+
+            return self.engine.encrypt(value)
 
     def process_result_value(self, value, dialect):
         """Decrypt value on the way out."""
-        decrypted_value = self.engine.decrypt(value)
-        return self.underlying_type.python_type(decrypted_value)
+        if value is not None:
+            self._update_key()
+            decrypted_value = self.engine.decrypt(value)
+
+            try:
+                return self.underlying_type.process_result_value(
+                    decrypted_value, dialect
+                )
+
+            except AttributeError:
+                # Doesn't have 'process_result_value'
+
+                # Handle 'boolean' and 'dates'
+                type_ = self.underlying_type.python_type
+                if issubclass(type_, bool):
+                    return decrypted_value == 'true'
+
+                elif issubclass(type_, datetime.datetime):
+                    return datetime.datetime.strptime(
+                        decrypted_value, '%Y-%m-%dT%H:%M:%S'
+                    )
+
+                elif issubclass(type_, datetime.time):
+                    return datetime.datetime.strptime(
+                        decrypted_value, '%H:%M:%S'
+                    ).time()
+
+                elif issubclass(type_, datetime.date):
+                    return datetime.datetime.strptime(
+                        decrypted_value, '%Y-%m-%d'
+                    ).date()
+
+                # Handle all others
+                return self.underlying_type.python_type(decrypted_value)
+
+    def _coerce(self, value):
+        if isinstance(self.underlying_type, ScalarCoercible):
+            return self.underlying_type._coerce(value)
+
+        return value
