@@ -375,6 +375,8 @@ except ImportError:
     # SQLAlchemy 0.8
     from sqlalchemy.sql.expression import _FunctionGenerator
 
+from .relationships import chained_join
+
 
 aggregated_attrs = WeakKeyDictionary(defaultdict(list))
 
@@ -452,6 +454,26 @@ def get_aggregate_query(agg_expr, relationships):
     return query.where(condition)
 
 
+def local_condition(prop, objects):
+    pairs = prop.local_remote_pairs
+    if prop.secondary is not None:
+        column = pairs[1][0]
+        key = pairs[1][0].key
+    else:
+        column = pairs[0][0]
+        key = pairs[0][1].key
+
+    values = []
+    for obj in objects:
+        try:
+            values.append(getattr(obj, key))
+        except sa.orm.exc.ObjectDeletedError:
+            pass
+
+    if values:
+        return column.in_(values)
+
+
 class AggregatedValue(object):
     def __init__(self, class_, attr, relationships, expr):
         self.class_ = class_
@@ -480,7 +502,7 @@ class AggregatedValue(object):
         )
         if len(self.relationships) == 1:
             prop = self.relationships[-1].property
-            condition = self.local_condition(prop, objects)
+            condition = local_condition(prop, objects)
             if condition is not None:
                 return query.where(condition)
         else:
@@ -498,7 +520,7 @@ class AggregatedValue(object):
             remote_pairs = property_.local_remote_pairs
             local = remote_pairs[0][0]
             remote = remote_pairs[0][1]
-            condition = self.local_condition(
+            condition = local_condition(
                 self.relationships[0].property,
                 objects
             )
@@ -507,54 +529,14 @@ class AggregatedValue(object):
                     local.in_(
                         sa.select(
                             [remote],
-                            from_obj=[self.multi_level_aggregate_query_base]
+                            from_obj=[
+                                chained_join(*reversed(self.relationships))
+                            ]
                         ).where(
                             condition
                         )
                     )
                 )
-
-    @property
-    def multi_level_aggregate_query_base(self):
-        property_ = self.relationships[-1].property
-
-        from_ = property_.mapper.class_.__table__
-        for relationship in reversed(self.relationships[0:-1]):
-            property_ = relationship.property
-            if property_.secondary is not None:
-                from_ = from_.join(
-                    property_.secondary,
-                    property_.primaryjoin
-                )
-                from_ = from_.join(
-                    property_.mapper.class_,
-                    property_.secondaryjoin
-                )
-            else:
-                from_ = from_.join(
-                    property_.mapper.class_,
-                    property_.primaryjoin
-                )
-        return from_
-
-    def local_condition(self, prop, objects):
-        pairs = prop.local_remote_pairs
-        if prop.secondary is not None:
-            column = pairs[1][0]
-            key = pairs[1][0].key
-        else:
-            column = pairs[0][0]
-            key = pairs[0][1].key
-
-        values = []
-        for obj in objects:
-            try:
-                values.append(getattr(obj, key))
-            except sa.orm.exc.ObjectDeletedError:
-                pass
-
-        if values:
-            return column.in_(values)
 
 
 class AggregationManager(object):
