@@ -6,10 +6,10 @@ import sqlalchemy as sa
 intervals = None
 try:
     import intervals
+    from infinity import inf
 except ImportError:
     pass
 from tests import TestCase
-from infinity import inf
 from sqlalchemy_utils import NumericRangeType
 
 
