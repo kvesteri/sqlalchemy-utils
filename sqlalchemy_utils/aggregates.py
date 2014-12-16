@@ -375,7 +375,8 @@ except ImportError:
     # SQLAlchemy 0.8
     from sqlalchemy.sql.expression import _FunctionGenerator
 
-from .relationships import chained_join
+from .functions.orm import get_column_key
+from .relationships import chained_join, select_aggregate
 
 
 aggregated_attrs = WeakKeyDictionary(defaultdict(list))
@@ -404,64 +405,16 @@ class AggregatedAttribute(declared_attr):
         return desc.column
 
 
-def aggregate_select(agg_expr, relationships):
-    """
-    Return a subquery for fetching an aggregate value of given aggregate
-    expression and given sequence of relationships.
-
-    The returned aggregate query can be used when updating denormalized column
-    value with query such as:
-
-    UPDATE table SET column = {aggregate_query}
-    WHERE {condition}
-
-    :param agg_expr:
-        an expression to be selected, for example sa.func.count('1')
-    :param relationships:
-        Sequence of relationships to be used for building the aggregate
-        query.
-    """
-    from_ = relationships[0].mapper.class_.__table__
-    for relationship in relationships[0:-1]:
-        property_ = relationship.property
-        if property_.secondary is not None:
-            from_ = from_.join(
-                property_.secondary,
-                property_.secondaryjoin
-            )
-
-        from_ = (
-            from_
-            .join(
-                property_.parent.class_,
-                property_.primaryjoin
-            )
-        )
-
-    prop = relationships[-1].property
-    condition = prop.primaryjoin
-    if prop.secondary is not None:
-        from_ = from_.join(
-            prop.secondary,
-            prop.secondaryjoin
-        )
-
-    query = sa.select(
-        [agg_expr],
-        from_obj=[from_]
-    )
-
-    return query.where(condition)
-
-
 def local_condition(prop, objects):
     pairs = prop.local_remote_pairs
     if prop.secondary is not None:
-        column = pairs[1][0]
-        key = pairs[1][0].key
+        parent_column = pairs[1][0]
+        fetched_column = pairs[1][0]
     else:
-        column = pairs[0][0]
-        key = pairs[0][1].key
+        parent_column = pairs[0][0]
+        fetched_column = pairs[0][1]
+
+    key = get_column_key(prop.mapper, fetched_column)
 
     values = []
     for obj in objects:
@@ -471,7 +424,7 @@ def local_condition(prop, objects):
             pass
 
     if values:
-        return column.in_(values)
+        return parent_column.in_(values)
 
 
 def aggregate_expression(expr, class_):
@@ -492,7 +445,7 @@ class AggregatedValue(object):
 
     @property
     def aggregate_query(self):
-        query = aggregate_select(self.expr, self.relationships)
+        query = select_aggregate(self.expr, self.relationships)
 
         return query.correlate(self.class_).as_scalar()
 

@@ -1,4 +1,7 @@
 def chained_join(*relationships):
+    """
+    Return a chained Join object for given relationships.
+    """
     property_ = relationships[0].property
 
     if property_.secondary is not None:

@@ -14,7 +14,7 @@ class TestChainedJoinFoDeepToManyToMany(ThreeLevelDeepManyToMany, TestCase):
     def test_simple_join(self):
         assert str(chained_join(self.Catalog.categories)) == (
             'catalog_category JOIN category ON '
-            'category.id = catalog_category.category_id'
+            'category._id = catalog_category.category_id'
         )
 
     def test_two_relations(self):
@@ -23,10 +23,11 @@ class TestChainedJoinFoDeepToManyToMany(ThreeLevelDeepManyToMany, TestCase):
             self.Category.sub_categories
         )
         assert str(sql) == (
-            'catalog_category JOIN category ON category.id = '
+            'catalog_category JOIN category ON category._id = '
             'catalog_category.category_id JOIN category_subcategory ON '
-            'category.id = category_subcategory.category_id JOIN sub_category '
-            'ON sub_category.id = category_subcategory.subcategory_id'
+            'category._id = category_subcategory.category_id JOIN '
+            'sub_category ON sub_category._id = '
+            'category_subcategory.subcategory_id'
         )
 
     def test_three_relations(self):
@@ -36,13 +37,13 @@ class TestChainedJoinFoDeepToManyToMany(ThreeLevelDeepManyToMany, TestCase):
             self.SubCategory.products
         )
         assert str(sql) == (
-            'catalog_category JOIN category ON category.id = '
+            'catalog_category JOIN category ON category._id = '
             'catalog_category.category_id JOIN category_subcategory ON '
-            'category.id = category_subcategory.category_id JOIN sub_category '
-            'ON sub_category.id = category_subcategory.subcategory_id JOIN '
-            'subcategory_product ON sub_category.id = '
-            'subcategory_product.subcategory_id JOIN product ON product.id = '
-            'subcategory_product.product_id'
+            'category._id = category_subcategory.category_id JOIN sub_category'
+            ' ON sub_category._id = category_subcategory.subcategory_id JOIN '
+            'subcategory_product ON sub_category._id = '
+            'subcategory_product.subcategory_id JOIN product ON product._id ='
+            ' subcategory_product.product_id'
         )
 
 
@@ -59,8 +60,8 @@ class TestChainedJoinForDeepOneToMany(ThreeLevelDeepOneToMany, TestCase):
             self.Category.sub_categories
         )
         assert str(sql) == (
-            'category JOIN sub_category ON category.id = '
-            'sub_category.category_id'
+            'category JOIN sub_category ON category._id = '
+            'sub_category._category_id'
         )
 
     def test_three_relations(self):
@@ -70,9 +71,9 @@ class TestChainedJoinForDeepOneToMany(ThreeLevelDeepOneToMany, TestCase):
             self.SubCategory.products
         )
         assert str(sql) == (
-            'category JOIN sub_category ON category.id = '
-            'sub_category.category_id JOIN product ON sub_category.id = '
-            'product.sub_category_id'
+            'category JOIN sub_category ON category._id = '
+            'sub_category._category_id JOIN product ON sub_category._id = '
+            'product._sub_category_id'
         )
 
 
@@ -89,8 +90,8 @@ class TestChainedJoinForDeepOneToOne(ThreeLevelDeepOneToOne, TestCase):
             self.Category.sub_category
         )
         assert str(sql) == (
-            'category JOIN sub_category ON category.id = '
-            'sub_category.category_id'
+            'category JOIN sub_category ON category._id = '
+            'sub_category._category_id'
         )
 
     def test_three_relations(self):
@@ -100,7 +101,7 @@ class TestChainedJoinForDeepOneToOne(ThreeLevelDeepOneToOne, TestCase):
             self.SubCategory.product
         )
         assert str(sql) == (
-            'category JOIN sub_category ON category.id = '
-            'sub_category.category_id JOIN product ON sub_category.id = '
-            'product.sub_category_id'
+            'category JOIN sub_category ON category._id = '
+            'sub_category._category_id JOIN product ON sub_category._id = '
+            'product._sub_category_id'
         )
