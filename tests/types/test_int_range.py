@@ -1,12 +1,13 @@
 from pytest import mark
 import sqlalchemy as sa
 intervals = None
+inf = -1
 try:
     import intervals
+    from infinity import inf
 except ImportError:
     pass
 from tests import TestCase
-from infinity import inf
 from sqlalchemy_utils import IntRangeType
 
 
