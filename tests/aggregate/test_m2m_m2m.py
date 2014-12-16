@@ -76,6 +76,5 @@ class TestAggregateManyToManyAndManyToMany(TestCase):
         catalog2 = self.Catalog(products=products)
         self.session.add(catalog)
         self.session.commit()
-        print self.connection.queries[-1]
         assert catalog.category_count == 1
         assert catalog2.category_count == 1

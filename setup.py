@@ -36,7 +36,6 @@ extras_require = {
         'pytz>=2014.2',
         'python-dateutil>=2.2',
         'pymysql',
-        'colour>=0.0.4'
     ],
     'anyjson': ['anyjson>=0.3.3'],
     'babel': ['Babel>=1.3'],
@@ -53,9 +52,10 @@ extras_require = {
 
 
 # Add all optional dependencies to testing requirements.
+test_all = []
 for name, requirements in extras_require.items():
-    if name != 'test':
-        extras_require['test'] += requirements
+    test_all += requirements
+extras_require['test_all'] = test_all
 
 
 setup(

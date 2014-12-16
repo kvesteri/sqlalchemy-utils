@@ -17,10 +17,6 @@ def count_sql_calls(conn, cursor, statement, parameters, context, executemany):
         conn.query_count += 1
     except AttributeError:
         conn.query_count = 0
-    try:
-        conn.queries.append(statement)
-    except AttributeError:
-        conn.queries = [statement]
 
 
 warnings.simplefilter('error', sa.exc.SAWarning)
@@ -59,7 +55,6 @@ class TestCase(object):
     def teardown_method(self, method):
         aggregates.manager.reset()
         self.session.close_all()
-        self.connection.queries = []
         if self.create_tables:
             self.Base.metadata.drop_all(self.connection)
         self.connection.close()
