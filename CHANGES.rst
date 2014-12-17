@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.28.3 (2014-12-17)
+^^^^^^^^^^^^^^^^^^^
+
+- Made aggregated fully support column aliases
+- Changed test matrix to run all tests without any optional dependencies (as well as with all optional dependencies)
+
+
 0.28.2 (2014-12-13)
 ^^^^^^^^^^^^^^^^^^^
 
