@@ -13,7 +13,12 @@ python:
   - 3.3
   - 3.4
 
+env:
+  - EXTRAS=test
+  - EXTRAS=test_all
+
 install:
-  - pip install -e ".[test]"
+  - pip install -e .[$EXTRAS]
+
 script:
   - py.test
