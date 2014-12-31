@@ -326,7 +326,7 @@ Average movie rating
 
         @aggregated('ratings', sa.Column(sa.Numeric))
         def avg_rating(self):
-            return sa.func.sum(Product.price)
+            return sa.func.avg(Rating.stars)
 
         ratings = sa.orm.relationship('Rating')
 
