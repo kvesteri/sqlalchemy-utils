@@ -1,15 +1,6 @@
-from pytest import raises
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
-from sqlalchemy_utils.types import TSVectorType
-from sqlalchemy_utils.expressions import (
-    explain,
-    explain_analyze,
-    tsvector_match,
-    tsvector_concat,
-    to_tsquery,
-    plainto_tsquery
-)
+from sqlalchemy_utils.expressions import explain, explain_analyze
 from tests import TestCase
 
 
@@ -22,8 +13,6 @@ class ExpressionTestCase(TestCase):
             id = sa.Column(sa.Integer, primary_key=True)
             name = sa.Column(sa.Unicode(255))
             content = sa.Column(sa.UnicodeText)
-            search_vector = sa.Column(TSVectorType)
-            search_vector2 = sa.Column(TSVectorType)
 
         self.Article = Article
 

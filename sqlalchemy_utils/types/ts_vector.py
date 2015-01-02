@@ -28,7 +28,7 @@ class TSVectorType(sa.types.TypeDecorator):
         from sqlalchemy_utils import TSVectorType
 
 
-        class Article(self.Base):
+        class Article(Base):
             __tablename__ = 'user'
             id = sa.Column(sa.Integer, primary_key=True)
             name = sa.Column(sa.String(100))
@@ -44,7 +44,7 @@ class TSVectorType(sa.types.TypeDecorator):
     ::
 
 
-        class Article(self.Base):
+        class Article(Base):
             __tablename__ = 'user'
             id = sa.Column(sa.Integer, primary_key=True)
             name = sa.Column(sa.String(100))
@@ -60,7 +60,7 @@ class TSVectorType(sa.types.TypeDecorator):
     You can configure TSVectorType to use a specific regconfig.
     ::
 
-        class Article(self.Base):
+        class Article(Base):
             __tablename__ = 'user'
             id = sa.Column(sa.Integer, primary_key=True)
             name = sa.Column(sa.String(100))
