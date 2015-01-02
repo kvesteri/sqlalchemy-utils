@@ -4,6 +4,15 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.29.0 (2015-01-02)
+^^^^^^^^^^^^^^^^^^^
+
+- Removed TSVectorType.match_tsquery (now replaced by TSVectorType.match to be compatible with SQLAlchemy)
+- Removed undocumented function tsvector_concat
+- Added support for TSVectorType concatenation through OR operator
+- Added documentation for TSVectorType (#102)
+
+
 0.28.3 (2014-12-17)
 ^^^^^^^^^^^^^^^^^^^
 

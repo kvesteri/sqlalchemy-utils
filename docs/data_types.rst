@@ -103,6 +103,14 @@ TimezoneType
 .. autoclass:: TimezoneType
 
 
+TSVectorType
+^^^^^^^^^^^^
+
+.. module:: sqlalchemy_utils.types.ts_vector
+
+.. autoclass:: TSVectorType
+
+
 URLType
 ^^^^^^^
 
