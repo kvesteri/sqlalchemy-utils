@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.29.1 (2015-01-03)
+^^^^^^^^^^^^^^^^^^^
+
+- Added assert_min_value and assert_max_value testing functions
+
+
 0.29.0 (2015-01-02)
 ^^^^^^^^^^^^^^^^^^^
 
