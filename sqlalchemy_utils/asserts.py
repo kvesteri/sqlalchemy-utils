@@ -44,9 +44,7 @@ class raises(object):
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        if exc_type != self.expected_exc:
-            return False
-        return True
+        return exc_type == self.expected_exc
 
 
 def _update_field(obj, field, value):
@@ -101,6 +99,31 @@ def assert_max_length(obj, column, max_length):
 
     :param obj: SQLAlchemy declarative model object
     :param column: Name of the column
+    :param max_length: Maximum length of given column
     """
     _expect_successful_update(obj, column, u'a' * max_length, DataError)
     _expect_failing_update(obj, column, u'a' * (max_length + 1), DataError)
+
+
+def assert_min_value(obj, column, min_value):
+    """
+    Assert that the given column must have a minimum value of `min_value`.
+
+    :param obj: SQLAlchemy declarative model object
+    :param column: Name of the column
+    :param min_value: The minimum allowed value for given column
+    """
+    _expect_successful_update(obj, column, min_value, IntegrityError)
+    _expect_failing_update(obj, column, min_value - 1, IntegrityError)
+
+
+def assert_max_value(obj, column, min_value):
+    """
+    Assert that the given column must have a minimum value of `max_value`.
+
+    :param obj: SQLAlchemy declarative model object
+    :param column: Name of the column
+    :param max_value: The maximum allowed value for given column
+    """
+    _expect_successful_update(obj, column, min_value, IntegrityError)
+    _expect_failing_update(obj, column, min_value + 1, IntegrityError)

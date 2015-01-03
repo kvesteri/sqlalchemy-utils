@@ -1,9 +1,11 @@
 import sqlalchemy as sa
 import pytest
 from sqlalchemy_utils import (
+    assert_min_value,
+    assert_max_length,
+    assert_max_value,
     assert_nullable,
-    assert_non_nullable,
-    assert_max_length
+    assert_non_nullable
 )
 from sqlalchemy_utils.asserts import raises
 
@@ -32,6 +34,10 @@ class AssertionTestCase(TestCase):
             name = sa.Column(sa.String(20))
             age = sa.Column(sa.Integer, nullable=False)
             email = sa.Column(sa.String(200), nullable=False, unique=True)
+
+            __table_args__ = (
+                sa.CheckConstraint(sa.and_(age >= 0, age <= 150)),
+            )
 
         self.User = User
 
@@ -88,3 +94,39 @@ class TestAssertMaxLength(AssertionTestCase):
             assert_max_length(self.user, 'name', 21)
         with raises(AssertionError):
             assert_max_length(self.user, 'name', 21)
+
+
+class TestAssertMinValue(AssertionTestCase):
+    def test_with_min_value(self):
+        assert_min_value(self.user, 'age', 0)
+        assert_min_value(self.user, 'age', 0)
+
+    def test_smaller_than_min_value(self):
+        with raises(AssertionError):
+            assert_min_value(self.user, 'age', -1)
+        with raises(AssertionError):
+            assert_min_value(self.user, 'age', -1)
+
+    def test_bigger_than_min_value(self):
+        with raises(AssertionError):
+            assert_min_value(self.user, 'age', 1)
+        with raises(AssertionError):
+            assert_min_value(self.user, 'age', 1)
+
+
+class TestAssertMaxValue(AssertionTestCase):
+    def test_with_min_value(self):
+        assert_max_value(self.user, 'age', 150)
+        assert_max_value(self.user, 'age', 150)
+
+    def test_smaller_than_max_value(self):
+        with raises(AssertionError):
+            assert_max_value(self.user, 'age', 149)
+        with raises(AssertionError):
+            assert_max_value(self.user, 'age', 149)
+
+    def test_bigger_than_max_value(self):
+        with raises(AssertionError):
+            assert_max_value(self.user, 'age', 151)
+        with raises(AssertionError):
+            assert_max_value(self.user, 'age', 151)

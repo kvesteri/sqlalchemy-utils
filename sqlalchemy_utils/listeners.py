@@ -113,7 +113,8 @@ def auto_delete_orphans(attr):
     """
     Delete orphans for given SQLAlchemy model attribute. This function can be
     used for deleting many-to-many associated orphans easily. For more
-    information see https://bitbucket.org/zzzeek/sqlalchemy/wiki/UsageRecipes/ManyToManyOrphan.
+    information see
+    https://bitbucket.org/zzzeek/sqlalchemy/wiki/UsageRecipes/ManyToManyOrphan.
 
     Consider the following model definition:
 
