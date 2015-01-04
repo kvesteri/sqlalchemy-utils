@@ -184,7 +184,7 @@ def make_order_by_deterministic(query):
         else:
             column = order_by
 
-    # Queries that are ordered by an already
+    # Skip queries that are ordered by an already deterministic column
     if isinstance(column, sa.Column):
         try:
             if has_unique_index(column):
