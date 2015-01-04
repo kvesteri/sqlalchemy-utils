@@ -1,4 +1,3 @@
-from .defer_except import defer_except
 from .mock import create_mock_engine, mock_engine
 from .render import render_expression, render_statement
 from .sort_query import (
@@ -47,7 +46,6 @@ __all__ = (
     'create_database',
     'create_mock_engine',
     'database_exists',
-    'defer_except',
     'dependent_objects',
     'drop_database',
     'escape_like',
