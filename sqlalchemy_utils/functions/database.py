@@ -399,7 +399,7 @@ def drop_database(url):
         engine.raw_connection().set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         
         pid_column_query = '''
-        SELECT name FROM information_schema.columns
+        SELECT column_name FROM information_schema.columns
         WHERE table_name = 'pg_stat_activity'
         AND column_name = 'pid';
         '''
