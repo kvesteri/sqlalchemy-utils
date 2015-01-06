@@ -397,17 +397,19 @@ def drop_database(url):
     elif engine.dialect.name == 'postgresql' and engine.driver == 'psycopg2':
         from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
         engine.raw_connection().set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+        
+        pid_column_query = '''
+        SELECT name FROM information_schema.columns
+        WHERE table_name = 'pg_stat_activity'
+        AND column_name = 'pid';
+        '''
+        # This will be 'pid' or None
+        pid_column_result = engine.execute(pid_column_query).fetchall()
 
-        # Disconnect all users from the database we are dropping.
-        version = list(
-            map(
-                int,
-                engine.execute('SHOW server_version;').first()[0].split('.')
-            )
-        )
         pid_column = (
-            'pid' if (version[0] >= 9 and version[1] >= 2) else 'procpid'
+            'pid' if pid_column_result else 'procpid'
         )
+        
         text = '''
         SELECT pg_terminate_backend(pg_stat_activity.%(pid_column)s)
         FROM pg_stat_activity
