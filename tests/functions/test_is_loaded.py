@@ -22,4 +22,3 @@ class TestIsLoaded(object):
     def test_unloaded_property(self):
         article = self.Article(id=4)
         assert not is_loaded(article, 'title')
-

@@ -4,10 +4,11 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
-0.29.2 (2015-01-xx)
+0.29.2 (2015-01-08)
 ^^^^^^^^^^^^^^^^^^^
 
 - Removed deprecated defer_except (SQLAlchemy's own load_only should be used from now on)
+- Added json_sql PostgreSQL helper function
 
 
 0.29.1 (2015-01-03)

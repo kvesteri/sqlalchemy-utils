@@ -1,3 +1,5 @@
+import collections
+import itertools
 import os
 from copy import copy
 
@@ -103,6 +105,75 @@ def escape_like(string, escape_char='*'):
         .replace('%', escape_char + '%')
         .replace('_', escape_char + '_')
     )
+
+
+def json_sql(value, scalars_to_json=True):
+    """
+    Convert python data structures to PostgreSQL specific SQLAlchemy JSON
+    constructs. This function is extremly useful if you need to build
+    PostgreSQL JSON on python side.
+
+    .. note::
+
+        This function needs PostgreSQL >= 9.4
+
+    Scalars are converted to to_json SQLAlchemy function objects
+
+    ::
+
+        json_sql(1)     # Equals SQL: to_json(1)
+
+        json_sql('a')   # to_json('a')
+
+
+    Mappings are converted to json_build_object constructs
+
+    ::
+
+        json_sql({'a': 'c', '2': 5})  # json_build_object('a', 'c', '2', 5)
+
+
+    Sequences (other than strings) are converted to json_build_array constructs
+
+    ::
+
+        json_sql([1, 2, 3])  # json_build_array(1, 2, 3)
+
+
+    You can also nest these data structures
+
+    ::
+
+        json_sql({'a': [1, 2, 3]})
+        # json_build_object('a', json_build_array[1, 2, 3])
+
+
+    :param value:
+        value to be converted to SQLAlchemy PostgreSQL function constructs
+    """
+    scalar_convert = sa.text
+    if scalars_to_json:
+        scalar_convert = lambda a: sa.func.to_json(sa.text(a))
+
+    if isinstance(value, collections.Mapping):
+        return sa.func.json_build_object(
+            *(
+                json_sql(v, scalars_to_json=False)
+                for v in itertools.chain(*value.items())
+            )
+        )
+    elif isinstance(value, str):
+        return scalar_convert("'{0}'".format(value))
+    elif isinstance(value, collections.Sequence):
+        return sa.func.json_build_array(
+            *(
+                json_sql(v, scalars_to_json=False)
+                for v in value
+            )
+        )
+    elif isinstance(value, (int, float)):
+        return scalar_convert(str(value))
+    return value
 
 
 def has_index(column):

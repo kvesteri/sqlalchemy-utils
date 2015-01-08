@@ -14,6 +14,7 @@ from .database import (
     has_index,
     has_unique_index,
     is_auto_assigned_date_column,
+    json_sql
 )
 from .foreign_keys import (
     dependent_objects,
@@ -65,6 +66,7 @@ __all__ = (
     'is_loaded',
     'is_auto_assigned_date_column',
     'is_indexed_foreign_key',
+    'json_sql',
     'make_order_by_deterministic',
     'mock_engine',
     'naturally_equivalent',

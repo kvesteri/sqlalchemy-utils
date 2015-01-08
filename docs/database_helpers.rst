@@ -41,6 +41,12 @@ has_unique_index
 .. autofunction:: has_unique_index
 
 
+json_sql
+^^^^^^^^
+
+.. autofunction:: json_sql
+
+
 render_expression
 ^^^^^^^^^^^^^^^^^
 

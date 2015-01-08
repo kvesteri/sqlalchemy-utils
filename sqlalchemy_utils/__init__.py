@@ -34,6 +34,7 @@ from .functions import (
     has_unique_index,
     identity,
     is_loaded,
+    json_sql,
     merge_references,
     mock_engine,
     naturally_equivalent,
@@ -86,7 +87,7 @@ from .types import (
 from .models import Timestamp
 
 
-__version__ = '0.29.1'
+__version__ = '0.29.2'
 
 
 __all__ = (
