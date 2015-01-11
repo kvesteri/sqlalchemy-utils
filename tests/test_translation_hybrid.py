@@ -38,29 +38,9 @@ class TestTranslationHybrid(TestCase):
         self.translation_hybrid.current_locale = 'sv'
         assert city.name == 'Helsinki'
 
-
-class TestTranslationHybridWithDynamicDefaultLocale(TestCase):
-    dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
-
-    def create_models(self):
-        class City(self.Base):
-            __tablename__ = 'city'
-            id = sa.Column(sa.Integer, primary_key=True)
-            name_translations = sa.Column(JSON)
-            name = self.translation_hybrid(name_translations)
-            locale = sa.Column(sa.String(10))
-
-        self.City = City
-
-    def setup_method(self, method):
-        self.translation_hybrid = TranslationHybrid(
-            'fi',
-            lambda self: self.locale
-        )
-        TestCase.setup_method(self, method)
-
     def test_fallback_to_dynamic_locale(self):
         self.translation_hybrid.current_locale = 'en'
+        self.translation_hybrid.default_locale = lambda self: self.locale
         city = self.City(name_translations={})
         city.locale = 'fi'
         city.name_translations['fi'] = 'Helsinki'
