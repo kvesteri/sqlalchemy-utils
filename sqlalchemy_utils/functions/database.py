@@ -26,7 +26,15 @@ class PlanAnalysis(object):
 class QueryAnalysis(object):
     def __init__(self, result_set):
         self.plan = result_set[0]['Plan']
-        self.runtime = result_set[0]['Total Runtime']
+        if 'Total Runtime' in result_set[0]:
+            # PostgreSQL versions < 9.4
+            self.runtime = result_set[0]['Total Runtime']
+        else:
+            # PostgreSQL versions >= 9.4
+            self.runtime = (
+                result_set[0]['Execution Time'] +
+                result_set[0]['Planning Time']
+            )
 
     @property
     def node_types(self):
