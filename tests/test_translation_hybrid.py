@@ -1,5 +1,5 @@
 import sqlalchemy as sa
-from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy_utils import TranslationHybrid
 
 from tests import TestCase
@@ -12,7 +12,7 @@ class TestTranslationHybrid(TestCase):
         class City(self.Base):
             __tablename__ = 'city'
             id = sa.Column(sa.Integer, primary_key=True)
-            name_translations = sa.Column(JSON())
+            name_translations = sa.Column(HSTORE)
             name = self.translation_hybrid(name_translations)
             locale = 'en'
 
@@ -46,3 +46,12 @@ class TestTranslationHybrid(TestCase):
         city.name_translations['fi'] = 'Helsinki'
 
         assert city.name == 'Helsinki'
+
+    def test_hybrid_as_an_expression(self):
+        city = self.City(name_translations={'en': 'Helsinki'})
+        self.session.add(city)
+        self.session.commit()
+
+        assert city == self.session.query(self.City).filter(
+            self.City.name['en'] == 'Helsinki'
+        ).first()
