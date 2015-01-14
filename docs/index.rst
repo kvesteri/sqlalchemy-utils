@@ -15,6 +15,7 @@ SQLAlchemy-Utils provides custom data types and various utility functions for SQ
    aggregates
    observers
    decorators
+   internationalization
    generic_relationship
    database_helpers
    foreign_key_helpers
