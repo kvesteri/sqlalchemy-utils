@@ -45,6 +45,7 @@ extras_require = {
     'password': ['passlib >= 1.6, < 2.0'],
     'color': ['colour>=0.0.4'],
     'ipaddress': ['ipaddr'] if not PY3 else [],
+    'enum': ['enum34'] if sys.version_info < (3, 4) else [],
     'timezone': ['python-dateutil'],
     'url': ['furl >= 0.4.1'],
     'encrypted': ['cryptography>=0.6']

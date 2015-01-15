@@ -45,6 +45,13 @@ EncryptedType
 
 .. autoclass:: EncryptedType
 
+EnumType
+^^^^^^^^
+
+.. module:: sqlalchemy_utils.types.enum
+
+.. autoclass:: EnumType
+
 JSONType
 ^^^^^^^^
 
