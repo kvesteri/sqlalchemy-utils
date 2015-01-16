@@ -88,6 +88,22 @@ class TestPhoneNumberType(TestCase):
         )
         assert result.first()[0] == u'+358401234567'
 
+    def test_phone_number_with_extension(self):
+        user = self.User(phone_number='555-555-5555 Ext. 555')
+
+        self.session.add(user)
+        self.session.commit()
+        self.session.refresh(user)
+        assert user.phone_number.extension == '555'
+
+    def test_empty_phone_number_is_equiv_to_none(self):
+        user = self.User(phone_number='')
+
+        self.session.add(user)
+        self.session.commit()
+        self.session.refresh(user)
+        assert user.phone_number is None
+
     def test_phone_number_is_none(self):
         phone_number = None
         user = self.User()

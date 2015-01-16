@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.30.12 (2015-07-05)
+^^^^^^^^^^^^^^^^^^^^
+
+- Added support for PhoneNumber extensions (#121)
+
+
 0.30.11 (2015-06-18)
 ^^^^^^^^^^^^^^^^^^^^
 

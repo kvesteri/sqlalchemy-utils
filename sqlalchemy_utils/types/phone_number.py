@@ -109,10 +109,14 @@ class PhoneNumberType(types.TypeDecorator, ScalarCoercible):
 
     def process_bind_param(self, value, dialect):
         if value:
-            if isinstance(value, PhoneNumber):
-                return getattr(value, self.STORE_FORMAT)
-            else:
-                return getattr(PhoneNumber(value), self.STORE_FORMAT)
+            if not isinstance(value, PhoneNumber):
+                value = PhoneNumber(value, country_code=self.country_code)
+
+            if self.STORE_FORMAT == 'e164' and value.extension:
+                return '%s;ext=%s' % (value.e164, value.extension)
+
+            return getattr(value, self.STORE_FORMAT)
+
         return value
 
     def process_result_value(self, value, dialect):
@@ -121,6 +125,7 @@ class PhoneNumberType(types.TypeDecorator, ScalarCoercible):
         return value
 
     def _coerce(self, value):
-        if value is not None and not isinstance(value, PhoneNumber):
+        if value and not isinstance(value, PhoneNumber):
             value = PhoneNumber(value, country_code=self.country_code)
-        return value
+
+        return value or None
