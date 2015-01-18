@@ -6,7 +6,6 @@ from .color import ColorType
 from .country import CountryType, Country
 from .email import EmailType
 from .encrypted import EncryptedType
-from .enum import EnumType
 from .ip_address import IPAddressType
 from .json import JSONType
 from .locale import LocaleType
@@ -37,7 +36,6 @@ __all__ = (
     DateTimeRangeType,
     EmailType,
     EncryptedType,
-    EnumType,
     IntRangeType,
     IPAddressType,
     JSONType,
