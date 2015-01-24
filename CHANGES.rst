@@ -4,10 +4,11 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
-0.29.3 (2015-xx-xx)
+0.29.3 (2015-01-24)
 ^^^^^^^^^^^^^^^^^^^
 
 - Fixed analyze function runtime property handling for PostgreSQL >= 9.4
+- Fixed drop_database and create_database identifier quoting (#122)
 
 
 0.29.2 (2015-01-08)

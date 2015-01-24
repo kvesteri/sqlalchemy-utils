@@ -8,6 +8,8 @@ from sqlalchemy.engine.url import make_url
 from sqlalchemy.exc import ProgrammingError, OperationalError
 from sqlalchemy_utils.expressions import explain_analyze
 
+from .orm import quote
+
 
 class PlanAnalysis(object):
     def __init__(self, plan):
@@ -429,20 +431,25 @@ def create_database(url, encoding='utf8', template=None):
         if not template:
             template = 'template0'
 
-        text = "CREATE DATABASE %s ENCODING '%s' TEMPLATE %s" % (
-            database, encoding, template
+        text = "CREATE DATABASE {0} ENCODING '{1}' TEMPLATE {2}".format(
+            quote(engine, database),
+            encoding,
+            quote(engine, template)
         )
         engine.execute(text)
 
     elif engine.dialect.name == 'mysql':
-        text = "CREATE DATABASE %s CHARACTER SET = '%s'" % (database, encoding)
+        text = "CREATE DATABASE {0} CHARACTER SET = '{1}'".format(
+            quote(engine, database),
+            encoding
+        )
         engine.execute(text)
 
     elif engine.dialect.name == 'sqlite' and database != ':memory:':
         open(database, 'w').close()
 
     else:
-        text = "CREATE DATABASE %s" % database
+        text = 'CREATE DATABASE {0}'.format(quote(engine, database))
         engine.execute(text)
 
 
@@ -481,7 +488,7 @@ def drop_database(url):
         version = list(
             map(
                 int,
-                engine.execute('SHOW server_version;').first()[0].split('.')
+                engine.execute('SHOW server_version').first()[0].split('.')
             )
         )
         pid_column = (
@@ -496,9 +503,9 @@ def drop_database(url):
         engine.execute(text)
 
         # Drop the database.
-        text = "DROP DATABASE %s" % database
+        text = 'DROP DATABASE {0}'.format(quote(engine, database))
         engine.execute(text)
 
     else:
-        text = "DROP DATABASE %s" % database
+        text = 'DROP DATABASE {0}'.format(quote(engine, database))
         engine.execute(text)

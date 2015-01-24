@@ -28,7 +28,6 @@ class DatabaseTest(TestCase):
 
 
 class TestDatabaseSQLite(DatabaseTest):
-
     url = 'sqlite:///sqlalchemy_utils.db'
 
     def setup(self):
@@ -42,6 +41,30 @@ class TestDatabaseSQLite(DatabaseTest):
 @mark.skipif('pymysql is None')
 class TestDatabaseMySQL(DatabaseTest):
     url = 'mysql+pymysql://travis@localhost/db_test_sqlalchemy_util'
+
+
+@mark.skipif('pymysql is None')
+class TestDatabaseMySQLWithQuotedName(DatabaseTest):
+    url = 'mysql+pymysql://travis@localhost/db_test_sqlalchemy-util'
+
+
+class TestDatabasePostgresWithQuotedName(DatabaseTest):
+    url = 'postgres://postgres@localhost/db_test_sqlalchemy-util'
+
+    def test_template(self):
+        (
+            flexmock(sa.engine.Engine)
+            .should_receive('execute')
+            .with_args(
+                '''CREATE DATABASE "db_test_sqlalchemy-util"'''
+                " ENCODING 'utf8' "
+                'TEMPLATE "my-template"'
+            )
+        )
+        create_database(
+            'postgres://postgres@localhost/db_test_sqlalchemy-util',
+            template='my-template'
+        )
 
 
 class TestDatabasePostgres(DatabaseTest):
