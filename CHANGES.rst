@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.29.4 (2015-01-31)
+^^^^^^^^^^^^^^^^^^^
+
+- Made CaseInsensitiveComparator not cast already lowercased types to lowercase
+
+
 0.29.3 (2015-01-24)
 ^^^^^^^^^^^^^^^^^^^
 

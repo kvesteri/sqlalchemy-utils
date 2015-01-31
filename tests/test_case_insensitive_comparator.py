@@ -42,3 +42,8 @@ class TestCaseInsensitiveComparator(TestCase):
             '"user".email NOT IN (lower(:lower_1), lower(:lower_2))'
             in str(query)
         )
+
+    def test_does_not_apply_lower_to_types_that_are_already_lowercased(self):
+        assert str(self.User.email == self.User.email) == (
+            '"user".email = "user".email'
+        )

@@ -1,17 +1,41 @@
 import sqlalchemy as sa
 
 
+def inspect_type(mixed):
+    if isinstance(mixed, sa.orm.attributes.InstrumentedAttribute):
+        return mixed.property.columns[0].type
+    elif isinstance(mixed, sa.orm.ColumnProperty):
+        return mixed.columns[0].type
+    elif isinstance(mixed, sa.Column):
+        return mixed.type
+
+
+def is_case_insensitive(mixed):
+    try:
+        return isinstance(
+            inspect_type(mixed).comparator,
+            CaseInsensitiveComparator
+        )
+    except AttributeError:
+        try:
+            return issubclass(
+                inspect_type(mixed).comparator_factory,
+                CaseInsensitiveComparator
+            )
+        except AttributeError:
+            return False
+
+
 class CaseInsensitiveComparator(sa.Unicode.Comparator):
     @classmethod
     def lowercase_arg(cls, func):
         def operation(self, other, **kwargs):
+            operator = getattr(sa.Unicode.Comparator, func)
             if other is None:
-                return getattr(sa.Unicode.Comparator, func)(
-                    self, other, **kwargs
-                )
-            return getattr(sa.Unicode.Comparator, func)(
-                self, sa.func.lower(other), **kwargs
-            )
+                return operator(self, other, **kwargs)
+            if not is_case_insensitive(other):
+                other = sa.func.lower(other)
+            return operator(self, other, **kwargs)
         return operation
 
     def in_(self, other):
