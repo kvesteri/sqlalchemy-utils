@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.29.5 (2015-02-03)
+^^^^^^^^^^^^^^^^^^^
+
+- Made assert_max_length support PostgreSQL array type
+
+
 0.29.4 (2015-01-31)
 ^^^^^^^^^^^^^^^^^^^
 

@@ -1,5 +1,6 @@
 import sqlalchemy as sa
 import pytest
+from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy_utils import (
     assert_min_value,
     assert_max_length,
@@ -34,19 +35,48 @@ class AssertionTestCase(TestCase):
             name = sa.Column(sa.String(20))
             age = sa.Column(sa.Integer, nullable=False)
             email = sa.Column(sa.String(200), nullable=False, unique=True)
+            fav_numbers = sa.Column(ARRAY(sa.Integer))
 
             __table_args__ = (
                 sa.CheckConstraint(sa.and_(age >= 0, age <= 150)),
+                sa.CheckConstraint(
+                    sa.and_(
+                        sa.func.array_length(fav_numbers, 1) <= 8
+                    )
+                )
             )
 
         self.User = User
 
     def setup_method(self, method):
         TestCase.setup_method(self, method)
-        user = self.User(name='Someone', email='someone@example.com', age=15)
+        user = self.User(
+            name='Someone',
+            email='someone@example.com',
+            age=15,
+            fav_numbers=[1, 2, 3]
+        )
         self.session.add(user)
         self.session.commit()
         self.user = user
+
+
+class TestAssertMaxLengthWithArray(AssertionTestCase):
+    def test_with_max_length(self):
+        assert_max_length(self.user, 'fav_numbers', 8)
+        assert_max_length(self.user, 'fav_numbers', 8)
+
+    def test_smaller_than_max_length(self):
+        with raises(AssertionError):
+            assert_max_length(self.user, 'fav_numbers', 7)
+        with raises(AssertionError):
+            assert_max_length(self.user, 'fav_numbers', 7)
+
+    def test_bigger_than_max_length(self):
+        with raises(AssertionError):
+            assert_max_length(self.user, 'fav_numbers', 9)
+        with raises(AssertionError):
+            assert_max_length(self.user, 'fav_numbers', 9)
 
 
 class TestAssertNonNullable(AssertionTestCase):
