@@ -6,6 +6,7 @@ from tests import TestCase
 
 
 class JSONTestCase(TestCase):
+
     def create_models(self):
         class Document(self.Base):
             __tablename__ = 'document'
