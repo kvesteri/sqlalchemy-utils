@@ -131,6 +131,7 @@ from sqlalchemy.dialects.postgresql import (
     DATERANGE,
     NUMRANGE,
     TSRANGE,
+    TSTZRANGE
 )
 from sqlalchemy import types
 from ..exceptions import ImproperlyConfigured
@@ -371,4 +372,12 @@ class DateTimeRangeType(RangeType):
 
     def __init__(self, *args, **kwargs):
         super(DateTimeRangeType, self).__init__(*args, **kwargs)
+        self.interval_class = intervals.DateTimeInterval
+
+
+class DateTimeTZRangeType(RangeType):
+    impl = TSTZRANGE
+
+    def __init__(self, *args, **kwargs):
+        super(DateTimeTZRangeType, self).__init__(*args, **kwargs)
         self.interval_class = intervals.DateTimeInterval
