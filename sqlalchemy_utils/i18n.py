@@ -26,9 +26,10 @@ except ImportError:
 
 
 class TranslationHybrid(object):
-    def __init__(self, current_locale, default_locale):
+    def __init__(self, current_locale, default_locale, default_value=None):
         self.current_locale = current_locale
         self.default_locale = default_locale
+        self.default_value = default_value
 
     def cast_locale(self, obj, locale):
         """
@@ -60,7 +61,7 @@ class TranslationHybrid(object):
                 try:
                     return getattr(obj, attr.key)[default_locale]
                 except (TypeError, KeyError):
-                    return None
+                    return self.default_value
         return getter
 
     def setter_factory(self, attr):

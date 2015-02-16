@@ -33,6 +33,11 @@ class TestTranslationHybrid(TestCase):
         city = self.City()
         assert city.name is None
 
+    def test_custom_default_value(self):
+        self.translation_hybrid.default_value = 'Some value'
+        city = self.City()
+        assert city.name is 'Some value'
+
     def test_fall_back_to_default_translation(self):
         city = self.City(name_translations={'en': 'Helsinki'})
         self.translation_hybrid.current_locale = 'sv'

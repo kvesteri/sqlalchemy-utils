@@ -90,4 +90,29 @@ Translation hybrids can also be used as expressions.
 
     session.query(Article).filter(Article.name['en'] == 'Some article')
 
+
+By default if no value is found for either current or default locale the
+translation hybrid returns `None`. You can customize this value with `default_value` parameter
+of translation_hybrid. In the following example we make translation hybrid fallback to empty string instead of `None`.
+
+::
+
+    translation_hybrid = TranslationHybrid(
+        current_locale=get_locale,
+        default_locale='en',
+        default_value=''
+    )
+
+
+    class Article(Base):
+        __tablename__ = 'article'
+
+        id = Column(Integer, primary_key=True)
+        name_translations = Column(HSTORE)
+
+        name = translation_hybrid(name_translations, default)
+
+
+    Article().name  # ''
+
 .. _SQLAlchemy-i18n: https://github.com/kvesteri/sqlalchemy-i18n

@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.29.6 (2015-02-03)
+^^^^^^^^^^^^^^^^^^^
+
+- Added customizable TranslationHybrid default value
+
+
 0.29.5 (2015-02-03)
 ^^^^^^^^^^^^^^^^^^^
 
