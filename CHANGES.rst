@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.29.7 (2015-03-01)
+^^^^^^^^^^^^^^^^^^^
+
+- Added Enum representation support for ChoiceType
+
+
 0.29.6 (2015-02-03)
 ^^^^^^^^^^^^^^^^^^^
 
