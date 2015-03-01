@@ -141,8 +141,11 @@ class ChoiceType(types.TypeDecorator, ScalarCoercible):
     def __init__(self, choices, impl=None):
         self.choices = choices
 
-        if Enum is not None and \
-                isinstance(choices, type) and issubclass(choices, Enum):
+        if (
+            Enum is not None and
+            isinstance(choices, type) and
+            issubclass(choices, Enum)
+        ):
             self.type_impl = EnumTypeImpl(enum_class=choices)
         else:
             self.type_impl = ChoiceTypeImpl(choices=choices)
@@ -199,10 +202,12 @@ class EnumTypeImpl(object):
         if Enum is None:
             raise ImproperlyConfigured(
                 "'enum34' package is required to use 'EnumType' in Python "
-                "< 3.4")
+                "< 3.4"
+            )
         if not issubclass(enum_class, Enum):
             raise ImproperlyConfigured(
-                "EnumType needs a class of enum defined.")
+                "EnumType needs a class of enum defined."
+            )
 
         self.enum_class = enum_class
 

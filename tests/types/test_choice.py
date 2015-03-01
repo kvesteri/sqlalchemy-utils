@@ -91,7 +91,8 @@ class TestEnumType(TestCase):
             id_ = sa.Column(sa.Integer, primary_key=True)
             status = sa.Column(
                 ChoiceType(OrderStatus, impl=sa.Integer()),
-                default=OrderStatus.unpaid)
+                default=OrderStatus.unpaid
+            )
 
             def __repr__(self):
                 return 'Order(%r, %r)' % (self.id_, self.status)
