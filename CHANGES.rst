@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.29.8 (2015-03-03)
+^^^^^^^^^^^^^^^^^^^
+
+- Added get_class_by_table ORM utility function
+
+
 0.29.7 (2015-03-01)
 ^^^^^^^^^^^^^^^^^^^
 
