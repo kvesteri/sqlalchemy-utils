@@ -16,6 +16,12 @@ get_bind
 .. autofunction:: get_bind
 
 
+get_class_by_table
+^^^^^^^^^^^^^^^^^^
+
+.. autofunction:: get_class_by_table
+
+
 get_column_key
 ^^^^^^^^^^^^^^
 

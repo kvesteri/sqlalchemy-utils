@@ -26,6 +26,7 @@ from .foreign_keys import (
 )
 from .orm import (
     get_bind,
+    get_class_by_table,
     get_column_key,
     get_columns,
     get_declarative_base,
@@ -51,6 +52,7 @@ __all__ = (
     'drop_database',
     'escape_like',
     'get_bind',
+    'get_class_by_table',
     'get_columns',
     'get_declarative_base',
     'get_hybrid_properties',

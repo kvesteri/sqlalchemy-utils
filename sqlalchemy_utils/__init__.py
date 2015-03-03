@@ -19,6 +19,7 @@ from .functions import (
     drop_database,
     escape_like,
     get_bind,
+    get_class_by_table,
     get_column_key,
     get_columns,
     get_declarative_base,
