@@ -86,6 +86,15 @@ PhoneNumberType
 .. autoclass:: PhoneNumberType
 
 
+DateTimeType
+^^^^^^^^^^^^
+
+
+.. module:: sqlalchemy_utils.types.datetime
+
+.. autoclass:: DateTimeType
+
+
 ScalarListType
 ^^^^^^^^^^^^^^
 
