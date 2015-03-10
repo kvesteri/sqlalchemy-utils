@@ -1,5 +1,13 @@
+"""JSONType definition."""
+
 from __future__ import absolute_import
+
+import six
+
 import sqlalchemy as sa
+from sqlalchemy.dialects.postgresql.base import ischema_names
+
+from ..exceptions import ImproperlyConfigured
 
 json = None
 try:
@@ -7,23 +15,33 @@ try:
 except ImportError:
     import json as json
 
-import six
-from sqlalchemy.dialects.postgresql.base import ischema_names
-from ..exceptions import ImproperlyConfigured
-
 try:
     from sqlalchemy.dialects.postgresql import JSON
     has_postgres_json = True
 except ImportError:
-    class PostgresJSONType(sa.types.UserDefinedType):
+    class JSON(sa.types.UserDefinedType):
         """
         Text search vector type for postgresql.
         """
         def get_col_spec(self):
             return 'json'
 
-    ischema_names['json'] = PostgresJSONType
+    ischema_names['json'] = JSON
     has_postgres_json = False
+
+try:
+    from sqlalchemy.dialects.postgresql import JSONB
+    has_postgres_jsonb = True
+except ImportError:
+    class JSONB(sa.types.UserDefinedType):
+        """
+        Text search vector type for postgresql.
+        """
+        def get_col_spec(self):
+            return 'jsonb'
+
+    ischema_names['jsonb'] = JSONB
+    has_postgres_jsonb = False
 
 
 class JSONType(sa.types.TypeDecorator):
@@ -53,27 +71,32 @@ class JSONType(sa.types.TypeDecorator):
         }
         session.commit()
     """
+
     impl = sa.UnicodeText
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, binary=True, impl=sa.UnicodeText, *args, **kwargs):
         if json is None:
             raise ImproperlyConfigured(
                 'JSONType needs anyjson package installed.'
             )
+        self.binary = binary
+        self.engine_available = ((self.binary and has_postgres_jsonb) or
+                                 (not self.binary and has_postgres_json))
+        self.impl = impl
         super(JSONType, self).__init__(*args, **kwargs)
 
     def load_dialect_impl(self, dialect):
         if dialect.name == 'postgresql':
-            # Use the native JSON type.
-            if has_postgres_json:
-                return dialect.type_descriptor(JSON())
+            # Use the native JSONB or JSON type.
+            if self.binary:
+                return dialect.type_descriptor(JSONB())
             else:
-                return dialect.type_descriptor(PostgresJSONType())
+                return dialect.type_descriptor(JSON())
         else:
             return dialect.type_descriptor(self.impl)
 
     def process_bind_param(self, value, dialect):
-        if dialect.name == 'postgresql' and has_postgres_json:
+        if dialect.name == 'postgresql' and self.engine_available:
             return value
         if value is not None:
             value = six.text_type(json.dumps(value))
