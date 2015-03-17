@@ -1,7 +1,8 @@
-from flexmock import flexmock
-from pytest import raises, mark
 import sqlalchemy as sa
-from sqlalchemy_utils import ChoiceType, Choice, ImproperlyConfigured
+from flexmock import flexmock
+from pytest import mark, raises
+
+from sqlalchemy_utils import Choice, ChoiceType, ImproperlyConfigured
 from sqlalchemy_utils.types.choice import Enum
 from tests import TestCase
 

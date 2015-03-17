@@ -1,7 +1,9 @@
-import sqlalchemy as sa
-from tests import TestCase
-from sqlalchemy_utils import UUIDType
 import uuid
+
+import sqlalchemy as sa
+
+from sqlalchemy_utils import UUIDType
+from tests import TestCase
 
 
 class TestUUIDType(TestCase):

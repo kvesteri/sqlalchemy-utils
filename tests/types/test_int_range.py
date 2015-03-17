@@ -1,5 +1,9 @@
-from pytest import mark
 import sqlalchemy as sa
+from pytest import mark
+
+from sqlalchemy_utils import IntRangeType
+from tests import TestCase
+
 intervals = None
 inf = -1
 try:
@@ -7,8 +11,6 @@ try:
     from infinity import inf
 except ImportError:
     pass
-from tests import TestCase
-from sqlalchemy_utils import IntRangeType
 
 
 @mark.skipif('intervals is None')

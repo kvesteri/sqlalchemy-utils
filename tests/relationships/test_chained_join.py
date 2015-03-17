@@ -3,7 +3,7 @@ from tests import TestCase
 from tests.mixins import (
     ThreeLevelDeepManyToMany,
     ThreeLevelDeepOneToMany,
-    ThreeLevelDeepOneToOne,
+    ThreeLevelDeepOneToOne
 )
 
 

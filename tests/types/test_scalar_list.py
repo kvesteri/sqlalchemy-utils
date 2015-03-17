@@ -1,7 +1,8 @@
 import six
 import sqlalchemy as sa
-from sqlalchemy_utils import ScalarListType
 from pytest import raises
+
+from sqlalchemy_utils import ScalarListType
 from tests import TestCase
 
 

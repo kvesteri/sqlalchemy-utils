@@ -1,6 +1,7 @@
 import six
 
 from sqlalchemy_utils.utils import str_coercible
+
 from .weekday import WeekDay
 
 

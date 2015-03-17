@@ -1,4 +1,5 @@
 import sqlalchemy as sa
+
 from sqlalchemy_utils.functions import getdotattr
 from tests import TestCase
 

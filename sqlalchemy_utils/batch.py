@@ -1,21 +1,24 @@
 from collections import defaultdict
 from itertools import chain
+
 import six
 import sqlalchemy as sa
 from sqlalchemy.orm import RelationshipProperty
 from sqlalchemy.orm.attributes import (
-    set_committed_value, InstrumentedAttribute
+    InstrumentedAttribute,
+    set_committed_value
 )
 from sqlalchemy.orm.session import object_session
-from sqlalchemy_utils.generic import GenericRelationshipProperty
+
 from sqlalchemy_utils.functions.orm import (
-    list_local_values,
     list_local_remote_exprs,
+    list_local_values,
     local_values,
+    remote,
     remote_column_names,
-    remote_values,
-    remote
+    remote_values
 )
+from sqlalchemy_utils.generic import GenericRelationshipProperty
 
 
 class PathException(Exception):

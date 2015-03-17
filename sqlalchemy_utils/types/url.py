@@ -5,6 +5,7 @@ except ImportError:
     pass
 import six
 from sqlalchemy import types
+
 from .scalar_coercible import ScalarCoercible
 
 

@@ -1,5 +1,6 @@
-from pytest import mark, raises
 import sqlalchemy as sa
+from pytest import mark, raises
+
 from sqlalchemy_utils.types import locale
 from tests import TestCase
 

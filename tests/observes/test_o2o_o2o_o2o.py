@@ -1,4 +1,5 @@
 import sqlalchemy as sa
+
 from sqlalchemy_utils.observer import observes
 from tests import TestCase
 

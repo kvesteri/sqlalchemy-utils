@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 import base64
-import six
 import datetime
-from sqlalchemy.types import TypeDecorator, String, Binary
+
+import six
+from sqlalchemy.types import Binary, String, TypeDecorator
+
 from sqlalchemy_utils.exceptions import ImproperlyConfigured
+
 from .scalar_coercible import ScalarCoercible
 
 cryptography = None

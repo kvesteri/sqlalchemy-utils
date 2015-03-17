@@ -1,7 +1,7 @@
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import HSTORE
-from sqlalchemy_utils import TranslationHybrid
 
+from sqlalchemy_utils import TranslationHybrid
 from tests import TestCase
 
 

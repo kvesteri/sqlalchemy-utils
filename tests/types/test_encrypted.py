@@ -1,16 +1,18 @@
-import sqlalchemy as sa
-from datetime import datetime, date, time
+from datetime import date, datetime, time
+
 import pytest
+import sqlalchemy as sa
 from pytest import mark
+
+from sqlalchemy_utils import ColorType, EncryptedType, PhoneNumberType
+from sqlalchemy_utils.types.encrypted import AesEngine, FernetEngine
+from tests import TestCase
+
 cryptography = None
 try:
     import cryptography  # noqa
 except ImportError:
     pass
-
-from tests import TestCase
-from sqlalchemy_utils import EncryptedType, PhoneNumberType, ColorType
-from sqlalchemy_utils.types.encrypted import AesEngine, FernetEngine
 
 
 @mark.skipif('cryptography is None')

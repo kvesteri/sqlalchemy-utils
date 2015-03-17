@@ -1,6 +1,8 @@
 from datetime import datetime
-from pytest import mark
+
 import sqlalchemy as sa
+from pytest import mark
+
 from sqlalchemy_utils.types import arrow
 from tests import TestCase
 

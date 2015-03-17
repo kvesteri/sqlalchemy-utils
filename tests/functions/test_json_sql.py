@@ -1,7 +1,7 @@
 import pytest
 import sqlalchemy as sa
-from sqlalchemy_utils import json_sql
 
+from sqlalchemy_utils import json_sql
 from tests import TestCase
 
 

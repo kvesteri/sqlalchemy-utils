@@ -1,8 +1,9 @@
-from pytest import mark
 import sqlalchemy as sa
-from tests import TestCase
+from pytest import mark
 from sqlalchemy import inspect
+
 from sqlalchemy_utils import Password, PasswordType, types  # noqa
+from tests import TestCase
 
 
 @mark.skipif('types.password.passlib is None')

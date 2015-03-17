@@ -33,6 +33,7 @@ We can easily test the constraints by assert_* functions::
     assert_max_length(user, 'email', 300)
 """
 from decimal import Decimal
+
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.exc import DataError, IntegrityError

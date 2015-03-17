@@ -1,4 +1,5 @@
 import sqlalchemy as sa
+
 from sqlalchemy_utils import EmailType
 from tests import TestCase
 

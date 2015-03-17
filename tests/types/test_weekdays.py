@@ -1,10 +1,10 @@
 import pytest
 import sqlalchemy as sa
+
+from sqlalchemy_utils import i18n
+from sqlalchemy_utils.primitives import WeekDays
 from sqlalchemy_utils.types import WeekDaysType
 from sqlalchemy_utils.types.weekdays import babel
-from sqlalchemy_utils.primitives import WeekDays
-from sqlalchemy_utils import i18n
-
 from tests import TestCase
 
 

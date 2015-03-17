@@ -1,11 +1,12 @@
-try:
-    from collections import OrderedDict
-except ImportError:
-    from ordereddict import OrderedDict
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy_utils import get_primary_keys
+
+try:
+    from collections import OrderedDict
+except ImportError:
+    from ordereddict import OrderedDict
 
 
 class TestGetPrimaryKeys(object):

@@ -1,8 +1,9 @@
 from datetime import datetime
+
 import sqlalchemy as sa
+
 from sqlalchemy_utils.listeners import force_instant_defaults
 from tests import TestCase
-
 
 force_instant_defaults()
 

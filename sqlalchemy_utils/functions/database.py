@@ -5,7 +5,8 @@ from copy import copy
 
 import sqlalchemy as sa
 from sqlalchemy.engine.url import make_url
-from sqlalchemy.exc import ProgrammingError, OperationalError
+from sqlalchemy.exc import OperationalError, ProgrammingError
+
 from sqlalchemy_utils.expressions import explain_analyze
 
 from .orm import quote

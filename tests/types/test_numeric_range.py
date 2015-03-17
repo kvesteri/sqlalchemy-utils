@@ -1,16 +1,17 @@
 from decimal import Decimal
 
-
-from pytest import mark
 import sqlalchemy as sa
+from pytest import mark
+
+from sqlalchemy_utils import NumericRangeType
+from tests import TestCase
+
 intervals = None
 try:
     import intervals
     from infinity import inf
 except ImportError:
     pass
-from tests import TestCase
-from sqlalchemy_utils import NumericRangeType
 
 
 @mark.skipif('intervals is None')

@@ -1,8 +1,8 @@
-from sqlalchemy_utils import ExpressionParser
 import sqlalchemy as sa
 from sqlalchemy.sql.elements import Cast, Null
 
-from . import TestCase
+from sqlalchemy_utils import ExpressionParser
+from tests import TestCase
 
 
 class MyExpressionParser(ExpressionParser):

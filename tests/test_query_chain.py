@@ -1,6 +1,6 @@
 import sqlalchemy as sa
-from sqlalchemy_utils import QueryChain
 
+from sqlalchemy_utils import QueryChain
 from tests import TestCase
 
 

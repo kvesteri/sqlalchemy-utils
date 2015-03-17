@@ -1,7 +1,9 @@
-from sqlalchemy import types
 import six
+from sqlalchemy import types
+
 from ..exceptions import ImproperlyConfigured
 from .scalar_coercible import ScalarCoercible
+
 try:
     from enum import Enum
 except ImportError:

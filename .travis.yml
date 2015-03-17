@@ -33,5 +33,6 @@ install:
   - pip install -e .[$EXTRAS]
 
 script:
+  - isort --recursive --diff sqlalchemy_utils tests && isort --recursive --check-only sqlalchemy_utils tests
   - flake8 sqlalchemy_utils tests
   - py.test

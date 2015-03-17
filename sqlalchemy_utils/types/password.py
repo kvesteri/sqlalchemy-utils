@@ -1,10 +1,13 @@
-import six
 import weakref
-from sqlalchemy_utils.exceptions import ImproperlyConfigured
+
+import six
 from sqlalchemy import types
-from sqlalchemy.dialects import postgresql, oracle
-from .scalar_coercible import ScalarCoercible
+from sqlalchemy.dialects import oracle, postgresql
 from sqlalchemy.ext.mutable import Mutable
+
+from sqlalchemy_utils.exceptions import ImproperlyConfigured
+
+from .scalar_coercible import ScalarCoercible
 
 passlib = None
 try:
