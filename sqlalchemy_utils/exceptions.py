@@ -1,5 +1,7 @@
-"""Global SQLAlchemy-Utils exception classes.
 """
+Global SQLAlchemy-Utils exception classes.
+"""
+
 
 class ImproperlyConfigured(Exception):
     """

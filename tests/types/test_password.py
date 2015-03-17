@@ -2,11 +2,10 @@ from pytest import mark
 import sqlalchemy as sa
 from tests import TestCase
 from sqlalchemy import inspect
-from sqlalchemy_utils.types import password
-from sqlalchemy_utils import Password, PasswordType
+from sqlalchemy_utils import Password, PasswordType, types  # noqa
 
 
-@mark.skipif('password.passlib is None')
+@mark.skipif('types.password.passlib is None')
 class TestPasswordType(TestCase):
     def create_models(self):
         class User(self.Base):
@@ -142,12 +141,12 @@ class TestPasswordType(TestCase):
         obj.password = None
 
         assert obj.password is None
-        assert obj.password == None
+        assert obj.password == None  # noqa
 
         obj.password = 'b'
 
         assert obj.password is not None
-        assert obj.password != None
+        assert obj.password != None  # noqa
 
     def test_check_and_update_persist(self):
         """

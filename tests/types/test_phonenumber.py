@@ -3,11 +3,10 @@ import sqlalchemy as sa
 from pytest import mark
 
 from tests import TestCase
-from sqlalchemy_utils import PhoneNumberType, PhoneNumber
-from sqlalchemy_utils.types import phone_number
+from sqlalchemy_utils import PhoneNumberType, PhoneNumber, types  # noqa
 
 
-@mark.skipif('phone_number.phonenumbers is None')
+@mark.skipif('types.phone_number.phonenumbers is None')
 class TestPhoneNumber(object):
     def setup_method(self, method):
         self.valid_phone_numbers = [
@@ -48,13 +47,13 @@ class TestPhoneNumber(object):
     def test_phone_number_str_repr(self):
         number = PhoneNumber('+358401234567')
         if six.PY2:
-            assert unicode(number) == number.national
+            assert unicode(number) == number.national  # noqa
             assert str(number) == number.national.encode('utf-8')
         else:
             assert str(number) == number.national
 
 
-@mark.skipif('phone_number.phonenumbers is None')
+@mark.skipif('types.phone_number.phonenumbers is None')
 class TestPhoneNumberType(TestCase):
 
     def create_models(self):

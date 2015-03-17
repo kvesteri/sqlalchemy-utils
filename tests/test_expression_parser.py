@@ -40,7 +40,7 @@ class TestExpressionParser(TestCase):
         assert str(expr) == 'category.name IN (:name_1, :name_2)'
 
     def test_boolean_expression(self):
-        expr = self.parser(self.User.name == False)
+        expr = self.parser(self.User.name == False)  # noqa
         assert str(expr) == 'category.name = 0'
 
     def test_label(self):
