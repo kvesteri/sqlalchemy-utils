@@ -257,7 +257,7 @@ class TestSortQueryWithPolymorphicInheritance(TestCase):
             self.session.query(self.TextItem),
             'item_count'
         )
-        assert_contains('ORDER BY (SELECT count(:param_2) AS count_2', query)
+        assert_contains('ORDER BY (SELECT count(:param_2) AS count_1', query)
 
     def test_child_class_attribute(self):
         query = sort_query(
