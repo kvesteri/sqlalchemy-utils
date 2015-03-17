@@ -70,10 +70,10 @@ def get_class_by_table(base, table, data=None):
     :param data: Data row to determine the class in polymorphic scenarios
     :return: Declarative class or None.
     """
-    found_classes = set()
-    for c in base._decl_class_registry.values():
-        if hasattr(c, '__table__') and c.__table__ is table:
-            found_classes.add(c)
+    found_classes = set(
+        c for c in base._decl_class_registry.values()
+        if hasattr(c, '__table__') and c.__table__ is table
+    )
     if len(found_classes) > 1:
         if not data:
             raise ValueError(
