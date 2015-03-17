@@ -92,8 +92,8 @@ def get_class_by_table(base, table, data=None):
                         return cls
             raise ValueError(
                 "Multiple declarative classes found for table '{0}'. Given "
-                "data row matches does not match any polymorphic identity of "
-                "the found classes."
+                "data row does not match any polymorphic identity of the "
+                "found classes."
             )
     elif found_classes:
         return found_classes.pop()
