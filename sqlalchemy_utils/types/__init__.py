@@ -1,29 +1,30 @@
 from functools import wraps
+
 from sqlalchemy.orm.collections import InstrumentedList as _InstrumentedList
+
 from .arrow import ArrowType
-from .choice import ChoiceType, Choice
+from .choice import Choice, ChoiceType
 from .color import ColorType
-from .country import CountryType, Country
+from .country import Country, CountryType
 from .email import EmailType
 from .encrypted import EncryptedType
 from .ip_address import IPAddressType
 from .json import JSONType
 from .locale import LocaleType
+from .password import Password, PasswordType
+from .phone_number import PhoneNumber, PhoneNumberType
 from .range import (
     DateRangeType,
     DateTimeRangeType,
     IntRangeType,
-    NumericRangeType,
+    NumericRangeType
 )
-from .password import Password, PasswordType
-from .phone_number import PhoneNumber, PhoneNumberType
 from .scalar_list import ScalarListException, ScalarListType
 from .timezone import TimezoneType
 from .ts_vector import TSVectorType
 from .url import URLType
 from .uuid import UUIDType
 from .weekdays import WeekDaysType
-
 
 __all__ = (
     ArrowType,

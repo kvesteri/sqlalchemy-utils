@@ -1,7 +1,9 @@
 from __future__ import unicode_literals
+
 import sqlalchemy as sa
-from tests import TestCase
+
 from sqlalchemy_utils import batch_fetch, generic_relationship
+from tests import TestCase
 
 
 class TestBatchFetchGenericRelationship(TestCase):

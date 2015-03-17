@@ -1,15 +1,15 @@
-import sqlalchemy as sa
 import pytest
+import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import ARRAY
+
 from sqlalchemy_utils import (
-    assert_min_value,
     assert_max_length,
     assert_max_value,
-    assert_nullable,
-    assert_non_nullable
+    assert_min_value,
+    assert_non_nullable,
+    assert_nullable
 )
 from sqlalchemy_utils.asserts import raises
-
 from tests import TestCase
 
 

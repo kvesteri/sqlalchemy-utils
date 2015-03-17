@@ -2,7 +2,6 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from .exceptions import ImproperlyConfigured
 
-
 try:
     from babel.dates import get_day_names
 except ImportError:
@@ -12,7 +11,6 @@ except ImportError:
             ' babel or make a similar function and override it in this '
             'module.'
         )
-
 
 try:
     from flask.ext.babel import get_locale

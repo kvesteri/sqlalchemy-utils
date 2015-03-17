@@ -5,10 +5,12 @@ except ImportError:
     pass
 import six
 from sqlalchemy import types
+
 from sqlalchemy_utils.exceptions import ImproperlyConfigured
 from sqlalchemy_utils.primitives import WeekDay, WeekDays
-from .scalar_coercible import ScalarCoercible
+
 from .bit import BitType
+from .scalar_coercible import ScalarCoercible
 
 
 class WeekDaysType(types.TypeDecorator, ScalarCoercible):

@@ -1,14 +1,15 @@
+import pytest
+import six
+from flexmock import flexmock
+
+from sqlalchemy_utils import i18n
+from sqlalchemy_utils.primitives import WeekDay, WeekDays
+
 Locale = None
 try:
     from babel import Locale
 except ImportError:
     pass
-from flexmock import flexmock
-import pytest
-
-import six
-from sqlalchemy_utils.primitives import WeekDay, WeekDays
-from sqlalchemy_utils import i18n
 
 
 @pytest.mark.skipif('Locale is None')

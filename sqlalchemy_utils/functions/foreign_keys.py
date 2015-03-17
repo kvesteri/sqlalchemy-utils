@@ -5,10 +5,10 @@ import six
 import sqlalchemy as sa
 from sqlalchemy.exc import NoInspectionAvailable
 from sqlalchemy.orm import object_session
-from sqlalchemy.schema import MetaData, Table, ForeignKeyConstraint
+from sqlalchemy.schema import ForeignKeyConstraint, MetaData, Table
 
-from .orm import get_column_key, get_mapper, get_tables
 from ..query_chain import QueryChain
+from .orm import get_column_key, get_mapper, get_tables
 
 
 def get_foreign_key_values(fk, obj):

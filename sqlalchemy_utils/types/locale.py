@@ -1,7 +1,9 @@
-from sqlalchemy import types
 import six
-from .scalar_coercible import ScalarCoercible
+from sqlalchemy import types
+
 from ..exceptions import ImproperlyConfigured
+from .scalar_coercible import ScalarCoercible
+
 babel = None
 try:
     import babel

@@ -1,6 +1,7 @@
-from flexmock import flexmock
 import sqlalchemy as sa
-from sqlalchemy_utils import ProxyDict, proxy_dict
+from flexmock import flexmock
+
+from sqlalchemy_utils import proxy_dict, ProxyDict
 from tests import TestCase
 
 

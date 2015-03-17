@@ -1,5 +1,6 @@
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import TSVECTOR
+
 from sqlalchemy_utils import TSVectorType
 from tests import TestCase
 

@@ -1,7 +1,9 @@
-from sqlalchemy import types
 import six
-from .scalar_coercible import ScalarCoercible
+from sqlalchemy import types
+
 from sqlalchemy_utils import i18n
+
+from .scalar_coercible import ScalarCoercible
 
 
 class Country(object):

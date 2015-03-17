@@ -1,7 +1,10 @@
 from __future__ import absolute_import
+
 import uuid
+
 from sqlalchemy import types
 from sqlalchemy.dialects import postgresql
+
 from .scalar_coercible import ScalarCoercible
 
 

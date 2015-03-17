@@ -3,11 +3,11 @@ from collections import Iterable
 import six
 import sqlalchemy as sa
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import attributes, class_mapper
-from sqlalchemy.orm import ColumnProperty
+from sqlalchemy.orm import attributes, class_mapper, ColumnProperty
 from sqlalchemy.orm.interfaces import MapperProperty, PropComparator
 from sqlalchemy.orm.session import _state_session
 from sqlalchemy.util import set_creation_order
+
 from sqlalchemy_utils.functions import identity
 
 from .exceptions import ImproperlyConfigured

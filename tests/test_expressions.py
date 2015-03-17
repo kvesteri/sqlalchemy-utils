@@ -1,5 +1,6 @@
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
+
 from sqlalchemy_utils.expressions import explain, explain_analyze
 from tests import TestCase
 

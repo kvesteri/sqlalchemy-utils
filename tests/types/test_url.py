@@ -1,7 +1,7 @@
-from pytest import mark
 import sqlalchemy as sa
-from sqlalchemy_utils.types import url
+from pytest import mark
 
+from sqlalchemy_utils.types import url
 from tests import TestCase
 
 

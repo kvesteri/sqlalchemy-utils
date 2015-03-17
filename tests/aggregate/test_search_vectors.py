@@ -1,4 +1,5 @@
 import sqlalchemy as sa
+
 from sqlalchemy_utils import aggregated, TSVectorType
 from tests import TestCase
 

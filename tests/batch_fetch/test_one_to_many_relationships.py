@@ -1,5 +1,6 @@
 import sqlalchemy as sa
 from pytest import raises
+
 from sqlalchemy_utils import batch_fetch
 from tests import TestCase
 

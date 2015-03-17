@@ -1,5 +1,6 @@
 import sqlalchemy as sa
-from sqlalchemy_utils import CountryType, Country
+
+from sqlalchemy_utils import Country, CountryType
 from tests import TestCase
 
 

@@ -1,6 +1,7 @@
 import sqlalchemy as sa
-from tests import TestCase
+
 from sqlalchemy_utils.functions import non_indexed_foreign_keys
+from tests import TestCase
 
 
 class TestFindNonIndexedForeignKeys(TestCase):

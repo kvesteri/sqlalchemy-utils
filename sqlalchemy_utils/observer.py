@@ -149,14 +149,14 @@ Category has many Products.
     catalog.product_count  # 1
 
 """
+import itertools
+from collections import defaultdict, Iterable, namedtuple
+
 import sqlalchemy as sa
 
-from collections import defaultdict, namedtuple, Iterable
-import itertools
 from sqlalchemy_utils.functions import getdotattr
 from sqlalchemy_utils.path import AttrPath
 from sqlalchemy_utils.utils import is_sequence
-
 
 Callback = namedtuple('Callback', ['func', 'path', 'backref', 'fullpath'])
 

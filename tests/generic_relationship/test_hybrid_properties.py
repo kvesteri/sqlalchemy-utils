@@ -1,7 +1,9 @@
 from __future__ import unicode_literals
+
 import six
 import sqlalchemy as sa
 from sqlalchemy.ext.hybrid import hybrid_property
+
 from sqlalchemy_utils import generic_relationship
 from tests import TestCase
 

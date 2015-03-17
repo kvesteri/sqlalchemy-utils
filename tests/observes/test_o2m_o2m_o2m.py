@@ -1,7 +1,7 @@
 import sqlalchemy as sa
 
-from tests import TestCase
 from sqlalchemy_utils.observer import observes
+from tests import TestCase
 
 
 class TestObservesFor3LevelDeepOneToMany(TestCase):

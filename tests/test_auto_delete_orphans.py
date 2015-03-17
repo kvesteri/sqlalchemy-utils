@@ -1,7 +1,7 @@
-from pytest import raises
 import sqlalchemy as sa
-from sqlalchemy_utils import auto_delete_orphans, ImproperlyConfigured
+from pytest import raises
 
+from sqlalchemy_utils import auto_delete_orphans, ImproperlyConfigured
 from tests import TestCase
 
 

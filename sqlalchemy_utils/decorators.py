@@ -1,7 +1,9 @@
-from collections import defaultdict
 import itertools
-import sqlalchemy as sa
+from collections import defaultdict
+
 import six
+import sqlalchemy as sa
+
 from .functions import getdotattr
 
 

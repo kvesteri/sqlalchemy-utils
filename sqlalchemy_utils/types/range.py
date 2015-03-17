@@ -119,22 +119,25 @@ Membership operators
 .. _intervals: https://github.com/kvesteri/intervals
 """
 from collections import Iterable
+
+import six
+import sqlalchemy as sa
+from sqlalchemy import types
+from sqlalchemy.dialects.postgresql import (
+    DATERANGE,
+    INT4RANGE,
+    NUMRANGE,
+    TSRANGE
+)
+
+from ..exceptions import ImproperlyConfigured
+from .scalar_coercible import ScalarCoercible
+
 intervals = None
 try:
     import intervals
 except ImportError:
     pass
-import six
-import sqlalchemy as sa
-from sqlalchemy.dialects.postgresql import (
-    INT4RANGE,
-    DATERANGE,
-    NUMRANGE,
-    TSRANGE,
-)
-from sqlalchemy import types
-from ..exceptions import ImproperlyConfigured
-from .scalar_coercible import ScalarCoercible
 
 
 class RangeComparator(types.TypeEngine.Comparator):

@@ -1,4 +1,5 @@
 import sqlalchemy as sa
+
 from sqlalchemy_utils.aggregates import select_aggregate
 from tests import TestCase
 from tests.mixins import ThreeLevelDeepManyToMany
