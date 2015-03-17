@@ -1,12 +1,11 @@
 from flexmock import flexmock
 from pytest import mark
 import sqlalchemy as sa
-from sqlalchemy_utils import ColorType
-from sqlalchemy_utils.types import color
+from sqlalchemy_utils import ColorType, types  # noqa
 from tests import TestCase
 
 
-@mark.skipif('color.python_colour_type is None')
+@mark.skipif('types.color.python_colour_type is None')
 class TestColorType(TestCase):
     def create_models(self):
         class Document(self.Base):

@@ -1,2 +1,2 @@
-from .chained_join import chained_join
-from .select_aggregate import select_aggregate
+from .chained_join import chained_join  # noqa
+from .select_aggregate import select_aggregate  # noqa

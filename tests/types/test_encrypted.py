@@ -4,7 +4,7 @@ import pytest
 from pytest import mark
 cryptography = None
 try:
-    import cryptography
+    import cryptography  # noqa
 except ImportError:
     pass
 

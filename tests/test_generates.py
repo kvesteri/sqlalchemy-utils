@@ -119,7 +119,6 @@ class TestGeneratesWithSourcePath(DeepPathGeneratesTestCase):
             def copy_locale(self, document):
                 return document.locale
 
-
         self.Document = Document
         self.Section = Section
         self.SubSection = SubSection

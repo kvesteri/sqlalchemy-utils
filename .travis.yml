@@ -33,4 +33,5 @@ install:
   - pip install -e .[$EXTRAS]
 
 script:
+  - flake8 sqlalchemy_utils tests
   - py.test

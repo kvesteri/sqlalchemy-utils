@@ -1,4 +1,3 @@
-import six
 from sqlalchemy import types
 from sqlalchemy_utils.exceptions import ImproperlyConfigured
 from sqlalchemy_utils.utils import str_coercible
@@ -46,8 +45,9 @@ class PhoneNumber(BasePhoneNumber):
             italian_leading_zero=self._phone_number.italian_leading_zero,
             raw_input=self._phone_number.raw_input,
             country_code_source=self._phone_number.country_code_source,
-            preferred_domestic_carrier_code=
-            self._phone_number.preferred_domestic_carrier_code
+            preferred_domestic_carrier_code=(
+                self._phone_number.preferred_domestic_carrier_code
+            )
         )
         self.national = phonenumbers.format_number(
             self._phone_number,

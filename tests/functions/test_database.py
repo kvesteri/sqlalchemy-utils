@@ -5,7 +5,7 @@ from flexmock import flexmock
 from pytest import mark
 pymysql = None
 try:
-    import pymysql
+    import pymysql  # noqa
 except ImportError:
     pass
 

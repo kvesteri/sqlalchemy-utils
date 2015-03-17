@@ -3,6 +3,7 @@ import sqlalchemy as sa
 from sqlalchemy_utils import aggregated
 from tests import TestCase
 
+
 class Test3LevelDeepOneToMany(TestCase):
     dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
 

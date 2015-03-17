@@ -35,7 +35,7 @@ class NumberRangeTestCase(TestCase):
 
     def test_nullify_range(self):
         building = self.create_building(None)
-        assert building.persons_at_night == None
+        assert building.persons_at_night is None
 
     def test_update_with_none(self):
         interval = intervals.IntInterval('(,)')

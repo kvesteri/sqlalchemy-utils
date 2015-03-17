@@ -52,6 +52,7 @@ class JSONTestCase(TestCase):
 class TestSqliteJSONType(JSONTestCase):
     pass
 
+
 @mark.skipif('json.json is None')
 class TestPostgresJSONType(JSONTestCase):
     dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'

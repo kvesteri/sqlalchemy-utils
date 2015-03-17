@@ -29,8 +29,8 @@ class URLType(types.TypeDecorator, ScalarCoercible):
 
         user = User(website=u'www.example.com')
 
-        # website is coerced to furl object, hence all nice furl operations come
-        # available
+        # website is coerced to furl object, hence all nice furl operations
+        # come available
         user.website.args['some_argument'] = '12'
 
         print user.website

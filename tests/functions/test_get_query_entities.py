@@ -91,7 +91,10 @@ class TestGetQueryEntities(TestCase):
         ).label('number_of_articles')
 
         query = self.session.query(self.Article, number_of_articles)
-        assert list(get_query_entities(query)) == [self.Article, number_of_articles]
+        assert list(get_query_entities(query)) == [
+            self.Article,
+            number_of_articles
+        ]
 
     def test_aliased_entity(self):
         alias = sa.orm.aliased(self.Article)
