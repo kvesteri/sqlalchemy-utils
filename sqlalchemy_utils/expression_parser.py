@@ -7,22 +7,22 @@ import six
 import sqlalchemy as sa
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.sql.annotation import AnnotatedColumn
-from sqlalchemy.sql.expression import (
-    BooleanClauseList,
-    BinaryExpression,
-    UnaryExpression,
-    BindParameter,
-    Cast,
-)
 from sqlalchemy.sql.elements import (
-    False_,
-    True_,
-    Grouping,
-    ClauseList,
-    Label,
     Case,
-    Tuple,
-    Null
+    ClauseList,
+    False_,
+    Grouping,
+    Label,
+    Null,
+    True_,
+    Tuple
+)
+from sqlalchemy.sql.expression import (
+    BinaryExpression,
+    BindParameter,
+    BooleanClauseList,
+    Cast,
+    UnaryExpression
 )
 
 

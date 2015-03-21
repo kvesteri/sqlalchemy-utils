@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
+
 import sqlalchemy as sa
+
 from sqlalchemy_utils import generic_relationship
 from tests.generic_relationship import GenericRelationshipTestCase
 

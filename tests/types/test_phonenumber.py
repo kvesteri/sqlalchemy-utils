@@ -2,8 +2,8 @@ import six
 import sqlalchemy as sa
 from pytest import mark
 
+from sqlalchemy_utils import PhoneNumber, PhoneNumberType, types  # noqa
 from tests import TestCase
-from sqlalchemy_utils import PhoneNumberType, PhoneNumber, types  # noqa
 
 
 @mark.skipif('types.phone_number.phonenumbers is None')

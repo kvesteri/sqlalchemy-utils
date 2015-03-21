@@ -1,11 +1,11 @@
 import sqlalchemy as sa
+from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.sql import expression
 from sqlalchemy.sql.expression import (
-    Executable,
+    _literal_as_text,
     ClauseElement,
-    _literal_as_text
+    Executable
 )
-from sqlalchemy.ext.compiler import compiles
 
 
 class explain(Executable, ClauseElement):

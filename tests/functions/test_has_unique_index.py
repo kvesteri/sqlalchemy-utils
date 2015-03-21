@@ -1,5 +1,5 @@
-from pytest import raises
 import sqlalchemy as sa
+from pytest import raises
 from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy_utils import has_unique_index

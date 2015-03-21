@@ -1,6 +1,6 @@
 import sqlalchemy as sa
-from sqlalchemy_utils import merge_references
 
+from sqlalchemy_utils import merge_references
 from tests import TestCase
 
 

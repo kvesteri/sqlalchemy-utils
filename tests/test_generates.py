@@ -1,4 +1,5 @@
 import sqlalchemy as sa
+
 from sqlalchemy_utils import generates
 from tests import TestCase
 

@@ -1,13 +1,16 @@
 import warnings
-import sqlalchemy as sa
 
+import sqlalchemy as sa
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base, synonym_for
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import sessionmaker
 
 from sqlalchemy_utils import (
-    InstrumentedList, coercion_listener, aggregates, i18n
+    aggregates,
+    coercion_listener,
+    i18n,
+    InstrumentedList
 )
 
 

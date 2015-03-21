@@ -1,6 +1,6 @@
 import sqlalchemy as sa
-from sqlalchemy_utils import get_query_entities
 
+from sqlalchemy_utils import get_query_entities
 from tests import TestCase
 
 

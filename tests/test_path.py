@@ -2,7 +2,8 @@ import six
 import sqlalchemy as sa
 from pytest import mark
 from sqlalchemy.util.langhelpers import symbol
-from sqlalchemy_utils.path import Path, AttrPath
+
+from sqlalchemy_utils.path import AttrPath, Path
 from tests import TestCase
 
 

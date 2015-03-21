@@ -1,10 +1,11 @@
 import sqlalchemy as sa
-from tests import TestCase
+
 from sqlalchemy_utils.functions import (
-    render_statement,
+    mock_engine,
     render_expression,
-    mock_engine
+    render_statement
 )
+from tests import TestCase
 
 
 class TestRender(TestCase):

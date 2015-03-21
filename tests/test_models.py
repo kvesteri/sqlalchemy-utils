@@ -1,5 +1,7 @@
 from datetime import datetime
+
 import sqlalchemy as sa
+
 from sqlalchemy_utils import Timestamp
 from tests import TestCase
 

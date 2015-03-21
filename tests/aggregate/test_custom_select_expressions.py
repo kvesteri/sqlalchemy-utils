@@ -1,5 +1,7 @@
 from decimal import Decimal
+
 import sqlalchemy as sa
+
 from sqlalchemy_utils.aggregates import aggregated
 from tests import TestCase
 

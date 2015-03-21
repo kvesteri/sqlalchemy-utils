@@ -1,7 +1,6 @@
 import sqlalchemy as sa
 
 from sqlalchemy_utils import get_tables
-
 from tests import TestCase
 
 

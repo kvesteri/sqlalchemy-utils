@@ -1,16 +1,20 @@
 from __future__ import absolute_import
+
 from collections import Iterable
 from datetime import datetime
+
 import six
+from sqlalchemy import types
+
+from sqlalchemy_utils.exceptions import ImproperlyConfigured
+
+from .scalar_coercible import ScalarCoercible
 
 arrow = None
 try:
     import arrow
 except:
     pass
-from sqlalchemy import types
-from sqlalchemy_utils.exceptions import ImproperlyConfigured
-from .scalar_coercible import ScalarCoercible
 
 
 class ArrowType(types.TypeDecorator, ScalarCoercible):

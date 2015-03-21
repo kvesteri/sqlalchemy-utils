@@ -1,6 +1,7 @@
 import sqlalchemy as sa
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.util.langhelpers import symbol
+
 from .utils import str_coercible
 
 

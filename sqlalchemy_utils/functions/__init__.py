@@ -1,10 +1,3 @@
-from .mock import create_mock_engine, mock_engine  # noqa
-from .render import render_expression, render_statement  # noqa
-from .sort_query import (  # noqa
-    make_order_by_deterministic,
-    sort_query,
-    QuerySorterException
-)
 from .database import (  # noqa
     analyze,
     create_database,
@@ -22,8 +15,9 @@ from .foreign_keys import (  # noqa
     group_foreign_keys,
     is_indexed_foreign_key,
     merge_references,
-    non_indexed_foreign_keys,
+    non_indexed_foreign_keys
 )
+from .mock import create_mock_engine, mock_engine  # noqa
 from .orm import (  # noqa
     get_bind,
     get_class_by_table,
@@ -41,5 +35,11 @@ from .orm import (  # noqa
     is_loaded,
     naturally_equivalent,
     quote,
-    table_name,
+    table_name
+)
+from .render import render_expression, render_statement  # noqa
+from .sort_query import (  # noqa
+    make_order_by_deterministic,
+    QuerySorterException,
+    sort_query
 )

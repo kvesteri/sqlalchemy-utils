@@ -1,10 +1,10 @@
 from .aggregates import aggregated  # noqa
 from .asserts import (  # noqa
-    assert_min_value,
     assert_max_length,
     assert_max_value,
-    assert_nullable,
-    assert_non_nullable
+    assert_min_value,
+    assert_non_nullable,
+    assert_nullable
 )
 from .batch import batch_fetch, with_backrefs  # noqa
 from .decorators import generates  # noqa
@@ -25,8 +25,8 @@ from .functions import (  # noqa
     get_declarative_base,
     get_hybrid_properties,
     get_mapper,
-    get_query_entities,
     get_primary_keys,
+    get_query_entities,
     get_referencing_foreign_keys,
     get_tables,
     group_foreign_keys,
@@ -42,8 +42,9 @@ from .functions import (  # noqa
     render_expression,
     render_statement,
     sort_query,
-    table_name,
+    table_name
 )
+from .generic import generic_relationship  # noqa
 from .i18n import TranslationHybrid  # noqa
 from .listeners import (  # noqa
     auto_delete_orphans,
@@ -51,9 +52,9 @@ from .listeners import (  # noqa
     force_auto_coercion,
     force_instant_defaults
 )
-from .generic import generic_relationship  # noqa
-from .proxy_dict import ProxyDict, proxy_dict  # noqa
+from .models import Timestamp  # noqa
 from .observer import observes  # noqa
+from .proxy_dict import proxy_dict, ProxyDict  # noqa
 from .query_chain import QueryChain  # noqa
 from .types import (  # noqa
     ArrowType,
@@ -85,7 +86,5 @@ from .types import (  # noqa
     UUIDType,
     WeekDaysType
 )
-from .models import Timestamp  # noqa
-
 
 __version__ = '0.29.8'

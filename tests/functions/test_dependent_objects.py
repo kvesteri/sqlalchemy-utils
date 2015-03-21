@@ -1,4 +1,5 @@
 import sqlalchemy as sa
+
 from sqlalchemy_utils import dependent_objects, get_referencing_foreign_keys
 from tests import TestCase
 

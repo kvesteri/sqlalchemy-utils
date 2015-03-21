@@ -1,4 +1,5 @@
 import sqlalchemy as sa
+
 from sqlalchemy_utils.types import timezone
 from tests import TestCase
 

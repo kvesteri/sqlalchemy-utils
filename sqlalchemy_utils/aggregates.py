@@ -365,18 +365,19 @@ TODO
 from collections import defaultdict
 from weakref import WeakKeyDictionary
 
-import sqlalchemy as sa
 import six
+import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declared_attr
+
+from .functions.orm import get_column_key
+from .relationships import chained_join, select_aggregate
+
 try:
     # SQLAlchemy 0.9
     from sqlalchemy.sql.functions import _FunctionGenerator
 except ImportError:
     # SQLAlchemy 0.8
     from sqlalchemy.sql.expression import _FunctionGenerator
-
-from .functions.orm import get_column_key
-from .relationships import chained_join, select_aggregate
 
 
 aggregated_attrs = WeakKeyDictionary(defaultdict(list))

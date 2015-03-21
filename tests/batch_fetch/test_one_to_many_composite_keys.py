@@ -1,4 +1,5 @@
 import sqlalchemy as sa
+
 from sqlalchemy_utils import batch_fetch
 from tests import TestCase
 

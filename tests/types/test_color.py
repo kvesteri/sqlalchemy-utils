@@ -1,6 +1,7 @@
+import sqlalchemy as sa
 from flexmock import flexmock
 from pytest import mark
-import sqlalchemy as sa
+
 from sqlalchemy_utils import ColorType, types  # noqa
 from tests import TestCase
 

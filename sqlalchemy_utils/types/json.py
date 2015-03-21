@@ -1,15 +1,16 @@
 from __future__ import absolute_import
+
+import six
 import sqlalchemy as sa
+from sqlalchemy.dialects.postgresql.base import ischema_names
+
+from ..exceptions import ImproperlyConfigured
 
 json = None
 try:
     import anyjson as json
 except ImportError:
     import json as json
-
-import six
-from sqlalchemy.dialects.postgresql.base import ischema_names
-from ..exceptions import ImproperlyConfigured
 
 try:
     from sqlalchemy.dialects.postgresql import JSON

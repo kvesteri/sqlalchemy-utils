@@ -2,10 +2,12 @@ try:
     from collections import OrderedDict
 except ImportError:
     from ordereddict import OrderedDict
+
 from functools import partial
 from inspect import isclass
 from itertools import chain
 from operator import attrgetter
+
 import six
 import sqlalchemy as sa
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -16,6 +18,7 @@ from sqlalchemy.orm.properties import ColumnProperty
 from sqlalchemy.orm.query import _ColumnEntity
 from sqlalchemy.orm.session import object_session
 from sqlalchemy.orm.util import AliasedInsp
+
 from sqlalchemy_utils.utils import is_sequence
 
 

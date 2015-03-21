@@ -1,6 +1,7 @@
-from pytest import mark
 import six
 import sqlalchemy as sa
+from pytest import mark
+
 from sqlalchemy_utils.types import ip_address
 from tests import TestCase
 

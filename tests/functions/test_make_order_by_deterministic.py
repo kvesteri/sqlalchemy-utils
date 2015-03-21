@@ -1,7 +1,6 @@
 import sqlalchemy as sa
 
 from sqlalchemy_utils.functions.sort_query import make_order_by_deterministic
-
 from tests import assert_contains, TestCase
 
 

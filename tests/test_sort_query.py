@@ -1,5 +1,6 @@
-from pytest import raises
 import sqlalchemy as sa
+from pytest import raises
+
 from sqlalchemy_utils import sort_query
 from sqlalchemy_utils.functions import QuerySorterException
 from tests import assert_contains, TestCase
