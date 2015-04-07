@@ -1,7 +1,3 @@
-from .weekday import WeekDay
-from .weekdays import WeekDays
-
-__all__ = (
-    WeekDay,
-    WeekDays
-)
+from .currency import Currency  # noqa
+from .weekday import WeekDay  # noqa
+from .weekdays import WeekDays  # noqa

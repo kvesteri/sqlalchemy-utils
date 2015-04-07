@@ -38,6 +38,19 @@ CountryType
 
 .. autoclass:: CountryType
 
+
+CurrencyType
+^^^^^^^^^^^^
+
+.. module:: sqlalchemy_utils.types.currency
+
+.. autoclass:: CurrencyType
+
+.. module:: sqlalchemy_utils.primitives.currency
+
+.. autoclass:: Currency
+
+
 EncryptedType
 ^^^^^^^^^^^^^
 
