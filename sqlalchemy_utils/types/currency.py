@@ -1,6 +1,12 @@
+babel = None
+try:
+    import babel
+except ImportError:
+    pass
 import six
 from sqlalchemy import types
 
+from sqlalchemy_utils import ImproperlyConfigured
 from sqlalchemy_utils.primitives import Currency
 
 from .scalar_coercible import ScalarCoercible
@@ -49,6 +55,14 @@ class CurrencyType(types.TypeDecorator, ScalarCoercible):
     """
     impl = types.String(3)
     python_type = Currency
+
+    def __init__(self, *args, **kwargs):
+        if babel is None:
+            raise ImproperlyConfigured(
+                "'babel' package is required in order to use CurrencyType."
+            )
+
+        super(CurrencyType, self).__init__(*args, **kwargs)
 
     def process_bind_param(self, value, dialect):
         if isinstance(value, Currency):

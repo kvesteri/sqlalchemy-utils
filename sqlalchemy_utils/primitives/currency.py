@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
+babel = None
+try:
+    import babel
+except ImportError:
+    pass
 import six
-from babel.numbers import get_currency_symbol
 
-from sqlalchemy_utils import i18n
+from sqlalchemy_utils import i18n, ImproperlyConfigured
 from sqlalchemy_utils.utils import str_coercible
 
 
@@ -54,6 +58,10 @@ class Currency(object):
 
     """
     def __init__(self, code):
+        if babel is None:
+            raise ImproperlyConfigured(
+                "'babel' package is required in order to use Currency class."
+            )
         if isinstance(code, Currency):
             self.code = code
         elif isinstance(code, six.string_types):
@@ -75,7 +83,7 @@ class Currency(object):
 
     @property
     def symbol(self):
-        return get_currency_symbol(self.code, i18n.get_locale())
+        return babel.numbers.get_currency_symbol(self.code, i18n.get_locale())
 
     @property
     def name(self):

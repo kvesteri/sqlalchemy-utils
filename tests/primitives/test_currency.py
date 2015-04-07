@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 import six
-from babel import Locale
 from pytest import mark, raises
 
 from sqlalchemy_utils import Currency, i18n
+from sqlalchemy_utils.primitives.currency import babel  # noqa
 
 
+@mark.skipif('babel is None')
 class TestCurrency(object):
     def setup_method(self, method):
-        i18n.get_locale = lambda: Locale('en')
+        i18n.get_locale = lambda: babel.Locale('en')
 
     def test_init(self):
         assert Currency('USD') == Currency(Currency('USD'))
