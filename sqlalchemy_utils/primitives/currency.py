@@ -8,6 +8,51 @@ from sqlalchemy_utils.utils import str_coercible
 
 @str_coercible
 class Currency(object):
+    """
+    Currency class wraps a 3-letter currency code. It provides various
+    convenience properties and methods.
+
+    ::
+
+        from babel import Locale
+        from sqlalchemy_utils import Currency, i18n
+
+
+        # First lets add a locale getter for testing purposes
+        i18n.get_locale = lambda: Locale('en')
+
+
+        Currency('USD').name  # US Dollar
+        Currency('USD').symbol  # $
+
+        Currency(Currency('USD')).code  # 'USD'
+
+    Currency always validates the given code.
+
+    ::
+
+        Currency(None)  # raises TypeError
+
+        Currency('UnknownCode')  # raises ValueError
+
+
+    Currency supports equality operators.
+
+    ::
+
+        Currency('USD') == Currency('USD')
+        Currency('USD') != Currency('EUR')
+
+
+    Currencies are hashable.
+
+
+    ::
+
+        len(set([Currency('USD'), Currency('USD')]))  # 1
+
+
+    """
     def __init__(self, code):
         if isinstance(code, Currency):
             self.code = code
@@ -54,4 +99,4 @@ class Currency(object):
         return '%s(%r)' % (self.__class__.__name__, self.code)
 
     def __unicode__(self):
-        return self.name
+        return self.code

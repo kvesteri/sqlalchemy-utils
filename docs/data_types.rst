@@ -46,6 +46,10 @@ CurrencyType
 
 .. autoclass:: CurrencyType
 
+.. module:: sqlalchemy_utils.primitives.currency
+
+.. autoclass:: Currency
+
 
 EncryptedType
 ^^^^^^^^^^^^^

@@ -8,8 +8,8 @@ from .scalar_coercible import ScalarCoercible
 
 class CurrencyType(types.TypeDecorator, ScalarCoercible):
     """
-    Changes Currency objects to a string representation on the way in and
-    changes them back to Currency objects on the way out.
+    Changes :class:`.Currency` objects to a string representation on the way in
+    and changes them back to :class:`.Currency` objects on the way out.
 
     In order to use CurrencyType you need to install Babel_ first.
 

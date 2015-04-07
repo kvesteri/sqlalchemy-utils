@@ -55,11 +55,11 @@ class TestCurrency(object):
 
     def test_unicode(self):
         currency = Currency('USD')
-        assert six.text_type(currency) == u'US Dollar'
+        assert six.text_type(currency) == u'USD'
 
     def test_str(self):
         currency = Currency('USD')
-        assert str(currency) == 'US Dollar'
+        assert str(currency) == 'USD'
 
     def test_representation(self):
         currency = Currency('USD')
