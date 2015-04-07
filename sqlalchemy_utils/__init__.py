@@ -89,4 +89,4 @@ from .types import (  # noqa
     WeekDaysType
 )
 
-__version__ = '0.29.8'
+__version__ = '0.29.9'

@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.29.9 (2015-04-07)
+^^^^^^^^^^^^^^^^^^^
+
+- Added CurrencyType (#19) and Currency class
+
+
 0.29.8 (2015-03-03)
 ^^^^^^^^^^^^^^^^^^^
 
