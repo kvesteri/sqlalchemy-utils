@@ -6,6 +6,7 @@ from .arrow import ArrowType
 from .choice import Choice, ChoiceType
 from .color import ColorType
 from .country import Country, CountryType
+from .currency import CurrencyType
 from .email import EmailType
 from .encrypted import EncryptedType
 from .ip_address import IPAddressType
@@ -33,6 +34,7 @@ __all__ = (
     ColorType,
     Country,
     CountryType,
+    CurrencyType,
     DateRangeType,
     DateTimeRangeType,
     EmailType,

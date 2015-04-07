@@ -64,6 +64,7 @@ from .types import (  # noqa
     ColorType,
     Country,
     CountryType,
+    CurrencyType,
     DateRangeType,
     DateTimeRangeType,
     EmailType,
