@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.29.10 (2015-04-xx)
+^^^^^^^^^^^^^^^^^^^^
+
+- Added __hash__ method to Country class
+
+
 0.29.9 (2015-04-07)
 ^^^^^^^^^^^^^^^^^^^
 

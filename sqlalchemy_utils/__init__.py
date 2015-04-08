@@ -54,7 +54,7 @@ from .listeners import (  # noqa
 )
 from .models import Timestamp  # noqa
 from .observer import observes  # noqa
-from .primitives import Currency, WeekDay, WeekDays  # noqa
+from .primitives import Country, Currency, WeekDay, WeekDays  # noqa
 from .proxy_dict import proxy_dict, ProxyDict  # noqa
 from .query_chain import QueryChain  # noqa
 from .types import (  # noqa
@@ -62,7 +62,6 @@ from .types import (  # noqa
     Choice,
     ChoiceType,
     ColorType,
-    Country,
     CountryType,
     CurrencyType,
     DateRangeType,
