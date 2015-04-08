@@ -5,6 +5,50 @@ from sqlalchemy_utils.utils import str_coercible
 
 @str_coercible
 class Country(object):
+    """
+    Country class wraps a 2 to 3 letter country code. It provides various
+    convenience properties and methods.
+
+    ::
+
+        from babel import Locale
+        from sqlalchemy_utils import Country, i18n
+
+
+        # First lets add a locale getter for testing purposes
+        i18n.get_locale = lambda: Locale('en')
+
+
+        Country('FI').name  # Finland
+        Country('FI').code  # FI
+
+        Country(Country('FI')).code  # 'FI'
+
+    Country always validates the given code.
+
+    ::
+
+        Country(None)  # raises TypeError
+
+        Country('UnknownCode')  # raises ValueError
+
+
+    Country supports equality operators.
+
+    ::
+
+        Country('FI') == Country('FI')
+        Country('FI') != Country('US')
+
+
+    Country objects are hashable.
+
+
+    ::
+
+        assert hash(Country('FI')) == hash('FI')
+
+    """
     def __init__(self, code_or_country):
         if isinstance(code_or_country, Country):
             self.code = code_or_country.code

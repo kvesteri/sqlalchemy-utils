@@ -7,8 +7,8 @@ from .scalar_coercible import ScalarCoercible
 
 class CountryType(types.TypeDecorator, ScalarCoercible):
     """
-    Changes Country objects to a string representation on the way in and
-    changes them back to Country objects on the way out.
+    Changes :class:`.Country` objects to a string representation on the way in
+    and changes them back to :class:`.Country` objects on the way out.
 
     In order to use CountryType you need to install Babel_ first.
 

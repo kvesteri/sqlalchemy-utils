@@ -38,6 +38,10 @@ CountryType
 
 .. autoclass:: CountryType
 
+.. module:: sqlalchemy_utils.primitives.country
+
+.. autoclass:: Country
+
 
 CurrencyType
 ^^^^^^^^^^^^
