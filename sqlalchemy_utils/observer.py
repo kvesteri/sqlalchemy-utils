@@ -1,5 +1,5 @@
 """
-This module provides a decorator function for observing changes in given
+This module provides a decorator function for observing changes in a given
 property. Internally the decorator is implemented using SQLAlchemy event
 listeners. Both column properties and relationship properties can be observed.
 
@@ -54,8 +54,8 @@ Director.
 
 .. note::
 
-    This example could be done much more efficiently using a compound foreing
-    key from direcor_name, director_id to Director.name, Director.id but for
+    This example could be done much more efficiently using a compound foreign
+    key from director_name, director_id to Director.name, Director.id but for
     the sake of simplicity we added this as an example.
 
 
@@ -67,11 +67,11 @@ things. However performance wise you should take the following things into
 consideration:
 
 * :func:`observes` works always inside transaction and deals with objects. If
-  the relationship observer is observing has large number of objects its better
+  the relationship observer is observing has a large number of objects it's better
   to use :func:`.aggregates.aggregated`.
 * :func:`.aggregates.aggregated` always executes one additional query per
-  aggregate so in scenarios where the observed relationship has only handful of
-  objects its better to use :func:`observes` instead.
+  aggregate so in scenarios where the observed relationship has only a handful of
+  objects it's better to use :func:`observes` instead.
 
 
 Example 1. Movie with many ratings
@@ -284,7 +284,7 @@ observer = PropertyObserver()
 
 def observes(path, observer=observer):
     """
-    Mark method as property observer for given property path. Inside
+    Mark method as property observer for the given property path. Inside
     transaction observer gathers all changes made in given property path and
     feeds the changed objects to observer-marked method at the before flush
     phase.
