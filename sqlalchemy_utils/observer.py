@@ -67,11 +67,11 @@ things. However performance wise you should take the following things into
 consideration:
 
 * :func:`observes` works always inside transaction and deals with objects. If
-  the relationship observer is observing has a large number of objects it's better
-  to use :func:`.aggregates.aggregated`.
+  the relationship observer is observing has a large number of objects it's
+  better to use :func:`.aggregates.aggregated`.
 * :func:`.aggregates.aggregated` always executes one additional query per
-  aggregate so in scenarios where the observed relationship has only a handful of
-  objects it's better to use :func:`observes` instead.
+  aggregate so in scenarios where the observed relationship has only a handful
+  of objects it's better to use :func:`observes` instead.
 
 
 Example 1. Movie with many ratings
@@ -223,15 +223,17 @@ class PropertyObserver(object):
 
                 for index in range(len(path)):
                     i = index + 1
-                    prop_class = path[index].property.mapper.class_
-                    self.callback_map[prop_class].append(
-                        Callback(
-                            func=callback,
-                            path=path[i:],
-                            backref=~ (path[:i]),
-                            fullpath=path
+                    prop = path[index].property
+                    if isinstance(prop, sa.orm.RelationshipProperty):
+                        prop_class = path[index].property.mapper.class_
+                        self.callback_map[prop_class].append(
+                            Callback(
+                                func=callback,
+                                path=path[i:],
+                                backref=~ (path[:i]),
+                                fullpath=path
+                            )
                         )
-                    )
 
     def gather_callback_args(self, obj, callbacks):
         session = sa.orm.object_session(obj)

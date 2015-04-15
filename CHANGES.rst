@@ -4,12 +4,14 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
-0.29.10 (2015-04-xx)
-^^^^^^^^^^^^^^^^^^^^
+0.30.0 (2015-04-15)
+^^^^^^^^^^^^^^^^^^^
 
 - Added __hash__ method to Country class
 - Made Country validate itself during object initialization
 - Made Country string coercible
+- Removed deprecated function generates
+- Fixed observes function to work with simple column properties
 
 
 0.29.9 (2015-04-07)
