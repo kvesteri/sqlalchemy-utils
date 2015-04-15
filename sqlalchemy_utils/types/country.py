@@ -2,13 +2,14 @@ import six
 from sqlalchemy import types
 
 from sqlalchemy_utils.primitives import Country
+
 from .scalar_coercible import ScalarCoercible
 
 
 class CountryType(types.TypeDecorator, ScalarCoercible):
     """
     Changes :class:`.Country` objects to a string representation on the way in
-    and changes them back to :class:`.Country` objects on the way out.
+    and changes them back to :class:`.Country objects on the way out.
 
     In order to use CountryType you need to install Babel_ first.
 

@@ -1,4 +1,5 @@
 import six
+
 from sqlalchemy_utils import i18n
 from sqlalchemy_utils.utils import str_coercible
 
