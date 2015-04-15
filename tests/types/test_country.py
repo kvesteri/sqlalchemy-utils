@@ -18,7 +18,7 @@ class TestCountryType(TestCase):
 
     def test_parameter_processing(self):
         user = self.User(
-            country=Country(u'FI')
+            country=Country(u'fi')
         )
 
         self.session.add(user)
@@ -28,6 +28,6 @@ class TestCountryType(TestCase):
         assert user.country.name == u'Finland'
 
     def test_scalar_attributes_get_coerced_to_objects(self):
-        user = self.User(country='FI')
+        user = self.User(country='fi')
 
         assert isinstance(user.country, Country)
