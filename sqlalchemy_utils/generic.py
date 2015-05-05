@@ -94,6 +94,7 @@ class GenericRelationshipProperty(MapperProperty):
     """
 
     def __init__(self, discriminator, id, doc=None):
+        super(GenericRelationshipProperty, self).__init__()
         self._discriminator_col = discriminator
         self._id_cols = id
         self._id = None
@@ -138,10 +139,9 @@ class GenericRelationshipProperty(MapperProperty):
         self.id = list(map(self._column_to_property, self._id_cols))
 
     class Comparator(PropComparator):
-
         def __init__(self, prop, parentmapper):
             self.property = prop
-            self._parentmapper = parentmapper
+            self._parententity = parentmapper
 
         def __eq__(self, other):
             discriminator = six.text_type(type(other).__name__)

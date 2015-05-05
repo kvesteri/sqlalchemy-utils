@@ -4,9 +4,10 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
-0.30.1 (2015-05-xx)
+0.30.1 (2015-05-05)
 ^^^^^^^^^^^^^^^^^^^
 
+- Fixed GenericRelationshipProperty comparator to work with SA 1.0.x (#139)
 - Make translation_hybrid expression work the same way as SQLAlchemy-i18n translation expressions
 
 
