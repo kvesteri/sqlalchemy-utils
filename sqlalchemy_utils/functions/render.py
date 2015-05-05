@@ -58,7 +58,7 @@ def render_statement(statement, bind=None):
 
     if isinstance(statement, sa.orm.query.Query):
         if bind is None:
-            bind = statement.session.get_bind(statement._mapper_zero_or_none())
+            bind = statement.session.get_bind(statement._mapper_zero())
 
         statement = statement.statement
 
