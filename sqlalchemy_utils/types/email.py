@@ -11,3 +11,7 @@ class EmailType(sa.types.TypeDecorator):
         if value is not None:
             return value.lower()
         return value
+
+    @property
+    def python_type(self):
+        return self.impl.type.python_type
