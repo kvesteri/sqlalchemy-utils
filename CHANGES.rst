@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.30.1 (2015-05-xx)
+^^^^^^^^^^^^^^^^^^^
+
+- Make translation_hybrid expression work the same way as SQLAlchemy-i18n translation expressions
+
+
 0.30.0 (2015-04-15)
 ^^^^^^^^^^^^^^^^^^^
 

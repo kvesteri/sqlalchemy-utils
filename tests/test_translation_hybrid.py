@@ -1,4 +1,5 @@
 import sqlalchemy as sa
+from pytest import mark
 from sqlalchemy.dialects.postgresql import HSTORE
 
 from sqlalchemy_utils import TranslationHybrid
@@ -26,9 +27,6 @@ class TestTranslationHybrid(TestCase):
         city = self.City(name='Helsinki')
         assert city.name_translations['fi'] == 'Helsinki'
 
-    def test_hybrid_as_expression(self):
-        assert self.City.name == self.City.name_translations
-
     def test_if_no_translation_exists_returns_none(self):
         city = self.City()
         assert city.name is None
@@ -52,11 +50,18 @@ class TestTranslationHybrid(TestCase):
 
         assert city.name == 'Helsinki'
 
-    def test_hybrid_as_an_expression(self):
-        city = self.City(name_translations={'en': 'Helsinki'})
+    @mark.parametrize(
+        ('name_translations', 'name'),
+        (
+            ({'fi': 'Helsinki', 'en': 'Helsing'}, 'Helsinki'),
+            ({'en': 'Helsinki'}, 'Helsinki'),
+            ({'fi': 'Helsinki'}, 'Helsinki'),
+            ({}, None),
+        )
+    )
+    def test_hybrid_as_an_expression(self, name_translations, name):
+        city = self.City(name_translations=name_translations)
         self.session.add(city)
         self.session.commit()
 
-        assert city == self.session.query(self.City).filter(
-            self.City.name['en'] == 'Helsinki'
-        ).first()
+        assert self.session.query(self.City.name).scalar() == name

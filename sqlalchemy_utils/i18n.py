@@ -1,3 +1,4 @@
+import sqlalchemy as sa
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from .exceptions import ImproperlyConfigured
@@ -71,7 +72,11 @@ class TranslationHybrid(object):
         return setter
 
     def expr_factory(self, attr):
-        return lambda cls: attr
+        def expr(cls):
+            current_locale = self.cast_locale(cls, self.current_locale)
+            default_locale = self.cast_locale(cls, self.default_locale)
+            return sa.func.coalesce(attr[current_locale], attr[default_locale])
+        return expr
 
     def __call__(self, attr):
         return hybrid_property(
