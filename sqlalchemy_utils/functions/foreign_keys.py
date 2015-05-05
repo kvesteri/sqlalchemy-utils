@@ -14,7 +14,7 @@ from .orm import get_column_key, get_mapper, get_tables
 def get_foreign_key_values(fk, obj):
     return dict(
         (
-            fk.constraint.columns[index].key,
+            fk.constraint.columns.values()[index].key,
             getattr(obj, element.column.key)
         )
         for

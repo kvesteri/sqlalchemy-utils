@@ -9,7 +9,9 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 - Drop undocumented batch fetch feature. Let's wait until the inner workings of SQLAlchemy loading API is well-documented.
 - Fixed GenericRelationshipProperty comparator to work with SA 1.0.x (#139)
+- Make all foreign key helpers SA 1.0 compliant
 - Make translation_hybrid expression work the same way as SQLAlchemy-i18n translation expressions
+- Update SQLAlchemy dependency to 1.0
 
 
 0.30.0 (2015-04-15)

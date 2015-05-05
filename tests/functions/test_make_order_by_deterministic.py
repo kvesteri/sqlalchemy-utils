@@ -64,7 +64,7 @@ class TestMakeOrderByDeterministic(TestCase):
     def test_string_order_by(self):
         query = self.session.query(self.User).order_by('name')
         query = make_order_by_deterministic(query)
-        assert_contains('ORDER BY name, "user".id ASC', query)
+        assert_contains('ORDER BY "user".name, "user".id ASC', query)
 
     def test_annotated_label(self):
         query = self.session.query(self.User).order_by(self.User.article_count)

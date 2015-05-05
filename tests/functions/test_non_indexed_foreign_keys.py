@@ -44,7 +44,7 @@ class TestFindNonIndexedForeignKeys(TestCase):
             fks
         )
         column_names = [
-            column_name for column_name in fks['article'][0].columns
+            column_name for column_name in fks['article'][0].columns.keys()
         ]
         assert 'category_id' in column_names
         assert 'author_id' not in column_names
