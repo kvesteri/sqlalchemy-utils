@@ -6,7 +6,6 @@ from .asserts import (  # noqa
     assert_non_nullable,
     assert_nullable
 )
-from .batch import batch_fetch, with_backrefs  # noqa
 from .exceptions import ImproperlyConfigured  # noqa
 from .expression_parser import ExpressionParser  # noqa
 from .functions import (  # noqa
