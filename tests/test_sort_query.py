@@ -179,7 +179,7 @@ class TestSortQuery(TestCase):
     def test_table(self):
         query = self.session.query(self.Article.__table__)
         query = sort_query(query, 'name')
-        assert_contains('ORDER BY name', query)
+        assert_contains('ORDER BY article.name', query)
 
 
 class TestSortQueryRelationshipCounts(TestCase):
@@ -258,7 +258,7 @@ class TestSortQueryWithPolymorphicInheritance(TestCase):
             self.session.query(self.TextItem),
             'item_count'
         )
-        assert_contains('ORDER BY (SELECT count(:param_2) AS count_1', query)
+        assert_contains('ORDER BY item_count', query)
 
     def test_child_class_attribute(self):
         query = sort_query(
