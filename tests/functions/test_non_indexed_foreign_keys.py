@@ -1,3 +1,5 @@
+from itertools import chain
+
 import sqlalchemy as sa
 
 from sqlalchemy_utils.functions import non_indexed_foreign_keys
@@ -43,8 +45,13 @@ class TestFindNonIndexedForeignKeys(TestCase):
             'article' in
             fks
         )
-        column_names = [
-            column_name for column_name in fks['article'][0].columns.keys()
-        ]
+        column_names = list(chain(
+            *(
+                names for names in (
+                    fk.columns.keys()
+                    for fk in fks['article']
+                )
+            )
+        ))
         assert 'category_id' in column_names
         assert 'author_id' not in column_names

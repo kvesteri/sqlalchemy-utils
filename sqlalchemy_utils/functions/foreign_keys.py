@@ -357,9 +357,9 @@ def is_indexed_foreign_key(constraint):
     :param constraint: ForeignKeyConstraint object to check the indexes
     """
     return any(
-        set(column.name for column in index.columns)
+        set(constraint.columns.keys())
         ==
-        set(constraint.columns)
+        set(column.name for column in index.columns)
         for index
         in constraint.table.indexes
     )
