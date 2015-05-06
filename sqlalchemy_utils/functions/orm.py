@@ -471,28 +471,34 @@ def get_query_entities(query):
 
     :param query: SQLAlchemy Query object
     """
+    exprs = [
+        d['expr']
+        if is_labeled_query(d['expr']) or isinstance(d['expr'], sa.Column)
+        else d['entity']
+        for d in query.column_descriptions
+    ]
     return [
-        get_query_entity(entity) for entity in
-        chain(query._entities, query._join_entities)
+        get_query_entity(expr) for expr in exprs
+    ] + [
+        get_query_entity(entity) for entity in query._join_entities
     ]
 
 
-def get_query_entity(mixed):
-    if hasattr(mixed, 'expr'):
-        expr = mixed.expr
-    else:
-        expr = mixed
+def is_labeled_query(expr):
+    return (
+        isinstance(expr, sa.sql.elements.Label) and
+        isinstance(
+            list(expr.base_columns)[0],
+            (sa.sql.selectable.Select, sa.sql.selectable.ScalarSelect)
+        )
+    )
+
+
+def get_query_entity(expr):
     if isinstance(expr, sa.orm.attributes.InstrumentedAttribute):
         return expr.parent.class_
     elif isinstance(expr, sa.Column):
         return expr.table
-    elif isinstance(expr, sa.sql.expression.Label):
-        if mixed.entity_zero:
-            return mixed.entity_zero
-        else:
-            return expr
-    elif isinstance(expr, sa.orm.Mapper):
-        return expr.class_
     elif isinstance(expr, AliasedInsp):
         return expr.entity
     return expr
@@ -561,7 +567,7 @@ def get_descriptor(entity, attr):
                 # Handle synonyms, relationship properties and hybrid
                 # properties
                 try:
-                    return getattr(entity, attr)
+                    return getattr(mapper.class_, attr)
                 except AttributeError:
                     pass
 
