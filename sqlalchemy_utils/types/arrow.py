@@ -85,3 +85,7 @@ class ArrowType(types.TypeDecorator, ScalarCoercible):
         elif isinstance(value, datetime):
             value = arrow.get(value)
         return value
+
+    @property
+    def python_type(self):
+        return self.impl.type.python_type

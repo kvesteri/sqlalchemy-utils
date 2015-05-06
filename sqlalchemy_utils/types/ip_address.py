@@ -67,3 +67,7 @@ class IPAddressType(types.TypeDecorator, ScalarCoercible):
 
     def _coerce(self, value):
         return ip_address(value) if value else None
+
+    @property
+    def python_type(self):
+        return self.impl.type.python_type
