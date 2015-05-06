@@ -5,7 +5,6 @@ except ImportError:
 
 from functools import partial
 from inspect import isclass
-from itertools import chain
 from operator import attrgetter
 
 import six
