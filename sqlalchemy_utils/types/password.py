@@ -208,5 +208,9 @@ class PasswordType(types.TypeDecorator, ScalarCoercible):
 
         return value
 
+    @property
+    def python_type(self):
+        return self.impl.type.python_type
+
 
 Password.associate_with(PasswordType)

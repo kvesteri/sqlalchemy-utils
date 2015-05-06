@@ -61,3 +61,7 @@ class URLType(types.TypeDecorator, ScalarCoercible):
         if value is not None and not isinstance(value, furl):
             return furl(value)
         return value
+
+    @property
+    def python_type(self):
+        return self.impl.type.python_type
