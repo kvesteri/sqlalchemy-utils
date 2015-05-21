@@ -4,8 +4,8 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
-0.30.2 (not yet released)
-^^^^^^^^^^^^^^^^^^^^^^^^^
+0.30.2 (2015-05-21)
+^^^^^^^^^^^^^^^^^^^
 
 - Fixed ``assert_max_length``, ``assert_non_nullable``, ``assert_min_value`` and ``assert_max_value`` not properly raising an ``AssertionError`` when the assertion failed.
 
