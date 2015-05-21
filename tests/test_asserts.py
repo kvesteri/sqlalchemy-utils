@@ -9,20 +9,7 @@ from sqlalchemy_utils import (
     assert_non_nullable,
     assert_nullable
 )
-from sqlalchemy_utils.asserts import raises
 from tests import TestCase
-
-
-class TestRaises(object):
-    def test_matching_exception(self):
-        with raises(Exception):
-            raise Exception()
-        assert True
-
-    def test_non_matchin_exception(self):
-        with pytest.raises(Exception):
-            with raises(ValueError):
-                raise Exception()
 
 
 class AssertionTestCase(TestCase):
@@ -67,15 +54,15 @@ class TestAssertMaxLengthWithArray(AssertionTestCase):
         assert_max_length(self.user, 'fav_numbers', 8)
 
     def test_smaller_than_max_length(self):
-        with raises(AssertionError):
+        with pytest.raises(AssertionError):
             assert_max_length(self.user, 'fav_numbers', 7)
-        with raises(AssertionError):
+        with pytest.raises(AssertionError):
             assert_max_length(self.user, 'fav_numbers', 7)
 
     def test_bigger_than_max_length(self):
-        with raises(AssertionError):
+        with pytest.raises(AssertionError):
             assert_max_length(self.user, 'fav_numbers', 9)
-        with raises(AssertionError):
+        with pytest.raises(AssertionError):
             assert_max_length(self.user, 'fav_numbers', 9)
 
 
@@ -86,9 +73,9 @@ class TestAssertNonNullable(AssertionTestCase):
         assert_non_nullable(self.user, 'age')
 
     def test_nullable_column(self):
-        with raises(AssertionError):
+        with pytest.raises(AssertionError):
             assert_non_nullable(self.user, 'name')
-        with raises(AssertionError):
+        with pytest.raises(AssertionError):
             assert_non_nullable(self.user, 'name')
 
 
@@ -98,9 +85,9 @@ class TestAssertNullable(AssertionTestCase):
         assert_nullable(self.user, 'name')
 
     def test_non_nullable_column(self):
-        with raises(AssertionError):
+        with pytest.raises(AssertionError):
             assert_nullable(self.user, 'age')
-        with raises(AssertionError):
+        with pytest.raises(AssertionError):
             assert_nullable(self.user, 'age')
 
 
@@ -114,15 +101,15 @@ class TestAssertMaxLength(AssertionTestCase):
         assert_max_length(self.user, 'email', 200)
 
     def test_smaller_than_max_length(self):
-        with raises(AssertionError):
+        with pytest.raises(AssertionError):
             assert_max_length(self.user, 'name', 19)
-        with raises(AssertionError):
+        with pytest.raises(AssertionError):
             assert_max_length(self.user, 'name', 19)
 
     def test_bigger_than_max_length(self):
-        with raises(AssertionError):
+        with pytest.raises(AssertionError):
             assert_max_length(self.user, 'name', 21)
-        with raises(AssertionError):
+        with pytest.raises(AssertionError):
             assert_max_length(self.user, 'name', 21)
 
 
@@ -132,15 +119,15 @@ class TestAssertMinValue(AssertionTestCase):
         assert_min_value(self.user, 'age', 0)
 
     def test_smaller_than_min_value(self):
-        with raises(AssertionError):
+        with pytest.raises(AssertionError):
             assert_min_value(self.user, 'age', -1)
-        with raises(AssertionError):
+        with pytest.raises(AssertionError):
             assert_min_value(self.user, 'age', -1)
 
     def test_bigger_than_min_value(self):
-        with raises(AssertionError):
+        with pytest.raises(AssertionError):
             assert_min_value(self.user, 'age', 1)
-        with raises(AssertionError):
+        with pytest.raises(AssertionError):
             assert_min_value(self.user, 'age', 1)
 
 
@@ -150,13 +137,13 @@ class TestAssertMaxValue(AssertionTestCase):
         assert_max_value(self.user, 'age', 150)
 
     def test_smaller_than_max_value(self):
-        with raises(AssertionError):
+        with pytest.raises(AssertionError):
             assert_max_value(self.user, 'age', 149)
-        with raises(AssertionError):
+        with pytest.raises(AssertionError):
             assert_max_value(self.user, 'age', 149)
 
     def test_bigger_than_max_value(self):
-        with raises(AssertionError):
+        with pytest.raises(AssertionError):
             assert_max_value(self.user, 'age', 151)
-        with raises(AssertionError):
+        with pytest.raises(AssertionError):
             assert_max_value(self.user, 'age', 151)
