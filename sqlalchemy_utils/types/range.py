@@ -115,10 +115,27 @@ Membership operators
     ~ Car.price_range.in_([[300, 400], [700, 800]])
 
 
+Length
+^^^^^^
+
+SQLAlchemy-Utils provides length property for all range types. The
+implementation of this property varies on different range types.
+
+In the following example we find all cars whose price range's length is more
+than 500.
+
+::
+
+    session.query(Car).filter(
+        Car.price_range.length > 500
+    )
+
+
 
 .. _intervals: https://github.com/kvesteri/intervals
 """
 from collections import Iterable
+from datetime import timedelta
 
 import six
 import sqlalchemy as sa
@@ -204,6 +221,26 @@ class RangeComparator(types.TypeEngine.Comparator):
     def contained_by(self, other, **kwargs):
         other = self.coerce_arg(other)
         return self.op('<@')(other)
+
+
+class DiscreteRangeComparator(RangeComparator):
+    @property
+    def length(self):
+        return sa.func.upper(self.expr) - self.step - sa.func.lower(self.expr)
+
+
+class IntRangeComparator(DiscreteRangeComparator):
+    step = 1
+
+
+class DateRangeComparator(DiscreteRangeComparator):
+    step = timedelta(days=1)
+
+
+class ContinuousRangeComparator(RangeComparator):
+    @property
+    def length(self):
+        return sa.func.upper(self.expr) - sa.func.lower(self.expr)
 
 
 funcs = [
@@ -312,6 +349,7 @@ class IntRangeType(RangeType):
         # '30-140'
     """
     impl = INT4RANGE
+    comparator_factory = IntRangeComparator
 
     def __init__(self, *args, **kwargs):
         super(IntRangeType, self).__init__(*args, **kwargs)
@@ -337,6 +375,7 @@ class DateRangeType(RangeType):
             during = sa.Column(DateRangeType)
     """
     impl = DATERANGE
+    comparator_factory = DateRangeComparator
 
     def __init__(self, *args, **kwargs):
         super(DateRangeType, self).__init__(*args, **kwargs)
@@ -363,6 +402,7 @@ class NumericRangeType(RangeType):
     """
 
     impl = NUMRANGE
+    comparator_factory = ContinuousRangeComparator
 
     def __init__(self, *args, **kwargs):
         super(NumericRangeType, self).__init__(*args, **kwargs)
@@ -371,6 +411,7 @@ class NumericRangeType(RangeType):
 
 class DateTimeRangeType(RangeType):
     impl = TSRANGE
+    comparator_factory = ContinuousRangeComparator
 
     def __init__(self, *args, **kwargs):
         super(DateTimeRangeType, self).__init__(*args, **kwargs)
