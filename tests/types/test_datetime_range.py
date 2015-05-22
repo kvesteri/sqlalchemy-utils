@@ -7,6 +7,7 @@ from sqlalchemy_utils import DateTimeRangeType
 from tests import TestCase
 
 intervals = None
+inf = 0
 try:
     import intervals
     from infinity import inf
