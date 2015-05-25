@@ -12,6 +12,7 @@ from sqlalchemy_utils import (
     i18n,
     InstrumentedList
 )
+from sqlalchemy_utils.types.pg_composite import remove_composite_listeners
 
 
 @sa.event.listens_for(sa.engine.Engine, 'before_cursor_execute')
@@ -60,6 +61,7 @@ class TestCase(object):
         self.session.close_all()
         if self.create_tables:
             self.Base.metadata.drop_all(self.connection)
+        remove_composite_listeners()
         self.connection.close()
         self.engine.dispose()
 

@@ -49,7 +49,7 @@ Generic relationship is a form of relationship that supports creating a 1 to man
 
 
 Inheritance
-^^^^^^^^^^^
+-----------
 
 ::
 
@@ -108,7 +108,7 @@ We can even test super types::
 
 
 Abstract base classes
-^^^^^^^^^^^^^^^^^^^^^
+---------------------
 
 Generic relationships also allows using string arguments. When using generic_relationship with abstract base classes you need to set up the relationship using declared_attr decorator and string arguments.
 
@@ -140,7 +140,7 @@ Generic relationships also allows using string arguments. When using generic_rel
 
 
 Composite keys
-^^^^^^^^^^^^^^
+--------------
 
 For some very rare cases you may need to use generic_relationships with composite primary keys. There is a limitation here though: you can only set up generic_relationship for similar composite primary key types. In other words you can't mix generic relationship to both composite keyed objects and single keyed objects.
 
