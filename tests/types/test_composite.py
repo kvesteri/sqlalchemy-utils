@@ -127,8 +127,8 @@ class TestCompositeTypeInsideArray(TestCase):
     def test_parameter_processing(self):
         account = self.Account(
             balances=[
-                self.type.type_cls('USD', 15),
-                self.type.type_cls('AUD', 20)
+                self.type.type_cls(Currency('USD'), 15),
+                self.type.type_cls(Currency('AUD'), 20)
             ]
         )
 

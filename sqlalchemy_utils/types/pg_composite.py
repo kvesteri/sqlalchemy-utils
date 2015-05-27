@@ -97,6 +97,7 @@ import psycopg2
 import sqlalchemy as sa
 from psycopg2.extensions import adapt, AsIs, register_adapter
 from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql.psycopg2 import PGDialect_psycopg2
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.schema import _CreateDropBase
 from sqlalchemy.sql.expression import FunctionElement
@@ -127,7 +128,7 @@ def _compile_pgelem(expr, compiler, **kw):
 class CompositeArray(ARRAY):
     def _proc_array(self, arr, itemproc, dim, collection):
         if dim is None:
-            if issubclass(self.item_type.python_type, (list, tuple)):
+            if issubclass(self.item_type.python_type, tuple):
                 return arr
         ARRAY._proc_array(self, arr, itemproc, dim, collection)
 
@@ -166,8 +167,7 @@ class CompositeType(UserDefinedType, SchemaType):
         self.columns = columns
         if name in registered_composites:
             self.type_cls = registered_composites[name].type_cls
-        else:
-            registered_composites[name] = self
+        registered_composites[name] = self
         attach_composite_listeners()
 
     def get_col_spec(self):
@@ -226,7 +226,14 @@ def register_psycopg2_composite(dbapi_connection, composite):
 
     def adapt_composite(value):
         values = [
-            adapt(getattr(value, column.name)).getquoted().decode('utf-8')
+            adapt(
+                getattr(value, column.name)
+                if not isinstance(column.type, TypeDecorator)
+                else column.type.process_bind_param(
+                    getattr(value, column.name),
+                    PGDialect_psycopg2()
+                )
+            ).getquoted().decode('utf-8')
             for column in
             composite.columns
         ]
