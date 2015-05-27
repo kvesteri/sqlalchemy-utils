@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.30.4 (2015-05-27)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed CompositeType bind parameter processing when one of the fields is of TypeDecorator type.
+
+
 0.30.3 (2015-05-27)
 ^^^^^^^^^^^^^^^^^^^
 

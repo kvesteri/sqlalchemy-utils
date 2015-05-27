@@ -173,6 +173,21 @@ class CompositeType(UserDefinedType, SchemaType):
     def get_col_spec(self):
         return self.name
 
+    def bind_processor(self, dialect):
+        def process(value):
+            processed_value = []
+            for i, column in enumerate(self.columns):
+                if isinstance(column.type, TypeDecorator):
+                    processed_value.append(
+                        column.type.process_bind_param(
+                            value[i], dialect
+                        )
+                    )
+                else:
+                    processed_value.append(value[i])
+            return tuple(processed_value)
+        return process
+
     def result_processor(self, dialect, coltype):
         def process(value):
             cls = value.__class__

@@ -73,9 +73,21 @@ class TestCompositeTypeWithTypeDecorators(TestCase):
 
         self.Account = Account
 
-    def test_parameter_processing(self):
+    def test_result_set_processing(self):
         account = self.Account(
             balance=('USD', 15)
+        )
+
+        self.session.add(account)
+        self.session.commit()
+
+        account = self.session.query(self.Account).first()
+        assert account.balance.currency == Currency('USD')
+        assert account.balance.amount == 15
+
+    def test_parameter_processing(self):
+        account = self.Account(
+            balance=(Currency('USD'), 15)
         )
 
         self.session.add(account)
