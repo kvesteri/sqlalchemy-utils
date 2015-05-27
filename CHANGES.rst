@@ -4,10 +4,11 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
-0.30.3 (2015-05-22)
+0.30.3 (2015-05-27)
 ^^^^^^^^^^^^^^^^^^^
 
 - Added length property to range types
+- Added CompositeType for PostgreSQL
 
 
 0.30.2 (2015-05-21)
