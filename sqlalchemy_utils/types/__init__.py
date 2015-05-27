@@ -2,59 +2,36 @@ from functools import wraps
 
 from sqlalchemy.orm.collections import InstrumentedList as _InstrumentedList
 
-from .arrow import ArrowType
-from .choice import Choice, ChoiceType
-from .color import ColorType
-from .country import CountryType
-from .currency import CurrencyType
-from .email import EmailType
-from .encrypted import EncryptedType
-from .ip_address import IPAddressType
-from .json import JSONType
-from .locale import LocaleType
-from .password import Password, PasswordType
-from .phone_number import PhoneNumber, PhoneNumberType
-from .range import (
+from .arrow import ArrowType  # noqa
+from .choice import Choice, ChoiceType  # noqa
+from .color import ColorType  # noqa
+from .country import CountryType  # noqa
+from .currency import CurrencyType  # noqa
+from .email import EmailType  # noqa
+from .encrypted import EncryptedType  # noqa
+from .ip_address import IPAddressType  # noqa
+from .json import JSONType  # noqa
+from .locale import LocaleType  # noqa
+from .password import Password, PasswordType  # noqa
+from .pg_composite import (  # noqa
+    CompositeArray,
+    CompositeType,
+    register_composites,
+    remove_composite_listeners
+)
+from .phone_number import PhoneNumber, PhoneNumberType  # noqa
+from .range import (  # noqa
     DateRangeType,
     DateTimeRangeType,
     IntRangeType,
     NumericRangeType
 )
-from .scalar_list import ScalarListException, ScalarListType
-from .timezone import TimezoneType
-from .ts_vector import TSVectorType
-from .url import URLType
-from .uuid import UUIDType
-from .weekdays import WeekDaysType
-
-__all__ = (
-    ArrowType,
-    Choice,
-    ChoiceType,
-    ColorType,
-    CountryType,
-    CurrencyType,
-    DateRangeType,
-    DateTimeRangeType,
-    EmailType,
-    EncryptedType,
-    IntRangeType,
-    IPAddressType,
-    JSONType,
-    LocaleType,
-    NumericRangeType,
-    Password,
-    PasswordType,
-    PhoneNumber,
-    PhoneNumberType,
-    ScalarListException,
-    ScalarListType,
-    TimezoneType,
-    TSVectorType,
-    URLType,
-    UUIDType,
-    WeekDaysType,
-)
+from .scalar_list import ScalarListException, ScalarListType  # noqa
+from .timezone import TimezoneType  # noqa
+from .ts_vector import TSVectorType  # noqa
+from .url import URLType  # noqa
+from .uuid import UUIDType  # noqa
+from .weekdays import WeekDaysType  # noqa
 
 
 class InstrumentedList(_InstrumentedList):

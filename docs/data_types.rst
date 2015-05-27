@@ -8,7 +8,7 @@ advantage of these datatypes you should use automatic data coercion. See :func:`
 
 
 ArrowType
-^^^^^^^^^
+---------
 
 .. module:: sqlalchemy_utils.types.arrow
 
@@ -16,7 +16,7 @@ ArrowType
 
 
 ChoiceType
-^^^^^^^^^^
+----------
 
 .. module:: sqlalchemy_utils.types.choice
 
@@ -24,15 +24,23 @@ ChoiceType
 
 
 ColorType
-^^^^^^^^^
+---------
 
 .. module:: sqlalchemy_utils.types.color
 
 .. autoclass:: ColorType
 
 
+CompositeType
+-------------
+
+.. automodule:: sqlalchemy_utils.types.pg_composite
+
+.. autoclass:: CompositeType
+
+
 CountryType
-^^^^^^^^^^^
+-----------
 
 .. module:: sqlalchemy_utils.types.country
 
@@ -44,7 +52,7 @@ CountryType
 
 
 CurrencyType
-^^^^^^^^^^^^
+------------
 
 .. module:: sqlalchemy_utils.types.currency
 
@@ -56,14 +64,14 @@ CurrencyType
 
 
 EncryptedType
-^^^^^^^^^^^^^
+-------------
 
 .. module:: sqlalchemy_utils.types.encrypted
 
 .. autoclass:: EncryptedType
 
 JSONType
-^^^^^^^^
+--------
 
 .. module:: sqlalchemy_utils.types.json
 
@@ -71,7 +79,7 @@ JSONType
 
 
 LocaleType
-^^^^^^^^^^
+----------
 
 
 .. module:: sqlalchemy_utils.types.locale
@@ -80,7 +88,7 @@ LocaleType
 
 
 IPAddressType
-^^^^^^^^^^^^^
+-------------
 
 .. module:: sqlalchemy_utils.types.ip_address
 
@@ -88,7 +96,7 @@ IPAddressType
 
 
 PasswordType
-^^^^^^^^^^^^
+------------
 
 .. module:: sqlalchemy_utils.types.password
 
@@ -96,7 +104,7 @@ PasswordType
 
 
 PhoneNumberType
-^^^^^^^^^^^^^^^
+---------------
 
 .. module:: sqlalchemy_utils.types.phone_number
 
@@ -104,7 +112,7 @@ PhoneNumberType
 
 
 ScalarListType
-^^^^^^^^^^^^^^
+--------------
 
 .. module:: sqlalchemy_utils.types.scalar_list
 
@@ -112,7 +120,7 @@ ScalarListType
 
 
 TimezoneType
-^^^^^^^^^^^^
+------------
 
 
 .. module:: sqlalchemy_utils.types.timezone
@@ -121,7 +129,7 @@ TimezoneType
 
 
 TSVectorType
-^^^^^^^^^^^^
+------------
 
 .. module:: sqlalchemy_utils.types.ts_vector
 
@@ -129,7 +137,7 @@ TSVectorType
 
 
 URLType
-^^^^^^^
+-------
 
 .. module:: sqlalchemy_utils.types.url
 
@@ -137,7 +145,7 @@ URLType
 
 
 UUIDType
-^^^^^^^^
+--------
 
 
 .. module:: sqlalchemy_utils.types.uuid
@@ -147,7 +155,7 @@ UUIDType
 
 
 WeekDaysType
-^^^^^^^^^^^^
+------------
 
 .. module:: sqlalchemy_utils.types.weekdays
 

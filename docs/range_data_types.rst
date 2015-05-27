@@ -7,31 +7,31 @@ Range data types
 
 
 DateRangeType
-^^^^^^^^^^^^^
+-------------
 
 .. autoclass:: DateRangeType
 
 
 DateTimeRangeType
-^^^^^^^^^^^^^^^^^
+-----------------
 
 .. autoclass:: DateTimeRangeType
 
 
 IntRangeType
-^^^^^^^^^^^^
+------------
 
 .. autoclass:: IntRangeType
 
 
 NumericRangeType
-^^^^^^^^^^^^^^^^
+----------------
 
 .. autoclass:: NumericRangeType
 
 
 RangeComparator
-^^^^^^^^^^^^^^^
+---------------
 
 .. autoclass:: RangeComparator
     :members:
