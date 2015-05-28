@@ -1,5 +1,4 @@
 import sqlalchemy as sa
-from intervals import DecimalInterval
 from pytest import mark
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -15,6 +14,7 @@ from sqlalchemy_utils import (
     register_composites,
     remove_composite_listeners
 )
+from sqlalchemy_utils.types.range import intervals
 from sqlalchemy_utils.types.currency import babel
 from sqlalchemy_utils.types import pg_composite
 from tests import TestCase
@@ -145,6 +145,7 @@ class TestCompositeTypeInsideArray(TestCase):
         assert account.balances[1].amount == 20
 
 
+@mark.skipif('intervals is None')
 class TestCompositeTypeWithRangeTypeInsideArray(TestCase):
     dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
 
@@ -173,8 +174,14 @@ class TestCompositeTypeWithRangeTypeInsideArray(TestCase):
     def test_parameter_processing_with_named_tuple(self):
         account = self.Account(
             categories=[
-                self.type.type_cls(DecimalInterval([15, 18]), 'bad'),
-                self.type.type_cls(DecimalInterval([18, 20]), 'good')
+                self.type.type_cls(
+                    intervals.DecimalInterval([15, 18]),
+                    'bad'
+                ),
+                self.type.type_cls(
+                    intervals.DecimalInterval([18, 20]),
+                    'good'
+                )
             ]
         )
 
@@ -182,16 +189,20 @@ class TestCompositeTypeWithRangeTypeInsideArray(TestCase):
         self.session.commit()
 
         account = self.session.query(self.Account).first()
-        assert account.categories[0].scale == DecimalInterval([15, 18])
+        assert (
+            account.categories[0].scale == intervals.DecimalInterval([15, 18])
+        )
         assert account.categories[0].name == 'bad'
-        assert account.categories[1].scale == DecimalInterval([18, 20])
+        assert (
+            account.categories[1].scale == intervals.DecimalInterval([18, 20])
+        )
         assert account.categories[1].name == 'good'
 
     def test_parameter_processing_with_tuple(self):
         account = self.Account(
             categories=[
-                (DecimalInterval([15, 18]), 'bad'),
-                (DecimalInterval([18, 20]), 'good')
+                (intervals.DecimalInterval([15, 18]), 'bad'),
+                (intervals.DecimalInterval([18, 20]), 'good')
             ]
         )
 
@@ -199,9 +210,13 @@ class TestCompositeTypeWithRangeTypeInsideArray(TestCase):
         self.session.commit()
 
         account = self.session.query(self.Account).first()
-        assert account.categories[0].scale == DecimalInterval([15, 18])
+        assert (
+            account.categories[0].scale == intervals.DecimalInterval([15, 18])
+        )
         assert account.categories[0].name == 'bad'
-        assert account.categories[1].scale == DecimalInterval([18, 20])
+        assert (
+            account.categories[1].scale == intervals.DecimalInterval([18, 20])
+        )
         assert account.categories[1].name == 'good'
 
 
