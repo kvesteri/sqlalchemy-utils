@@ -9,14 +9,14 @@ from sqlalchemy_utils import (
     CompositeType,
     Currency,
     CurrencyType,
-    NumericRangeType,
     i18n,
+    NumericRangeType,
     register_composites,
     remove_composite_listeners
 )
-from sqlalchemy_utils.types.range import intervals
-from sqlalchemy_utils.types.currency import babel
 from sqlalchemy_utils.types import pg_composite
+from sqlalchemy_utils.types.currency import babel
+from sqlalchemy_utils.types.range import intervals
 from tests import TestCase
 
 

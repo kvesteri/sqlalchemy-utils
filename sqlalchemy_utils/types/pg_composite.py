@@ -95,17 +95,6 @@ http://schinckel.net/2014/09/24/using-postgres-composite-types-in-django/
 """
 from collections import namedtuple
 
-psycopg2 = None
-CompositeCaster = None
-adapt = None
-AsIs = None
-register_adapter = None
-try:
-    import psycopg2
-    from psycopg2.extras import CompositeCaster
-    from psycopg2.extensions import adapt, AsIs, register_adapter
-except ImportError:
-    pass
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.dialects.postgresql.psycopg2 import PGDialect_psycopg2
@@ -118,7 +107,20 @@ from sqlalchemy.types import (
     TypeDecorator,
     UserDefinedType
 )
+
 from sqlalchemy_utils import ImproperlyConfigured
+
+psycopg2 = None
+CompositeCaster = None
+adapt = None
+AsIs = None
+register_adapter = None
+try:
+    import psycopg2
+    from psycopg2.extras import CompositeCaster
+    from psycopg2.extensions import adapt, AsIs, register_adapter
+except ImportError:
+    pass
 
 
 class CompositeElement(FunctionElement):
