@@ -93,8 +93,11 @@ Related links:
 
 http://schinckel.net/2014/09/24/using-postgres-composite-types-in-django/
 """
+from collections import namedtuple
+
 import psycopg2
 import sqlalchemy as sa
+from psycopg2.extras import CompositeCaster
 from psycopg2.extensions import adapt, AsIs, register_adapter
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.dialects.postgresql.psycopg2 import PGDialect_psycopg2
@@ -128,9 +131,10 @@ def _compile_pgelem(expr, compiler, **kw):
 class CompositeArray(ARRAY):
     def _proc_array(self, arr, itemproc, dim, collection):
         if dim is None:
-            if issubclass(self.item_type.python_type, tuple):
+            if isinstance(self.item_type, CompositeType):
+                arr = [itemproc(a) for a in arr]
                 return arr
-        ARRAY._proc_array(self, arr, itemproc, dim, collection)
+        return ARRAY._proc_array(self, arr, itemproc, dim, collection)
 
 
 # TODO: Make the registration work on connection level instead of global level
@@ -167,7 +171,17 @@ class CompositeType(UserDefinedType, SchemaType):
         self.columns = columns
         if name in registered_composites:
             self.type_cls = registered_composites[name].type_cls
+        else:
+            self.type_cls = namedtuple(
+                self.name, [c.name for c in columns]
+            )
         registered_composites[name] = self
+
+        class Caster(CompositeCaster):
+            def make(obj, values):
+                return self.type_cls(*values)
+
+        self.caster = Caster
         attach_composite_listeners()
 
     def get_col_spec(self):
@@ -185,7 +199,7 @@ class CompositeType(UserDefinedType, SchemaType):
                     )
                 else:
                     processed_value.append(value[i])
-            return tuple(processed_value)
+            return self.type_cls(*processed_value)
         return process
 
     def result_processor(self, dialect, coltype):
@@ -218,11 +232,12 @@ class CompositeType(UserDefinedType, SchemaType):
 
 
 def register_psycopg2_composite(dbapi_connection, composite):
-    composite.type_cls = psycopg2.extras.register_composite(
+    psycopg2.extras.register_composite(
         composite.name,
         dbapi_connection,
-        globally=True
-    ).type
+        globally=True,
+        factory=composite.caster
+    )
 
     def adapt_composite(value):
         values = [

@@ -1,4 +1,5 @@
 import sqlalchemy as sa
+from intervals import DecimalInterval
 from pytest import mark
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -9,11 +10,13 @@ from sqlalchemy_utils import (
     CompositeType,
     Currency,
     CurrencyType,
+    NumericRangeType,
     i18n,
     register_composites,
     remove_composite_listeners
 )
 from sqlalchemy_utils.types.currency import babel
+from sqlalchemy_utils.types import pg_composite
 from tests import TestCase
 
 
@@ -142,14 +145,83 @@ class TestCompositeTypeInsideArray(TestCase):
         assert account.balances[1].amount == 20
 
 
+class TestCompositeTypeWithRangeTypeInsideArray(TestCase):
+    dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
+
+    def setup_method(self, method):
+        self.type = CompositeType(
+            'category',
+            [
+                sa.Column('scale', NumericRangeType),
+                sa.Column('name', sa.String)
+            ]
+        )
+
+        TestCase.setup_method(self, method)
+        i18n.get_locale = lambda: babel.Locale('en')
+
+    def create_models(self):
+        class Account(self.Base):
+            __tablename__ = 'account'
+            id = sa.Column(sa.Integer, primary_key=True)
+            categories = sa.Column(
+                CompositeArray(self.type)
+            )
+
+        self.Account = Account
+
+    def test_parameter_processing_with_named_tuple(self):
+        account = self.Account(
+            categories=[
+                self.type.type_cls(DecimalInterval([15, 18]), 'bad'),
+                self.type.type_cls(DecimalInterval([18, 20]), 'good')
+            ]
+        )
+
+        self.session.add(account)
+        self.session.commit()
+
+        account = self.session.query(self.Account).first()
+        assert account.categories[0].scale == DecimalInterval([15, 18])
+        assert account.categories[0].name == 'bad'
+        assert account.categories[1].scale == DecimalInterval([18, 20])
+        assert account.categories[1].name == 'good'
+
+    def test_parameter_processing_with_tuple(self):
+        account = self.Account(
+            categories=[
+                (DecimalInterval([15, 18]), 'bad'),
+                (DecimalInterval([18, 20]), 'good')
+            ]
+        )
+
+        self.session.add(account)
+        self.session.commit()
+
+        account = self.session.query(self.Account).first()
+        assert account.categories[0].scale == DecimalInterval([15, 18])
+        assert account.categories[0].name == 'bad'
+        assert account.categories[1].scale == DecimalInterval([18, 20])
+        assert account.categories[1].name == 'good'
+
+
 class TestCompositeTypeWhenTypeAlreadyExistsInDatabase(TestCase):
     dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
 
     def setup_method(self, method):
         self.engine = create_engine(self.dns)
-        # self.engine.echo = True
+        self.engine.echo = True
         self.connection = self.engine.connect()
         self.Base = declarative_base()
+        pg_composite.registered_composites = {}
+
+        self.type = CompositeType(
+            'money_type',
+            [
+                sa.Column('currency', sa.String),
+                sa.Column('amount', sa.Integer)
+            ]
+        )
 
         self.create_models()
         sa.orm.configure_mappers()
@@ -169,6 +241,7 @@ class TestCompositeTypeWhenTypeAlreadyExistsInDatabase(TestCase):
     def teardown_method(self, method):
         self.session.execute('DROP TABLE account')
         self.session.execute('DROP TYPE money_type')
+        self.session.commit()
         self.session.close_all()
         self.connection.close()
         remove_composite_listeners()
@@ -178,15 +251,7 @@ class TestCompositeTypeWhenTypeAlreadyExistsInDatabase(TestCase):
         class Account(self.Base):
             __tablename__ = 'account'
             id = sa.Column(sa.Integer, primary_key=True)
-            balance = sa.Column(
-                CompositeType(
-                    'money_type',
-                    [
-                        sa.Column('currency', sa.String),
-                        sa.Column('amount', sa.Integer)
-                    ]
-                )
-            )
+            balance = sa.Column(self.type)
 
         self.Account = Account
 
