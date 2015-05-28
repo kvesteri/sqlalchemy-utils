@@ -8,6 +8,7 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 ^^^^^^^^^^^^^^^^^^^
 
 - Make psycopg2 requirement optional (#145, #146)
+- Make CompositeArray work with tuples given as bind parameters
 
 
 0.30.5 (2015-05-27)
