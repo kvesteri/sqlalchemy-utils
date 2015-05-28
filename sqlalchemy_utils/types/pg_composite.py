@@ -95,10 +95,18 @@ http://schinckel.net/2014/09/24/using-postgres-composite-types-in-django/
 """
 from collections import namedtuple
 
-import psycopg2
+psycopg2 = None
+CompositeCaster = None
+adapt = None
+AsIs = None
+register_adapter = None
+try:
+    import psycopg2
+    from psycopg2.extras import CompositeCaster
+    from psycopg2.extensions import adapt, AsIs, register_adapter
+except ImportError:
+    pass
 import sqlalchemy as sa
-from psycopg2.extras import CompositeCaster
-from psycopg2.extensions import adapt, AsIs, register_adapter
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.dialects.postgresql.psycopg2 import PGDialect_psycopg2
 from sqlalchemy.ext.compiler import compiles
@@ -110,6 +118,7 @@ from sqlalchemy.types import (
     TypeDecorator,
     UserDefinedType
 )
+from sqlalchemy_utils import ImproperlyConfigured
 
 
 class CompositeElement(FunctionElement):
@@ -166,6 +175,10 @@ class CompositeType(UserDefinedType, SchemaType):
             return CompositeElement(self.expr, key, type_)
 
     def __init__(self, name, columns):
+        if psycopg2 is None:
+            raise ImproperlyConfigured(
+                "'psycopg2' package is required in order to use CompositeType."
+            )
         SchemaType.__init__(self)
         self.name = name
         self.columns = columns
