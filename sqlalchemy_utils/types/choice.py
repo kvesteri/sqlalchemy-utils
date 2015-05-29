@@ -148,7 +148,7 @@ class ChoiceType(types.TypeDecorator, ScalarCoercible):
             isinstance(choices, type) and
             issubclass(choices, Enum)
         ):
-            self.type_impl = EnumTypeImpl(enum_class=choices)
+            self.type_impl = EnumTypeIntImpl(enum_class=choices)
         else:
             self.type_impl = ChoiceTypeImpl(choices=choices)
 
@@ -197,7 +197,7 @@ class ChoiceTypeImpl(object):
         return value
 
 
-class EnumTypeImpl(object):
+class EnumTypeIntImpl(object):
     """The implementation for the ``Enum`` usage."""
 
     def __init__(self, enum_class):
