@@ -199,7 +199,7 @@ class ChoiceTypeImpl(object):
 
 
 class EnumTypeIntImpl(object):
-    """The implementation for the ``Enum`` usage."""
+    """The implementation for the ``Enum`` usage with Integer based DB type."""
 
     def __init__(self, enum_class):
         if Enum is None:
