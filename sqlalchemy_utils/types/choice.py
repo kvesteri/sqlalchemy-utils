@@ -222,3 +222,46 @@ class EnumTypeIntImpl(object):
 
     def process_result_value(self, value, dialect):
         return self.enum_class(value) if value else None
+
+class EnumTypeStringImpl(object):
+
+    """The implementation for the ``Enum`` usage with String based DB type."""
+
+    def __init__(self, enum_class):
+        if Enum is None:
+            raise ImproperlyConfigured(
+                "'enum34' package is required to use 'EnumType' in Python "
+                "< 3.4"
+            )
+        if not issubclass(enum_class, Enum):
+            raise ImproperlyConfigured(
+                "EnumType needs a class of enum defined."
+            )
+
+        self.enum_class = enum_class
+
+    def _coerce(self, value):
+        if not value:
+            return None
+
+        for member in self.enum_class:
+             dbvalue = getattr(member, 'dbvalue', None)
+             if dbvalue == value:
+                return member
+
+        return self.enum_class[value]
+
+    def process_bind_param(self, value, dialect):
+        return getattr(self.enum_class(value), 'dbvalue',
+                       self.enum_class(value).name) if value else None
+
+    def process_result_value(self, value, dialect):
+        if not value:
+            return None
+
+        for member in self.enum_class:
+             dbvalue = getattr(member, 'dbvalue', None)
+             if dbvalue == value:
+                return member
+
+        return self.enum_class[value]
