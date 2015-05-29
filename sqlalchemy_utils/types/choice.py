@@ -146,7 +146,8 @@ class ChoiceType(types.TypeDecorator, ScalarCoercible):
         if (
             Enum is not None and
             isinstance(choices, type) and
-            issubclass(choices, Enum)
+            issubclass(choices, Enum) and
+            isinstance(impl, types.Integer)
         ):
             self.type_impl = EnumTypeIntImpl(enum_class=choices)
         else:
