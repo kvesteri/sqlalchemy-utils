@@ -204,6 +204,8 @@ class CompositeType(UserDefinedType, SchemaType):
 
     def bind_processor(self, dialect):
         def process(value):
+            if value is None:
+                return None
             processed_value = []
             for i, column in enumerate(self.columns):
                 if isinstance(column.type, TypeDecorator):
@@ -219,6 +221,8 @@ class CompositeType(UserDefinedType, SchemaType):
 
     def result_processor(self, dialect, coltype):
         def process(value):
+            if value is None:
+                return None
             cls = value.__class__
             kwargs = {}
             for column in self.columns:

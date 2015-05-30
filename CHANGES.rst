@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.30.7 (2015-05-28)
+^^^^^^^^^^^^^^^^^^^
+
+- Fix CompositeType null handling
+
+
 0.30.6 (2015-05-28)
 ^^^^^^^^^^^^^^^^^^^
 

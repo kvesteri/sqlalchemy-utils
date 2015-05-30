@@ -219,6 +219,35 @@ class TestCompositeTypeWithRangeTypeInsideArray(TestCase):
         )
         assert account.categories[1].name == 'good'
 
+    def test_parameter_processing_with_nulls_as_composite_fields(self):
+        account = self.Account(
+            categories=[
+                (None, 'bad'),
+                (intervals.DecimalInterval([18, 20]), None)
+            ]
+        )
+        self.session.add(account)
+        self.session.commit()
+        assert account.categories[0].scale is None
+        assert account.categories[0].name == 'bad'
+        assert (
+            account.categories[1].scale == intervals.DecimalInterval([18, 20])
+        )
+        assert account.categories[1].name is None
+
+    def test_parameter_processing_with_nulls_as_composites(self):
+        account = self.Account(
+            categories=[
+                (None, None),
+                None
+            ]
+        )
+        self.session.add(account)
+        self.session.commit()
+        assert account.categories[0].scale is None
+        assert account.categories[0].name is None
+        assert account.categories[1] is None
+
 
 class TestCompositeTypeWhenTypeAlreadyExistsInDatabase(TestCase):
     dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
