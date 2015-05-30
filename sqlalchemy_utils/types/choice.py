@@ -229,8 +229,8 @@ class EnumTypeIntImpl(object):
     def process_result_value(self, value, dialect):
         return self.enum_class(value) if value else None
 
-class EnumTypeStringImpl(object):
 
+class EnumTypeStringImpl(object):
     """The implementation for the ``Enum`` usage with String based Columns."""
 
     def __init__(self, enum_class):
@@ -251,8 +251,8 @@ class EnumTypeStringImpl(object):
             return None
 
         for member in self.enum_class:
-             dbvalue = getattr(member, 'dbvalue', None)
-             if dbvalue == value:
+            dbvalue = getattr(member, 'dbvalue', None)
+            if dbvalue == value:
                 return member
 
         return self.enum_class[value]
@@ -266,8 +266,8 @@ class EnumTypeStringImpl(object):
             return None
 
         for member in self.enum_class:
-             dbvalue = getattr(member, 'dbvalue', None)
-             if dbvalue == value:
+            dbvalue = getattr(member, 'dbvalue', None)
+            if dbvalue == value:
                 return member
 
         return self.enum_class[value]
