@@ -129,7 +129,7 @@ class ChoiceType(types.TypeDecorator, ScalarCoercible):
             __tablename__ = 'user'
             id = sa.Column(sa.Integer, primary_key=True)
             name = sa.Column(sa.Unicode(255))
-            type = sa.Column(ChoiceType(TYPES))
+            type = sa.Column(ChoiceType(UserType, impl=sa.Integer()))
 
 
         user = User(type=UserType.admin)
