@@ -28,6 +28,7 @@ from .functions import (  # noqa
     get_query_entities,
     get_referencing_foreign_keys,
     get_tables,
+    get_type,
     group_foreign_keys,
     has_changes,
     has_index,
@@ -91,4 +92,4 @@ from .types import (  # noqa
     WeekDaysType
 )
 
-__version__ = '0.30.8'
+__version__ = '0.30.9'

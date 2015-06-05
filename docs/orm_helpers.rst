@@ -70,6 +70,12 @@ get_tables
 .. autofunction:: get_tables
 
 
+get_type
+--------
+
+.. autofunction:: get_type
+
+
 has_changes
 -----------
 

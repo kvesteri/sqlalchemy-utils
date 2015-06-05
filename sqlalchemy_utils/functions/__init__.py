@@ -29,6 +29,7 @@ from .orm import (  # noqa
     get_primary_keys,
     get_query_entities,
     get_tables,
+    get_type,
     getdotattr,
     has_changes,
     identity,

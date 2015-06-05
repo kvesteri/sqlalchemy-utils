@@ -14,7 +14,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapperlib
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.orm.exc import UnmappedInstanceError
-from sqlalchemy.orm.properties import ColumnProperty
+from sqlalchemy.orm.properties import ColumnProperty, RelationshipProperty
 from sqlalchemy.orm.query import _ColumnEntity
 from sqlalchemy.orm.session import object_session
 from sqlalchemy.orm.util import AliasedInsp
@@ -103,6 +103,54 @@ def get_class_by_table(base, table, data=None):
     elif found_classes:
         return found_classes.pop()
     return None
+
+
+def get_type(expr):
+    """
+    Return the associated type with given Column, InstrumentedAttribute,
+    ColumnProperty, RelationshipProperty or other similar SQLAlchemy construct.
+
+    For constructs wrapping columns this is the column type. For relationships
+    this function returns the relationship mapper class.
+
+    :param expr:
+        SQLAlchemy Column, InstrumentedAttribute, ColumnProperty or other
+        similar SA construct.
+
+    ::
+
+        class User(Base):
+            __tablename__ = 'user'
+            id = sa.Column(sa.Integer, primary_key=True)
+            name = sa.Column(sa.String)
+
+
+        class Article(Base):
+            __tablename__ = 'article'
+            id = sa.Column(sa.Integer, primary_key=True)
+            author_id = sa.Column(sa.Integer, sa.ForeignKey(User.id))
+            author = sa.orm.relationship(User)
+
+
+        get_type(User.__table__.c.name)  # sa.String()
+        get_type(User.name)  # sa.String()
+        get_type(User.name.property)  # sa.String()
+
+        get_type(Article.author)  # User
+
+
+    .. versionadded: 0.30.9
+    """
+    if hasattr(expr, 'type'):
+        return expr.type
+    elif isinstance(expr, InstrumentedAttribute):
+        expr = expr.property
+
+    if isinstance(expr, ColumnProperty):
+        return expr.columns[0].type
+    elif isinstance(expr, RelationshipProperty):
+        return expr.mapper.class_
+    raise TypeError("Couldn't inspect type.")
 
 
 def get_column_key(model, column):
