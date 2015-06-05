@@ -1,4 +1,5 @@
 import sqlalchemy as sa
+from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.sql.elements import ColumnClause
 from sqlalchemy.sql.expression import (
@@ -89,6 +90,16 @@ def compile_array_get(element, compiler, **kw):
         compiler.process(args[0]),
         sa.text(str(args[1].value + 1))
     )
+
+
+class row_to_json(FunctionElement):
+    name = 'row_to_json'
+    type = JSON
+
+
+@compiles(row_to_json, 'postgresql')
+def compile_row_to_json(element, compiler, **kw):
+    return "%s(%s)" % (element.name, compiler.process(element.clauses))
 
 
 class Asterisk(ColumnElement):

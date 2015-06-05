@@ -1,7 +1,8 @@
 import sqlalchemy as sa
+from pytest import raises
 from sqlalchemy.dialects import postgresql
 
-from sqlalchemy_utils import Asterisk
+from sqlalchemy_utils import Asterisk, row_to_json
 from sqlalchemy_utils.expressions import explain, explain_analyze
 from tests import TestCase
 
@@ -106,3 +107,21 @@ class TestAsterisk(object):
         assert str(Asterisk(User.__table__).compile(
             dialect=postgresql.dialect()
         )) == '"user".*'
+
+
+class TestRowToJson(object):
+    def test_compiler_with_default_dialect(self):
+        with raises(sa.exc.CompileError):
+            assert str(row_to_json(sa.text('article.*'))) == (
+                'row_to_json(article.*)'
+            )
+
+    def test_compiler_with_postgresql(self):
+        assert str(row_to_json(sa.text('article.*')).compile(
+            dialect=postgresql.dialect()
+        )) == (
+            'row_to_json(article.*)'
+        )
+
+    def test_type(self):
+        assert row_to_json(sa.text('article.*')).type == postgresql.JSON
