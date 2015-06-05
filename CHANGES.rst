@@ -8,7 +8,8 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 ^^^^^^^^^^^^^^^^^^^
 
 - Added Asterisk compiler
-- Added row_to_json FunctionElement
+- Added row_to_json GenericFunction
+- Added array_agg GenericFunction
 - Made quote function accept dialect object as the first paremeter
 - Made has_index work with tables without primary keys (#148)
 

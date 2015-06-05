@@ -2,7 +2,7 @@ import sqlalchemy as sa
 from pytest import raises
 from sqlalchemy.dialects import postgresql
 
-from sqlalchemy_utils import Asterisk, row_to_json
+from sqlalchemy_utils import array_agg, Asterisk, row_to_json
 from sqlalchemy_utils.expressions import explain, explain_analyze
 from tests import TestCase
 
@@ -112,16 +112,32 @@ class TestAsterisk(object):
 class TestRowToJson(object):
     def test_compiler_with_default_dialect(self):
         with raises(sa.exc.CompileError):
-            assert str(row_to_json(sa.text('article.*'))) == (
-                'row_to_json(article.*)'
-            )
+            str(row_to_json(sa.text('article.*')))
 
     def test_compiler_with_postgresql(self):
         assert str(row_to_json(sa.text('article.*')).compile(
             dialect=postgresql.dialect()
-        )) == (
-            'row_to_json(article.*)'
-        )
+        )) == 'row_to_json(article.*)'
 
     def test_type(self):
-        assert row_to_json(sa.text('article.*')).type == postgresql.JSON
+        assert isinstance(
+            sa.func.row_to_json(sa.text('article.*')).type,
+            postgresql.JSON
+        )
+
+
+class TestArrayAgg(object):
+    def test_compiler_with_default_dialect(self):
+        with raises(sa.exc.CompileError):
+            str(array_agg(sa.text('u.name')))
+
+    def test_compiler_with_postgresql(self):
+        assert str(array_agg(sa.text('u.name')).compile(
+            dialect=postgresql.dialect()
+        )) == "array_agg(u.name)"
+
+    def test_type(self):
+        assert isinstance(
+            sa.func.array_agg(sa.text('u.name')).type,
+            postgresql.ARRAY
+        )
