@@ -4,23 +4,25 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
-0.30.8 (2015-06-xx)
+0.30.8 (2015-06-05)
 ^^^^^^^^^^^^^^^^^^^
 
-- Make has_index work with tables without primary keys (#148)
+- Added Asterisk compiler
+- Made quote function accept dialect object as the first paremeter
+- Made has_index work with tables without primary keys (#148)
 
 
 0.30.7 (2015-05-28)
 ^^^^^^^^^^^^^^^^^^^
 
-- Fix CompositeType null handling
+- Fixed CompositeType null handling
 
 
 0.30.6 (2015-05-28)
 ^^^^^^^^^^^^^^^^^^^
 
-- Make psycopg2 requirement optional (#145, #146)
-- Make CompositeArray work with tuples given as bind parameters
+- Made psycopg2 requirement optional (#145, #146)
+- Made CompositeArray work with tuples given as bind parameters
 
 
 0.30.5 (2015-05-27)

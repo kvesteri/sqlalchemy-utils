@@ -1,11 +1,15 @@
 import sqlalchemy as sa
 from sqlalchemy.ext.compiler import compiles
-from sqlalchemy.sql import expression
+from sqlalchemy.sql.elements import ColumnClause
 from sqlalchemy.sql.expression import (
     _literal_as_text,
     ClauseElement,
-    Executable
+    ColumnElement,
+    Executable,
+    FunctionElement
 )
+
+from sqlalchemy_utils.functions.orm import quote
 
 
 class explain(Executable, ClauseElement):
@@ -64,7 +68,7 @@ def pg_explain(element, compiler, **kw):
     return text
 
 
-class array_get(expression.FunctionElement):
+class array_get(FunctionElement):
     name = 'array_get'
 
 
@@ -85,3 +89,13 @@ def compile_array_get(element, compiler, **kw):
         compiler.process(args[0]),
         sa.text(str(args[1].value + 1))
     )
+
+
+class Asterisk(ColumnElement):
+    def __init__(self, selectable):
+        self.selectable = selectable
+
+
+@compiles(Asterisk)
+def compile_asterisk(element, compiler, **kw):
+    return '%s.*' % quote(compiler.dialect, element.selectable.name)

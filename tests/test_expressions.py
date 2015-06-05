@@ -1,6 +1,7 @@
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
+from sqlalchemy_utils import Asterisk
 from sqlalchemy_utils.expressions import explain, explain_analyze
 from tests import TestCase
 
@@ -83,3 +84,25 @@ class TestExplainAnalyze(ExpressionTestCase):
                 dialect=postgresql.dialect()
             )
         ).startswith('EXPLAIN (ANALYZE true) SELECT')
+
+
+class TestAsterisk(object):
+    def test_with_table_object(self):
+        Base = sa.ext.declarative.declarative_base()
+
+        class Article(Base):
+            __tablename__ = 'article'
+            id = sa.Column(sa.Integer, primary_key=True)
+
+        assert str(Asterisk(Article.__table__)) == 'article.*'
+
+    def test_with_table_object(self):
+        Base = sa.ext.declarative.declarative_base()
+
+        class User(Base):
+            __tablename__ = 'user'
+            id = sa.Column(sa.Integer, primary_key=True)
+
+        assert str(Asterisk(User.__table__).compile(
+            dialect=postgresql.dialect()
+        )) == '"user".*'

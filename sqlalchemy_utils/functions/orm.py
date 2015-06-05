@@ -13,6 +13,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapperlib
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.orm.exc import UnmappedInstanceError
+from sqlalchemy.engine.interfaces import Dialect
 from sqlalchemy.orm.properties import ColumnProperty
 from sqlalchemy.orm.query import _ColumnEntity
 from sqlalchemy.orm.session import object_session
@@ -407,10 +408,13 @@ def quote(mixed, ident):
         # 'some_other_identifier'
 
 
-    :param mixed: SQLAlchemy Session / Connection / Engine object.
+    :param mixed: SQLAlchemy Session / Connection / Engine / Dialect object.
     :param ident: identifier to conditionally quote
     """
-    dialect = get_bind(mixed).dialect
+    if isinstance(mixed, Dialect):
+        dialect = mixed
+    else:
+        dialect = get_bind(mixed).dialect
     return dialect.preparer(dialect).quote(ident)
 
 
