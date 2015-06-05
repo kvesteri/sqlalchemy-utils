@@ -41,12 +41,9 @@ class TestHasIndex(object):
         assert not has_index(self.table.c.is_archived)
 
     def test_table_without_primary_key(self):
-        Base = declarative_base()
-
         article = sa.Table(
             'article',
             sa.MetaData(),
             sa.Column('name', sa.String)
         )
-
         assert not has_index(article.c.name)

@@ -9,11 +9,11 @@ from operator import attrgetter
 
 import six
 import sqlalchemy as sa
+from sqlalchemy.engine.interfaces import Dialect
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapperlib
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.orm.exc import UnmappedInstanceError
-from sqlalchemy.engine.interfaces import Dialect
 from sqlalchemy.orm.properties import ColumnProperty
 from sqlalchemy.orm.query import _ColumnEntity
 from sqlalchemy.orm.session import object_session

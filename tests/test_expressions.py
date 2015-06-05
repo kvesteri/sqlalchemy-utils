@@ -97,7 +97,7 @@ class TestAsterisk(object):
 
         assert str(Asterisk(Article.__table__)) == 'article.*'
 
-    def test_with_table_object(self):
+    def test_with_quoted_identifier(self):
         Base = sa.ext.declarative.declarative_base()
 
         class User(Base):

@@ -1,7 +1,6 @@
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import ARRAY, JSON
 from sqlalchemy.ext.compiler import compiles
-from sqlalchemy.sql.elements import ColumnClause
 from sqlalchemy.sql.expression import (
     _literal_as_text,
     ClauseElement,
@@ -123,7 +122,7 @@ class array_agg(GenericFunction):
 
 
 @compiles(array_agg, 'postgresql')
-def compile_json_array_length(element, compiler, **kw):
+def compile_array_agg(element, compiler, **kw):
     return "%s(%s)" % (element.name, compiler.process(element.clauses))
 
 

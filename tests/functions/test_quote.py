@@ -1,4 +1,5 @@
 from sqlalchemy.dialects import postgresql
+
 from sqlalchemy_utils.functions import quote
 from tests import TestCase
 
