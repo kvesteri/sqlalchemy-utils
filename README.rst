@@ -14,9 +14,9 @@ Resources
 - `Issue Tracker <http://github.com/kvesteri/sqlalchemy-utils/issues>`_
 - `Code <http://github.com/kvesteri/sqlalchemy-utils/>`_
 
-.. |Build Status| image:: https://travis-ci.org/kvesteri/sqlalchemy-utils.png?branch=master
+.. |Build Status| image:: https://travis-ci.org/kvesteri/sqlalchemy-utils.svg?branch=master
    :target: https://travis-ci.org/kvesteri/sqlalchemy-utils
-.. |Version Status| image:: https://pypip.in/v/SQLAlchemy-Utils/badge.png
+.. |Version Status| image:: https://img.shields.io/pypi/v/SQLAlchemy-Utils.svg
    :target: https://pypi.python.org/pypi/SQLAlchemy-Utils/
-.. |Downloads| image:: https://pypip.in/d/SQLAlchemy-Utils/badge.png
+.. |Downloads| image:: https://img.shields.io/pypi/dm/SQLAlchemy-Utils.svg
    :target: https://pypi.python.org/pypi/SQLAlchemy-Utils/
