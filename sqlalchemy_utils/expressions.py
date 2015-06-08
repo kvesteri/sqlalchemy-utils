@@ -1,5 +1,5 @@
 import sqlalchemy as sa
-from sqlalchemy.dialects.postgresql import ARRAY, JSON
+from sqlalchemy.dialects.postgresql import array, ARRAY, JSON
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.sql.expression import (
     _literal_as_text,
@@ -116,14 +116,21 @@ class array_agg(GenericFunction):
     name = 'array_agg'
     type = ARRAY
 
-    def __init__(self, arg, **kw):
+    def __init__(self, arg, default=None, **kw):
         self.type = ARRAY(arg.type)
+        self.default = default
         GenericFunction.__init__(self, arg, **kw)
 
 
 @compiles(array_agg, 'postgresql')
 def compile_array_agg(element, compiler, **kw):
-    return "%s(%s)" % (element.name, compiler.process(element.clauses))
+    compiled = "%s(%s)" % (element.name, compiler.process(element.clauses))
+    if element.default is None:
+        return compiled
+    return str(sa.func.coalesce(
+        sa.text(compiled),
+        sa.cast(array(element.default), element.type)
+    ).compile(compiler))
 
 
 class Asterisk(ColumnElement):

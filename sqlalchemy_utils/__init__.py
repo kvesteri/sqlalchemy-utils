@@ -8,7 +8,7 @@ from .asserts import (  # noqa
 )
 from .exceptions import ImproperlyConfigured  # noqa
 from .expression_parser import ExpressionParser  # noqa
-from .expressions import array_agg, Asterisk, row_to_json  # noqa
+from .expressions import Asterisk, row_to_json  # noqa
 from .functions import (  # noqa
     analyze,
     create_database,

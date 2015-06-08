@@ -4,10 +4,11 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
-0.30.9 (2015-06-05)
+0.30.9 (2015-06-08)
 ^^^^^^^^^^^^^^^^^^^
 
 - Added get_type utility function
+- Added default parameter for array_agg function
 
 
 0.30.8 (2015-06-05)

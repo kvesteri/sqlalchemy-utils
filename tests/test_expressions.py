@@ -2,7 +2,7 @@ import sqlalchemy as sa
 from pytest import raises
 from sqlalchemy.dialects import postgresql
 
-from sqlalchemy_utils import array_agg, Asterisk, row_to_json
+from sqlalchemy_utils import Asterisk, row_to_json
 from sqlalchemy_utils.expressions import explain, explain_analyze
 from tests import TestCase
 
@@ -129,10 +129,10 @@ class TestRowToJson(object):
 class TestArrayAgg(object):
     def test_compiler_with_default_dialect(self):
         with raises(sa.exc.CompileError):
-            str(array_agg(sa.text('u.name')))
+            str(sa.func.array_agg(sa.text('u.name')))
 
     def test_compiler_with_postgresql(self):
-        assert str(array_agg(sa.text('u.name')).compile(
+        assert str(sa.func.array_agg(sa.text('u.name')).compile(
             dialect=postgresql.dialect()
         )) == "array_agg(u.name)"
 
@@ -140,4 +140,18 @@ class TestArrayAgg(object):
         assert isinstance(
             sa.func.array_agg(sa.text('u.name')).type,
             postgresql.ARRAY
+        )
+
+    def test_array_agg_with_default(self):
+        Base = sa.ext.declarative.declarative_base()
+
+        class Article(Base):
+            __tablename__ = 'article'
+            id = sa.Column(sa.Integer, primary_key=True)
+
+        assert str(sa.func.array_agg(Article.id, [1]).compile(
+            dialect=postgresql.dialect()
+        )) == (
+            'coalesce(array_agg(article.id), CAST(ARRAY[%(param_1)s]'
+            ' AS INTEGER[]))'
         )
