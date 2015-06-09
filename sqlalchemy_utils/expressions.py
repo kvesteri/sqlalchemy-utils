@@ -1,5 +1,5 @@
 import sqlalchemy as sa
-from sqlalchemy.dialects.postgresql import array, ARRAY, JSON
+from sqlalchemy.dialects import postgresql
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.sql.expression import (
     _literal_as_text,
@@ -94,7 +94,7 @@ def compile_array_get(element, compiler, **kw):
 
 class row_to_json(GenericFunction):
     name = 'row_to_json'
-    type = JSON
+    type = postgresql.JSON
 
 
 @compiles(row_to_json, 'postgresql')
@@ -114,10 +114,10 @@ def compile_json_array_length(element, compiler, **kw):
 
 class array_agg(GenericFunction):
     name = 'array_agg'
-    type = ARRAY
+    type = postgresql.ARRAY
 
     def __init__(self, arg, default=None, **kw):
-        self.type = ARRAY(arg.type)
+        self.type = postgresql.ARRAY(arg.type)
         self.default = default
         GenericFunction.__init__(self, arg, **kw)
 
@@ -129,7 +129,7 @@ def compile_array_agg(element, compiler, **kw):
         return compiled
     return str(sa.func.coalesce(
         sa.text(compiled),
-        sa.cast(array(element.default), element.type)
+        sa.cast(postgresql.array(element.default), element.type)
     ).compile(compiler))
 
 
