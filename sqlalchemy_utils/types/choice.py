@@ -214,10 +214,18 @@ class EnumTypeImpl(object):
         self.enum_class = enum_class
 
     def _coerce(self, value):
-        return self.enum_class(value) if value else None
+        if value is None:
+            return None
+        if value in self.enum_class:
+            return value
+        return self.enum_class(value)
 
     def process_bind_param(self, value, dialect):
-        return self.enum_class(value).value if value else None
+        if value is None:
+            return None
+        return self.enum_class(value).value
 
     def process_result_value(self, value, dialect):
-        return self.enum_class(value) if value else None
+        if value is None:
+            return None
+        return self.enum_class(value)
