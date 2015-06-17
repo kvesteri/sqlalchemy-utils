@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.30.10 (2015-06-17)
+^^^^^^^^^^^^^^^^^^^^
+
+- Added better support for dynamic locales in translation_hybrid
+
+
 0.30.9 (2015-06-09)
 ^^^^^^^^^^^^^^^^^^^
 

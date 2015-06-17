@@ -3,6 +3,9 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from .exceptions import ImproperlyConfigured
 
+from babel import Locale
+
+
 try:
     from babel.dates import get_day_names
 except ImportError:
@@ -37,10 +40,12 @@ class TranslationHybrid(object):
         """
         if callable(locale):
             try:
-                return str(locale())
+                locale = locale()
             except TypeError:
-                return str(locale(obj))
-        return str(locale)
+                locale = locale(obj)
+        if isinstance(locale, Locale):
+            return str(locale)
+        return locale
 
     def getter_factory(self, attr):
         """

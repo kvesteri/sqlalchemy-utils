@@ -65,3 +65,21 @@ class TestTranslationHybrid(TestCase):
         self.session.commit()
 
         assert self.session.query(self.City.name).scalar() == name
+
+    def test_dynamic_locale(self):
+        self.translation_hybrid = TranslationHybrid(
+            lambda obj: obj.locale,
+            'fi'
+        )
+
+        class Article(self.Base):
+            __tablename__ = 'article'
+            id = sa.Column(sa.Integer, primary_key=True)
+            name_translations = sa.Column(HSTORE)
+            name = self.translation_hybrid(name_translations)
+            locale = sa.Column(sa.String)
+
+        assert (
+            'coalesce(article.name_translations -> article.locale'
+            in str(Article.name)
+        )

@@ -115,4 +115,39 @@ of translation_hybrid. In the following example we make translation hybrid fallb
 
     Article().name  # ''
 
+
+Dynamic locales
+---------------
+
+Sometimes locales need to be dynamic. The following example illustrates how to setup
+dynamic locales.
+
+
+::
+
+    translation_hybrid = TranslationHybrid(
+        current_locale=get_locale,
+        default_locale=lambda obj: obj.locale,
+    )
+
+
+    class Article(Base):
+        __tablename__ = 'article'
+
+        id = Column(Integer, primary_key=True)
+        name_translations = Column(HSTORE)
+
+        name = translation_hybrid(name_translations, default)
+        locale = Column(String)
+
+
+    article = Article(name_translations={'en': 'Some article'})
+    session.add(article)
+    session.commit()
+
+    article.name  # Some article (even if current locale is other than 'en')
+
+
+
+
 .. _SQLAlchemy-i18n: https://github.com/kvesteri/sqlalchemy-i18n
