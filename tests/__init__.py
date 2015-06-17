@@ -31,7 +31,7 @@ sa.event.listen(sa.orm.mapper, 'mapper_configured', coercion_listener)
 
 def get_locale():
     class Locale():
-        territories = {'fi': 'Finland'}
+        territories = {'FI': 'Finland'}
 
     return Locale()
 

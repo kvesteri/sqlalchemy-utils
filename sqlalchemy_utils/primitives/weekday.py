@@ -39,7 +39,7 @@ class WeekDay(object):
         return self.name
 
     def get_name(self, width='wide', context='format'):
-        names = i18n.get_day_names(
+        names = i18n.babel.dates.get_day_names(
             width,
             context,
             i18n.get_locale()

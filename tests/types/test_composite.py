@@ -15,7 +15,6 @@ from sqlalchemy_utils import (
     remove_composite_listeners
 )
 from sqlalchemy_utils.types import pg_composite
-from sqlalchemy_utils.types.currency import babel
 from sqlalchemy_utils.types.range import intervals
 from tests import TestCase
 
@@ -52,13 +51,13 @@ class TestCompositeTypeWithRegularTypes(TestCase):
         assert account.balance.amount == 15
 
 
-@mark.skipif('babel is None')
+@mark.skipif('i18n.babel is None')
 class TestCompositeTypeWithTypeDecorators(TestCase):
     dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
 
     def setup_method(self, method):
         TestCase.setup_method(self, method)
-        i18n.get_locale = lambda: babel.Locale('en')
+        i18n.get_locale = lambda: i18n.babel.Locale('en')
 
     def create_models(self):
         class Account(self.Base):
@@ -101,7 +100,7 @@ class TestCompositeTypeWithTypeDecorators(TestCase):
         assert account.balance.amount == 15
 
 
-@mark.skipif('babel is None')
+@mark.skipif('i18n.babel is None')
 class TestCompositeTypeInsideArray(TestCase):
     dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
 
@@ -115,7 +114,7 @@ class TestCompositeTypeInsideArray(TestCase):
         )
 
         TestCase.setup_method(self, method)
-        i18n.get_locale = lambda: babel.Locale('en')
+        i18n.get_locale = lambda: i18n.babel.Locale('en')
 
     def create_models(self):
         class Account(self.Base):
@@ -159,7 +158,6 @@ class TestCompositeTypeWithRangeTypeInsideArray(TestCase):
         )
 
         TestCase.setup_method(self, method)
-        i18n.get_locale = lambda: babel.Locale('en')
 
     def create_models(self):
         class Account(self.Base):

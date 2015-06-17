@@ -2,10 +2,11 @@ import sqlalchemy as sa
 from pytest import mark
 from sqlalchemy.dialects.postgresql import HSTORE
 
-from sqlalchemy_utils import TranslationHybrid
+from sqlalchemy_utils import i18n, TranslationHybrid  # noqa
 from tests import TestCase
 
 
+@mark.skipif('i18n.babel is None')
 class TestTranslationHybrid(TestCase):
     dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
 

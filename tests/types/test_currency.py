@@ -3,15 +3,14 @@ import sqlalchemy as sa
 from pytest import mark
 
 from sqlalchemy_utils import Currency, CurrencyType, i18n
-from sqlalchemy_utils.types.currency import babel
 from tests import TestCase
 
 
-@mark.skipif('babel is None')
+@mark.skipif('i18n.babel is None')
 class TestCurrencyType(TestCase):
     def setup_method(self, method):
         TestCase.setup_method(self, method)
-        i18n.get_locale = lambda: babel.Locale('en')
+        i18n.get_locale = lambda: i18n.babel.Locale('en')
 
     def create_models(self):
         class User(self.Base):

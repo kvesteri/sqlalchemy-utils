@@ -4,15 +4,14 @@ import sqlalchemy as sa
 from sqlalchemy_utils import i18n
 from sqlalchemy_utils.primitives import WeekDays
 from sqlalchemy_utils.types import WeekDaysType
-from sqlalchemy_utils.types.weekdays import babel
 from tests import TestCase
 
 
-@pytest.mark.skipif('babel is None')
+@pytest.mark.skipif('i18n.babel is None')
 class WeekDaysTypeTestCase(TestCase):
     def setup_method(self, method):
         TestCase.setup_method(self, method)
-        i18n.get_locale = lambda: babel.Locale('en')
+        i18n.get_locale = lambda: i18n.babel.Locale('en')
 
     def create_models(self):
         class Schedule(self.Base):

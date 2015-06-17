@@ -1,11 +1,7 @@
-babel = None
-try:
-    import babel
-except ImportError:
-    pass
 import six
 from sqlalchemy import types
 
+from sqlalchemy_utils import i18n
 from sqlalchemy_utils.exceptions import ImproperlyConfigured
 from sqlalchemy_utils.primitives import WeekDay, WeekDays
 
@@ -57,7 +53,7 @@ class WeekDaysType(types.TypeDecorator, ScalarCoercible):
     impl = BitType(WeekDay.NUM_WEEK_DAYS)
 
     def __init__(self, *args, **kwargs):
-        if babel is None:
+        if i18n.babel is None:
             raise ImproperlyConfigured(
                 "'babel' package is required to use 'WeekDaysType'"
             )

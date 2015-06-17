@@ -1,12 +1,7 @@
-babel = None
-try:
-    import babel
-except ImportError:
-    pass
 import six
 from sqlalchemy import types
 
-from sqlalchemy_utils import ImproperlyConfigured
+from sqlalchemy_utils import i18n, ImproperlyConfigured
 from sqlalchemy_utils.primitives import Currency
 
 from .scalar_coercible import ScalarCoercible
@@ -57,7 +52,7 @@ class CurrencyType(types.TypeDecorator, ScalarCoercible):
     python_type = Currency
 
     def __init__(self, *args, **kwargs):
-        if babel is None:
+        if i18n.babel is None:
             raise ImproperlyConfigured(
                 "'babel' package is required in order to use CurrencyType."
             )

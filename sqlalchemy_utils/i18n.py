@@ -3,18 +3,10 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from .exceptions import ImproperlyConfigured
 
-from babel import Locale
-
-
 try:
-    from babel.dates import get_day_names
+    import babel
 except ImportError:
-    def get_day_names():
-        raise ImproperlyConfigured(
-            'Could not load get_day_names function from babel. Either install '
-            ' babel or make a similar function and override it in this '
-            'module.'
-        )
+    babel = None
 
 try:
     from flask.ext.babel import get_locale
@@ -29,6 +21,10 @@ except ImportError:
 
 class TranslationHybrid(object):
     def __init__(self, current_locale, default_locale, default_value=None):
+        if babel is None:
+            raise ImproperlyConfigured(
+                'You need to install babel in order to use TranslationHybrid.'
+            )
         self.current_locale = current_locale
         self.default_locale = default_locale
         self.default_value = default_value
@@ -43,8 +39,9 @@ class TranslationHybrid(object):
                 locale = locale()
             except TypeError:
                 locale = locale(obj)
-        if isinstance(locale, Locale):
+        if isinstance(locale, babel.Locale):
             return str(locale)
+
         return locale
 
     def getter_factory(self, attr):

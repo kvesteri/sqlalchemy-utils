@@ -71,7 +71,7 @@ class Country(object):
     @classmethod
     def validate(self, code):
         try:
-            i18n.get_locale().territories[code]
+            i18n.babel.Locale('en').territories[code]
         except KeyError:
             raise ValueError(
                 'Could not convert string to country code: {0}'.format(code)

@@ -5,17 +5,11 @@ from flexmock import flexmock
 from sqlalchemy_utils import i18n
 from sqlalchemy_utils.primitives import WeekDay, WeekDays
 
-Locale = None
-try:
-    from babel import Locale
-except ImportError:
-    pass
 
-
-@pytest.mark.skipif('Locale is None')
+@pytest.mark.skipif('i18n.babel is None')
 class TestWeekDay(object):
     def setup_method(self, method):
-        i18n.get_locale = lambda: Locale('fi')
+        i18n.get_locale = lambda: i18n.babel.Locale('fi')
 
     def test_constructor_with_valid_index(self):
         day = WeekDay(1)
@@ -88,7 +82,7 @@ class TestWeekDay(object):
         assert str(day) == 'maanantaina'
 
 
-@pytest.mark.skipif('Locale is None')
+@pytest.mark.skipif('i18n.babel is None')
 class TestWeekDays(object):
     def test_constructor_with_valid_bit_string(self):
         days = WeekDays('1000100')
@@ -161,11 +155,11 @@ class TestWeekDays(object):
         assert indices == [1, 2, 3, 4, 5, 6, 0]
 
     def test_unicode(self):
-        i18n.get_locale = lambda: Locale('fi')
+        i18n.get_locale = lambda: i18n.babel.Locale('fi')
         days = WeekDays('1000100')
         assert six.text_type(days) == u'maanantaina, perjantaina'
 
     def test_str(self):
-        i18n.get_locale = lambda: Locale('fi')
+        i18n.get_locale = lambda: i18n.babel.Locale('fi')
         days = WeekDays('1000100')
         assert str(days) == 'maanantaina, perjantaina'

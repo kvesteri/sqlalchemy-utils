@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-babel = None
-try:
-    import babel
-except ImportError:
-    pass
 import six
 
 from sqlalchemy_utils import i18n, ImproperlyConfigured
@@ -58,7 +53,7 @@ class Currency(object):
 
     """
     def __init__(self, code):
-        if babel is None:
+        if i18n.babel is None:
             raise ImproperlyConfigured(
                 "'babel' package is required in order to use Currency class."
             )
@@ -77,13 +72,16 @@ class Currency(object):
     @classmethod
     def validate(self, code):
         try:
-            i18n.get_locale().currencies[code]
+            i18n.babel.Locale('en').currencies[code]
         except KeyError:
             raise ValueError("{0}' is not valid currency code.")
 
     @property
     def symbol(self):
-        return babel.numbers.get_currency_symbol(self.code, i18n.get_locale())
+        return i18n.babel.numbers.get_currency_symbol(
+            self.code,
+            i18n.get_locale()
+        )
 
     @property
     def name(self):

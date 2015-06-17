@@ -8,6 +8,7 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 ^^^^^^^^^^^^^^^^^^^^
 
 - Added better support for dynamic locales in translation_hybrid
+- Make babel dependent primitive types to use Locale('en') for data validation instead of current locale. Using current locale leads to infinite recursion in cases where the loaded data has dependency to the loaded object's locale.
 
 
 0.30.9 (2015-06-09)
