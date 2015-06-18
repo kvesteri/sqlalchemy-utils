@@ -7,6 +7,7 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 0.30.11 (2015-06-18)
 ^^^^^^^^^^^^^^^^^^^^
 
+- Fix None type handling of ChoiceType
 - Make locale casting for translation hybrid expressions cast locales on compilation phase. This extra lazy locale casting is needed in some cases where translation hybrid expressions are used before get_locale
 function is available.
 
