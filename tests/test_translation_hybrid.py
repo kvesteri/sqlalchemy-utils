@@ -96,6 +96,7 @@ class TestTranslationHybrid(TestCase):
             LocaleGetter().current_locale,
             'fi'
         )
+
         class Article(self.Base):
             __tablename__ = 'article'
             id = sa.Column(sa.Integer, primary_key=True)
