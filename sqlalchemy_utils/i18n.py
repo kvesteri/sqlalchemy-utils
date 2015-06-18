@@ -1,4 +1,7 @@
+import six
 import sqlalchemy as sa
+from sqlalchemy.ext.compiler import compiles
+from sqlalchemy.sql.expression import ColumnElement
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from .exceptions import ImproperlyConfigured
@@ -14,9 +17,42 @@ except ImportError:
     def get_locale():
         raise ImproperlyConfigured(
             'Could not load get_locale function from Flask-Babel. Either '
-            'install babel or make a similar function and override it '
+            'install Flask-Babel or make a similar function and override it '
             'in this module.'
         )
+
+
+def cast_locale(obj, locale):
+    """
+    Cast given locale to string. Supports also callbacks that return locales.
+
+    :param obj:
+        Object or class to use as a possible parameter to locale callable
+    :param locale:
+        Locale object or string or callable that returns a locale.
+    """
+    if callable(locale):
+        try:
+            locale = locale()
+        except TypeError:
+            locale = locale(obj)
+    if isinstance(locale, babel.Locale):
+        return str(locale)
+    return locale
+
+
+class cast_locale_expr(ColumnElement):
+    def __init__(self, cls, locale):
+        self.cls = cls
+        self.locale = locale
+
+
+@compiles(cast_locale_expr)
+def compile_cast_locale_expr(element, compiler, **kw):
+    locale = cast_locale(element.cls, element.locale)
+    if isinstance(locale, six.string_types):
+        return "'{0}'".format(locale)
+    return compiler.process(locale)
 
 
 class TranslationHybrid(object):
@@ -29,21 +65,6 @@ class TranslationHybrid(object):
         self.default_locale = default_locale
         self.default_value = default_value
 
-    def cast_locale(self, obj, locale):
-        """
-        Cast given locale to string. Supports also callbacks that return
-        locales.
-        """
-        if callable(locale):
-            try:
-                locale = locale()
-            except TypeError:
-                locale = locale(obj)
-        if isinstance(locale, babel.Locale):
-            return str(locale)
-
-        return locale
-
     def getter_factory(self, attr):
         """
         Return a hybrid_property getter function for given attribute. The
@@ -52,11 +73,11 @@ class TranslationHybrid(object):
         is no translation found for default locale it returns None.
         """
         def getter(obj):
-            current_locale = self.cast_locale(obj, self.current_locale)
+            current_locale = cast_locale(obj, self.current_locale)
             try:
                 return getattr(obj, attr.key)[current_locale]
             except (TypeError, KeyError):
-                default_locale = self.cast_locale(
+                default_locale = cast_locale(
                     obj, self.default_locale
                 )
                 try:
@@ -69,14 +90,14 @@ class TranslationHybrid(object):
         def setter(obj, value):
             if getattr(obj, attr.key) is None:
                 setattr(obj, attr.key, {})
-            locale = self.cast_locale(obj, self.current_locale)
+            locale = cast_locale(obj, self.current_locale)
             getattr(obj, attr.key)[locale] = value
         return setter
 
     def expr_factory(self, attr):
         def expr(cls):
-            current_locale = self.cast_locale(cls, self.current_locale)
-            default_locale = self.cast_locale(cls, self.default_locale)
+            current_locale = cast_locale_expr(cls, self.current_locale)
+            default_locale = cast_locale_expr(cls, self.default_locale)
             return sa.func.coalesce(attr[current_locale], attr[default_locale])
         return expr
 

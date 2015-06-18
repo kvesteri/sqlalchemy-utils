@@ -1,4 +1,5 @@
 import sqlalchemy as sa
+from flexmock import flexmock
 from pytest import mark
 from sqlalchemy.dialects.postgresql import HSTORE
 
@@ -68,7 +69,7 @@ class TestTranslationHybrid(TestCase):
         assert self.session.query(self.City.name).scalar() == name
 
     def test_dynamic_locale(self):
-        self.translation_hybrid = TranslationHybrid(
+        translation_hybrid = TranslationHybrid(
             lambda obj: obj.locale,
             'fi'
         )
@@ -77,10 +78,29 @@ class TestTranslationHybrid(TestCase):
             __tablename__ = 'article'
             id = sa.Column(sa.Integer, primary_key=True)
             name_translations = sa.Column(HSTORE)
-            name = self.translation_hybrid(name_translations)
+            name = translation_hybrid(name_translations)
             locale = sa.Column(sa.String)
 
         assert (
             'coalesce(article.name_translations -> article.locale'
             in str(Article.name)
         )
+
+    def test_locales_casted_only_in_compilation_phase(self):
+        class LocaleGetter(object):
+            def current_locale(self):
+                return lambda obj: obj.locale
+
+        flexmock(LocaleGetter).should_receive('current_locale').never()
+        translation_hybrid = TranslationHybrid(
+            LocaleGetter().current_locale,
+            'fi'
+        )
+        class Article(self.Base):
+            __tablename__ = 'article'
+            id = sa.Column(sa.Integer, primary_key=True)
+            name_translations = sa.Column(HSTORE)
+            name = translation_hybrid(name_translations)
+            locale = sa.Column(sa.String)
+
+        Article.name
