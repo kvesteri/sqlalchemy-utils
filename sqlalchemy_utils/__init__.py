@@ -81,6 +81,7 @@ from .types import (  # noqa
     PasswordType,
     PhoneNumber,
     PhoneNumberType,
+    PriceType,
     register_composites,
     remove_composite_listeners,
     ScalarListException,

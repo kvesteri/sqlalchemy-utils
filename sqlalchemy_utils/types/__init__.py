@@ -20,6 +20,7 @@ from .pg_composite import (  # noqa
     remove_composite_listeners
 )
 from .phone_number import PhoneNumber, PhoneNumberType  # noqa
+from .price import PriceType  # noqa
 from .range import (  # noqa
     DateRangeType,
     DateTimeRangeType,
