@@ -73,6 +73,10 @@ class UUIDType(types.TypeDecorator, ScalarCoercible):
             return value
 
         if self.native and dialect.name == 'postgresql':
+            if isinstance(value, uuid.UUID):
+                # Some drivers convert PostgreSQL's uuid values to
+                # Python's uuid.UUID objects by themselves
+                return value
             return uuid.UUID(value)
 
         return uuid.UUID(bytes=value) if self.binary else uuid.UUID(value)
