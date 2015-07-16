@@ -624,16 +624,20 @@ def get_descriptor(entity, attr):
 
 
 def get_all_descriptors(expr):
+    if isinstance(expr, sa.sql.selectable.Selectable):
+        return expr.c
     insp = sa.inspect(expr)
-    polymorphic_mappers = get_polymorphic_mappers(insp)
-    if polymorphic_mappers:
+    try:
+        polymorphic_mappers = get_polymorphic_mappers(insp)
+    except sa.exc.NoInspectionAvailable:
+        return get_mapper(expr).all_orm_descriptors
+    else:
         attrs = dict(get_mapper(expr).all_orm_descriptors)
         for submapper in polymorphic_mappers:
             for key, descriptor in submapper.all_orm_descriptors.items():
                 if key not in attrs:
                     attrs[key] = descriptor
         return attrs
-    return get_mapper(expr).all_orm_descriptors
 
 
 def get_hybrid_properties(model):
