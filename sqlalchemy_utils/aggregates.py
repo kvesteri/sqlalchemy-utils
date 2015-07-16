@@ -374,7 +374,7 @@ from .functions.orm import get_column_key
 from .relationships import (
     chained_join,
     path_to_relationships,
-    select_aggregate
+    select_correlated_expression
 )
 
 
@@ -447,9 +447,14 @@ class AggregatedValue(object):
 
     @property
     def aggregate_query(self):
-        query = select_aggregate(self.expr, self.relationships)
+        query = select_correlated_expression(
+            self.class_,
+            self.expr,
+            self.path,
+            self.relationships[0].mapper.class_
+        )
 
-        return query.correlate(self.class_).as_scalar()
+        return query.as_scalar()
 
     def update_query(self, objects):
         table = self.class_.__table__

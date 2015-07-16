@@ -2,7 +2,6 @@ import sqlalchemy as sa
 from sqlalchemy.sql.util import ClauseAdapter
 
 from .chained_join import chained_join  # noqa
-from .select_aggregate import select_aggregate  # noqa
 
 
 def path_to_relationships(path, cls):
