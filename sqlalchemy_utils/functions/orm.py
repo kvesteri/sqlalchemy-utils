@@ -403,14 +403,18 @@ def get_columns(mixed):
         SA Table object, SA Mapper, SA declarative class, SA declarative class
         instance or an alias of any of these objects
     """
-    if isinstance(mixed, sa.Table):
+    if isinstance(mixed, sa.sql.selectable.Selectable):
         return mixed.c
     if isinstance(mixed, sa.orm.util.AliasedClass):
         return sa.inspect(mixed).mapper.columns
-    if isinstance(mixed, sa.sql.selectable.Alias):
-        return mixed.c
     if isinstance(mixed, sa.orm.Mapper):
         return mixed.columns
+    if isinstance(mixed, InstrumentedAttribute):
+        return mixed.property.columns
+    if isinstance(mixed, ColumnProperty):
+        return mixed.columns
+    if isinstance(mixed, sa.Column):
+        return [mixed]
     if not isclass(mixed):
         mixed = mixed.__class__
     return sa.inspect(mixed).columns

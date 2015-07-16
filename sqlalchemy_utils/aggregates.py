@@ -377,7 +377,6 @@ from .relationships import (
     select_correlated_expression
 )
 
-
 aggregated_attrs = WeakKeyDictionary(defaultdict(list))
 
 

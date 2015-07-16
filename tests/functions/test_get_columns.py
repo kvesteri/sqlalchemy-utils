@@ -21,6 +21,19 @@ class TestGetColumns(object):
             sa.sql.base.ImmutableColumnCollection
         )
 
+    def test_instrumented_attribute(self):
+        assert get_columns(self.Building.id) == [self.Building.__table__.c._id]
+
+    def test_column_property(self):
+        assert get_columns(self.Building.id.property) == [
+            self.Building.__table__.c._id
+        ]
+
+    def test_column(self):
+        assert get_columns(self.Building.__table__.c._id) == [
+            self.Building.__table__.c._id
+        ]
+
     def test_declarative_class(self):
         assert isinstance(
             get_columns(self.Building),

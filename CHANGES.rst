@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.30.13 (2015-07-16)
+^^^^^^^^^^^^^^^^^^^^
+
+- Added support for InstrumentedAttributes, ColumnProperties and Columns in get_columns function
+
+
 0.30.12 (2015-07-05)
 ^^^^^^^^^^^^^^^^^^^^
 
