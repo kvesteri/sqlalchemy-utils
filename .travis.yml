@@ -1,22 +1,10 @@
+addons:
+  postgresql: "9.4"
+
 before_script:
   - psql -c 'create database sqlalchemy_utils_test;' -U postgres
   - psql -c 'create extension hstore;' -U postgres -d sqlalchemy_utils_test
   - mysql -e 'create database sqlalchemy_utils_test;'
-
-before_install:
- - sudo /etc/init.d/postgresql stop
- - sudo apt-get update
- - sudo apt-get purge postgresql-9.1 postgresql-9.2 postgresql-9.3
- - sudo apt-get install postgresql-client-common postgresql-9.4 postgresql-contrib-9.4
- - sudo apt-get install pidentd
- - sudo chmod 777 /etc/postgresql/9.4/main/pg_hba.conf
- - sudo echo "local   all         postgres                          trust" >  /etc/postgresql/9.4/main/pg_hba.conf
- - sudo echo "local   all         all                               trust" >> /etc/postgresql/9.4/main/pg_hba.conf
- - sudo echo "host    all         all         127.0.0.1/32          trust" >> /etc/postgresql/9.4/main/pg_hba.conf
- - sudo echo "host    all         all         ::1/128               trust" >> /etc/postgresql/9.4/main/pg_hba.conf
- - sudo sh -c "echo 127.0.0.1 postgres >> /etc/hosts"
- - sudo /etc/init.d/postgresql restart
-
 
 language: python
 python:
