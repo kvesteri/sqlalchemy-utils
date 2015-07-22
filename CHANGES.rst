@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.30.14 (2015-07-23)
+^^^^^^^^^^^^^^^^^^^^
+
+- Added cast_if utility function
+
+
 0.30.13 (2015-07-21)
 ^^^^^^^^^^^^^^^^^^^^
 

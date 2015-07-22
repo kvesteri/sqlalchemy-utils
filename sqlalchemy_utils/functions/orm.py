@@ -153,6 +153,57 @@ def get_type(expr):
     raise TypeError("Couldn't inspect type.")
 
 
+def cast_if(expression, type_):
+    """
+    Produce a CAST expression but only if given expression is not of given type
+    already.
+
+    Assume we have a model with two fields id (Integer) and name (String).
+
+    ::
+
+        import sqlalchemy as sa
+        from sqlalchemy_utils import cast_if
+
+
+        cast_if(User.id, sa.Integer)    # "user".id
+        cast_if(User.name, sa.String)   # "user".name
+        cast_if(User.id, sa.String)     # CAST("user".id AS TEXT)
+
+
+    This function supports scalar values as well.
+
+    ::
+
+        cast_if(1, sa.Integer)          # 1
+        cast_if('text', sa.String)      # 'text'
+        cast_if(1, sa.String)           # CAST(1 AS TEXT)
+
+
+    :param expression:
+        A SQL expression, such as a ColumnElement expression or a Python string
+        which will be coerced into a bound literal value.
+    :param type_:
+        A TypeEngine class or instance indicating the type to which the CAST
+        should apply.
+
+    .. versionadded: 0.30.14
+    """
+    try:
+        expr_type = get_type(expression)
+    except TypeError:
+        expr_type = expression
+        check_type = type_().python_type
+    else:
+        check_type = type_
+
+    return (
+        sa.cast(expression, type_)
+        if not isinstance(expr_type, check_type)
+        else expression
+    )
+
+
 def get_column_key(model, column):
     """
     Return the key for given column in given model.

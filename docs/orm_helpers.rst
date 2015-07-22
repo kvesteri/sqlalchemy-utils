@@ -4,6 +4,12 @@ ORM helpers
 .. module:: sqlalchemy_utils.functions
 
 
+cast_if
+-------
+
+.. autofunction:: cast_if
+
+
 escape_like
 -----------
 

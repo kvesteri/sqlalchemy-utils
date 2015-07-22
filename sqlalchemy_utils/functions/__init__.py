@@ -19,6 +19,7 @@ from .foreign_keys import (  # noqa
 )
 from .mock import create_mock_engine, mock_engine  # noqa
 from .orm import (  # noqa
+    cast_if,
     get_bind,
     get_class_by_table,
     get_column_key,

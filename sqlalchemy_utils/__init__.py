@@ -11,6 +11,7 @@ from .expression_parser import ExpressionParser  # noqa
 from .expressions import Asterisk, row_to_json  # noqa
 from .functions import (  # noqa
     analyze,
+    cast_if,
     create_database,
     create_mock_engine,
     database_exists,
@@ -92,4 +93,4 @@ from .types import (  # noqa
     WeekDaysType
 )
 
-__version__ = '0.30.13'
+__version__ = '0.30.14'
