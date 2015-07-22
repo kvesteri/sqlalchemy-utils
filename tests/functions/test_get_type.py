@@ -40,3 +40,7 @@ class TestGetType(object):
 
     def test_relationship_property(self):
         assert get_type(self.Article.author) == self.User
+
+    def test_scalar_select(self):
+        query = sa.select([self.Article.id]).as_scalar()
+        assert isinstance(get_type(query), sa.Integer)
