@@ -7,7 +7,6 @@ from .asserts import (  # noqa
     assert_nullable
 )
 from .exceptions import ImproperlyConfigured  # noqa
-from .expression_parser import ExpressionParser  # noqa
 from .expressions import Asterisk, row_to_json  # noqa
 from .functions import (  # noqa
     analyze,
