@@ -35,3 +35,10 @@ class TestGetHybridProperties(object):
             list(get_hybrid_properties(sa.inspect(self.Category)).keys()) ==
             ['lowercase_name']
         )
+
+    def test_aliased_class(self):
+        assert (
+            list(get_hybrid_properties(sa.orm.aliased(self.Category)).keys())
+            ==
+            ['lowercase_name']
+        )

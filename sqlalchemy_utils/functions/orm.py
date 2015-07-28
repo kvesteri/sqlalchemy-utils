@@ -734,14 +734,27 @@ def get_hybrid_properties(model):
         get_hybrid_properties(Category).keys()  # ['lowercase_name']
 
 
+    This function also supports aliased classes
+
+    ::
+
+
+        get_hybrid_properties(
+            sa.orm.aliased(Category)
+        ).keys()  # ['lowercase_name']
+
+
     .. versionchanged: 0.26.7
         This function now returns a dictionary instead of generator
+
+    .. versionchanged: 0.30.15
+        Added support for aliased classes
 
     :param model: SQLAlchemy declarative model or mapper
     """
     return dict(
         (key, prop)
-        for key, prop in sa.inspect(model).all_orm_descriptors.items()
+        for key, prop in get_mapper(model).all_orm_descriptors.items()
         if isinstance(prop, hybrid_property)
     )
 
