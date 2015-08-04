@@ -1,5 +1,6 @@
 import sqlalchemy as sa
 from pytest import raises
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from sqlalchemy_utils import sort_query
 from sqlalchemy_utils.functions import QuerySorterException
