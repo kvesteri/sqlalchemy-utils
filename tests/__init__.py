@@ -75,6 +75,15 @@ class TestCase(object):
             __tablename__ = 'category'
             id = sa.Column(sa.Integer, primary_key=True)
             name = sa.Column(sa.Unicode(255))
+            title = sa.Column(sa.Unicode(255))
+
+            @hybrid_property
+            def full_name(self):
+                return u'%s %s' % (self.title, self.name)
+
+            @full_name.expression
+            def full_name(self):
+                return sa.func.concat(self.title, ' ', self.name)
 
             @hybrid_property
             def articles_count(self):

@@ -672,6 +672,9 @@ def get_descriptor(entity, attr):
             else:
                 # Handle synonyms, relationship properties and hybrid
                 # properties
+
+                if isinstance(entity, sa.orm.util.AliasedClass):
+                    return getattr(entity, attr)
                 try:
                     return getattr(mapper.class_, attr)
                 except AttributeError:

@@ -1,5 +1,6 @@
 import sqlalchemy as sa
 from pytest import raises
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from sqlalchemy_utils import sort_query
 from sqlalchemy_utils.functions import QuerySorterException
@@ -210,6 +211,23 @@ class TestSortQueryRelationshipCounts(TestCase):
         ).group_by(alias.id, self.Article.id)
         query = sort_query(query, '-categories-articles_count')
         assert_contains('ORDER BY (SELECT count(article.id) AS count_1', query)
+
+    def test_aliased_concat_hybrid_property(self):
+        alias = sa.orm.aliased(
+            self.Category,
+            name='aliased'
+        )
+        query = (
+            self.session.query(self.Article)
+            .outerjoin(alias, self.Article.category)
+            .options(
+                sa.orm.contains_eager(self.Article.category, alias=alias)
+            )
+        )
+        query = sort_query(query, 'aliased-full_name')
+        assert_contains(
+            'concat(aliased.title, :param_1, aliased.name)', query
+        )
 
 
 class TestSortQueryWithPolymorphicInheritance(TestCase):
