@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.30.16 (2015-08-04)
+^^^^^^^^^^^^^^^^^^^^
+
+- Fixed sort_query handling of aliased classes with hybrid properties
+
+
 0.30.15 (2015-07-28)
 ^^^^^^^^^^^^^^^^^^^^
 
