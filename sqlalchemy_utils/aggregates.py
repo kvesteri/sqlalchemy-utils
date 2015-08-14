@@ -285,7 +285,7 @@ categories.
         def net_worth(self):
             return sa.func.sum(Product.price)
 
-        categories = sa.orm.relationship('Product')
+        categories = sa.orm.relationship('Category')
 
 
     class Category(Base):
