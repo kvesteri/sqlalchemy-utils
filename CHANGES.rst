@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.30.17 (2015-08-16)
+^^^^^^^^^^^^^^^^^^^^
+
+- Added correlate parameter to select_correlated_expression function
+
+
 0.30.16 (2015-08-04)
 ^^^^^^^^^^^^^^^^^^^^
 

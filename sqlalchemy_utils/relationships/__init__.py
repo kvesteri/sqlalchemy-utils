@@ -89,7 +89,8 @@ def select_correlated_expression(
     path,
     leaf_model,
     from_obj=None,
-    order_by=None
+    order_by=None,
+    correlate=True
 ):
     relationships = list(reversed(path_to_relationships(path, root_model)))
 
@@ -112,6 +113,8 @@ def select_correlated_expression(
 
     query = query.select_from(join_expr.selectable)
 
-    return query.correlate(
-        from_obj if from_obj is not None else root_model
-    ).where(condition)
+    if correlate:
+        query = query.correlate(
+            from_obj if from_obj is not None else root_model
+        )
+    return query.where(condition)
