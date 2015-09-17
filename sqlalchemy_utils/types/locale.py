@@ -67,7 +67,7 @@ class LocaleType(types.TypeDecorator, ScalarCoercible):
 
     def process_result_value(self, value, dialect):
         if value is not None:
-            return babel.Locale(value)
+            return babel.Locale.parse(value)
 
     def _coerce(self, value):
         if value is not None and not isinstance(value, babel.Locale):

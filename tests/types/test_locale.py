@@ -28,6 +28,14 @@ class TestLocaleType(TestCase):
 
         user = self.session.query(self.User).first()
 
+    def test_territory_parsing(self):
+        ko_kr = locale.babel.Locale(u'ko', territory=u'KR')
+        user = self.User(locale=ko_kr)
+        self.session.add(user)
+        self.session.commit()
+
+        assert self.session.query(self.User.locale).first()[0] == ko_kr
+
     def test_scalar_attributes_get_coerced_to_objects(self):
         user = self.User(locale='en_US')
 

@@ -9,8 +9,9 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 - Made has_index allow fk constraint as parameter
 - Made has_unique_index allow fk constraint as parameter
-- Made the extra packages in setup.py to be returned in deterministic order
+- Made the extra packages in setup.py to be returned in deterministic order (courtesy of thomasgoirand)
 - Removed is_indexed_foreign_key (superceded by more versatile has_index)
+- Fixed LocaleType territory parsing (courtesy of dahlia)
 
 
 0.30.17 (2015-08-16)
