@@ -20,3 +20,10 @@ def is_sequence(value):
     return (
         isinstance(value, Iterable) and not isinstance(value, six.string_types)
     )
+
+
+def starts_with(iterable, prefix):
+    """
+    Returns whether or not given iterable starts with given prefix.
+    """
+    return list(iterable)[0:len(prefix)] == list(prefix)

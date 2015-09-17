@@ -22,6 +22,7 @@ from .functions import (  # noqa
     get_column_key,
     get_columns,
     get_declarative_base,
+    get_fk_constraint_for_columns,
     get_hybrid_properties,
     get_mapper,
     get_primary_keys,
@@ -92,4 +93,4 @@ from .types import (  # noqa
     WeekDaysType
 )
 
-__version__ = '0.30.17'
+__version__ = '0.31.0'

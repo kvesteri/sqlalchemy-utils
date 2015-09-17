@@ -9,6 +9,7 @@ from sqlalchemy.exc import OperationalError, ProgrammingError
 
 from sqlalchemy_utils.expressions import explain_analyze
 
+from ..utils import starts_with
 from .orm import quote
 
 
@@ -187,15 +188,22 @@ def json_sql(value, scalars_to_json=True):
     return value
 
 
-def has_index(column):
+def has_index(column_or_constraint):
     """
-    Return whether or not given column has an index. A column has an index if
-    it has a single column index or it is the first column in compound column
-    index.
+    Return whether or not given column or the columns of given foreign key
+    constraint have an index. A column has an index if it has a single column
+    index or it is the first column in compound column index.
 
-    :param column: SQLAlchemy Column object
+    A foreign key constraint has an index if the constraint columns are the
+    first columns in compound column index.
+
+    :param column_or_constraint:
+        SQLAlchemy Column object or SA ForeignKeyConstraint object
 
     .. versionadded: 0.26.2
+
+    .. versionchanged: 0.30.18
+        Added support for foreign key constaints.
 
     ::
 
@@ -240,33 +248,81 @@ def has_index(column):
 
         has_index(table.c.locale)   # False
         has_index(table.c.id)       # True
+
+
+    This function supports foreign key constraints as well:
+
+
+        class User(Base):
+            __tablename__ = 'user'
+            first_name = sa.Column(sa.Unicode(255), primary_key=True)
+            last_name = sa.Column(sa.Unicode(255), primary_key=True)
+
+        class Article(Base):
+            __tablename__ = 'article'
+            id = sa.Column(sa.Integer, primary_key=True)
+            author_first_name = sa.Column(sa.Unicode(255))
+            author_last_name = sa.Column(sa.Unicode(255))
+            __table_args__ = (
+                sa.ForeignKeyConstraint(
+                    [author_first_name, author_last_name],
+                    [User.first_name, User.last_name]
+                ),
+                sa.Index(
+                    'my_index',
+                    author_first_name,
+                    author_last_name
+                )
+            )
+
+        table = Article.__table__
+        constraint = list(table.foreign_keys)[0].constraint
+
+        has_index(constraint)  # True
     """
-    table = column.table
+    table = column_or_constraint.table
     if not isinstance(table, sa.Table):
         raise TypeError(
             'Only columns belonging to Table objects are supported. Given '
             'column belongs to %r.' % table
         )
     primary_keys = table.primary_key.columns.values()
+    if isinstance(column_or_constraint, sa.ForeignKeyConstraint):
+        columns = list(column_or_constraint.columns.values())
+    else:
+        columns = [column_or_constraint]
+
     return (
-        (primary_keys and column is primary_keys[0])
+        (primary_keys and starts_with(primary_keys, columns))
         or
         any(
-            index.columns.values()[0] is column
+            starts_with(index.columns.values(), columns)
             for index in table.indexes
         )
     )
 
 
-def has_unique_index(column):
+def has_unique_index(column_or_constraint):
     """
-    Return whether or not given column has a unique index. A column has a
-    unique index if it has a single column primary key index or it has a
-    single column UniqueConstraint.
+    Return whether or not given column or given foreign key constraint has a
+    unique index.
+
+    A column has a unique index if it has a single column primary key index or
+    it has a single column UniqueConstraint.
+
+    A foreign key constraint has a unique index if the columns of the
+    constraint are the same as the columns of table primary key or the coluns
+    of any unique index or any unique constraint of the given table.
 
     :param column: SQLAlchemy Column object
 
     .. versionadded: 0.27.1
+
+    .. versionchanged: 0.30.18
+        Added support for foreign key constaints.
+
+        Fixed support for unique indexes (previously only worked for unique
+        constraints)
 
     ::
 
@@ -289,29 +345,67 @@ def has_unique_index(column):
         has_unique_index(table.c.id)           # True
 
 
+    This function supports foreign key constraints as well:
+
+
+        class User(Base):
+            __tablename__ = 'user'
+            first_name = sa.Column(sa.Unicode(255), primary_key=True)
+            last_name = sa.Column(sa.Unicode(255), primary_key=True)
+
+        class Article(Base):
+            __tablename__ = 'article'
+            id = sa.Column(sa.Integer, primary_key=True)
+            author_first_name = sa.Column(sa.Unicode(255))
+            author_last_name = sa.Column(sa.Unicode(255))
+            __table_args__ = (
+                sa.ForeignKeyConstraint(
+                    [author_first_name, author_last_name],
+                    [User.first_name, User.last_name]
+                ),
+                sa.Index(
+                    'my_index',
+                    author_first_name,
+                    author_last_name,
+                    unique=True
+                )
+            )
+
+        table = Article.__table__
+        constraint = list(table.foreign_keys)[0].constraint
+
+        has_unique_index(constraint)  # True
+
+
     :raises TypeError: if given column does not belong to a Table object
     """
-    table = column.table
+    table = column_or_constraint.table
     if not isinstance(table, sa.Table):
         raise TypeError(
             'Only columns belonging to Table objects are supported. Given '
             'column belongs to %r.' % table
         )
-    pks = table.primary_key.columns
+    primary_keys = list(table.primary_key.columns.values())
+    if isinstance(column_or_constraint, sa.ForeignKeyConstraint):
+        columns = list(column_or_constraint.columns.values())
+    else:
+        columns = [column_or_constraint]
+
     return (
-        (column is pks.values()[0] and len(pks) == 1)
+        (columns == primary_keys)
         or
         any(
-            match_columns(constraint.columns.values()[0], column) and
-            len(constraint.columns) == 1
-            for constraint in column.table.constraints
+            columns == list(constraint.columns.values())
+            for constraint in table.constraints
             if isinstance(constraint, sa.sql.schema.UniqueConstraint)
         )
+        or
+        any(
+            columns == list(index.columns.values())
+            for index in table.indexes
+            if index.unique
+        )
     )
-
-
-def match_columns(column, column2):
-    return column.table is column2.table and column.name == column2.name
 
 
 def is_auto_assigned_date_column(column):

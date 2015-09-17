@@ -11,9 +11,9 @@ from .database import (  # noqa
 )
 from .foreign_keys import (  # noqa
     dependent_objects,
+    get_fk_constraint_for_columns,
     get_referencing_foreign_keys,
     group_foreign_keys,
-    is_indexed_foreign_key,
     merge_references,
     non_indexed_foreign_keys
 )

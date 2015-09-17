@@ -2,7 +2,7 @@ import sqlalchemy as sa
 from pytest import raises
 from sqlalchemy.ext.declarative import declarative_base
 
-from sqlalchemy_utils import has_unique_index
+from sqlalchemy_utils import get_fk_constraint_for_columns, has_unique_index
 
 
 class TestHasUniqueIndex(object):
@@ -50,3 +50,102 @@ class TestHasUniqueIndex(object):
     def test_compound_column_unique_index(self):
         assert not has_unique_index(self.article_translations.c.is_published)
         assert not has_unique_index(self.article_translations.c.is_archived)
+
+
+class TestHasUniqueIndexWithFKConstraint(object):
+    def test_composite_fk_without_index(self):
+        Base = declarative_base()
+
+        class User(Base):
+            __tablename__ = 'user'
+            first_name = sa.Column(sa.Unicode(255), primary_key=True)
+            last_name = sa.Column(sa.Unicode(255), primary_key=True)
+
+        class Article(Base):
+            __tablename__ = 'article'
+            id = sa.Column(sa.Integer, primary_key=True)
+            author_first_name = sa.Column(sa.Unicode(255))
+            author_last_name = sa.Column(sa.Unicode(255))
+            __table_args__ = (
+                sa.ForeignKeyConstraint(
+                    [author_first_name, author_last_name],
+                    [User.first_name, User.last_name]
+                ),
+            )
+
+        table = Article.__table__
+        constraint = get_fk_constraint_for_columns(
+            table,
+            table.c.author_first_name,
+            table.c.author_last_name
+        )
+        assert not has_unique_index(constraint)
+
+    def test_composite_fk_with_index(self):
+        Base = declarative_base()
+
+        class User(Base):
+            __tablename__ = 'user'
+            first_name = sa.Column(sa.Unicode(255), primary_key=True)
+            last_name = sa.Column(sa.Unicode(255), primary_key=True)
+
+        class Article(Base):
+            __tablename__ = 'article'
+            id = sa.Column(sa.Integer, primary_key=True)
+            author_first_name = sa.Column(sa.Unicode(255))
+            author_last_name = sa.Column(sa.Unicode(255))
+            __table_args__ = (
+                sa.ForeignKeyConstraint(
+                    [author_first_name, author_last_name],
+                    [User.first_name, User.last_name]
+                ),
+                sa.Index(
+                    'my_index',
+                    author_first_name,
+                    author_last_name,
+                    unique=True
+                )
+            )
+
+        table = Article.__table__
+        constraint = get_fk_constraint_for_columns(
+            table,
+            table.c.author_first_name,
+            table.c.author_last_name
+        )
+        assert has_unique_index(constraint)
+
+    def test_composite_fk_with_partial_index_match(self):
+        Base = declarative_base()
+
+        class User(Base):
+            __tablename__ = 'user'
+            first_name = sa.Column(sa.Unicode(255), primary_key=True)
+            last_name = sa.Column(sa.Unicode(255), primary_key=True)
+
+        class Article(Base):
+            __tablename__ = 'article'
+            id = sa.Column(sa.Integer, primary_key=True)
+            author_first_name = sa.Column(sa.Unicode(255))
+            author_last_name = sa.Column(sa.Unicode(255))
+            __table_args__ = (
+                sa.ForeignKeyConstraint(
+                    [author_first_name, author_last_name],
+                    [User.first_name, User.last_name]
+                ),
+                sa.Index(
+                    'my_index',
+                    author_first_name,
+                    author_last_name,
+                    id,
+                    unique=True
+                )
+            )
+
+        table = Article.__table__
+        constraint = get_fk_constraint_for_columns(
+            table,
+            table.c.author_first_name,
+            table.c.author_last_name
+        )
+        assert not has_unique_index(constraint)

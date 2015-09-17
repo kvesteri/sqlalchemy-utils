@@ -8,6 +8,7 @@ from sqlalchemy.orm import object_session
 from sqlalchemy.schema import ForeignKeyConstraint, MetaData, Table
 
 from ..query_chain import QueryChain
+from .database import has_index
 from .orm import get_column_key, get_mapper, get_tables
 
 
@@ -344,22 +345,13 @@ def non_indexed_foreign_keys(metadata, engine=None):
             if not isinstance(constraint, ForeignKeyConstraint):
                 continue
 
-            if not is_indexed_foreign_key(constraint):
+            if not has_index(constraint):
                 constraints[table.name].append(constraint)
 
     return dict(constraints)
 
 
-def is_indexed_foreign_key(constraint):
-    """
-    Whether or not given foreign key constraint's columns have been indexed.
-
-    :param constraint: ForeignKeyConstraint object to check the indexes
-    """
-    return any(
-        set(constraint.columns.keys())
-        ==
-        set(column.name for column in index.columns)
-        for index
-        in constraint.table.indexes
-    )
+def get_fk_constraint_for_columns(table, *columns):
+    for constraint in table.constraints:
+        if list(constraint.columns.values()) == list(columns):
+            return constraint
