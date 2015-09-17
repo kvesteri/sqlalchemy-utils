@@ -22,9 +22,6 @@ def get_version():
     return re.search(pattern, contents, re.MULTILINE).group(1)
 
 
-PY3 = sys.version_info[0] == 3
-
-
 extras_require = {
     'test': [
         'pytest>=2.7.1',
