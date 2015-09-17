@@ -57,7 +57,7 @@ extras_require = {
 
 # Add all optional dependencies to testing requirements.
 test_all = []
-for name, requirements in extras_require.items():
+for name, requirements in sorted(extras_require.items()):
     test_all += requirements
 extras_require['test_all'] = test_all
 
