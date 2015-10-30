@@ -4,6 +4,18 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.31.2 (2015-10-30)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed observes crashing when observable root_obj is ``None`` (#168)
+
+
+0.31.1 (2015-10-26)
+^^^^^^^^^^^^^^^^^^^
+
+- Column observers only notified when actual changes have been made to underlying columns (#138)
+
+
 0.31.0 (2015-09-17)
 ^^^^^^^^^^^^^^^^^^^
 
