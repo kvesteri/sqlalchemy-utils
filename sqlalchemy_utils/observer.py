@@ -245,9 +245,10 @@ class PropertyObserver(object):
                     root_objs = [root_objs]
 
                 for root_obj in root_objs:
-                    args = self.get_callback_args(root_obj, callback)
-                    if args:
-                        yield args
+                    if root_obj:
+                        args = self.get_callback_args(root_obj, callback)
+                        if args:
+                            yield args
 
     def get_callback_args(self, root_obj, callback):
         session = sa.orm.object_session(root_obj)
