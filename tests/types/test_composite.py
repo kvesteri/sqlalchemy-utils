@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import sqlalchemy as sa
 from pytest import mark
 from sqlalchemy import create_engine
@@ -48,6 +49,18 @@ class TestCompositeTypeWithRegularTypes(TestCase):
 
         account = self.session.query(self.Account).first()
         assert account.balance.currency == 'USD'
+        assert account.balance.amount == 15
+
+    def test_non_ascii_chars(self):
+        account = self.Account(
+            balance=(u'ääöö', 15)
+        )
+
+        self.session.add(account)
+        self.session.commit()
+
+        account = self.session.query(self.Account).first()
+        assert account.balance.currency == u'ääöö'
         assert account.balance.amount == 15
 
 

@@ -95,6 +95,7 @@ http://schinckel.net/2014/09/24/using-postgres-composite-types-in-django/
 """
 from collections import namedtuple
 
+import six
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.dialects.postgresql.psycopg2 import PGDialect_psycopg2
@@ -259,7 +260,7 @@ def register_psycopg2_composite(dbapi_connection, composite):
     )
 
     def adapt_composite(value):
-        values = [
+        adapted = [
             adapt(
                 getattr(value, column.name)
                 if not isinstance(column.type, TypeDecorator)
@@ -267,9 +268,18 @@ def register_psycopg2_composite(dbapi_connection, composite):
                     getattr(value, column.name),
                     PGDialect_psycopg2()
                 )
-            ).getquoted().decode('utf-8')
+            )
             for column in
             composite.columns
+        ]
+        for value in adapted:
+            if hasattr(value, 'prepare'):
+                value.prepare(dbapi_connection)
+        values = [
+            value.getquoted().decode(dbapi_connection.encoding)
+            if six.PY3
+            else value.getquoted()
+            for value in adapted
         ]
         return AsIs("(%s)::%s" % (', '.join(values), composite.name))
 

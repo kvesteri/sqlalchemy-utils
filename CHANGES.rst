@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.31.3 (2015-11-09)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed non-ascii string handling in composite types (#170)
+
+
 0.31.2 (2015-10-30)
 ^^^^^^^^^^^^^^^^^^^
 
