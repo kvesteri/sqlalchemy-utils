@@ -41,8 +41,8 @@ from sqlalchemy.exc import DataError, IntegrityError
 
 def _update_field(obj, field, value):
     session = sa.orm.object_session(obj)
-    table = sa.inspect(obj.__class__).columns[field].table
-    query = table.update().values(**{field: value})
+    column = sa.inspect(obj.__class__).columns[field]
+    query = column.table.update().values(**{column.key: value})
     session.execute(query)
     session.flush()
 

@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.31.4 (2015-12-06)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed column alias handling with assert_* functions (#175)
+
+
 0.31.3 (2015-11-09)
 ^^^^^^^^^^^^^^^^^^^
 
