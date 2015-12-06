@@ -18,11 +18,13 @@ class AssertionTestCase(TestCase):
     def create_models(self):
         class User(self.Base):
             __tablename__ = 'user'
-            id = sa.Column(sa.Integer, primary_key=True)
-            name = sa.Column(sa.String(20))
-            age = sa.Column(sa.Integer, nullable=False)
-            email = sa.Column(sa.String(200), nullable=False, unique=True)
-            fav_numbers = sa.Column(ARRAY(sa.Integer))
+            id = sa.Column('_id', sa.Integer, primary_key=True)
+            name = sa.Column('_name', sa.String(20))
+            age = sa.Column('_age', sa.Integer, nullable=False)
+            email = sa.Column(
+                '_email', sa.String(200), nullable=False, unique=True
+            )
+            fav_numbers = sa.Column('_fav_numbers', ARRAY(sa.Integer))
 
             __table_args__ = (
                 sa.CheckConstraint(sa.and_(age >= 0, age <= 150)),
