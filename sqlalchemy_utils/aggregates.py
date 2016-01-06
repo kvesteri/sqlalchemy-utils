@@ -265,7 +265,7 @@ scenarios includes things such as:
 Multi-level aggregates
 ----------------------
 
-Aggregates can span accross multiple relationships. In the following example
+Aggregates can span across multiple relationships. In the following example
 each Catalog has a net_worth which is the sum of all products in all
 categories.
 
