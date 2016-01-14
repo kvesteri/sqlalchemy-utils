@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.31.5 (2015-01-14)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed scalar parsing of LocaleType (#173)
+
+
 0.31.4 (2015-12-06)
 ^^^^^^^^^^^^^^^^^^^
 

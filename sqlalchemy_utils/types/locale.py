@@ -46,7 +46,7 @@ class LocaleType(types.TypeDecorator, ScalarCoercible):
 
 
         user.locale = 'de_DE'
-        user.locale  # Locale('de_DE')
+        user.locale  # Locale('de', territory='DE')
 
     """
 
@@ -71,5 +71,5 @@ class LocaleType(types.TypeDecorator, ScalarCoercible):
 
     def _coerce(self, value):
         if value is not None and not isinstance(value, babel.Locale):
-            return babel.Locale(value)
+            return babel.Locale.parse(value)
         return value
