@@ -36,6 +36,11 @@ class TestLocaleType(TestCase):
 
         assert self.session.query(self.User.locale).first()[0] == ko_kr
 
+    def test_coerce_territory_parsing(self):
+        user = self.User()
+        user.locale = 'ko_KR'
+        assert user.locale == locale.babel.Locale(u'ko', territory=u'KR')
+
     def test_scalar_attributes_get_coerced_to_objects(self):
         user = self.User(locale='en_US')
 
