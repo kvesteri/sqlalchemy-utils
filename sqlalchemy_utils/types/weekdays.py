@@ -66,10 +66,12 @@ class WeekDaysType(types.TypeDecorator, ScalarCoercible):
 
     def process_bind_param(self, value, dialect):
         if isinstance(value, WeekDays):
-            return value.as_bit_string()
+            value = value.as_bit_string()
 
-        if isinstance(value, six.string_types):
-            return value
+        if dialect.name == 'mysql':
+            func = bytes if six.PY3 else bytearray
+            return func(value, 'utf8')
+        return value
 
     def process_result_value(self, value, dialect):
         if value is not None:

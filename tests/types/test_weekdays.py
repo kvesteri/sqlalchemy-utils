@@ -35,7 +35,7 @@ class WeekDaysTypeTestCase(TestCase):
         assert isinstance(schedule.working_days, WeekDays)
 
     def test_scalar_attributes_get_coerced_to_objects(self):
-        schedule = self.Schedule(working_days=u'1010101')
+        schedule = self.Schedule(working_days='1010101')
 
         assert isinstance(schedule.working_days, WeekDays)
 
