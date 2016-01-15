@@ -26,7 +26,7 @@ class WeekDaysTypeTestCase(TestCase):
 
     def test_color_parameter_processing(self):
         schedule = self.Schedule(
-            working_days='0001111'
+            working_days=b'0001111'
         )
         self.session.add(schedule)
         self.session.commit()
@@ -35,7 +35,7 @@ class WeekDaysTypeTestCase(TestCase):
         assert isinstance(schedule.working_days, WeekDays)
 
     def test_scalar_attributes_get_coerced_to_objects(self):
-        schedule = self.Schedule(working_days='1010101')
+        schedule = self.Schedule(working_days=b'1010101')
 
         assert isinstance(schedule.working_days, WeekDays)
 
