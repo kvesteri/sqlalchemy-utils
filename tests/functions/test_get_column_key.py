@@ -25,13 +25,11 @@ class TestGetColumnKey(object):
 
     def test_supports_aliases(self):
         assert (
-            get_column_key(self.Building, self.Building.__table__.c.id)
-            ==
+            get_column_key(self.Building, self.Building.__table__.c.id) ==
             'id'
         )
         assert (
-            get_column_key(self.Building, self.Building.__table__.c._name)
-            ==
+            get_column_key(self.Building, self.Building.__table__.c._name) ==
             'name'
         )
 

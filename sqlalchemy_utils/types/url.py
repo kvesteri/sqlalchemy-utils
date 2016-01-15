@@ -1,12 +1,13 @@
+import six
+from sqlalchemy import types
+
+from .scalar_coercible import ScalarCoercible
+
 furl = None
 try:
     from furl import furl
 except ImportError:
     pass
-import six
-from sqlalchemy import types
-
-from .scalar_coercible import ScalarCoercible
 
 
 class URLType(types.TypeDecorator, ScalarCoercible):

@@ -165,7 +165,8 @@ def json_sql(value, scalars_to_json=True):
     """
     scalar_convert = sa.text
     if scalars_to_json:
-        scalar_convert = lambda a: sa.func.to_json(sa.text(a))
+        def scalar_convert(a):
+            return sa.func.to_json(sa.text(a))
 
     if isinstance(value, collections.Mapping):
         return sa.func.json_build_object(
@@ -293,8 +294,7 @@ def has_index(column_or_constraint):
         columns = [column_or_constraint]
 
     return (
-        (primary_keys and starts_with(primary_keys, columns))
-        or
+        (primary_keys and starts_with(primary_keys, columns)) or
         any(
             starts_with(index.columns.values(), columns)
             for index in table.indexes
@@ -392,14 +392,12 @@ def has_unique_index(column_or_constraint):
         columns = [column_or_constraint]
 
     return (
-        (columns == primary_keys)
-        or
+        (columns == primary_keys) or
         any(
             columns == list(constraint.columns.values())
             for constraint in table.constraints
             if isinstance(constraint, sa.sql.schema.UniqueConstraint)
-        )
-        or
+        ) or
         any(
             columns == list(index.columns.values())
             for index in table.indexes
@@ -419,8 +417,7 @@ def is_auto_assigned_date_column(column):
         (
             isinstance(column.type, sa.DateTime) or
             isinstance(column.type, sa.Date)
-        )
-        and
+        ) and
         (
             column.default or
             column.server_default or

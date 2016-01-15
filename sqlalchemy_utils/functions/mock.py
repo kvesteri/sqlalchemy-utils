@@ -47,8 +47,8 @@ def create_mock_engine(bind, stream=None):
             stream.write('\n%s;' % text)
 
     else:
-
-        dump = lambda *a, **kw: None
+        def dump(*args, **kw):
+            return None
 
     engine = sa.create_engine(bind_url, strategy='mock', executor=dump)
     return engine
