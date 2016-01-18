@@ -56,3 +56,11 @@ class TestArrowDateTimeType(object):
         assert article.created_at == time == local
         session.commit()
         assert article.created_at == time
+
+    def test_literal_param(self, session, Article):
+        time = arrow.arrow.utcnow()
+        article = Article(created_at=time)
+        session.add(article)
+        clause = Article.created_at > '2015-01-01'
+        compiled = str(clause.compile(compile_kwargs={"literal_binds": True}))
+        assert compiled == 'article.created_at > 2015-01-01'
