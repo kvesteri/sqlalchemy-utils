@@ -1,31 +1,23 @@
 import pytest
 import sqlalchemy as sa
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import sessionmaker
 
 from sqlalchemy_utils.relationships import select_correlated_expression
 
 
-@pytest.fixture(scope='class')
-def base():
-    return declarative_base()
-
-
-@pytest.fixture(scope='class')
-def group_user_cls(base):
+@pytest.fixture
+def group_user_tbl(Base):
     return sa.Table(
         'group_user',
-        base.metadata,
+        Base.metadata,
         sa.Column('user_id', sa.Integer, sa.ForeignKey('user.id')),
         sa.Column('group_id', sa.Integer, sa.ForeignKey('group.id'))
     )
 
 
-@pytest.fixture(scope='class')
-def group_cls(base):
-    class Group(base):
+@pytest.fixture
+def group_tbl(Base):
+    class Group(Base):
         __tablename__ = 'group'
         id = sa.Column(sa.Integer, primary_key=True)
         name = sa.Column(sa.String)
@@ -33,11 +25,11 @@ def group_cls(base):
     return Group
 
 
-@pytest.fixture(scope='class')
-def friendship_cls(base):
+@pytest.fixture
+def friendship_tbl(Base):
     return sa.Table(
         'friendships',
-        base.metadata,
+        Base.metadata,
         sa.Column(
             'friend_a_id',
             sa.Integer,
@@ -53,35 +45,37 @@ def friendship_cls(base):
     )
 
 
-@pytest.fixture(scope='class')
-def user_cls(base, group_user_cls, friendship_cls):
-    class User(base):
+@pytest.fixture
+def User(Base, group_user_tbl, friendship_tbl):
+    class User(Base):
         __tablename__ = 'user'
         id = sa.Column(sa.Integer, primary_key=True)
         name = sa.Column(sa.String)
         groups = sa.orm.relationship(
             'Group',
-            secondary=group_user_cls,
+            secondary=group_user_tbl,
             backref='users'
         )
 
         # this relationship is used for persistence
         friends = sa.orm.relationship(
             'User',
-            secondary=friendship_cls,
-            primaryjoin=id == friendship_cls.c.friend_a_id,
-            secondaryjoin=id == friendship_cls.c.friend_b_id,
+            secondary=friendship_tbl,
+            primaryjoin=id == friendship_tbl.c.friend_a_id,
+            secondaryjoin=id == friendship_tbl.c.friend_b_id,
         )
 
-    friendship_union = sa.select([
-        friendship_cls.c.friend_a_id,
-        friendship_cls.c.friend_b_id
+    friendship_union = (
+        sa.select([
+            friendship_tbl.c.friend_a_id,
+            friendship_tbl.c.friend_b_id
         ]).union(
             sa.select([
-                friendship_cls.c.friend_b_id,
-                friendship_cls.c.friend_a_id]
+                friendship_tbl.c.friend_b_id,
+                friendship_tbl.c.friend_a_id]
             )
-    ).alias()
+        ).alias()
+    )
 
     User.all_friends = sa.orm.relationship(
         'User',
@@ -94,9 +88,9 @@ def user_cls(base, group_user_cls, friendship_cls):
     return User
 
 
-@pytest.fixture(scope='class')
-def category_cls(base, group_user_cls, friendship_cls):
-    class Category(base):
+@pytest.fixture
+def Category(Base, group_user_tbl, friendship_tbl):
+    class Category(Base):
         __tablename__ = 'category'
         id = sa.Column(sa.Integer, primary_key=True)
         name = sa.Column(sa.String)
@@ -111,9 +105,9 @@ def category_cls(base, group_user_cls, friendship_cls):
     return Category
 
 
-@pytest.fixture(scope='class')
-def article_cls(base, category_cls, user_cls):
-    class Article(base):
+@pytest.fixture
+def Article(Base, Category, User):
+    class Article(Base):
         __tablename__ = 'article'
         id = sa.Column('_id', sa.Integer, primary_key=True)
         name = sa.Column(sa.String)
@@ -129,144 +123,104 @@ def article_cls(base, category_cls, user_cls):
 
         content = sa.Column(sa.String)
 
-        category_id = sa.Column(sa.Integer, sa.ForeignKey(category_cls.id))
-        category = sa.orm.relationship(category_cls, backref='articles')
+        category_id = sa.Column(sa.Integer, sa.ForeignKey(Category.id))
+        category = sa.orm.relationship(Category, backref='articles')
 
-        author_id = sa.Column(sa.Integer, sa.ForeignKey(user_cls.id))
+        author_id = sa.Column(sa.Integer, sa.ForeignKey(User.id))
         author = sa.orm.relationship(
-            user_cls,
-            primaryjoin=author_id == user_cls.id,
+            User,
+            primaryjoin=author_id == User.id,
             backref='authored_articles'
         )
 
-        owner_id = sa.Column(sa.Integer, sa.ForeignKey(user_cls.id))
+        owner_id = sa.Column(sa.Integer, sa.ForeignKey(User.id))
         owner = sa.orm.relationship(
-            user_cls,
-            primaryjoin=owner_id == user_cls.id,
+            User,
+            primaryjoin=owner_id == User.id,
             backref='owned_articles'
         )
     return Article
 
 
-@pytest.fixture(scope='class')
-def comment_cls(base, article_cls, user_cls):
-    class Comment(base):
+@pytest.fixture
+def Comment(Base, Article, User):
+    class Comment(Base):
         __tablename__ = 'comment'
         id = sa.Column(sa.Integer, primary_key=True)
         content = sa.Column(sa.String)
-        article_id = sa.Column(sa.Integer, sa.ForeignKey(article_cls.id))
-        article = sa.orm.relationship(article_cls, backref='comments')
+        article_id = sa.Column(sa.Integer, sa.ForeignKey(Article.id))
+        article = sa.orm.relationship(Article, backref='comments')
 
-        author_id = sa.Column(sa.Integer, sa.ForeignKey(user_cls.id))
-        author = sa.orm.relationship(user_cls, backref='comments')
+        author_id = sa.Column(sa.Integer, sa.ForeignKey(User.id))
+        author = sa.orm.relationship(User, backref='comments')
 
-    article_cls.comment_count = sa.orm.column_property(
+    Article.comment_count = sa.orm.column_property(
         sa.select([sa.func.count(Comment.id)])
-        .where(Comment.article_id == article_cls.id)
-        .correlate_except(article_cls)
+        .where(Comment.article_id == Article.id)
+        .correlate_except(Article)
     )
 
     return Comment
 
 
-@pytest.fixture(scope='class')
-def composite_pk_cls(base):
-    class CompositePKModel(base):
-        __tablename__ = 'composite_pk_model'
-        a = sa.Column(sa.Integer, primary_key=True)
-        b = sa.Column(sa.Integer, primary_key=True)
-    return CompositePKModel
-
-
-@pytest.fixture(scope='class')
-def dns():
-    return 'postgres://postgres@localhost/sqlalchemy_utils_test'
-
-
-@pytest.yield_fixture(scope='class')
-def engine(dns):
-    engine = create_engine(dns)
-    engine.echo = True
-    yield engine
-    engine.dispose()
-
-
-@pytest.yield_fixture(scope='class')
-def connection(engine):
-    conn = engine.connect()
-    yield conn
-    conn.close()
-
-
-@pytest.fixture(scope='class')
-def model_mapping(article_cls, category_cls, comment_cls, group_cls, user_cls):
+@pytest.fixture
+def model_mapping(Article, Category, Comment, group_tbl, User):
     return {
-        'articles': article_cls,
-        'categories': category_cls,
-        'comments': comment_cls,
-        'groups': group_cls,
-        'users': user_cls
+        'articles': Article,
+        'categories': Category,
+        'comments': Comment,
+        'groups': group_tbl,
+        'users': User
     }
 
 
-@pytest.yield_fixture(scope='class')
-def table_creator(base, connection, model_mapping):
-    sa.orm.configure_mappers()
-    base.metadata.create_all(connection)
-    yield
-    base.metadata.drop_all(connection)
+@pytest.fixture
+def init_models(Article, Category, Comment, group_tbl, User):
+    pass
 
 
-@pytest.yield_fixture(scope='class')
-def session(connection):
-    Session = sessionmaker(bind=connection)
-    session = Session()
-    yield session
-    session.close_all()
-
-
-@pytest.fixture(scope='class')
+@pytest.fixture
 def dataset(
     session,
-    user_cls,
-    group_cls,
-    article_cls,
-    category_cls,
-    comment_cls
+    User,
+    group_tbl,
+    Article,
+    Category,
+    Comment
 ):
-    group = group_cls(name='Group 1')
-    group2 = group_cls(name='Group 2')
-    user = user_cls(id=1, name='User 1', groups=[group, group2])
-    user2 = user_cls(id=2, name='User 2')
-    user3 = user_cls(id=3, name='User 3', groups=[group])
-    user4 = user_cls(id=4, name='User 4', groups=[group2])
-    user5 = user_cls(id=5, name='User 5')
+    group = group_tbl(name='Group 1')
+    group2 = group_tbl(name='Group 2')
+    user = User(id=1, name='User 1', groups=[group, group2])
+    user2 = User(id=2, name='User 2')
+    user3 = User(id=3, name='User 3', groups=[group])
+    user4 = User(id=4, name='User 4', groups=[group2])
+    user5 = User(id=5, name='User 5')
 
     user.friends = [user2]
     user2.friends = [user3, user4]
     user3.friends = [user5]
 
-    article = article_cls(
+    article = Article(
         name='Some article',
         author=user,
         owner=user2,
-        category=category_cls(
+        category=Category(
             id=1,
             name='Some category',
             subcategories=[
-                category_cls(
+                Category(
                     id=2,
                     name='Subcategory 1',
                     subcategories=[
-                        category_cls(
+                        Category(
                             id=3,
                             name='Subsubcategory 1',
                             subcategories=[
-                                category_cls(
+                                Category(
                                     id=5,
                                     name='Subsubsubcategory 1',
                                 ),
-                                category_cls(
+                                Category(
                                     id=6,
                                     name='Subsubsubcategory 2',
                                 )
@@ -274,11 +228,11 @@ def dataset(
                         )
                     ]
                 ),
-                category_cls(id=4, name='Subcategory 2'),
+                Category(id=4, name='Subcategory 2'),
             ]
         ),
         comments=[
-            comment_cls(
+            Comment(
                 content='Some comment',
                 author=user
             )
@@ -290,7 +244,7 @@ def dataset(
     session.commit()
 
 
-@pytest.mark.usefixtures('table_creator', 'dataset')
+@pytest.mark.usefixtures('dataset', 'postgresql_dsn')
 class TestSelectCorrelatedExpression(object):
     @pytest.mark.parametrize(
         ('model_key', 'related_model_key', 'path', 'result'),
@@ -428,20 +382,20 @@ class TestSelectCorrelatedExpression(object):
     def test_with_non_aggregate_function(
         self,
         session,
-        user_cls,
-        article_cls
+        User,
+        Article
     ):
         aggregate = select_correlated_expression(
-            article_cls,
-            sa.func.json_build_object('name', user_cls.name),
+            Article,
+            sa.func.json_build_object('name', User.name),
             'comments.author',
-            user_cls
+            User
         )
 
         query = session.query(
-            article_cls.id,
+            Article.id,
             aggregate.label('author_json')
-        ).order_by(article_cls.id)
+        ).order_by(Article.id)
         result = query.all()
         assert result == [
             (1, {'name': 'User 1'})

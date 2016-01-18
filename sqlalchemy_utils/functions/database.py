@@ -7,8 +7,7 @@ import sqlalchemy as sa
 from sqlalchemy.engine.url import make_url
 from sqlalchemy.exc import OperationalError, ProgrammingError
 
-from sqlalchemy_utils.expressions import explain_analyze
-
+from ..expressions import explain_analyze
 from ..utils import starts_with
 from .orm import quote
 

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import six
 
-from sqlalchemy_utils import i18n, ImproperlyConfigured
-from sqlalchemy_utils.utils import str_coercible
+from .. import i18n, ImproperlyConfigured
+from ..utils import str_coercible
 
 
 @str_coercible

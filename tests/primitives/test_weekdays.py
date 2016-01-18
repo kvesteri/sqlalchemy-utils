@@ -6,10 +6,14 @@ from sqlalchemy_utils import i18n
 from sqlalchemy_utils.primitives import WeekDay, WeekDays
 
 
+@pytest.fixture
+def set_get_locale():
+    i18n.get_locale = lambda: i18n.babel.Locale('fi')
+
+
 @pytest.mark.skipif('i18n.babel is None')
+@pytest.mark.usefixtures('set_get_locale')
 class TestWeekDay(object):
-    def setup_method(self, method):
-        i18n.get_locale = lambda: i18n.babel.Locale('fi')
 
     def test_constructor_with_valid_index(self):
         day = WeekDay(1)

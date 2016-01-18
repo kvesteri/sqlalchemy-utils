@@ -1,8 +1,7 @@
+import pytest
 import sqlalchemy as sa
-from pytest import mark
 
 from sqlalchemy_utils import IntRangeType
-from tests import TestCase
 
 intervals = None
 inf = -1
@@ -13,91 +12,102 @@ except ImportError:
     pass
 
 
-@mark.skipif('intervals is None')
-class NumberRangeTestCase(TestCase):
-    def create_models(self):
-        class Building(self.Base):
-            __tablename__ = 'building'
-            id = sa.Column(sa.Integer, primary_key=True)
-            persons_at_night = sa.Column(IntRangeType)
+@pytest.fixture
+def Building(Base):
+    class Building(Base):
+        __tablename__ = 'building'
+        id = sa.Column(sa.Integer, primary_key=True)
+        persons_at_night = sa.Column(IntRangeType)
 
-            def __repr__(self):
-                return 'Building(%r)' % self.id
+        def __repr__(self):
+            return 'Building(%r)' % self.id
+    return Building
 
-        self.Building = Building
 
-    def create_building(self, number_range):
-        building = self.Building(
+@pytest.fixture
+def init_models(Building):
+    pass
+
+
+@pytest.fixture
+def create_building(session, Building):
+    def create_building(number_range):
+        building = Building(
             persons_at_night=number_range
         )
 
-        self.session.add(building)
-        self.session.commit()
-        return self.session.query(self.Building).first()
+        session.add(building)
+        session.commit()
+        return session.query(Building).first()
+    return create_building
 
-    def test_nullify_range(self):
-        building = self.create_building(None)
+
+@pytest.mark.skipif('intervals is None')
+class NumberRangeTestCase(object):
+
+    def test_nullify_range(self, create_building):
+        building = create_building(None)
         assert building.persons_at_night is None
 
-    def test_update_with_none(self):
+    def test_update_with_none(self, session, create_building):
         interval = intervals.IntInterval('(,)')
-        building = self.create_building(interval)
+        building = create_building(interval)
         building.persons_at_night = None
         assert building.persons_at_night is None
-        self.session.commit()
+        session.commit()
         assert building.persons_at_night is None
 
-    @mark.parametrize(
+    @pytest.mark.parametrize(
         'number_range',
         (
             [1, 3],
             '1 - 3',
         )
     )
-    def test_save_number_range(self, number_range):
-        building = self.create_building(number_range)
+    def test_save_number_range(self, create_building, number_range):
+        building = create_building(number_range)
         assert building.persons_at_night.lower == 1
         assert building.persons_at_night.upper == 3
 
-    def test_infinite_upper_bound(self):
-        building = self.create_building([1, inf])
+    def test_infinite_upper_bound(self, create_building):
+        building = create_building([1, inf])
         assert building.persons_at_night.lower == 1
         assert building.persons_at_night.upper == inf
 
-    def test_infinite_lower_bound(self):
-        building = self.create_building([-inf, 1])
+    def test_infinite_lower_bound(self, create_building):
+        building = create_building([-inf, 1])
         assert building.persons_at_night.lower == -inf
         assert building.persons_at_night.upper == 1
 
-    def test_nullify_number_range(self):
-        building = self.Building(
+    def test_nullify_number_range(self, session, Building):
+        building = Building(
             persons_at_night=intervals.IntInterval([1, 3])
         )
 
-        self.session.add(building)
-        self.session.commit()
+        session.add(building)
+        session.commit()
 
-        building = self.session.query(self.Building).first()
+        building = session.query(Building).first()
         building.persons_at_night = None
-        self.session.commit()
+        session.commit()
 
-        building = self.session.query(self.Building).first()
+        building = session.query(Building).first()
         assert building.persons_at_night is None
 
-    def test_string_coercion(self):
-        building = self.Building(persons_at_night='[12, 18]')
+    def test_string_coercion(self, Building):
+        building = Building(persons_at_night='[12, 18]')
         assert isinstance(building.persons_at_night, intervals.IntInterval)
 
-    def test_integer_coercion(self):
-        building = self.Building(persons_at_night=15)
+    def test_integer_coercion(self, Building):
+        building = Building(persons_at_night=15)
         assert building.persons_at_night.lower == 15
         assert building.persons_at_night.upper == 15
 
 
+@pytest.mark.usefixtures('postgresql_dsn')
 class TestIntRangeTypeOnPostgres(NumberRangeTestCase):
-    dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
 
-    @mark.parametrize(
+    @pytest.mark.parametrize(
         'number_range',
         (
             [1, 3],
@@ -105,15 +115,21 @@ class TestIntRangeTypeOnPostgres(NumberRangeTestCase):
             (0, 4)
         )
     )
-    def test_eq_operator(self, number_range):
-        self.create_building([1, 3])
+    def test_eq_operator(
+        self,
+        session,
+        Building,
+        create_building,
+        number_range
+    ):
+        create_building([1, 3])
         query = (
-            self.session.query(self.Building)
-            .filter(self.Building.persons_at_night == number_range)
+            session.query(Building)
+            .filter(Building.persons_at_night == number_range)
         )
         assert query.count()
 
-    @mark.parametrize(
+    @pytest.mark.parametrize(
         ('number_range', 'length'),
         (
             ([1, 3], 2),
@@ -125,14 +141,21 @@ class TestIntRangeTypeOnPostgres(NumberRangeTestCase):
             ([-3, -1], 2)
         )
     )
-    def test_length(self, number_range, length):
-        self.create_building(number_range)
+    def test_length(
+        self,
+        session,
+        Building,
+        create_building,
+        number_range,
+        length
+    ):
+        create_building(number_range)
         query = (
-            self.session.query(self.Building.persons_at_night.length)
+            session.query(Building.persons_at_night.length)
         )
         assert query.scalar() == length
 
-    @mark.parametrize(
+    @pytest.mark.parametrize(
         'number_range',
         (
             [[1, 3]],
@@ -140,15 +163,21 @@ class TestIntRangeTypeOnPostgres(NumberRangeTestCase):
             [(0, 4)],
         )
     )
-    def test_in_operator(self, number_range):
-        self.create_building([1, 3])
+    def test_in_operator(
+        self,
+        session,
+        Building,
+        create_building,
+        number_range
+    ):
+        create_building([1, 3])
         query = (
-            self.session.query(self.Building)
-            .filter(self.Building.persons_at_night.in_(number_range))
+            session.query(Building)
+            .filter(Building.persons_at_night.in_(number_range))
         )
         assert query.count()
 
-    @mark.parametrize(
+    @pytest.mark.parametrize(
         'number_range',
         (
             [1, 3],
@@ -156,15 +185,21 @@ class TestIntRangeTypeOnPostgres(NumberRangeTestCase):
             (0, 4),
         )
     )
-    def test_rshift_operator(self, number_range):
-        self.create_building([5, 6])
+    def test_rshift_operator(
+        self,
+        session,
+        Building,
+        create_building,
+        number_range
+    ):
+        create_building([5, 6])
         query = (
-            self.session.query(self.Building)
-            .filter(self.Building.persons_at_night >> number_range)
+            session.query(Building)
+            .filter(Building.persons_at_night >> number_range)
         )
         assert query.count()
 
-    @mark.parametrize(
+    @pytest.mark.parametrize(
         'number_range',
         (
             [1, 3],
@@ -172,15 +207,21 @@ class TestIntRangeTypeOnPostgres(NumberRangeTestCase):
             (0, 4),
         )
     )
-    def test_lshift_operator(self, number_range):
-        self.create_building([-1, 0])
+    def test_lshift_operator(
+        self,
+        session,
+        Building,
+        create_building,
+        number_range
+    ):
+        create_building([-1, 0])
         query = (
-            self.session.query(self.Building)
-            .filter(self.Building.persons_at_night << number_range)
+            session.query(Building)
+            .filter(Building.persons_at_night << number_range)
         )
         assert query.count()
 
-    @mark.parametrize(
+    @pytest.mark.parametrize(
         'number_range',
         (
             [1, 3],
@@ -189,15 +230,21 @@ class TestIntRangeTypeOnPostgres(NumberRangeTestCase):
             2
         )
     )
-    def test_contains_operator(self, number_range):
-        self.create_building([1, 3])
+    def test_contains_operator(
+        self,
+        session,
+        Building,
+        create_building,
+        number_range
+    ):
+        create_building([1, 3])
         query = (
-            self.session.query(self.Building)
-            .filter(self.Building.persons_at_night.contains(number_range))
+            session.query(Building)
+            .filter(Building.persons_at_night.contains(number_range))
         )
         assert query.count()
 
-    @mark.parametrize(
+    @pytest.mark.parametrize(
         'number_range',
         (
             [1, 3],
@@ -206,15 +253,21 @@ class TestIntRangeTypeOnPostgres(NumberRangeTestCase):
             (-inf, inf)
         )
     )
-    def test_contained_by_operator(self, number_range):
-        self.create_building([1, 3])
+    def test_contained_by_operator(
+        self,
+        session,
+        Building,
+        create_building,
+        number_range
+    ):
+        create_building([1, 3])
         query = (
-            self.session.query(self.Building)
-            .filter(self.Building.persons_at_night.contained_by(number_range))
+            session.query(Building)
+            .filter(Building.persons_at_night.contained_by(number_range))
         )
         assert query.count()
 
-    @mark.parametrize(
+    @pytest.mark.parametrize(
         'number_range',
         (
             [2, 5],
@@ -222,27 +275,32 @@ class TestIntRangeTypeOnPostgres(NumberRangeTestCase):
             0
         )
     )
-    def test_not_in_operator(self, number_range):
-        self.create_building([1, 3])
+    def test_not_in_operator(
+        self,
+        session,
+        Building,
+        create_building,
+        number_range
+    ):
+        create_building([1, 3])
         query = (
-            self.session.query(self.Building)
-            .filter(~ self.Building.persons_at_night.in_([number_range]))
+            session.query(Building)
+            .filter(~ Building.persons_at_night.in_([number_range]))
         )
         assert query.count()
 
-    def test_eq_with_query_arg(self):
-        self.create_building([1, 3])
+    def test_eq_with_query_arg(self, session, Building, create_building):
+        create_building([1, 3])
         query = (
-            self.session.query(self.Building)
+            session.query(Building)
             .filter(
-                self.Building.persons_at_night ==
-                self.session.query(
-                    self.Building.persons_at_night)
-                ).order_by(self.Building.persons_at_night).limit(1)
+                Building.persons_at_night ==
+                session.query(Building.persons_at_night)
+            ).order_by(Building.persons_at_night).limit(1)
         )
         assert query.count()
 
-    @mark.parametrize(
+    @pytest.mark.parametrize(
         'number_range',
         (
             [1, 2],
@@ -253,15 +311,21 @@ class TestIntRangeTypeOnPostgres(NumberRangeTestCase):
             1,
         )
     )
-    def test_ge_operator(self, number_range):
-        self.create_building([1, 3])
+    def test_ge_operator(
+        self,
+        session,
+        Building,
+        create_building,
+        number_range
+    ):
+        create_building([1, 3])
         query = (
-            self.session.query(self.Building)
-            .filter(self.Building.persons_at_night >= number_range)
+            session.query(Building)
+            .filter(Building.persons_at_night >= number_range)
         )
         assert query.count()
 
-    @mark.parametrize(
+    @pytest.mark.parametrize(
         'number_range',
         (
             [0, 2],
@@ -269,15 +333,21 @@ class TestIntRangeTypeOnPostgres(NumberRangeTestCase):
             [-inf, 2]
         )
     )
-    def test_gt_operator(self, number_range):
-        self.create_building([1, 3])
+    def test_gt_operator(
+        self,
+        session,
+        Building,
+        create_building,
+        number_range
+    ):
+        create_building([1, 3])
         query = (
-            self.session.query(self.Building)
-            .filter(self.Building.persons_at_night > number_range)
+            session.query(Building)
+            .filter(Building.persons_at_night > number_range)
         )
         assert query.count()
 
-    @mark.parametrize(
+    @pytest.mark.parametrize(
         'number_range',
         (
             [1, 4],
@@ -285,15 +355,21 @@ class TestIntRangeTypeOnPostgres(NumberRangeTestCase):
             [2, inf]
         )
     )
-    def test_le_operator(self, number_range):
-        self.create_building([1, 3])
+    def test_le_operator(
+        self,
+        session,
+        Building,
+        create_building,
+        number_range
+    ):
+        create_building([1, 3])
         query = (
-            self.session.query(self.Building)
-            .filter(self.Building.persons_at_night <= number_range)
+            session.query(Building)
+            .filter(Building.persons_at_night <= number_range)
         )
         assert query.count()
 
-    @mark.parametrize(
+    @pytest.mark.parametrize(
         'number_range',
         (
             [2, 4],
@@ -301,11 +377,17 @@ class TestIntRangeTypeOnPostgres(NumberRangeTestCase):
             [1, inf]
         )
     )
-    def test_lt_operator(self, number_range):
-        self.create_building([1, 3])
+    def test_lt_operator(
+        self,
+        session,
+        Building,
+        create_building,
+        number_range
+    ):
+        create_building([1, 3])
         query = (
-            self.session.query(self.Building)
-            .filter(self.Building.persons_at_night < number_range)
+            session.query(Building)
+            .filter(Building.persons_at_night < number_range)
         )
         assert query.count()
 

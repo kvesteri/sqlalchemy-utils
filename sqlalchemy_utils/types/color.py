@@ -1,8 +1,7 @@
 import six
 from sqlalchemy import types
 
-from sqlalchemy_utils.exceptions import ImproperlyConfigured
-
+from ..exceptions import ImproperlyConfigured
 from .scalar_coercible import ScalarCoercible
 
 colour = None

@@ -1,18 +1,20 @@
+import pytest
 import sqlalchemy as sa
-from pytest import raises
-from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy_utils import get_fk_constraint_for_columns, has_unique_index
 
 
 class TestHasUniqueIndex(object):
-    def setup_method(self, method):
-        Base = declarative_base()
 
+    @pytest.fixture
+    def articles(self, Base):
         class Article(Base):
             __tablename__ = 'article'
             id = sa.Column(sa.Integer, primary_key=True)
+        return Article.__table__
 
+    @pytest.fixture
+    def article_translations(self, Base):
         class ArticleTranslation(Base):
             __tablename__ = 'article_translation'
             id = sa.Column(sa.Integer, primary_key=True)
@@ -26,35 +28,33 @@ class TestHasUniqueIndex(object):
                 sa.Index('my_index', is_archived, is_published, unique=True),
             )
 
-        self.articles = Article.__table__
-        self.article_translations = ArticleTranslation.__table__
+        return ArticleTranslation.__table__
 
-    def test_primary_key(self):
-        assert has_unique_index(self.articles.c.id)
+    def test_primary_key(self, articles):
+        assert has_unique_index(articles.c.id)
 
-    def test_column_of_aliased_table(self):
-        alias = sa.orm.aliased(self.articles)
-        with raises(TypeError):
+    def test_column_of_aliased_table(self, articles):
+        alias = sa.orm.aliased(articles)
+        with pytest.raises(TypeError):
             assert has_unique_index(alias.c.id)
 
-    def test_unique_index(self):
-        assert has_unique_index(self.article_translations.c.is_deleted)
+    def test_unique_index(self, article_translations):
+        assert has_unique_index(article_translations.c.is_deleted)
 
-    def test_compound_primary_key(self):
-        assert not has_unique_index(self.article_translations.c.id)
-        assert not has_unique_index(self.article_translations.c.locale)
+    def test_compound_primary_key(self, article_translations):
+        assert not has_unique_index(article_translations.c.id)
+        assert not has_unique_index(article_translations.c.locale)
 
-    def test_single_column_index(self):
-        assert not has_unique_index(self.article_translations.c.is_published)
+    def test_single_column_index(self, article_translations):
+        assert not has_unique_index(article_translations.c.is_published)
 
-    def test_compound_column_unique_index(self):
-        assert not has_unique_index(self.article_translations.c.is_published)
-        assert not has_unique_index(self.article_translations.c.is_archived)
+    def test_compound_column_unique_index(self, article_translations):
+        assert not has_unique_index(article_translations.c.is_published)
+        assert not has_unique_index(article_translations.c.is_archived)
 
 
 class TestHasUniqueIndexWithFKConstraint(object):
-    def test_composite_fk_without_index(self):
-        Base = declarative_base()
+    def test_composite_fk_without_index(self, Base):
 
         class User(Base):
             __tablename__ = 'user'
@@ -81,8 +81,7 @@ class TestHasUniqueIndexWithFKConstraint(object):
         )
         assert not has_unique_index(constraint)
 
-    def test_composite_fk_with_index(self):
-        Base = declarative_base()
+    def test_composite_fk_with_index(self, Base):
 
         class User(Base):
             __tablename__ = 'user'
@@ -115,8 +114,7 @@ class TestHasUniqueIndexWithFKConstraint(object):
         )
         assert has_unique_index(constraint)
 
-    def test_composite_fk_with_partial_index_match(self):
-        Base = declarative_base()
+    def test_composite_fk_with_partial_index_match(self, Base):
 
         class User(Base):
             __tablename__ = 'user'

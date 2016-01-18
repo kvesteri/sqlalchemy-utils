@@ -1,9 +1,8 @@
 import six
 from sqlalchemy import types
 
-from sqlalchemy_utils import i18n, ImproperlyConfigured
-from sqlalchemy_utils.primitives import Currency
-
+from .. import i18n, ImproperlyConfigured
+from ..primitives import Currency
 from .scalar_coercible import ScalarCoercible
 
 

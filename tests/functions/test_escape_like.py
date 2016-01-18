@@ -1,7 +1,6 @@
 from sqlalchemy_utils import escape_like
-from tests import TestCase
 
 
-class TestEscapeLike(TestCase):
+class TestEscapeLike(object):
     def test_escapes_wildcards(self):
         assert escape_like('_*%') == '*_***%'

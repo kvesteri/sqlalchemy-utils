@@ -5,8 +5,7 @@ from sqlalchemy import types
 from sqlalchemy.dialects import oracle, postgresql
 from sqlalchemy.ext.mutable import Mutable
 
-from sqlalchemy_utils.exceptions import ImproperlyConfigured
-
+from ..exceptions import ImproperlyConfigured
 from .scalar_coercible import ScalarCoercible
 
 passlib = None

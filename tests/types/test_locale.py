@@ -1,51 +1,57 @@
+import pytest
 import sqlalchemy as sa
-from pytest import mark, raises
 
 from sqlalchemy_utils.types import locale
-from tests import TestCase
 
 
-@mark.skipif('locale.babel is None')
-class TestLocaleType(TestCase):
-    def create_models(self):
-        class User(self.Base):
-            __tablename__ = 'user'
-            id = sa.Column(sa.Integer, primary_key=True)
-            locale = sa.Column(locale.LocaleType)
+@pytest.fixture
+def User(Base):
+    class User(Base):
+        __tablename__ = 'user'
+        id = sa.Column(sa.Integer, primary_key=True)
+        locale = sa.Column(locale.LocaleType)
 
-            def __repr__(self):
-                return 'User(%r)' % self.id
+        def __repr__(self):
+            return 'User(%r)' % self.id
+    return User
 
-        self.User = User
 
-    def test_parameter_processing(self):
-        user = self.User(
+@pytest.fixture
+def init_models(User):
+    pass
+
+
+@pytest.mark.skipif('locale.babel is None')
+class TestLocaleType(object):
+
+    def test_parameter_processing(self, session, User):
+        user = User(
             locale=locale.babel.Locale(u'fi')
         )
 
-        self.session.add(user)
-        self.session.commit()
+        session.add(user)
+        session.commit()
 
-        user = self.session.query(self.User).first()
+        user = session.query(User).first()
 
-    def test_territory_parsing(self):
+    def test_territory_parsing(self, session, User):
         ko_kr = locale.babel.Locale(u'ko', territory=u'KR')
-        user = self.User(locale=ko_kr)
-        self.session.add(user)
-        self.session.commit()
+        user = User(locale=ko_kr)
+        session.add(user)
+        session.commit()
 
-        assert self.session.query(self.User.locale).first()[0] == ko_kr
+        assert session.query(User.locale).first()[0] == ko_kr
 
-    def test_coerce_territory_parsing(self):
-        user = self.User()
+    def test_coerce_territory_parsing(self, User):
+        user = User()
         user.locale = 'ko_KR'
         assert user.locale == locale.babel.Locale(u'ko', territory=u'KR')
 
-    def test_scalar_attributes_get_coerced_to_objects(self):
-        user = self.User(locale='en_US')
+    def test_scalar_attributes_get_coerced_to_objects(self, User):
+        user = User(locale='en_US')
 
         assert isinstance(user.locale, locale.babel.Locale)
 
-    def test_unknown_locale_throws_exception(self):
-        with raises(locale.babel.UnknownLocaleError):
-            self.User(locale=u'unknown')
+    def test_unknown_locale_throws_exception(self, User):
+        with pytest.raises(locale.babel.UnknownLocaleError):
+            User(locale=u'unknown')

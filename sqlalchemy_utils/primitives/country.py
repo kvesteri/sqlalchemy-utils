@@ -1,7 +1,7 @@
 import six
 
-from sqlalchemy_utils import i18n
-from sqlalchemy_utils.utils import str_coercible
+from .. import i18n
+from ..utils import str_coercible
 
 
 @str_coercible

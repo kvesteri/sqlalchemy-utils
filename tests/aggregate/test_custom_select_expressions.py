@@ -1,67 +1,76 @@
 from decimal import Decimal
 
+import pytest
 import sqlalchemy as sa
 
 from sqlalchemy_utils.aggregates import aggregated
-from tests import TestCase
 
 
-class TestLazyEvaluatedSelectExpressionsForAggregates(TestCase):
-    dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
+@pytest.fixture
+def Product(Base):
+    class Product(Base):
+        __tablename__ = 'product'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
+        price = sa.Column(sa.Numeric)
 
-    def create_models(self):
-        class Catalog(self.Base):
-            __tablename__ = 'catalog'
-            id = sa.Column(sa.Integer, primary_key=True)
-            name = sa.Column(sa.Unicode(255))
+        catalog_id = sa.Column(sa.Integer, sa.ForeignKey('catalog.id'))
+    return Product
 
-            @aggregated('products', sa.Column(sa.Numeric, default=0))
-            def net_worth(self):
-                return sa.func.sum(Product.price)
 
-            products = sa.orm.relationship('Product', backref='catalog')
+@pytest.fixture
+def Catalog(Base, Product):
+    class Catalog(Base):
+        __tablename__ = 'catalog'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
 
-        class Product(self.Base):
-            __tablename__ = 'product'
-            id = sa.Column(sa.Integer, primary_key=True)
-            name = sa.Column(sa.Unicode(255))
-            price = sa.Column(sa.Numeric)
+        @aggregated('products', sa.Column(sa.Numeric, default=0))
+        def net_worth(self):
+            return sa.func.sum(Product.price)
 
-            catalog_id = sa.Column(sa.Integer, sa.ForeignKey('catalog.id'))
+        products = sa.orm.relationship('Product', backref='catalog')
+    return Catalog
 
-        self.Catalog = Catalog
-        self.Product = Product
 
-    def test_assigns_aggregates_on_insert(self):
-        catalog = self.Catalog(
+@pytest.fixture
+def init_models(Product, Catalog):
+    pass
+
+
+@pytest.mark.usefixtures('postgresql_dsn')
+class TestLazyEvaluatedSelectExpressionsForAggregates(object):
+
+    def test_assigns_aggregates_on_insert(self, session, Product, Catalog):
+        catalog = Catalog(
             name=u'Some catalog'
         )
-        self.session.add(catalog)
-        self.session.commit()
-        product = self.Product(
+        session.add(catalog)
+        session.commit()
+        product = Product(
             name=u'Some product',
             price=Decimal('1000'),
             catalog=catalog
         )
-        self.session.add(product)
-        self.session.commit()
-        self.session.refresh(catalog)
+        session.add(product)
+        session.commit()
+        session.refresh(catalog)
         assert catalog.net_worth == Decimal('1000')
 
-    def test_assigns_aggregates_on_update(self):
-        catalog = self.Catalog(
+    def test_assigns_aggregates_on_update(self, session, Product, Catalog):
+        catalog = Catalog(
             name=u'Some catalog'
         )
-        self.session.add(catalog)
-        self.session.commit()
-        product = self.Product(
+        session.add(catalog)
+        session.commit()
+        product = Product(
             name=u'Some product',
             price=Decimal('1000'),
             catalog=catalog
         )
-        self.session.add(product)
-        self.session.commit()
+        session.add(product)
+        session.commit()
         product.price = Decimal('500')
-        self.session.commit()
-        self.session.refresh(catalog)
+        session.commit()
+        session.refresh(catalog)
         assert catalog.net_worth == Decimal('500')

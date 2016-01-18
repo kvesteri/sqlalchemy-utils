@@ -1,122 +1,127 @@
+import pytest
 import six
 import sqlalchemy as sa
-from pytest import mark
 from sqlalchemy.util.langhelpers import symbol
 
 from sqlalchemy_utils.path import AttrPath, Path
-from tests import TestCase
 
 
-class TestAttrPath(TestCase):
-    def create_models(self):
-        class Document(self.Base):
-            __tablename__ = 'document'
-            id = sa.Column(sa.Integer, primary_key=True)
-            name = sa.Column(sa.Unicode(255))
-            locale = sa.Column(sa.String(10))
+@pytest.fixture
+def Document(Base):
+    class Document(Base):
+        __tablename__ = 'document'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
+        locale = sa.Column(sa.String(10))
+    return Document
 
-        class Section(self.Base):
-            __tablename__ = 'section'
-            id = sa.Column(sa.Integer, primary_key=True)
-            name = sa.Column(sa.Unicode(255))
-            locale = sa.Column(sa.String(10))
 
-            document_id = sa.Column(
-                sa.Integer, sa.ForeignKey(Document.id)
-            )
+@pytest.fixture
+def Section(Base, Document):
+    class Section(Base):
+        __tablename__ = 'section'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
+        locale = sa.Column(sa.String(10))
 
-            document = sa.orm.relationship(Document, backref='sections')
-
-        class SubSection(self.Base):
-            __tablename__ = 'subsection'
-            id = sa.Column(sa.Integer, primary_key=True)
-            name = sa.Column(sa.Unicode(255))
-            locale = sa.Column(sa.String(10))
-
-            section_id = sa.Column(
-                sa.Integer, sa.ForeignKey(Section.id)
-            )
-
-            section = sa.orm.relationship(Section, backref='subsections')
-
-        self.Document = Document
-        self.Section = Section
-        self.SubSection = SubSection
-
-    @mark.parametrize(
-        ('class_', 'path', 'direction'),
-        (
-            ('SubSection', 'section', symbol('MANYTOONE')),
+        document_id = sa.Column(
+            sa.Integer, sa.ForeignKey(Document.id)
         )
-    )
-    def test_direction(self, class_, path, direction):
+
+        document = sa.orm.relationship(Document, backref='sections')
+    return Section
+
+
+@pytest.fixture
+def SubSection(Base, Section):
+    class SubSection(Base):
+        __tablename__ = 'subsection'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
+        locale = sa.Column(sa.String(10))
+
+        section_id = sa.Column(
+            sa.Integer, sa.ForeignKey(Section.id)
+        )
+
+        section = sa.orm.relationship(Section, backref='subsections')
+    return SubSection
+
+
+class TestAttrPath(object):
+
+    @pytest.fixture
+    def init_models(self, Document, Section, SubSection):
+        pass
+
+    def test_direction(self, SubSection):
         assert (
-            AttrPath(getattr(self, class_), path).direction == direction
+            AttrPath(SubSection, 'section').direction == symbol('MANYTOONE')
         )
 
-    def test_invert(self):
-        path = ~ AttrPath(self.SubSection, 'section.document')
+    def test_invert(self, Document, Section, SubSection):
+        path = ~ AttrPath(SubSection, 'section.document')
         assert path.parts == [
-            self.Document.sections,
-            self.Section.subsections
+            Document.sections,
+            Section.subsections
         ]
         assert str(path.path) == 'sections.subsections'
 
-    def test_len(self):
-        len(AttrPath(self.SubSection, 'section.document')) == 2
+    def test_len(self, SubSection):
+        len(AttrPath(SubSection, 'section.document')) == 2
 
-    def test_init(self):
-        path = AttrPath(self.SubSection, 'section.document')
-        assert path.class_ == self.SubSection
+    def test_init(self, SubSection):
+        path = AttrPath(SubSection, 'section.document')
+        assert path.class_ == SubSection
         assert path.path == Path('section.document')
 
-    def test_iter(self):
-        path = AttrPath(self.SubSection, 'section.document')
+    def test_iter(self, Section, SubSection):
+        path = AttrPath(SubSection, 'section.document')
         assert list(path) == [
-            self.SubSection.section,
-            self.Section.document
+            SubSection.section,
+            Section.document
         ]
 
-    def test_repr(self):
-        path = AttrPath(self.SubSection, 'section.document')
+    def test_repr(self, SubSection):
+        path = AttrPath(SubSection, 'section.document')
         assert repr(path) == (
             "AttrPath(SubSection, 'section.document')"
         )
 
-    def test_index(self):
-        path = AttrPath(self.SubSection, 'section.document')
-        assert path.index(self.Section.document) == 1
-        assert path.index(self.SubSection.section) == 0
+    def test_index(self, Section, SubSection):
+        path = AttrPath(SubSection, 'section.document')
+        assert path.index(Section.document) == 1
+        assert path.index(SubSection.section) == 0
 
-    def test_getitem(self):
-        path = AttrPath(self.SubSection, 'section.document')
-        assert path[0] is self.SubSection.section
-        assert path[1] is self.Section.document
+    def test_getitem(self, Section, SubSection):
+        path = AttrPath(SubSection, 'section.document')
+        assert path[0] is SubSection.section
+        assert path[1] is Section.document
 
-    def test_getitem_with_slice(self):
-        path = AttrPath(self.SubSection, 'section.document')
-        assert path[:] == AttrPath(self.SubSection, 'section.document')
-        assert path[:-1] == AttrPath(self.SubSection, 'section')
-        assert path[1:] == AttrPath(self.Section, 'document')
+    def test_getitem_with_slice(self, Section, SubSection):
+        path = AttrPath(SubSection, 'section.document')
+        assert path[:] == AttrPath(SubSection, 'section.document')
+        assert path[:-1] == AttrPath(SubSection, 'section')
+        assert path[1:] == AttrPath(Section, 'document')
 
-    def test_eq(self):
+    def test_eq(self, SubSection):
         assert (
-            AttrPath(self.SubSection, 'section.document') ==
-            AttrPath(self.SubSection, 'section.document')
+            AttrPath(SubSection, 'section.document') ==
+            AttrPath(SubSection, 'section.document')
         )
         assert not (
-            AttrPath(self.SubSection, 'section') ==
-            AttrPath(self.SubSection, 'section.document')
+            AttrPath(SubSection, 'section') ==
+            AttrPath(SubSection, 'section.document')
         )
 
-    def test_ne(self):
+    def test_ne(self, SubSection):
         assert not (
-            AttrPath(self.SubSection, 'section.document') !=
-            AttrPath(self.SubSection, 'section.document')
+            AttrPath(SubSection, 'section.document') !=
+            AttrPath(SubSection, 'section.document')
         )
         assert (
-            AttrPath(self.SubSection, 'section') !=
-            AttrPath(self.SubSection, 'section.document')
+            AttrPath(SubSection, 'section') !=
+            AttrPath(SubSection, 'section.document')
         )
 
 
@@ -133,7 +138,7 @@ class TestPath(object):
         path = Path('s.s2.s3')
         assert list(path) == ['s', 's2', 's3']
 
-    @mark.parametrize(('path', 'length'), (
+    @pytest.mark.parametrize(('path', 'length'), (
         (Path('s.s2.s3'), 3),
         (Path('s.s2'), 2),
         (Path(''), 0)
@@ -167,14 +172,14 @@ class TestPath(object):
         path = Path('s.s2.s3')
         assert path[1:] == Path('s2.s3')
 
-    @mark.parametrize(('test', 'result'), (
+    @pytest.mark.parametrize(('test', 'result'), (
         (Path('s.s2') == Path('s.s2'), True),
         (Path('s.s2') == Path('s.s3'), False)
     ))
     def test_eq(self, test, result):
         assert test is result
 
-    @mark.parametrize(('test', 'result'), (
+    @pytest.mark.parametrize(('test', 'result'), (
         (Path('s.s2') != Path('s.s2'), False),
         (Path('s.s2') != Path('s.s3'), True)
     ))

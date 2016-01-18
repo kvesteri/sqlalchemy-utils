@@ -1,101 +1,121 @@
 from decimal import Decimal
 
+import pytest
 import sqlalchemy as sa
 
 from sqlalchemy_utils.aggregates import aggregated
-from tests import TestCase
 
 
-class TestLazyEvaluatedSelectExpressionsForAggregates(TestCase):
-    dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
+@pytest.fixture
+def Product(Base):
+    class Product(Base):
+        __tablename__ = 'product'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
+        price = sa.Column(sa.Numeric)
 
-    def create_models(self):
-        class Catalog(self.Base):
-            __tablename__ = 'catalog'
-            id = sa.Column(sa.Integer, primary_key=True)
-            name = sa.Column(sa.Unicode(255))
-            type = sa.Column(sa.Unicode(255))
+        catalog_id = sa.Column(sa.Integer, sa.ForeignKey('catalog.id'))
+    return Product
 
-            __mapper_args__ = {
-                'polymorphic_on': type
-            }
 
-            @aggregated('products', sa.Column(sa.Numeric, default=0))
-            def net_worth(self):
-                return sa.func.sum(Product.price)
+@pytest.fixture
+def Catalog(Base, Product):
+    class Catalog(Base):
+        __tablename__ = 'catalog'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
+        type = sa.Column(sa.Unicode(255))
 
-            products = sa.orm.relationship('Product', backref='catalog')
+        __mapper_args__ = {
+            'polymorphic_on': type
+        }
 
-        class CostumeCatalog(Catalog):
-            __tablename__ = 'costume_catalog'
-            id = sa.Column(
-                sa.Integer, sa.ForeignKey(Catalog.id), primary_key=True
-            )
+        @aggregated('products', sa.Column(sa.Numeric, default=0))
+        def net_worth(self):
+            return sa.func.sum(Product.price)
 
-            __mapper_args__ = {
-                'polymorphic_identity': 'costumes',
-            }
+        products = sa.orm.relationship('Product', backref='catalog')
+    return Catalog
 
-        class CarCatalog(Catalog):
-            __tablename__ = 'car_catalog'
-            id = sa.Column(
-                sa.Integer, sa.ForeignKey(Catalog.id), primary_key=True
-            )
 
-            __mapper_args__ = {
-                'polymorphic_identity': 'cars',
-            }
+@pytest.fixture
+def CostumeCatalog(Catalog):
+    class CostumeCatalog(Catalog):
+        __tablename__ = 'costume_catalog'
+        id = sa.Column(
+            sa.Integer, sa.ForeignKey(Catalog.id), primary_key=True
+        )
 
-        class Product(self.Base):
-            __tablename__ = 'product'
-            id = sa.Column(sa.Integer, primary_key=True)
-            name = sa.Column(sa.Unicode(255))
-            price = sa.Column(sa.Numeric)
+        __mapper_args__ = {
+            'polymorphic_identity': 'costumes',
+        }
+    return CostumeCatalog
 
-            catalog_id = sa.Column(sa.Integer, sa.ForeignKey('catalog.id'))
 
-        self.Catalog = Catalog
-        self.CostumeCatalog = CostumeCatalog
-        self.CarCatalog = CarCatalog
-        self.Product = Product
+@pytest.fixture
+def CarCatalog(Catalog):
+    class CarCatalog(Catalog):
+        __tablename__ = 'car_catalog'
+        id = sa.Column(
+            sa.Integer, sa.ForeignKey(Catalog.id), primary_key=True
+        )
 
-    def test_columns_inherited_from_parent(self):
-        assert self.CarCatalog.net_worth
-        assert self.CostumeCatalog.net_worth
-        assert self.Catalog.net_worth
-        assert not hasattr(self.CarCatalog.__table__.c, 'net_worth')
-        assert not hasattr(self.CostumeCatalog.__table__.c, 'net_worth')
+        __mapper_args__ = {
+            'polymorphic_identity': 'cars',
+        }
+    return CarCatalog
 
-    def test_assigns_aggregates_on_insert(self):
-        catalog = self.Catalog(
+
+@pytest.fixture
+def init_models(Product, Catalog, CostumeCatalog, CarCatalog):
+    pass
+
+
+@pytest.mark.usefixtures('postgresql_dsn')
+class TestLazyEvaluatedSelectExpressionsForAggregates(object):
+
+    def test_columns_inherited_from_parent(
+        self,
+        Catalog,
+        CarCatalog,
+        CostumeCatalog
+    ):
+        assert CarCatalog.net_worth
+        assert CostumeCatalog.net_worth
+        assert Catalog.net_worth
+        assert not hasattr(CarCatalog.__table__.c, 'net_worth')
+        assert not hasattr(CostumeCatalog.__table__.c, 'net_worth')
+
+    def test_assigns_aggregates_on_insert(self, session, Product, Catalog):
+        catalog = Catalog(
             name=u'Some catalog'
         )
-        self.session.add(catalog)
-        self.session.commit()
-        product = self.Product(
+        session.add(catalog)
+        session.commit()
+        product = Product(
             name=u'Some product',
             price=Decimal('1000'),
             catalog=catalog
         )
-        self.session.add(product)
-        self.session.commit()
-        self.session.refresh(catalog)
+        session.add(product)
+        session.commit()
+        session.refresh(catalog)
         assert catalog.net_worth == Decimal('1000')
 
-    def test_assigns_aggregates_on_update(self):
-        catalog = self.Catalog(
+    def test_assigns_aggregates_on_update(self, session, Catalog, Product):
+        catalog = Catalog(
             name=u'Some catalog'
         )
-        self.session.add(catalog)
-        self.session.commit()
-        product = self.Product(
+        session.add(catalog)
+        session.commit()
+        product = Product(
             name=u'Some product',
             price=Decimal('1000'),
             catalog=catalog
         )
-        self.session.add(product)
-        self.session.commit()
+        session.add(product)
+        session.commit()
         product.price = Decimal('500')
-        self.session.commit()
-        self.session.refresh(catalog)
+        session.commit()
+        session.refresh(catalog)
         assert catalog.net_worth == Decimal('500')

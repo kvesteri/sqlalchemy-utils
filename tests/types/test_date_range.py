@@ -1,10 +1,9 @@
 from datetime import datetime, timedelta
 
+import pytest
 import sqlalchemy as sa
-from pytest import mark
 
 from sqlalchemy_utils import DateRangeType
-from tests import TestCase
 
 intervals = None
 inf = 0
@@ -15,30 +14,41 @@ except ImportError:
     pass
 
 
-@mark.skipif('intervals is None')
-class DateRangeTestCase(TestCase):
-    def create_models(self):
-        class Booking(self.Base):
-            __tablename__ = 'booking'
-            id = sa.Column(sa.Integer, primary_key=True)
-            during = sa.Column(DateRangeType)
+@pytest.fixture
+def Booking(Base):
+    class Booking(Base):
+        __tablename__ = 'booking'
+        id = sa.Column(sa.Integer, primary_key=True)
+        during = sa.Column(DateRangeType)
 
-        self.Booking = Booking
+    return Booking
 
-    def create_booking(self, date_range):
-        booking = self.Booking(
+
+@pytest.fixture
+def create_booking(session, Booking):
+    def create_booking(date_range):
+        booking = Booking(
             during=date_range
         )
+        session.add(booking)
+        session.commit()
+        return session.query(Booking).first()
+    return create_booking
 
-        self.session.add(booking)
-        self.session.commit()
-        return self.session.query(self.Booking).first()
 
-    def test_nullify_range(self):
-        booking = self.create_booking(None)
+@pytest.fixture
+def init_models(Booking):
+    pass
+
+
+@pytest.mark.skipif('intervals is None')
+class DateRangeTestCase(object):
+
+    def test_nullify_range(self, create_booking):
+        booking = create_booking(None)
         assert booking.during is None
 
-    @mark.parametrize(
+    @pytest.mark.parametrize(
         ('date_range'),
         (
             [datetime(2015, 1, 1).date(), datetime(2015, 1, 3).date()],
@@ -46,38 +56,38 @@ class DateRangeTestCase(TestCase):
             [-inf, datetime(2015, 1, 1).date()]
         )
     )
-    def test_save_date_range(self, date_range):
-        booking = self.create_booking(date_range)
+    def test_save_date_range(self, create_booking, date_range):
+        booking = create_booking(date_range)
         assert booking.during.lower == date_range[0]
         assert booking.during.upper == date_range[1]
 
-    def test_nullify_date_range(self):
-        booking = self.Booking(
+    def test_nullify_date_range(self, session, Booking):
+        booking = Booking(
             during=intervals.DateInterval(
                 [datetime(2015, 1, 1).date(), datetime(2015, 1, 3).date()]
             )
         )
 
-        self.session.add(booking)
-        self.session.commit()
+        session.add(booking)
+        session.commit()
 
-        booking = self.session.query(self.Booking).first()
+        booking = session.query(Booking).first()
         booking.during = None
-        self.session.commit()
+        session.commit()
 
-        booking = self.session.query(self.Booking).first()
+        booking = session.query(Booking).first()
         assert booking.during is None
 
-    def test_integer_coercion(self):
-        booking = self.Booking(during=datetime(2015, 1, 1).date())
+    def test_integer_coercion(self, Booking):
+        booking = Booking(during=datetime(2015, 1, 1).date())
         assert booking.during.lower == datetime(2015, 1, 1).date()
         assert booking.during.upper == datetime(2015, 1, 1).date()
 
 
-class TestDateRangeOnPostgres(DateRangeTestCase):
-    dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
+@pytest.mark.usefixtures('postgresql_dsn')
+class TestDateRangeOnPostgres(object):
 
-    @mark.parametrize(
+    @pytest.mark.parametrize(
         ('date_range', 'length'),
         (
             (
@@ -92,9 +102,16 @@ class TestDateRangeOnPostgres(DateRangeTestCase):
             ([datetime(2015, 1, 1).date(), inf], None),
         )
     )
-    def test_length(self, date_range, length):
-        self.create_booking(date_range)
+    def test_length(
+        self,
+        session,
+        Booking,
+        create_booking,
+        date_range,
+        length
+    ):
+        create_booking(date_range)
         query = (
-            self.session.query(self.Booking.during.length)
+            session.query(Booking.during.length)
         )
         assert query.scalar() == length

@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
+import pytest
 import sqlalchemy as sa
-from pytest import mark
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 from sqlalchemy_utils import (
@@ -17,14 +15,14 @@ from sqlalchemy_utils import (
 )
 from sqlalchemy_utils.types import pg_composite
 from sqlalchemy_utils.types.range import intervals
-from tests import TestCase
 
 
-class TestCompositeTypeWithRegularTypes(TestCase):
-    dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
+@pytest.mark.usefixtures('postgresql_dsn')
+class TestCompositeTypeWithRegularTypes(object):
 
-    def create_models(self):
-        class Account(self.Base):
+    @pytest.fixture
+    def Account(self, Base):
+        class Account(Base):
             __tablename__ = 'account'
             id = sa.Column(sa.Integer, primary_key=True)
             balance = sa.Column(
@@ -37,43 +35,44 @@ class TestCompositeTypeWithRegularTypes(TestCase):
                 )
             )
 
-        self.Account = Account
+        return Account
 
-    def test_parameter_processing(self):
-        account = self.Account(
+    @pytest.fixture
+    def init_models(self, Account):
+        pass
+
+    def test_parameter_processing(self, session, Account):
+        account = Account(
             balance=('USD', 15)
         )
 
-        self.session.add(account)
-        self.session.commit()
+        session.add(account)
+        session.commit()
 
-        account = self.session.query(self.Account).first()
+        account = session.query(Account).first()
         assert account.balance.currency == 'USD'
         assert account.balance.amount == 15
 
-    def test_non_ascii_chars(self):
-        account = self.Account(
+    def test_non_ascii_chars(self, session, Account):
+        account = Account(
             balance=(u'ääöö', 15)
         )
 
-        self.session.add(account)
-        self.session.commit()
+        session.add(account)
+        session.commit()
 
-        account = self.session.query(self.Account).first()
+        account = session.query(Account).first()
         assert account.balance.currency == u'ääöö'
         assert account.balance.amount == 15
 
 
-@mark.skipif('i18n.babel is None')
-class TestCompositeTypeWithTypeDecorators(TestCase):
-    dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
+@pytest.mark.skipif('i18n.babel is None')
+@pytest.mark.usefixtures('postgresql_dsn')
+class TestCompositeTypeWithTypeDecorators(object):
 
-    def setup_method(self, method):
-        TestCase.setup_method(self, method)
-        i18n.get_locale = lambda: i18n.babel.Locale('en')
-
-    def create_models(self):
-        class Account(self.Base):
+    @pytest.fixture
+    def Account(self, Base):
+        class Account(Base):
             __tablename__ = 'account'
             id = sa.Column(sa.Integer, primary_key=True)
             balance = sa.Column(
@@ -86,39 +85,44 @@ class TestCompositeTypeWithTypeDecorators(TestCase):
                 )
             )
 
-        self.Account = Account
+        return Account
 
-    def test_result_set_processing(self):
-        account = self.Account(
+    @pytest.fixture
+    def init_models(self, Account):
+        i18n.get_locale = lambda: i18n.babel.Locale('en')
+
+    def test_result_set_processing(self, session, Account):
+        account = Account(
             balance=('USD', 15)
         )
 
-        self.session.add(account)
-        self.session.commit()
+        session.add(account)
+        session.commit()
 
-        account = self.session.query(self.Account).first()
+        account = session.query(Account).first()
         assert account.balance.currency == Currency('USD')
         assert account.balance.amount == 15
 
-    def test_parameter_processing(self):
-        account = self.Account(
+    def test_parameter_processing(self, session, Account):
+        account = Account(
             balance=(Currency('USD'), 15)
         )
 
-        self.session.add(account)
-        self.session.commit()
+        session.add(account)
+        session.commit()
 
-        account = self.session.query(self.Account).first()
+        account = session.query(Account).first()
         assert account.balance.currency == Currency('USD')
         assert account.balance.amount == 15
 
 
-@mark.skipif('i18n.babel is None')
-class TestCompositeTypeInsideArray(TestCase):
-    dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
+@pytest.mark.skipif('i18n.babel is None')
+@pytest.mark.usefixtures('postgresql_dsn')
+class TestCompositeTypeInsideArray(object):
 
-    def setup_method(self, method):
-        self.type = CompositeType(
+    @pytest.fixture
+    def type_(self):
+        return CompositeType(
             'money_type',
             [
                 sa.Column('currency', CurrencyType),
@@ -126,43 +130,46 @@ class TestCompositeTypeInsideArray(TestCase):
             ]
         )
 
-        TestCase.setup_method(self, method)
-        i18n.get_locale = lambda: i18n.babel.Locale('en')
-
-    def create_models(self):
-        class Account(self.Base):
+    @pytest.fixture
+    def Account(self, Base, type_):
+        class Account(Base):
             __tablename__ = 'account'
             id = sa.Column(sa.Integer, primary_key=True)
             balances = sa.Column(
-                CompositeArray(self.type)
+                CompositeArray(type_)
             )
 
-        self.Account = Account
+        return Account
 
-    def test_parameter_processing(self):
-        account = self.Account(
+    @pytest.fixture
+    def init_models(self, Account):
+        i18n.get_locale = lambda: i18n.babel.Locale('en')
+
+    def test_parameter_processing(self, session, type_, Account):
+        account = Account(
             balances=[
-                self.type.type_cls(Currency('USD'), 15),
-                self.type.type_cls(Currency('AUD'), 20)
+                type_.type_cls(Currency('USD'), 15),
+                type_.type_cls(Currency('AUD'), 20)
             ]
         )
 
-        self.session.add(account)
-        self.session.commit()
+        session.add(account)
+        session.commit()
 
-        account = self.session.query(self.Account).first()
+        account = session.query(Account).first()
         assert account.balances[0].currency == Currency('USD')
         assert account.balances[0].amount == 15
         assert account.balances[1].currency == Currency('AUD')
         assert account.balances[1].amount == 20
 
 
-@mark.skipif('intervals is None')
-class TestCompositeTypeWithRangeTypeInsideArray(TestCase):
-    dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
+@pytest.mark.skipif('intervals is None')
+@pytest.mark.usefixtures('postgresql_dsn')
+class TestCompositeTypeWithRangeTypeInsideArray(object):
 
-    def setup_method(self, method):
-        self.type = CompositeType(
+    @pytest.fixture
+    def type_(self):
+        return CompositeType(
             'category',
             [
                 sa.Column('scale', NumericRangeType),
@@ -170,36 +177,44 @@ class TestCompositeTypeWithRangeTypeInsideArray(TestCase):
             ]
         )
 
-        TestCase.setup_method(self, method)
-
-    def create_models(self):
-        class Account(self.Base):
+    @pytest.fixture
+    def Account(self, Base, type_):
+        class Account(Base):
             __tablename__ = 'account'
             id = sa.Column(sa.Integer, primary_key=True)
             categories = sa.Column(
-                CompositeArray(self.type)
+                CompositeArray(type_)
             )
 
-        self.Account = Account
+        return Account
 
-    def test_parameter_processing_with_named_tuple(self):
-        account = self.Account(
+    @pytest.fixture
+    def init_models(self, Account):
+        pass
+
+    def test_parameter_processing_with_named_tuple(
+        self,
+        session,
+        type_,
+        Account
+    ):
+        account = Account(
             categories=[
-                self.type.type_cls(
+                type_.type_cls(
                     intervals.DecimalInterval([15, 18]),
                     'bad'
                 ),
-                self.type.type_cls(
+                type_.type_cls(
                     intervals.DecimalInterval([18, 20]),
                     'good'
                 )
             ]
         )
 
-        self.session.add(account)
-        self.session.commit()
+        session.add(account)
+        session.commit()
 
-        account = self.session.query(self.Account).first()
+        account = session.query(Account).first()
         assert (
             account.categories[0].scale == intervals.DecimalInterval([15, 18])
         )
@@ -209,18 +224,18 @@ class TestCompositeTypeWithRangeTypeInsideArray(TestCase):
         )
         assert account.categories[1].name == 'good'
 
-    def test_parameter_processing_with_tuple(self):
-        account = self.Account(
+    def test_parameter_processing_with_tuple(self, session, Account):
+        account = Account(
             categories=[
                 (intervals.DecimalInterval([15, 18]), 'bad'),
                 (intervals.DecimalInterval([18, 20]), 'good')
             ]
         )
 
-        self.session.add(account)
-        self.session.commit()
+        session.add(account)
+        session.commit()
 
-        account = self.session.query(self.Account).first()
+        account = session.query(Account).first()
         assert (
             account.categories[0].scale == intervals.DecimalInterval([15, 18])
         )
@@ -230,15 +245,19 @@ class TestCompositeTypeWithRangeTypeInsideArray(TestCase):
         )
         assert account.categories[1].name == 'good'
 
-    def test_parameter_processing_with_nulls_as_composite_fields(self):
-        account = self.Account(
+    def test_parameter_processing_with_nulls_as_composite_fields(
+        self,
+        session,
+        Account
+    ):
+        account = Account(
             categories=[
                 (None, 'bad'),
                 (intervals.DecimalInterval([18, 20]), None)
             ]
         )
-        self.session.add(account)
-        self.session.commit()
+        session.add(account)
+        session.commit()
         assert account.categories[0].scale is None
         assert account.categories[0].name == 'bad'
         assert (
@@ -246,31 +265,32 @@ class TestCompositeTypeWithRangeTypeInsideArray(TestCase):
         )
         assert account.categories[1].name is None
 
-    def test_parameter_processing_with_nulls_as_composites(self):
-        account = self.Account(
+    def test_parameter_processing_with_nulls_as_composites(
+        self,
+        session,
+        Account
+    ):
+        account = Account(
             categories=[
                 (None, None),
                 None
             ]
         )
-        self.session.add(account)
-        self.session.commit()
+        session.add(account)
+        session.commit()
         assert account.categories[0].scale is None
         assert account.categories[0].name is None
         assert account.categories[1] is None
 
 
-class TestCompositeTypeWhenTypeAlreadyExistsInDatabase(TestCase):
-    dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
+@pytest.mark.usefixtures('postgresql_dsn')
+class TestCompositeTypeWhenTypeAlreadyExistsInDatabase(object):
 
-    def setup_method(self, method):
-        self.engine = create_engine(self.dns)
-        self.engine.echo = True
-        self.connection = self.engine.connect()
-        self.Base = declarative_base()
+    @pytest.fixture
+    def Account(self, Base):
         pg_composite.registered_composites = {}
 
-        self.type = CompositeType(
+        type_ = CompositeType(
             'money_type',
             [
                 sa.Column('currency', sa.String),
@@ -278,46 +298,50 @@ class TestCompositeTypeWhenTypeAlreadyExistsInDatabase(TestCase):
             ]
         )
 
-        self.create_models()
+        class Account(Base):
+            __tablename__ = 'account'
+            id = sa.Column(sa.Integer, primary_key=True)
+            balance = sa.Column(type_)
+
+        return Account
+
+    @pytest.fixture
+    def session(self, request, engine, connection, Base, Account):
         sa.orm.configure_mappers()
 
-        Session = sessionmaker(bind=self.connection)
-        self.session = Session()
-        self.session.execute(
+        Session = sessionmaker(bind=connection)
+        session = Session()
+        session.execute(
             "CREATE TYPE money_type AS (currency VARCHAR, amount INTEGER)"
         )
-        self.session.execute(
+        session.execute(
             """CREATE TABLE account (
                 id SERIAL, balance MONEY_TYPE, PRIMARY KEY(id)
             )"""
         )
-        register_composites(self.connection)
 
-    def teardown_method(self, method):
-        self.session.execute('DROP TABLE account')
-        self.session.execute('DROP TYPE money_type')
-        self.session.commit()
-        self.session.close_all()
-        self.connection.close()
-        remove_composite_listeners()
-        self.engine.dispose()
+        def teardown():
+            session.execute('DROP TABLE account')
+            session.execute('DROP TYPE money_type')
+            session.commit()
+            session.close_all()
+            connection.close()
+            remove_composite_listeners()
+            engine.dispose()
 
-    def create_models(self):
-        class Account(self.Base):
-            __tablename__ = 'account'
-            id = sa.Column(sa.Integer, primary_key=True)
-            balance = sa.Column(self.type)
+        register_composites(connection)
+        request.addfinalizer(teardown)
 
-        self.Account = Account
+        return session
 
-    def test_parameter_processing(self):
-        account = self.Account(
+    def test_parameter_processing(self, session, Account):
+        account = Account(
             balance=('USD', 15),
         )
 
-        self.session.add(account)
-        self.session.commit()
+        session.add(account)
+        session.commit()
 
-        account = self.session.query(self.Account).first()
+        account = session.query(Account).first()
         assert account.balance.currency == 'USD'
         assert account.balance.amount == 15

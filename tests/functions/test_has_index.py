@@ -1,14 +1,13 @@
+import pytest
 import sqlalchemy as sa
-from pytest import raises
-from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy_utils import get_fk_constraint_for_columns, has_index
 
 
 class TestHasIndex(object):
-    def setup_method(self, method):
-        Base = declarative_base()
 
+    @pytest.fixture
+    def table(self, Base):
         class ArticleTranslation(Base):
             __tablename__ = 'article_translation'
             id = sa.Column(sa.Integer, primary_key=True)
@@ -21,24 +20,23 @@ class TestHasIndex(object):
             __table_args__ = (
                 sa.Index('my_index', is_deleted, is_archived),
             )
+        return ArticleTranslation.__table__
 
-        self.table = ArticleTranslation.__table__
-
-    def test_column_that_belongs_to_an_alias(self):
-        alias = sa.orm.aliased(self.table)
-        with raises(TypeError):
+    def test_column_that_belongs_to_an_alias(self, table):
+        alias = sa.orm.aliased(table)
+        with pytest.raises(TypeError):
             assert has_index(alias.c.id)
 
-    def test_compound_primary_key(self):
-        assert has_index(self.table.c.id)
-        assert not has_index(self.table.c.locale)
+    def test_compound_primary_key(self, table):
+        assert has_index(table.c.id)
+        assert not has_index(table.c.locale)
 
-    def test_single_column_index(self):
-        assert has_index(self.table.c.is_published)
+    def test_single_column_index(self, table):
+        assert has_index(table.c.is_published)
 
-    def test_compound_column_index(self):
-        assert has_index(self.table.c.is_deleted)
-        assert not has_index(self.table.c.is_archived)
+    def test_compound_column_index(self, table):
+        assert has_index(table.c.is_deleted)
+        assert not has_index(table.c.is_archived)
 
     def test_table_without_primary_key(self):
         article = sa.Table(
@@ -50,8 +48,7 @@ class TestHasIndex(object):
 
 
 class TestHasIndexWithFKConstraint(object):
-    def test_composite_fk_without_index(self):
-        Base = declarative_base()
+    def test_composite_fk_without_index(self, Base):
 
         class User(Base):
             __tablename__ = 'user'
@@ -78,8 +75,7 @@ class TestHasIndexWithFKConstraint(object):
         )
         assert not has_index(constraint)
 
-    def test_composite_fk_with_index(self):
-        Base = declarative_base()
+    def test_composite_fk_with_index(self, Base):
 
         class User(Base):
             __tablename__ = 'user'
@@ -109,8 +105,7 @@ class TestHasIndexWithFKConstraint(object):
         )
         assert has_index(constraint)
 
-    def test_composite_fk_with_partial_index_match(self):
-        Base = declarative_base()
+    def test_composite_fk_with_partial_index_match(self, Base):
 
         class User(Base):
             __tablename__ = 'user'

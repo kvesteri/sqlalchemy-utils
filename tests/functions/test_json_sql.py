@@ -2,11 +2,10 @@ import pytest
 import sqlalchemy as sa
 
 from sqlalchemy_utils import json_sql
-from tests import TestCase
 
 
-class TestJSONSQL(TestCase):
-    dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
+@pytest.mark.usefixtures('postgresql_dsn')
+class TestJSONSQL(object):
 
     @pytest.mark.parametrize(
         ('value', 'result'),
@@ -27,7 +26,7 @@ class TestJSONSQL(TestCase):
             )
         )
     )
-    def test_compiled_scalars(self, value, result):
+    def test_compiled_scalars(self, connection, value, result):
         assert result == (
-            self.connection.execute(sa.select([json_sql(value)])).fetchone()[0]
+            connection.execute(sa.select([json_sql(value)])).fetchone()[0]
         )

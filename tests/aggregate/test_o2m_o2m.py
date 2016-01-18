@@ -1,64 +1,76 @@
 from decimal import Decimal
 
+import pytest
 import sqlalchemy as sa
 
 from sqlalchemy_utils.aggregates import aggregated
-from tests import TestCase
 
 
-class TestAggregateOneToManyAndOneToMany(TestCase):
-    dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
+@pytest.fixture
+def Catalog(Base):
+    class Catalog(Base):
+        __tablename__ = 'catalog'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
 
-    def create_models(self):
-        class Catalog(self.Base):
-            __tablename__ = 'catalog'
-            id = sa.Column(sa.Integer, primary_key=True)
-            name = sa.Column(sa.Unicode(255))
+        @aggregated(
+            'categories.products',
+            sa.Column(sa.Integer, default=0)
+        )
+        def product_count(self):
+            return sa.func.count('1')
 
-            @aggregated(
-                'categories.products',
-                sa.Column(sa.Integer, default=0)
-            )
-            def product_count(self):
-                return sa.func.count('1')
+        categories = sa.orm.relationship('Category', backref='catalog')
+    return Catalog
 
-            categories = sa.orm.relationship('Category', backref='catalog')
 
-        class Category(self.Base):
-            __tablename__ = 'category'
-            id = sa.Column(sa.Integer, primary_key=True)
-            name = sa.Column(sa.Unicode(255))
+@pytest.fixture
+def Category(Base):
+    class Category(Base):
+        __tablename__ = 'category'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
 
-            catalog_id = sa.Column(sa.Integer, sa.ForeignKey('catalog.id'))
+        catalog_id = sa.Column(sa.Integer, sa.ForeignKey('catalog.id'))
 
-            products = sa.orm.relationship('Product', backref='category')
+        products = sa.orm.relationship('Product', backref='category')
+    return Category
 
-        class Product(self.Base):
-            __tablename__ = 'product'
-            id = sa.Column(sa.Integer, primary_key=True)
-            name = sa.Column(sa.Unicode(255))
-            price = sa.Column(sa.Numeric)
 
-            category_id = sa.Column(sa.Integer, sa.ForeignKey('category.id'))
+@pytest.fixture
+def Product(Base):
+    class Product(Base):
+        __tablename__ = 'product'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
+        price = sa.Column(sa.Numeric)
 
-        self.Catalog = Catalog
-        self.Category = Category
-        self.Product = Product
+        category_id = sa.Column(sa.Integer, sa.ForeignKey('category.id'))
+    return Product
 
-    def test_assigns_aggregates(self):
-        category = self.Category(name=u'Some category')
-        catalog = self.Catalog(
+
+@pytest.fixture
+def init_models(Catalog, Category, Product):
+    pass
+
+
+@pytest.mark.usefixtures('postgresql_dsn')
+class TestAggregateOneToManyAndOneToMany(object):
+
+    def test_assigns_aggregates(self, session, Category, Catalog, Product):
+        category = Category(name=u'Some category')
+        catalog = Catalog(
             categories=[category]
         )
         catalog.name = u'Some catalog'
-        self.session.add(catalog)
-        self.session.commit()
-        product = self.Product(
+        session.add(catalog)
+        session.commit()
+        product = Product(
             name=u'Some product',
             price=Decimal('1000'),
             category=category
         )
-        self.session.add(product)
-        self.session.commit()
-        self.session.refresh(catalog)
+        session.add(product)
+        session.commit()
+        session.refresh(catalog)
         assert catalog.product_count == 1

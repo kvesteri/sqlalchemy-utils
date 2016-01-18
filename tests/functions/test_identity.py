@@ -1,39 +1,46 @@
+import pytest
 import sqlalchemy as sa
 
 from sqlalchemy_utils.functions import identity
-from tests import TestCase
 
 
-class IdentityTestCase(TestCase):
-    def test_for_transient_class_without_id(self):
-        assert identity(self.Building()) == (None, )
+class IdentityTestCase(object):
 
-    def test_for_transient_class_with_id(self):
-        building = self.Building(name=u'Some building')
-        self.session.add(building)
-        self.session.flush()
+    @pytest.fixture
+    def init_models(self, Building):
+        pass
+
+    def test_for_transient_class_without_id(self, Building):
+        assert identity(Building()) == (None, )
+
+    def test_for_transient_class_with_id(self, session, Building):
+        building = Building(name=u'Some building')
+        session.add(building)
+        session.flush()
 
         assert identity(building) == (building.id, )
 
-    def test_identity_for_class(self):
-        assert identity(self.Building) == (self.Building.id, )
+    def test_identity_for_class(self, Building):
+        assert identity(Building) == (Building.id, )
 
 
 class TestIdentity(IdentityTestCase):
-    def create_models(self):
-        class Building(self.Base):
+
+    @pytest.fixture
+    def Building(self, Base):
+        class Building(Base):
             __tablename__ = 'building'
             id = sa.Column(sa.Integer, primary_key=True)
             name = sa.Column(sa.Unicode(255))
-
-        self.Building = Building
+        return Building
 
 
 class TestIdentityWithColumnAlias(IdentityTestCase):
-    def create_models(self):
-        class Building(self.Base):
+
+    @pytest.fixture
+    def Building(self, Base):
+        class Building(Base):
             __tablename__ = 'building'
             id = sa.Column('_id', sa.Integer, primary_key=True)
             name = sa.Column(sa.Unicode(255))
-
-        self.Building = Building
+        return Building

@@ -19,7 +19,7 @@ from sqlalchemy.orm.query import _ColumnEntity
 from sqlalchemy.orm.session import object_session
 from sqlalchemy.orm.util import AliasedInsp
 
-from sqlalchemy_utils.utils import is_sequence
+from ..utils import is_sequence
 
 
 def get_class_by_table(base, table, data=None):

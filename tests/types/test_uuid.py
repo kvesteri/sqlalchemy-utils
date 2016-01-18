@@ -1,35 +1,42 @@
 import uuid
 
+import pytest
 import sqlalchemy as sa
 
 from sqlalchemy_utils import UUIDType
-from tests import TestCase
 
 
-class TestUUIDType(TestCase):
-    def create_models(self):
-        class User(self.Base):
-            __tablename__ = 'user'
-            id = sa.Column(UUIDType, default=uuid.uuid4, primary_key=True)
+@pytest.fixture
+def User(Base):
+    class User(Base):
+        __tablename__ = 'user'
+        id = sa.Column(UUIDType, default=uuid.uuid4, primary_key=True)
 
-            def __repr__(self):
-                return 'User(%r)' % self.id
+        def __repr__(self):
+            return 'User(%r)' % self.id
+    return User
 
-        self.User = User
 
-    def test_commit(self):
-        obj = self.User()
+@pytest.fixture
+def init_models(User):
+    pass
+
+
+class TestUUIDType(object):
+
+    def test_commit(self, session, User):
+        obj = User()
         obj.id = uuid.uuid4().hex
 
-        self.session.add(obj)
-        self.session.commit()
+        session.add(obj)
+        session.commit()
 
-        u = self.session.query(self.User).one()
+        u = session.query(User).one()
 
         assert u.id == obj.id
 
-    def test_coerce(self):
-        obj = self.User()
+    def test_coerce(self, User):
+        obj = User()
         obj.id = identifier = uuid.uuid4().hex
 
         assert isinstance(obj.id, uuid.UUID)

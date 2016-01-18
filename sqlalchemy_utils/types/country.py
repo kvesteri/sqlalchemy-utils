@@ -1,8 +1,7 @@
 import six
 from sqlalchemy import types
 
-from sqlalchemy_utils.primitives import Country
-
+from ..primitives import Country
 from .scalar_coercible import ScalarCoercible
 
 

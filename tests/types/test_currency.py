@@ -1,39 +1,51 @@
-# -*- coding: utf-8 -*-
+import pytest
 import sqlalchemy as sa
-from pytest import mark
 
 from sqlalchemy_utils import Currency, CurrencyType, i18n
-from tests import TestCase
 
 
-@mark.skipif('i18n.babel is None')
-class TestCurrencyType(TestCase):
-    def setup_method(self, method):
-        TestCase.setup_method(self, method)
-        i18n.get_locale = lambda: i18n.babel.Locale('en')
+@pytest.fixture
+def set_get_locale():
+    i18n.get_locale = lambda: i18n.babel.Locale('en')
 
-    def create_models(self):
-        class User(self.Base):
-            __tablename__ = 'user'
-            id = sa.Column(sa.Integer, primary_key=True)
-            currency = sa.Column(CurrencyType)
 
-            def __repr__(self):
-                return 'User(%r)' % self.id
+@pytest.fixture
+def User(Base):
 
-        self.User = User
+    class User(Base):
+        __tablename__ = 'user'
+        id = sa.Column(sa.Integer, primary_key=True)
+        currency = sa.Column(CurrencyType)
 
-    def test_parameter_processing(self):
-        user = self.User(
+        def __repr__(self):
+            return 'User(%r)' % self.id
+
+    return User
+
+
+@pytest.fixture
+def init_models(User):
+    pass
+
+
+@pytest.mark.skipif('i18n.babel is None')
+class TestCurrencyType(object):
+
+    def test_parameter_processing(self, session, User, set_get_locale):
+        user = User(
             currency=Currency('USD')
         )
 
-        self.session.add(user)
-        self.session.commit()
+        session.add(user)
+        session.commit()
 
-        user = self.session.query(self.User).first()
+        user = session.query(User).first()
         assert user.currency.name == u'US Dollar'
 
-    def test_scalar_attributes_get_coerced_to_objects(self):
-        user = self.User(currency='USD')
+    def test_scalar_attributes_get_coerced_to_objects(
+        self,
+        User,
+        set_get_locale
+    ):
+        user = User(currency='USD')
         assert isinstance(user.currency, Currency)

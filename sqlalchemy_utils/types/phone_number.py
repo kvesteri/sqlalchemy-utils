@@ -1,8 +1,7 @@
 from sqlalchemy import types
 
-from sqlalchemy_utils.exceptions import ImproperlyConfigured
-from sqlalchemy_utils.utils import str_coercible
-
+from ..exceptions import ImproperlyConfigured
+from ..utils import str_coercible
 from .scalar_coercible import ScalarCoercible
 
 try:

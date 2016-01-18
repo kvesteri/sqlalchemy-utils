@@ -1,7 +1,7 @@
+import pytest
 import sqlalchemy as sa
 
 from sqlalchemy_utils import aggregated, TSVectorType
-from tests import TestCase
 
 
 def tsvector_reduce_concat(vectors):
@@ -13,45 +13,54 @@ def tsvector_reduce_concat(vectors):
     )
 
 
-class TestSearchVectorAggregates(TestCase):
-    dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
+@pytest.fixture
+def Product(Base):
+    class Product(Base):
+        __tablename__ = 'product'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
+        price = sa.Column(sa.Numeric)
 
-    def create_models(self):
-        class Catalog(self.Base):
-            __tablename__ = 'catalog'
-            id = sa.Column(sa.Integer, primary_key=True)
-            name = sa.Column(sa.Unicode(255))
+        catalog_id = sa.Column(sa.Integer, sa.ForeignKey('catalog.id'))
+    return Product
 
-            @aggregated('products', sa.Column(TSVectorType))
-            def product_search_vector(self):
-                return tsvector_reduce_concat(
-                    sa.func.to_tsvector(Product.name)
-                )
 
-            products = sa.orm.relationship('Product', backref='catalog')
+@pytest.fixture
+def Catalog(Base, Product):
+    class Catalog(Base):
+        __tablename__ = 'catalog'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
 
-        class Product(self.Base):
-            __tablename__ = 'product'
-            id = sa.Column(sa.Integer, primary_key=True)
-            name = sa.Column(sa.Unicode(255))
-            price = sa.Column(sa.Numeric)
+        @aggregated('products', sa.Column(TSVectorType))
+        def product_search_vector(self):
+            return tsvector_reduce_concat(
+                sa.func.to_tsvector(Product.name)
+            )
 
-            catalog_id = sa.Column(sa.Integer, sa.ForeignKey('catalog.id'))
+        products = sa.orm.relationship('Product', backref='catalog')
+    return Catalog
 
-        self.Catalog = Catalog
-        self.Product = Product
 
-    def test_assigns_aggregates_on_insert(self):
-        catalog = self.Catalog(
+@pytest.fixture
+def init_models(Product, Catalog):
+    pass
+
+
+@pytest.mark.usefixtures('postgresql_dsn')
+class TestSearchVectorAggregates(object):
+
+    def test_assigns_aggregates_on_insert(self, session, Product, Catalog):
+        catalog = Catalog(
             name=u'Some catalog'
         )
-        self.session.add(catalog)
-        self.session.commit()
-        product = self.Product(
+        session.add(catalog)
+        session.commit()
+        product = Product(
             name=u'Product XYZ',
             catalog=catalog
         )
-        self.session.add(product)
-        self.session.commit()
-        self.session.refresh(catalog)
+        session.add(product)
+        session.commit()
+        session.refresh(catalog)
         assert catalog.product_search_vector == "'product':1 'xyz':2"

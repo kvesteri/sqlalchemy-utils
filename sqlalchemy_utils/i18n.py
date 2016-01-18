@@ -8,6 +8,7 @@ from .exceptions import ImproperlyConfigured
 
 try:
     import babel
+    import babel.dates
 except ImportError:
     babel = None
 

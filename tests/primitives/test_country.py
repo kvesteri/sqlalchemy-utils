@@ -1,32 +1,36 @@
+import pytest
 import six
-from pytest import mark, raises
 
 from sqlalchemy_utils import Country, i18n
 
 
-@mark.skipif('i18n.babel is None')
+@pytest.fixture
+def set_get_locale():
+    i18n.get_locale = lambda: i18n.babel.Locale('en')
+
+
+@pytest.mark.skipif('i18n.babel is None')
+@pytest.mark.usefixtures('set_get_locale')
 class TestCountry(object):
-    def setup_method(self, method):
-        i18n.get_locale = lambda: i18n.babel.Locale('en')
 
     def test_init(self):
         assert Country(u'FI') == Country(Country(u'FI'))
 
     def test_constructor_with_wrong_type(self):
-        with raises(TypeError) as e:
+        with pytest.raises(TypeError) as e:
             Country(None)
         assert str(e.value) == (
             "Country() argument must be a string or a country, not 'NoneType'"
         )
 
     def test_constructor_with_invalid_code(self):
-        with raises(ValueError) as e:
+        with pytest.raises(ValueError) as e:
             Country('SomeUnknownCode')
         assert str(e.value) == (
             'Could not convert string to country code: SomeUnknownCode'
         )
 
-    @mark.parametrize(
+    @pytest.mark.parametrize(
         'code',
         (
             'FI',
@@ -37,7 +41,7 @@ class TestCountry(object):
         Country.validate(code)
 
     def test_validate_with_invalid_code(self):
-        with raises(ValueError) as e:
+        with pytest.raises(ValueError) as e:
             Country.validate('SomeUnknownCode')
         assert str(e.value) == (
             'Could not convert string to country code: SomeUnknownCode'

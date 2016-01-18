@@ -365,7 +365,6 @@ TODO
 from collections import defaultdict
 from weakref import WeakKeyDictionary
 
-import six
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.sql.functions import _FunctionGenerator
@@ -519,7 +518,7 @@ class AggregationManager(object):
         )
 
     def update_generator_registry(self):
-        for class_, attrs in six.iteritems(aggregated_attrs):
+        for class_, attrs in aggregated_attrs.items():
             for expr, path, column in attrs:
                 value = AggregatedValue(
                     class_=class_,
@@ -539,7 +538,7 @@ class AggregationManager(object):
             if class_ in self.generator_registry:
                 object_dict[class_].append(obj)
 
-        for class_, objects in six.iteritems(object_dict):
+        for class_, objects in object_dict.items():
             for aggregate_value in self.generator_registry[class_]:
                 query = aggregate_value.update_query(objects)
                 if query is not None:

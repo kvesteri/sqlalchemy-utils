@@ -1,3 +1,6 @@
+sudo: false
+language: python
+
 addons:
   postgresql: "9.4"
 
@@ -6,22 +9,29 @@ before_script:
   - psql -c 'create extension hstore;' -U postgres -d sqlalchemy_utils_test
   - mysql -e 'create database sqlalchemy_utils_test;'
 
-language: python
-python:
-  - 2.6
-  - 2.7
-  - 3.3
-  - 3.4
-  - 3.5
-
-env:
-  - EXTRAS=test
-  - EXTRAS=test_all
+matrix:
+  include:
+  - python: 2.6
+    env:
+      - "TOXENV=py26"
+  - python: 2.7
+    env:
+      - "TOXENV=py27"
+  - python: 3.3
+    env:
+      - "TOXENV=py33"
+  - python: 3.4
+    env:
+      - "TOXENV=py34"
+  - python: 3.5
+    env:
+      - "TOXENV=py35"
+  - python: 3.5
+    env:
+      - "TOXENV=lint"
 
 install:
-  - pip install -e .[$EXTRAS]
+  - pip install tox
 
 script:
-  - isort --recursive --diff sqlalchemy_utils tests && isort --recursive --check-only sqlalchemy_utils tests
-  - flake8 sqlalchemy_utils tests
-  - py.test
+  - tox
