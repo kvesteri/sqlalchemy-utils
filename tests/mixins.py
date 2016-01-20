@@ -1,18 +1,24 @@
+import pytest
 import sqlalchemy as sa
 
 
 class ThreeLevelDeepOneToOne(object):
-    def create_models(self):
-        class Catalog(self.Base):
+
+    @pytest.fixture
+    def Catalog(self, Base, Category):
+        class Catalog(Base):
             __tablename__ = 'catalog'
             id = sa.Column('_id', sa.Integer, primary_key=True)
             category = sa.orm.relationship(
-                'Category',
+                Category,
                 uselist=False,
                 backref='catalog'
             )
+        return Catalog
 
-        class Category(self.Base):
+    @pytest.fixture
+    def Category(self, Base, SubCategory):
+        class Category(Base):
             __tablename__ = 'category'
             id = sa.Column('_id', sa.Integer, primary_key=True)
             catalog_id = sa.Column(
@@ -22,12 +28,15 @@ class ThreeLevelDeepOneToOne(object):
             )
 
             sub_category = sa.orm.relationship(
-                'SubCategory',
+                SubCategory,
                 uselist=False,
                 backref='category'
             )
+        return Category
 
-        class SubCategory(self.Base):
+    @pytest.fixture
+    def SubCategory(self, Base, Product):
+        class SubCategory(Base):
             __tablename__ = 'sub_category'
             id = sa.Column('_id', sa.Integer, primary_key=True)
             category_id = sa.Column(
@@ -36,12 +45,15 @@ class ThreeLevelDeepOneToOne(object):
                 sa.ForeignKey('category._id')
             )
             product = sa.orm.relationship(
-                'Product',
+                Product,
                 uselist=False,
                 backref='sub_category'
             )
+        return SubCategory
 
-        class Product(self.Base):
+    @pytest.fixture
+    def Product(self, Base):
+        class Product(Base):
             __tablename__ = 'product'
             id = sa.Column('_id', sa.Integer, primary_key=True)
             price = sa.Column(sa.Integer)
@@ -51,22 +63,27 @@ class ThreeLevelDeepOneToOne(object):
                 sa.Integer,
                 sa.ForeignKey('sub_category._id')
             )
+        return Product
 
-        self.Catalog = Catalog
-        self.Category = Category
-        self.SubCategory = SubCategory
-        self.Product = Product
+    @pytest.fixture
+    def init_models(self, Catalog, Category, SubCategory, Product):
+        pass
 
 
 class ThreeLevelDeepOneToMany(object):
-    def create_models(self):
-        class Catalog(self.Base):
+
+    @pytest.fixture
+    def Catalog(self, Base, Category):
+        class Catalog(Base):
             __tablename__ = 'catalog'
             id = sa.Column('_id', sa.Integer, primary_key=True)
 
-            categories = sa.orm.relationship('Category', backref='catalog')
+            categories = sa.orm.relationship(Category, backref='catalog')
+        return Catalog
 
-        class Category(self.Base):
+    @pytest.fixture
+    def Category(self, Base, SubCategory):
+        class Category(Base):
             __tablename__ = 'category'
             id = sa.Column('_id', sa.Integer, primary_key=True)
             catalog_id = sa.Column(
@@ -76,10 +93,13 @@ class ThreeLevelDeepOneToMany(object):
             )
 
             sub_categories = sa.orm.relationship(
-                'SubCategory', backref='category'
+                SubCategory, backref='category'
             )
+        return Category
 
-        class SubCategory(self.Base):
+    @pytest.fixture
+    def SubCategory(self, Base, Product):
+        class SubCategory(Base):
             __tablename__ = 'sub_category'
             id = sa.Column('_id', sa.Integer, primary_key=True)
             category_id = sa.Column(
@@ -88,11 +108,14 @@ class ThreeLevelDeepOneToMany(object):
                 sa.ForeignKey('category._id')
             )
             products = sa.orm.relationship(
-                'Product',
+                Product,
                 backref='sub_category'
             )
+        return SubCategory
 
-        class Product(self.Base):
+    @pytest.fixture
+    def Product(self, Base):
+        class Product(Base):
             __tablename__ = 'product'
             id = sa.Column('_id', sa.Integer, primary_key=True)
             price = sa.Column(sa.Numeric)
@@ -105,25 +128,42 @@ class ThreeLevelDeepOneToMany(object):
 
             def __repr__(self):
                 return '<Product id=%r>' % self.id
+        return Product
 
-        self.Catalog = Catalog
-        self.Category = Category
-        self.SubCategory = SubCategory
-        self.Product = Product
+    @pytest.fixture
+    def init_models(self, Catalog, Category, SubCategory, Product):
+        pass
 
 
 class ThreeLevelDeepManyToMany(object):
-    def create_models(self):
+
+    @pytest.fixture
+    def Catalog(self, Base, Category):
+
         catalog_category = sa.Table(
             'catalog_category',
-            self.Base.metadata,
+            Base.metadata,
             sa.Column('catalog_id', sa.Integer, sa.ForeignKey('catalog._id')),
             sa.Column('category_id', sa.Integer, sa.ForeignKey('category._id'))
         )
 
+        class Catalog(Base):
+            __tablename__ = 'catalog'
+            id = sa.Column('_id', sa.Integer, primary_key=True)
+
+            categories = sa.orm.relationship(
+                Category,
+                backref='catalogs',
+                secondary=catalog_category
+            )
+        return Catalog
+
+    @pytest.fixture
+    def Category(self, Base, SubCategory):
+
         category_subcategory = sa.Table(
             'category_subcategory',
-            self.Base.metadata,
+            Base.metadata,
             sa.Column(
                 'category_id',
                 sa.Integer,
@@ -136,9 +176,23 @@ class ThreeLevelDeepManyToMany(object):
             )
         )
 
+        class Category(Base):
+            __tablename__ = 'category'
+            id = sa.Column('_id', sa.Integer, primary_key=True)
+
+            sub_categories = sa.orm.relationship(
+                SubCategory,
+                backref='categories',
+                secondary=category_subcategory
+            )
+        return Category
+
+    @pytest.fixture
+    def SubCategory(self, Base, Product):
+
         subcategory_product = sa.Table(
             'subcategory_product',
-            self.Base.metadata,
+            Base.metadata,
             sa.Column(
                 'subcategory_id',
                 sa.Integer,
@@ -151,41 +205,24 @@ class ThreeLevelDeepManyToMany(object):
             )
         )
 
-        class Catalog(self.Base):
-            __tablename__ = 'catalog'
-            id = sa.Column('_id', sa.Integer, primary_key=True)
-
-            categories = sa.orm.relationship(
-                'Category',
-                backref='catalogs',
-                secondary=catalog_category
-            )
-
-        class Category(self.Base):
-            __tablename__ = 'category'
-            id = sa.Column('_id', sa.Integer, primary_key=True)
-
-            sub_categories = sa.orm.relationship(
-                'SubCategory',
-                backref='categories',
-                secondary=category_subcategory
-            )
-
-        class SubCategory(self.Base):
+        class SubCategory(Base):
             __tablename__ = 'sub_category'
             id = sa.Column('_id', sa.Integer, primary_key=True)
             products = sa.orm.relationship(
-                'Product',
+                Product,
                 backref='sub_categories',
                 secondary=subcategory_product
             )
+        return SubCategory
 
-        class Product(self.Base):
+    @pytest.fixture
+    def Product(self, Base):
+        class Product(Base):
             __tablename__ = 'product'
             id = sa.Column('_id', sa.Integer, primary_key=True)
             price = sa.Column(sa.Numeric)
+        return Product
 
-        self.Catalog = Catalog
-        self.Category = Category
-        self.SubCategory = SubCategory
-        self.Product = Product
+    @pytest.fixture
+    def init_models(self, Catalog, Category, SubCategory, Product):
+        pass

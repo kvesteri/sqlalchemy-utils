@@ -1,3 +1,4 @@
+import pytest
 import sqlalchemy as sa
 
 from sqlalchemy_utils.functions import (
@@ -5,52 +6,58 @@ from sqlalchemy_utils.functions import (
     render_expression,
     render_statement
 )
-from tests import TestCase
 
 
-class TestRender(TestCase):
-    def create_models(self):
-        class User(self.Base):
+class TestRender(object):
+
+    @pytest.fixture
+    def User(self, Base):
+        class User(Base):
             __tablename__ = 'user'
             id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
             name = sa.Column(sa.Unicode(255))
+        return User
 
-        self.User = User
+    @pytest.fixture
+    def init_models(self, User):
+        pass
 
-    def test_render_orm_query(self):
-        query = self.session.query(self.User).filter_by(id=3)
+    def test_render_orm_query(self, session, User):
+        query = session.query(User).filter_by(id=3)
         text = render_statement(query)
 
         assert 'SELECT user.id, user.name' in text
         assert 'FROM user' in text
         assert 'WHERE user.id = 3' in text
 
-    def test_render_statement(self):
-        statement = self.User.__table__.select().where(self.User.id == 3)
-        text = render_statement(statement, bind=self.session.bind)
+    def test_render_statement(self, session, User):
+        statement = User.__table__.select().where(User.id == 3)
+        text = render_statement(statement, bind=session.bind)
 
         assert 'SELECT user.id, user.name' in text
         assert 'FROM user' in text
         assert 'WHERE user.id = 3' in text
 
-    def test_render_statement_without_mapper(self):
+    def test_render_statement_without_mapper(self, session):
         statement = sa.select([sa.text('1')])
-        text = render_statement(statement, bind=self.session.bind)
+        text = render_statement(statement, bind=session.bind)
 
         assert 'SELECT 1' in text
 
-    def test_render_ddl(self):
-        expression = 'self.User.__table__.create(engine)'
-        stream = render_expression(expression, self.engine)
+    def test_render_ddl(self, engine, User):
+        expression = 'User.__table__.create(engine)'
+        stream = render_expression(expression, engine)
 
         text = stream.getvalue()
 
         assert 'CREATE TABLE user' in text
         assert 'PRIMARY KEY' in text
 
-    def test_render_mock_ddl(self):
+    def test_render_mock_ddl(self, engine, User):
+        # TODO: mock_engine doesn't seem to work with locally scoped variables.
+        self.engine = engine
         with mock_engine('self.engine') as stream:
-            self.User.__table__.create(self.engine)
+            User.__table__.create(self.engine)
 
         text = stream.getvalue()
 

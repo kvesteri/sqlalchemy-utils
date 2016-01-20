@@ -1,65 +1,65 @@
+import pytest
 import sqlalchemy as sa
-from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy_utils import get_columns
 
 
+@pytest.fixture
+def Building(Base):
+    class Building(Base):
+        __tablename__ = 'building'
+        id = sa.Column('_id', sa.Integer, primary_key=True)
+        name = sa.Column('_name', sa.Unicode(255))
+    return Building
+
+
 class TestGetColumns(object):
-    def setup_method(self, method):
-        Base = declarative_base()
 
-        class Building(Base):
-            __tablename__ = 'building'
-            id = sa.Column('_id', sa.Integer, primary_key=True)
-            name = sa.Column('_name', sa.Unicode(255))
-
-        self.Building = Building
-
-    def test_table(self):
+    def test_table(self, Building):
         assert isinstance(
-            get_columns(self.Building.__table__),
+            get_columns(Building.__table__),
             sa.sql.base.ImmutableColumnCollection
         )
 
-    def test_instrumented_attribute(self):
-        assert get_columns(self.Building.id) == [self.Building.__table__.c._id]
+    def test_instrumented_attribute(self, Building):
+        assert get_columns(Building.id) == [Building.__table__.c._id]
 
-    def test_column_property(self):
-        assert get_columns(self.Building.id.property) == [
-            self.Building.__table__.c._id
+    def test_column_property(self, Building):
+        assert get_columns(Building.id.property) == [
+            Building.__table__.c._id
         ]
 
-    def test_column(self):
-        assert get_columns(self.Building.__table__.c._id) == [
-            self.Building.__table__.c._id
+    def test_column(self, Building):
+        assert get_columns(Building.__table__.c._id) == [
+            Building.__table__.c._id
         ]
 
-    def test_declarative_class(self):
+    def test_declarative_class(self, Building):
         assert isinstance(
-            get_columns(self.Building),
+            get_columns(Building),
             sa.util._collections.OrderedProperties
         )
 
-    def test_declarative_object(self):
+    def test_declarative_object(self, Building):
         assert isinstance(
-            get_columns(self.Building()),
+            get_columns(Building()),
             sa.util._collections.OrderedProperties
         )
 
-    def test_mapper(self):
+    def test_mapper(self, Building):
         assert isinstance(
-            get_columns(self.Building.__mapper__),
+            get_columns(Building.__mapper__),
             sa.util._collections.OrderedProperties
         )
 
-    def test_class_alias(self):
+    def test_class_alias(self, Building):
         assert isinstance(
-            get_columns(sa.orm.aliased(self.Building)),
+            get_columns(sa.orm.aliased(Building)),
             sa.util._collections.OrderedProperties
         )
 
-    def test_table_alias(self):
-        alias = sa.orm.aliased(self.Building.__table__)
+    def test_table_alias(self, Building):
+        alias = sa.orm.aliased(Building.__table__)
         assert isinstance(
             get_columns(alias),
             sa.sql.base.ImmutableColumnCollection

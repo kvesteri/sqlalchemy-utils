@@ -1,24 +1,32 @@
 from itertools import chain
 
+import pytest
 import sqlalchemy as sa
 
 from sqlalchemy_utils.functions import non_indexed_foreign_keys
-from tests import TestCase
 
 
-class TestFindNonIndexedForeignKeys(TestCase):
-    def create_models(self):
-        class User(self.Base):
+class TestFindNonIndexedForeignKeys(object):
+
+    @pytest.fixture
+    def User(self, Base):
+        class User(Base):
             __tablename__ = 'user'
             id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
             name = sa.Column(sa.Unicode(255))
+        return User
 
-        class Category(self.Base):
+    @pytest.fixture
+    def Category(self, Base):
+        class Category(Base):
             __tablename__ = 'category'
             id = sa.Column(sa.Integer, primary_key=True)
             name = sa.Column(sa.Unicode(255))
+        return Category
 
-        class Article(self.Base):
+    @pytest.fixture
+    def Article(self, Base, User, Category):
+        class Article(Base):
             __tablename__ = 'article'
             id = sa.Column(sa.Integer, primary_key=True)
             name = sa.Column(sa.Unicode(255))
@@ -34,13 +42,14 @@ class TestFindNonIndexedForeignKeys(TestCase):
                     'articles',
                 )
             )
+        return Article
 
-        self.User = User
-        self.Category = Category
-        self.Article = Article
+    @pytest.fixture
+    def init_models(self, User, Category, Article):
+        pass
 
-    def test_finds_all_non_indexed_fks(self):
-        fks = non_indexed_foreign_keys(self.Base.metadata, self.engine)
+    def test_finds_all_non_indexed_fks(self, session, Base, engine):
+        fks = non_indexed_foreign_keys(Base.metadata, engine)
         assert (
             'article' in
             fks

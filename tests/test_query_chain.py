@@ -1,93 +1,110 @@
+import pytest
 import sqlalchemy as sa
 
 from sqlalchemy_utils import QueryChain
-from tests import TestCase
 
 
-class TestQueryChain(TestCase):
-    def create_models(self):
-        class User(self.Base):
-            __tablename__ = 'user'
-            id = sa.Column(sa.Integer, primary_key=True)
+@pytest.fixture
+def User(Base):
+    class User(Base):
+        __tablename__ = 'user'
+        id = sa.Column(sa.Integer, primary_key=True)
+    return User
 
-        class Article(self.Base):
-            __tablename__ = 'article'
-            id = sa.Column(sa.Integer, primary_key=True)
 
-        class BlogPost(self.Base):
-            __tablename__ = 'blog_post'
-            id = sa.Column(sa.Integer, primary_key=True)
+@pytest.fixture
+def Article(Base):
+    class Article(Base):
+        __tablename__ = 'article'
+        id = sa.Column(sa.Integer, primary_key=True)
+    return Article
 
-        self.User = User
-        self.Article = Article
-        self.BlogPost = BlogPost
 
-    def setup_method(self, method):
-        TestCase.setup_method(self, method)
-        self.users = [
-            self.User(),
-            self.User()
+@pytest.fixture
+def BlogPost(Base):
+    class BlogPost(Base):
+        __tablename__ = 'blog_post'
+        id = sa.Column(sa.Integer, primary_key=True)
+    return BlogPost
+
+
+@pytest.fixture
+def init_models(User, Article, BlogPost):
+    pass
+
+
+@pytest.fixture
+def users(session, User):
+    users = [User(), User()]
+    session.add_all(users)
+    session.commit()
+    return users
+
+
+@pytest.fixture
+def articles(session, Article):
+    articles = [Article(), Article(), Article(), Article()]
+    session.add_all(articles)
+    session.commit()
+    return articles
+
+
+@pytest.fixture
+def posts(session, BlogPost):
+    posts = [BlogPost(), BlogPost(), BlogPost()]
+    session.add_all(posts)
+    session.commit()
+    return posts
+
+
+@pytest.fixture
+def chain(session, users, articles, posts, User, Article, BlogPost):
+    return QueryChain(
+        [
+            session.query(User).order_by('id'),
+            session.query(Article).order_by('id'),
+            session.query(BlogPost).order_by('id')
         ]
-        self.articles = [
-            self.Article(),
-            self.Article(),
-            self.Article(),
-            self.Article()
-        ]
-        self.posts = [
-            self.BlogPost(),
-            self.BlogPost(),
-            self.BlogPost(),
-        ]
+    )
 
-        self.session.add_all(self.users)
-        self.session.add_all(self.articles)
-        self.session.add_all(self.posts)
-        self.session.commit()
 
-        self.chain = QueryChain(
-            [
-                self.session.query(self.User).order_by('id'),
-                self.session.query(self.Article).order_by('id'),
-                self.session.query(self.BlogPost).order_by('id')
-            ]
-        )
+class TestQueryChain(object):
 
-    def test_iter(self):
-        assert len(list(self.chain)) == 9
+    def test_iter(self, chain):
+        assert len(list(chain)) == 9
 
-    def test_iter_with_limit(self):
-        chain = self.chain.limit(4)
-        objects = list(chain)
-        assert self.users == objects[0:2]
-        assert self.articles[0:2] == objects[2:]
+    def test_iter_with_limit(self, chain, users, articles):
+        c = chain.limit(4)
+        objects = list(c)
+        assert users == objects[0:2]
+        assert articles[0:2] == objects[2:]
 
-    def test_iter_with_offset(self):
-        chain = self.chain.offset(3)
-        objects = list(chain)
-        assert self.articles[1:] + self.posts == objects
+    def test_iter_with_offset(self, chain, articles, posts):
+        c = chain.offset(3)
+        objects = list(c)
+        assert articles[1:] + posts == objects
 
-    def test_iter_with_limit_and_offset(self):
-        chain = self.chain.offset(3).limit(4)
-        objects = list(chain)
-        assert self.articles[1:] + self.posts[0:1] == objects
+    def test_iter_with_limit_and_offset(self, chain, articles, posts):
+        c = chain.offset(3).limit(4)
+        objects = list(c)
+        assert articles[1:] + posts[0:1] == objects
 
-    def test_iter_with_offset_spanning_multiple_queries(self):
-        chain = self.chain.offset(7)
-        objects = list(chain)
-        assert self.posts[1:] == objects
+    def test_iter_with_offset_spanning_multiple_queries(self, chain, posts):
+        c = chain.offset(7)
+        objects = list(c)
+        assert posts[1:] == objects
 
-    def test_repr(self):
-        assert repr(self.chain) == '<QueryChain at 0x%x>' % id(self.chain)
+    def test_repr(self, chain):
+        assert repr(chain) == '<QueryChain at 0x%x>' % id(chain)
 
-    def test_getitem_with_slice(self):
-        chain = self.chain[1:]
-        assert chain._offset == 1
-        assert chain._limit is None
+    def test_getitem_with_slice(self, chain):
+        c = chain[1:]
+        assert c._offset == 1
+        assert c._limit is None
 
-    def test_getitem_with_single_key(self):
-        article = self.chain[2]
-        assert article == self.articles[0]
+    def test_getitem_with_single_key(self, chain, articles):
+        article = chain[2]
+        assert article == articles[0]
 
-    def test_count(self):
-        assert self.chain.count() == 9
+    def test_count(self, chain):
+        assert chain.count() == 9

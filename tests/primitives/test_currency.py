@@ -1,14 +1,18 @@
 # -*- coding: utf-8 -*-
+import pytest
 import six
-from pytest import mark, raises
 
 from sqlalchemy_utils import Currency, i18n
 
 
-@mark.skipif('i18n.babel is None')
+@pytest.fixture
+def set_get_locale():
+    i18n.get_locale = lambda: i18n.babel.Locale('en')
+
+
+@pytest.mark.skipif('i18n.babel is None')
+@pytest.mark.usefixtures('set_get_locale')
 class TestCurrency(object):
-    def setup_method(self, method):
-        i18n.get_locale = lambda: i18n.babel.Locale('en')
 
     def test_init(self):
         assert Currency('USD') == Currency(Currency('USD'))
@@ -17,14 +21,14 @@ class TestCurrency(object):
         assert len(set([Currency('USD'), Currency('USD')])) == 1
 
     def test_invalid_currency_code(self):
-        with raises(ValueError):
+        with pytest.raises(ValueError):
             Currency('Unknown code')
 
     def test_invalid_currency_code_type(self):
-        with raises(TypeError):
+        with pytest.raises(TypeError):
             Currency(None)
 
-    @mark.parametrize(
+    @pytest.mark.parametrize(
         ('code', 'name'),
         (
             ('USD', 'US Dollar'),
@@ -34,7 +38,7 @@ class TestCurrency(object):
     def test_name_property(self, code, name):
         assert Currency(code).name == name
 
-    @mark.parametrize(
+    @pytest.mark.parametrize(
         ('code', 'symbol'),
         (
             ('USD', u'$'),

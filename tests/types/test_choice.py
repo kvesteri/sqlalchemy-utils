@@ -1,10 +1,9 @@
+import pytest
 import sqlalchemy as sa
 from flexmock import flexmock
-from pytest import mark, raises
 
 from sqlalchemy_utils import Choice, ChoiceType, ImproperlyConfigured
 from sqlalchemy_utils.types.choice import Enum
-from tests import TestCase
 
 
 class TestChoice(object):
@@ -18,9 +17,12 @@ class TestChoice(object):
         assert not (Choice(1, 1) != 1)
 
 
-class TestChoiceType(TestCase):
-    def create_models(self):
-        class User(self.Base):
+class TestChoiceType(object):
+
+    @pytest.fixture
+    def User(self, Base):
+
+        class User(Base):
             TYPES = [
                 ('admin', 'Admin'),
                 ('regular-user', 'Regular user')
@@ -33,61 +35,71 @@ class TestChoiceType(TestCase):
             def __repr__(self):
                 return 'User(%r)' % self.id
 
-        self.User = User
+        return User
 
-    def test_python_type(self):
-        type_ = self.User.__table__.c.type.type
+    @pytest.fixture
+    def init_models(self, User):
+        pass
+
+    def test_python_type(self, User):
+        type_ = User.__table__.c.type.type
         assert type_.python_type
 
-    def test_string_processing(self):
+    def test_string_processing(self, session, User):
         flexmock(ChoiceType).should_receive('_coerce').and_return(
             u'admin'
         )
-        user = self.User(
+        user = User(
             type=u'admin'
         )
 
-        self.session.add(user)
-        self.session.commit()
+        session.add(user)
+        session.commit()
 
-        user = self.session.query(self.User).first()
+        user = session.query(User).first()
         assert user.type.value == u'Admin'
 
-    def test_parameter_processing(self):
-        user = self.User(
+    def test_parameter_processing(self, session, User):
+        user = User(
             type=u'admin'
         )
 
-        self.session.add(user)
-        self.session.commit()
+        session.add(user)
+        session.commit()
 
-        user = self.session.query(self.User).first()
+        user = session.query(User).first()
         assert user.type.value == u'Admin'
 
-    def test_scalar_attributes_get_coerced_to_objects(self):
-        user = self.User(type=u'admin')
+    def test_scalar_attributes_get_coerced_to_objects(self, User):
+        user = User(type=u'admin')
 
         assert isinstance(user.type, Choice)
 
     def test_throws_exception_if_no_choices_given(self):
-        with raises(ImproperlyConfigured):
+        with pytest.raises(ImproperlyConfigured):
             ChoiceType([])
 
 
-class TestChoiceTypeWithCustomUnderlyingType(TestCase):
+class TestChoiceTypeWithCustomUnderlyingType(object):
     def test_init_type(self):
         type_ = ChoiceType([(1, u'something')], impl=sa.Integer)
         assert type_.impl == sa.Integer
 
 
-@mark.skipif('Enum is None')
-class TestEnumType(TestCase):
-    def create_models(self):
+@pytest.mark.skipif('Enum is None')
+class TestEnumType(object):
+
+    @pytest.fixture
+    def OrderStatus(self):
         class OrderStatus(Enum):
             unpaid = 0
             paid = 1
+        return OrderStatus
 
-        class Order(self.Base):
+    @pytest.fixture
+    def Order(self, Base, OrderStatus):
+
+        class Order(Base):
             __tablename__ = 'order'
             id_ = sa.Column(sa.Integer, primary_key=True)
             status = sa.Column(
@@ -98,7 +110,12 @@ class TestEnumType(TestCase):
             def __repr__(self):
                 return 'Order(%r, %r)' % (self.id_, self.status)
 
-        class OrderNullable(self.Base):
+        return Order
+
+    @pytest.fixture
+    def OrderNullable(self, Base, OrderStatus):
+
+        class OrderNullable(Base):
             __tablename__ = 'order_nullable'
             id_ = sa.Column(sa.Integer, primary_key=True)
             status = sa.Column(
@@ -106,76 +123,83 @@ class TestEnumType(TestCase):
                 nullable=True,
             )
 
-        self.OrderStatus = OrderStatus
-        self.Order = Order
-        self.OrderNullable = OrderNullable
+        return OrderNullable
 
-    def test_parameter_initialization(self):
-        order = self.Order()
+    @pytest.fixture
+    def init_models(self, Order, OrderNullable):
+        pass
 
-        self.session.add(order)
-        self.session.commit()
+    def test_parameter_initialization(self, session, Order, OrderStatus):
+        order = Order()
 
-        order = self.session.query(self.Order).first()
-        assert order.status is self.OrderStatus.unpaid
+        session.add(order)
+        session.commit()
+
+        order = session.query(Order).first()
+        assert order.status is OrderStatus.unpaid
         assert order.status.value == 0
 
-    def test_setting_by_value(self):
-        order = self.Order()
+    def test_setting_by_value(self, session, Order, OrderStatus):
+        order = Order()
         order.status = 1
 
-        self.session.add(order)
-        self.session.commit()
+        session.add(order)
+        session.commit()
 
-        order = self.session.query(self.Order).first()
-        assert order.status is self.OrderStatus.paid
+        order = session.query(Order).first()
+        assert order.status is OrderStatus.paid
 
-    def test_setting_by_enum(self):
-        order = self.Order()
-        order.status = self.OrderStatus.paid
+    def test_setting_by_enum(self, session, Order, OrderStatus):
+        order = Order()
+        order.status = OrderStatus.paid
 
-        self.session.add(order)
-        self.session.commit()
+        session.add(order)
+        session.commit()
 
-        order = self.session.query(self.Order).first()
-        assert order.status is self.OrderStatus.paid
+        order = session.query(Order).first()
+        assert order.status is OrderStatus.paid
 
-    def test_setting_value_that_resolves_to_none(self):
-        order = self.Order()
+    def test_setting_value_that_resolves_to_none(
+        self,
+        session,
+        Order,
+        OrderStatus
+    ):
+        order = Order()
         order.status = 0
 
-        self.session.add(order)
-        self.session.commit()
+        session.add(order)
+        session.commit()
 
-        order = self.session.query(self.Order).first()
-        assert order.status is self.OrderStatus.unpaid
+        order = session.query(Order).first()
+        assert order.status is OrderStatus.unpaid
 
-    def test_setting_to_wrong_enum_raises_valueerror(self):
+    def test_setting_to_wrong_enum_raises_valueerror(self, Order):
         class WrongEnum(Enum):
             foo = 0
             bar = 1
 
-        order = self.Order()
+        order = Order()
 
-        with raises(ValueError):
+        with pytest.raises(ValueError):
             order.status = WrongEnum.foo
 
-    def test_setting_to_uncoerceable_type_raises_valueerror(self):
-        order = self.Order()
-        with raises(ValueError):
+    def test_setting_to_uncoerceable_type_raises_valueerror(self, Order):
+        order = Order()
+        with pytest.raises(ValueError):
             order.status = 'Bad value'
 
-    def test_order_nullable_stores_none(self):
+    def test_order_nullable_stores_none(self, session, OrderNullable):
         # With nullable=False as in `Order`, a `None` value is always
         # converted to the default value, unless we explicitly set it to
         # sqlalchemy.sql.null(), so we use this class to test our ability
         # to set and retrive `None`.
-        order_nullable = self.OrderNullable()
+        order_nullable = OrderNullable()
         assert order_nullable.status is None
 
         order_nullable.status = None
 
-        self.session.add(order_nullable)
-        self.session.commit()
+        session.add(order_nullable)
+        session.commit()
 
         assert order_nullable.status is None

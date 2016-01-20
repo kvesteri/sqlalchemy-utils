@@ -1,11 +1,8 @@
-import os
-
+import pytest
 import sqlalchemy as sa
 from flexmock import flexmock
-from pytest import mark
 
 from sqlalchemy_utils import create_database, database_exists, drop_database
-from tests import TestCase
 
 pymysql = None
 try:
@@ -14,38 +11,73 @@ except ImportError:
     pass
 
 
-class DatabaseTest(TestCase):
-    def test_create_and_drop(self):
-        assert not database_exists(self.url)
-        create_database(self.url)
-        assert database_exists(self.url)
-        drop_database(self.url)
-        assert not database_exists(self.url)
+class DatabaseTest(object):
+    def test_create_and_drop(self, dsn):
+        assert not database_exists(dsn)
+        create_database(dsn)
+        assert database_exists(dsn)
+        drop_database(dsn)
+        assert not database_exists(dsn)
 
 
-class TestDatabaseSQLite(DatabaseTest):
-    url = 'sqlite:///sqlalchemy_utils.db'
+@pytest.mark.usefixtures('sqlite_memory_dsn')
+class TestDatabaseSQLiteMemory(object):
 
-    def setup(self):
-        if os.path.exists('sqlalchemy_utils.db'):
-            os.remove('sqlalchemy_utils.db')
-
-    def test_exists_memory(self):
-        assert database_exists('sqlite:///:memory:')
+    def test_exists_memory(self, dsn):
+        assert database_exists(dsn)
 
 
-@mark.skipif('pymysql is None')
+@pytest.mark.usefixtures('sqlite_file_dsn')
+class TestDatabaseSQLiteFile(DatabaseTest):
+    pass
+
+
+@pytest.mark.skipif('pymysql is None')
+@pytest.mark.usefixtures('mysql_dsn')
 class TestDatabaseMySQL(DatabaseTest):
-    url = 'mysql+pymysql://travis@localhost/db_test_sqlalchemy_util'
+
+    @pytest.fixture
+    def db_name(self):
+        return 'db_test_sqlalchemy_util'
 
 
-@mark.skipif('pymysql is None')
+@pytest.mark.skipif('pymysql is None')
+@pytest.mark.usefixtures('mysql_dsn')
 class TestDatabaseMySQLWithQuotedName(DatabaseTest):
-    url = 'mysql+pymysql://travis@localhost/db_test_sqlalchemy-util'
+
+    @pytest.fixture
+    def db_name(self):
+        return 'db_test_sqlalchemy-util'
 
 
+@pytest.mark.usefixtures('postgresql_dsn')
+class TestDatabasePostgres(DatabaseTest):
+
+    @pytest.fixture
+    def db_name(self):
+        return 'db_test_sqlalchemy_util'
+
+    def test_template(self):
+        (
+            flexmock(sa.engine.Engine)
+            .should_receive('execute')
+            .with_args(
+                "CREATE DATABASE db_test_sqlalchemy_util ENCODING 'utf8' "
+                "TEMPLATE my_template"
+            )
+        )
+        create_database(
+            'postgres://postgres@localhost/db_test_sqlalchemy_util',
+            template='my_template'
+        )
+
+
+@pytest.mark.usefixtures('postgresql_dsn')
 class TestDatabasePostgresWithQuotedName(DatabaseTest):
-    url = 'postgres://postgres@localhost/db_test_sqlalchemy-util'
+
+    @pytest.fixture
+    def db_name(self):
+        return 'db_test_sqlalchemy-util'
 
     def test_template(self):
         (
@@ -60,22 +92,4 @@ class TestDatabasePostgresWithQuotedName(DatabaseTest):
         create_database(
             'postgres://postgres@localhost/db_test_sqlalchemy-util',
             template='my-template'
-        )
-
-
-class TestDatabasePostgres(DatabaseTest):
-    url = 'postgres://postgres@localhost/db_test_sqlalchemy_util'
-
-    def test_template(self):
-        (
-            flexmock(sa.engine.Engine)
-            .should_receive('execute')
-            .with_args(
-                "CREATE DATABASE db_test_sqlalchemy_util ENCODING 'utf8' "
-                "TEMPLATE my_template"
-            )
-        )
-        create_database(
-            'postgres://postgres@localhost/db_test_sqlalchemy_util',
-            template='my_template'
         )

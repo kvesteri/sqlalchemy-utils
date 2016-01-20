@@ -1,86 +1,93 @@
+import pytest
 import sqlalchemy as sa
-from pytest import raises
 from sqlalchemy.dialects import postgresql
 
 from sqlalchemy_utils import Asterisk, row_to_json
 from sqlalchemy_utils.expressions import explain, explain_analyze
-from tests import TestCase
 
 
-class ExpressionTestCase(TestCase):
-    dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
-
-    def create_models(self):
-        class Article(self.Base):
-            __tablename__ = 'article'
-            id = sa.Column(sa.Integer, primary_key=True)
-            name = sa.Column(sa.Unicode(255))
-            content = sa.Column(sa.UnicodeText)
-
-        self.Article = Article
-
-    def assert_startswith(self, query, query_part):
+@pytest.fixture
+def assert_startswith(session):
+    def assert_startswith(query, query_part):
         assert str(
             query.compile(dialect=postgresql.dialect())
         ).startswith(query_part)
         # Check that query executes properly
-        self.session.execute(query)
+        session.execute(query)
+    return assert_startswith
 
 
-class TestExplain(ExpressionTestCase):
-    def test_render_explain(self):
-        self.assert_startswith(
-            explain(self.session.query(self.Article)),
+@pytest.fixture
+def Article(Base):
+    class Article(Base):
+        __tablename__ = 'article'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
+        content = sa.Column(sa.UnicodeText)
+    return Article
+
+
+@pytest.mark.usefixtures('postgresql_dsn')
+class TestExplain(object):
+
+    def test_render_explain(self, session, assert_startswith, Article):
+        assert_startswith(
+            explain(session.query(Article)),
             'EXPLAIN SELECT'
         )
 
-    def test_render_explain_with_analyze(self):
-        self.assert_startswith(
-            explain(self.session.query(self.Article), analyze=True),
+    def test_render_explain_with_analyze(
+        self,
+        session,
+        assert_startswith,
+        Article
+    ):
+        assert_startswith(
+            explain(session.query(Article), analyze=True),
             'EXPLAIN (ANALYZE true) SELECT'
         )
 
-    def test_with_string_as_stmt_param(self):
-        self.assert_startswith(
+    def test_with_string_as_stmt_param(self, assert_startswith):
+        assert_startswith(
             explain('SELECT 1 FROM article'),
             'EXPLAIN SELECT'
         )
 
-    def test_format(self):
-        self.assert_startswith(
+    def test_format(self, assert_startswith):
+        assert_startswith(
             explain('SELECT 1 FROM article', format='json'),
             'EXPLAIN (FORMAT json) SELECT'
         )
 
-    def test_timing(self):
-        self.assert_startswith(
+    def test_timing(self, assert_startswith):
+        assert_startswith(
             explain('SELECT 1 FROM article', analyze=True, timing=False),
             'EXPLAIN (ANALYZE true, TIMING false) SELECT'
         )
 
-    def test_verbose(self):
-        self.assert_startswith(
+    def test_verbose(self, assert_startswith):
+        assert_startswith(
             explain('SELECT 1 FROM article', verbose=True),
             'EXPLAIN (VERBOSE true) SELECT'
         )
 
-    def test_buffers(self):
-        self.assert_startswith(
+    def test_buffers(self, assert_startswith):
+        assert_startswith(
             explain('SELECT 1 FROM article', analyze=True, buffers=True),
             'EXPLAIN (ANALYZE true, BUFFERS true) SELECT'
         )
 
-    def test_costs(self):
-        self.assert_startswith(
+    def test_costs(self, assert_startswith):
+        assert_startswith(
             explain('SELECT 1 FROM article', costs=False),
             'EXPLAIN (COSTS false) SELECT'
         )
 
 
-class TestExplainAnalyze(ExpressionTestCase):
-    def test_render_explain_analyze(self):
+class TestExplainAnalyze(object):
+    def test_render_explain_analyze(self, session, Article):
         assert str(
-            explain_analyze(self.session.query(self.Article))
+            explain_analyze(session.query(Article))
             .compile(
                 dialect=postgresql.dialect()
             )
@@ -111,7 +118,7 @@ class TestAsterisk(object):
 
 class TestRowToJson(object):
     def test_compiler_with_default_dialect(self):
-        with raises(sa.exc.CompileError):
+        with pytest.raises(sa.exc.CompileError):
             str(row_to_json(sa.text('article.*')))
 
     def test_compiler_with_postgresql(self):
@@ -128,7 +135,7 @@ class TestRowToJson(object):
 
 class TestArrayAgg(object):
     def test_compiler_with_default_dialect(self):
-        with raises(sa.exc.CompileError):
+        with pytest.raises(sa.exc.CompileError):
             str(sa.func.array_agg(sa.text('u.name')))
 
     def test_compiler_with_postgresql(self):

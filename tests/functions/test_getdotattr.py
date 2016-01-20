@@ -1,72 +1,94 @@
+import pytest
 import sqlalchemy as sa
 
 from sqlalchemy_utils.functions import getdotattr
-from tests import TestCase
 
 
-class TestGetDotAttr(TestCase):
-    def create_models(self):
-        class Document(self.Base):
-            __tablename__ = 'document'
-            id = sa.Column(sa.Integer, primary_key=True)
-            name = sa.Column(sa.Unicode(255))
+@pytest.fixture
+def Document(Base):
+    class Document(Base):
+        __tablename__ = 'document'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
+    return Document
 
-        class Section(self.Base):
-            __tablename__ = 'section'
-            id = sa.Column(sa.Integer, primary_key=True)
-            name = sa.Column(sa.Unicode(255))
 
-            document_id = sa.Column(
-                sa.Integer, sa.ForeignKey(Document.id)
-            )
+@pytest.fixture
+def Section(Base, Document):
+    class Section(Base):
+        __tablename__ = 'section'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
 
-            document = sa.orm.relationship(Document, backref='sections')
+        document_id = sa.Column(
+            sa.Integer, sa.ForeignKey(Document.id)
+        )
 
-        class SubSection(self.Base):
-            __tablename__ = 'subsection'
-            id = sa.Column(sa.Integer, primary_key=True)
-            name = sa.Column(sa.Unicode(255))
+        document = sa.orm.relationship(Document, backref='sections')
+    return Section
 
-            section_id = sa.Column(
-                sa.Integer, sa.ForeignKey(Section.id)
-            )
 
-            section = sa.orm.relationship(Section, backref='subsections')
+@pytest.fixture
+def SubSection(Base, Section):
+    class SubSection(Base):
+        __tablename__ = 'subsection'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
 
-        class SubSubSection(self.Base):
-            __tablename__ = 'subsubsection'
-            id = sa.Column(sa.Integer, primary_key=True)
-            name = sa.Column(sa.Unicode(255))
-            locale = sa.Column(sa.String(10))
+        section_id = sa.Column(
+            sa.Integer, sa.ForeignKey(Section.id)
+        )
 
-            subsection_id = sa.Column(
-                sa.Integer, sa.ForeignKey(SubSection.id)
-            )
+        section = sa.orm.relationship(Section, backref='subsections')
+    return SubSection
 
-            subsection = sa.orm.relationship(
-                SubSection, backref='subsubsections'
-            )
 
-        self.Document = Document
-        self.Section = Section
-        self.SubSection = SubSection
-        self.SubSubSection = SubSubSection
+@pytest.fixture
+def SubSubSection(Base, SubSection):
+    class SubSubSection(Base):
+        __tablename__ = 'subsubsection'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
+        locale = sa.Column(sa.String(10))
 
-    def test_simple_objects(self):
-        document = self.Document(name=u'some document')
-        section = self.Section(document=document)
-        subsection = self.SubSection(section=section)
+        subsection_id = sa.Column(
+            sa.Integer, sa.ForeignKey(SubSection.id)
+        )
+
+        subsection = sa.orm.relationship(
+            SubSection, backref='subsubsections'
+        )
+    return SubSubSection
+
+
+@pytest.fixture
+def init_models(Document, Section, SubSection, SubSubSection):
+    pass
+
+
+class TestGetDotAttr(object):
+
+    def test_simple_objects(self, Document, Section, SubSection):
+        document = Document(name=u'some document')
+        section = Section(document=document)
+        subsection = SubSection(section=section)
 
         assert getdotattr(
             subsection,
             'section.document.name'
         ) == u'some document'
 
-    def test_with_instrumented_lists(self):
-        document = self.Document(name=u'some document')
-        section = self.Section(document=document)
-        subsection = self.SubSection(section=section)
-        subsubsection = self.SubSubSection(subsection=subsection)
+    def test_with_instrumented_lists(
+        self,
+        Document,
+        Section,
+        SubSection,
+        SubSubSection
+    ):
+        document = Document(name=u'some document')
+        section = Section(document=document)
+        subsection = SubSection(section=section)
+        subsubsection = SubSubSection(subsection=subsection)
 
         assert getdotattr(document, 'sections') == [section]
         assert getdotattr(document, 'sections.subsections') == [
@@ -76,10 +98,10 @@ class TestGetDotAttr(TestCase):
             subsubsection
         ]
 
-    def test_class_paths(self):
-        assert getdotattr(self.Section, 'document') is self.Section.document
+    def test_class_paths(self, Document, Section, SubSection):
+        assert getdotattr(Section, 'document') is Section.document
         assert (
-            getdotattr(self.SubSection, 'section.document') is
-            self.Section.document
+            getdotattr(SubSection, 'section.document') is
+            Section.document
         )
-        assert getdotattr(self.Section, 'document.name') is self.Document.name
+        assert getdotattr(Section, 'document.name') is Document.name

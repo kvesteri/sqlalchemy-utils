@@ -1,39 +1,40 @@
 from datetime import datetime
 
+import pytest
 import sqlalchemy as sa
 
 from sqlalchemy_utils import Timestamp
-from tests import TestCase
 
 
-class TestTimestamp(TestCase):
+@pytest.fixture
+def Article(Base):
+    class Article(Base, Timestamp):
+        __tablename__ = 'article'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255), default=u'Some article')
+    return Article
 
-    def create_models(self):
-        class Article(self.Base, Timestamp):
-            __tablename__ = 'article'
-            id = sa.Column(sa.Integer, primary_key=True)
-            name = sa.Column(sa.Unicode(255), default=u'Some article')
 
-        self.Article = Article
+class TestTimestamp(object):
 
-    def test_created(self):
+    def test_created(self, session, Article):
         then = datetime.utcnow()
-        article = self.Article()
+        article = Article()
 
-        self.session.add(article)
-        self.session.commit()
+        session.add(article)
+        session.commit()
 
         assert article.created >= then and article.created <= datetime.utcnow()
 
-    def test_updated(self):
-        article = self.Article()
+    def test_updated(self, session, Article):
+        article = Article()
 
-        self.session.add(article)
-        self.session.commit()
+        session.add(article)
+        session.commit()
 
         then = datetime.utcnow()
         article.name = u"Something"
 
-        self.session.commit()
+        session.commit()
 
         assert article.updated >= then and article.updated <= datetime.utcnow()

@@ -1,10 +1,9 @@
 import six
 from sqlalchemy import types
 
-from sqlalchemy_utils import i18n
-from sqlalchemy_utils.exceptions import ImproperlyConfigured
-from sqlalchemy_utils.primitives import WeekDay, WeekDays
-
+from .. import i18n
+from ..exceptions import ImproperlyConfigured
+from ..primitives import WeekDay, WeekDays
 from .bit import BitType
 from .scalar_coercible import ScalarCoercible
 

@@ -1,15 +1,14 @@
+import pytest
 import sqlalchemy as sa
-from pytest import raises
-from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy_utils import get_class_by_table
 
 
 class TestGetClassByTableWithJoinedTableInheritance(object):
-    def setup_method(self, method):
-        self.Base = declarative_base()
 
-        class Entity(self.Base):
+    @pytest.fixture
+    def Entity(self, Base):
+        class Entity(Base):
             __tablename__ = 'entity'
             id = sa.Column(sa.Integer, primary_key=True)
             name = sa.Column(sa.String)
@@ -18,7 +17,10 @@ class TestGetClassByTableWithJoinedTableInheritance(object):
                 'polymorphic_on': type,
                 'polymorphic_identity': 'entity'
             }
+        return Entity
 
+    @pytest.fixture
+    def User(self, Entity):
         class User(Entity):
             __tablename__ = 'user'
             id = sa.Column(
@@ -29,31 +31,29 @@ class TestGetClassByTableWithJoinedTableInheritance(object):
             __mapper_args__ = {
                 'polymorphic_identity': 'user'
             }
+        return User
 
-        self.Entity = Entity
-        self.User = User
-
-    def test_returns_class(self):
-        assert get_class_by_table(self.Base, self.User.__table__) == self.User
+    def test_returns_class(self, Base, User, Entity):
+        assert get_class_by_table(Base, User.__table__) == User
         assert get_class_by_table(
-            self.Base,
-            self.Entity.__table__
-        ) == self.Entity
+            Base,
+            Entity.__table__
+        ) == Entity
 
-    def test_table_with_no_associated_class(self):
+    def test_table_with_no_associated_class(self, Base):
         table = sa.Table(
             'some_table',
-            self.Base.metadata,
+            Base.metadata,
             sa.Column('id', sa.Integer)
         )
-        assert get_class_by_table(self.Base, table) is None
+        assert get_class_by_table(Base, table) is None
 
 
 class TestGetClassByTableWithSingleTableInheritance(object):
-    def setup_method(self, method):
-        self.Base = declarative_base()
 
-        class Entity(self.Base):
+    @pytest.fixture
+    def Entity(self, Base):
+        class Entity(Base):
             __tablename__ = 'entity'
             id = sa.Column(sa.Integer, primary_key=True)
             name = sa.Column(sa.String)
@@ -62,38 +62,39 @@ class TestGetClassByTableWithSingleTableInheritance(object):
                 'polymorphic_on': type,
                 'polymorphic_identity': 'entity'
             }
+        return Entity
 
+    @pytest.fixture
+    def User(self, Entity):
         class User(Entity):
             __mapper_args__ = {
                 'polymorphic_identity': 'user'
             }
+        return User
 
-        self.Entity = Entity
-        self.User = User
-
-    def test_multiple_classes_without_data_parameter(self):
-        with raises(ValueError):
+    def test_multiple_classes_without_data_parameter(self, Base, Entity, User):
+        with pytest.raises(ValueError):
             assert get_class_by_table(
-                self.Base,
-                self.Entity.__table__
+                Base,
+                Entity.__table__
             )
 
-    def test_multiple_classes_with_data_parameter(self):
+    def test_multiple_classes_with_data_parameter(self, Base, Entity, User):
         assert get_class_by_table(
-            self.Base,
-            self.Entity.__table__,
+            Base,
+            Entity.__table__,
             {'type': 'entity'}
-        ) == self.Entity
+        ) == Entity
         assert get_class_by_table(
-            self.Base,
-            self.Entity.__table__,
+            Base,
+            Entity.__table__,
             {'type': 'user'}
-        ) == self.User
+        ) == User
 
-    def test_multiple_classes_with_bogus_data(self):
-        with raises(ValueError):
+    def test_multiple_classes_with_bogus_data(self, Base, Entity, User):
+        with pytest.raises(ValueError):
             assert get_class_by_table(
-                self.Base,
-                self.Entity.__table__,
+                Base,
+                Entity.__table__,
                 {'type': 'unknown'}
             )

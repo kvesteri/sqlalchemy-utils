@@ -1,7 +1,6 @@
 from collections import defaultdict
 from itertools import groupby
 
-import six
 import sqlalchemy as sa
 from sqlalchemy.exc import NoInspectionAvailable
 from sqlalchemy.orm import object_session
@@ -167,7 +166,7 @@ def merge_references(from_, to, foreign_keys=None):
         new_values = get_foreign_key_values(fk, to)
         criteria = (
             getattr(fk.constraint.table.c, key) == value
-            for key, value in six.iteritems(old_values)
+            for key, value in old_values.items()
         )
         try:
             mapper = get_mapper(fk.constraint.table)

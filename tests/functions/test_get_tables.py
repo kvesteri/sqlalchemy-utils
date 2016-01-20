@@ -1,76 +1,86 @@
+import pytest
 import sqlalchemy as sa
 
 from sqlalchemy_utils import get_tables
-from tests import TestCase
 
 
-class TestGetTables(TestCase):
-    def create_models(self):
-        class TextItem(self.Base):
-            __tablename__ = 'text_item'
-            id = sa.Column(sa.Integer, primary_key=True)
-            name = sa.Column(sa.Unicode(255))
-            type = sa.Column(sa.Unicode(255))
+@pytest.fixture
+def TextItem(Base):
+    class TextItem(Base):
+        __tablename__ = 'text_item'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
+        type = sa.Column(sa.Unicode(255))
 
-            __mapper_args__ = {
-                'polymorphic_on': type,
-                'with_polymorphic': '*'
-            }
+        __mapper_args__ = {
+            'polymorphic_on': type,
+            'with_polymorphic': '*'
+        }
+    return TextItem
 
-        class Article(TextItem):
-            __tablename__ = 'article'
-            id = sa.Column(
-                sa.Integer, sa.ForeignKey(TextItem.id), primary_key=True
-            )
-            __mapper_args__ = {
-                'polymorphic_identity': u'article'
-            }
 
-        self.TextItem = TextItem
-        self.Article = Article
+@pytest.fixture
+def Article(TextItem):
+    class Article(TextItem):
+        __tablename__ = 'article'
+        id = sa.Column(
+            sa.Integer, sa.ForeignKey(TextItem.id), primary_key=True
+        )
+        __mapper_args__ = {
+            'polymorphic_identity': u'article'
+        }
+    return Article
 
-    def test_child_class_using_join_table_inheritance(self):
-        assert get_tables(self.Article) == [
-            self.TextItem.__table__,
-            self.Article.__table__
+
+@pytest.fixture
+def init_models(TextItem, Article):
+    pass
+
+
+class TestGetTables(object):
+
+    def test_child_class_using_join_table_inheritance(self, TextItem, Article):
+        assert get_tables(Article) == [
+            TextItem.__table__,
+            Article.__table__
         ]
 
-    def test_entity_using_with_polymorphic(self):
-        assert get_tables(self.TextItem) == [
-            self.TextItem.__table__,
-            self.Article.__table__
+    def test_entity_using_with_polymorphic(self, TextItem, Article):
+        assert get_tables(TextItem) == [
+            TextItem.__table__,
+            Article.__table__
         ]
 
-    def test_instrumented_attribute(self):
-        assert get_tables(self.TextItem.name) == [
-            self.TextItem.__table__,
+    def test_instrumented_attribute(self, TextItem):
+        assert get_tables(TextItem.name) == [
+            TextItem.__table__,
         ]
 
-    def test_polymorphic_instrumented_attribute(self):
-        assert get_tables(self.Article.id) == [
-            self.TextItem.__table__,
-            self.Article.__table__
+    def test_polymorphic_instrumented_attribute(self, TextItem, Article):
+        assert get_tables(Article.id) == [
+            TextItem.__table__,
+            Article.__table__
         ]
 
-    def test_column(self):
-        assert get_tables(self.Article.__table__.c.id) == [
-            self.Article.__table__
+    def test_column(self, Article):
+        assert get_tables(Article.__table__.c.id) == [
+            Article.__table__
         ]
 
-    def test_mapper_entity_with_class(self):
-        query = self.session.query(self.Article)
+    def test_mapper_entity_with_class(self, session, TextItem, Article):
+        query = session.query(Article)
         assert get_tables(query._entities[0]) == [
-            self.TextItem.__table__, self.Article.__table__
+            TextItem.__table__, Article.__table__
         ]
 
-    def test_mapper_entity_with_mapper(self):
-        query = self.session.query(sa.inspect(self.Article))
+    def test_mapper_entity_with_mapper(self, session, TextItem, Article):
+        query = session.query(sa.inspect(Article))
         assert get_tables(query._entities[0]) == [
-            self.TextItem.__table__, self.Article.__table__
+            TextItem.__table__, Article.__table__
         ]
 
-    def test_column_entity(self):
-        query = self.session.query(self.Article.id)
+    def test_column_entity(self, session, TextItem, Article):
+        query = session.query(Article.id)
         assert get_tables(query._entities[0]) == [
-            self.TextItem.__table__, self.Article.__table__
+            TextItem.__table__, Article.__table__
         ]

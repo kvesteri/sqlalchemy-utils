@@ -1,34 +1,40 @@
+import pytest
 import sqlalchemy as sa
-from pytest import mark
 
 from sqlalchemy_utils import Country, CountryType, i18n  # noqa
-from tests import TestCase
 
 
-@mark.skipif('i18n.babel is None')
-class TestCountryType(TestCase):
-    def create_models(self):
-        class User(self.Base):
-            __tablename__ = 'user'
-            id = sa.Column(sa.Integer, primary_key=True)
-            country = sa.Column(CountryType)
+@pytest.fixture
+def User(Base):
+    class User(Base):
+        __tablename__ = 'user'
+        id = sa.Column(sa.Integer, primary_key=True)
+        country = sa.Column(CountryType)
 
-            def __repr__(self):
-                return 'User(%r)' % self.id
+        def __repr__(self):
+            return 'User(%r)' % self.id
+    return User
 
-        self.User = User
 
-    def test_parameter_processing(self):
-        user = self.User(
+@pytest.fixture
+def init_models(User):
+    pass
+
+
+@pytest.mark.skipif('i18n.babel is None')
+class TestCountryType(object):
+
+    def test_parameter_processing(self, session, User):
+        user = User(
             country=Country(u'FI')
         )
 
-        self.session.add(user)
-        self.session.commit()
+        session.add(user)
+        session.commit()
 
-        user = self.session.query(self.User).first()
+        user = session.query(User).first()
         assert user.country.name == u'Finland'
 
-    def test_scalar_attributes_get_coerced_to_objects(self):
-        user = self.User(country='FI')
+    def test_scalar_attributes_get_coerced_to_objects(self, User):
+        user = User(country='FI')
         assert isinstance(user.country, Country)

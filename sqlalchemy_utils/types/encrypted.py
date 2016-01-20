@@ -5,8 +5,7 @@ import datetime
 import six
 from sqlalchemy.types import Binary, String, TypeDecorator
 
-from sqlalchemy_utils.exceptions import ImproperlyConfigured
-
+from ..exceptions import ImproperlyConfigured
 from .scalar_coercible import ScalarCoercible
 
 cryptography = None
@@ -84,7 +83,7 @@ class AesEngine(EncryptionDecryptionBaseEngine):
             value = str(value)
         decryptor = self.cipher.decryptor()
         decrypted = base64.b64decode(value)
-        decrypted = decryptor.update(decrypted)+decryptor.finalize()
+        decrypted = decryptor.update(decrypted) + decryptor.finalize()
         decrypted = decrypted.rstrip(self.PADDING)
         if not isinstance(decrypted, six.string_types):
             decrypted = decrypted.decode('utf-8')

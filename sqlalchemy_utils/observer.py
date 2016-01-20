@@ -154,9 +154,9 @@ from collections import defaultdict, Iterable, namedtuple
 
 import sqlalchemy as sa
 
-from sqlalchemy_utils.functions import getdotattr, has_changes
-from sqlalchemy_utils.path import AttrPath
-from sqlalchemy_utils.utils import is_sequence
+from .functions import getdotattr, has_changes
+from .path import AttrPath
+from .utils import is_sequence
 
 Callback = namedtuple('Callback', ['func', 'path', 'backref', 'fullpath'])
 

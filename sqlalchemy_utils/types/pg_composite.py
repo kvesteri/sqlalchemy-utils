@@ -109,7 +109,7 @@ from sqlalchemy.types import (
     UserDefinedType
 )
 
-from sqlalchemy_utils import ImproperlyConfigured
+from .. import ImproperlyConfigured
 
 psycopg2 = None
 CompositeCaster = None

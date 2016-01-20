@@ -1,46 +1,49 @@
+import pytest
 import sqlalchemy as sa
-from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy_utils import get_type
 
 
+@pytest.fixture
+def User(Base):
+    class User(Base):
+        __tablename__ = 'user'
+        id = sa.Column(sa.Integer, primary_key=True)
+    return User
+
+
+@pytest.fixture
+def Article(Base, User):
+    class Article(Base):
+        __tablename__ = 'article'
+        id = sa.Column(sa.Integer, primary_key=True)
+
+        author_id = sa.Column(sa.Integer, sa.ForeignKey(User.id))
+        author = sa.orm.relationship(User)
+
+        some_property = sa.orm.column_property(
+            sa.func.coalesce(id, 1)
+        )
+    return Article
+
+
 class TestGetType(object):
-    def setup_method(self, method):
-        Base = declarative_base()
 
-        class User(Base):
-            __tablename__ = 'user'
-            id = sa.Column(sa.Integer, primary_key=True)
+    def test_instrumented_attribute(self, Article):
+        assert isinstance(get_type(Article.id), sa.Integer)
 
-        class Article(Base):
-            __tablename__ = 'article'
-            id = sa.Column(sa.Integer, primary_key=True)
+    def test_column_property(self, Article):
+        assert isinstance(get_type(Article.id.property), sa.Integer)
 
-            author_id = sa.Column(sa.Integer, sa.ForeignKey(User.id))
-            author = sa.orm.relationship(User)
+    def test_column(self, Article):
+        assert isinstance(get_type(Article.__table__.c.id), sa.Integer)
 
-            some_property = sa.orm.column_property(
-                sa.func.coalesce(id, 1)
-            )
+    def test_calculated_column_property(self, Article):
+        assert isinstance(get_type(Article.some_property), sa.Integer)
 
-        self.Article = Article
-        self.User = User
+    def test_relationship_property(self, Article, User):
+        assert get_type(Article.author) == User
 
-    def test_instrumented_attribute(self):
-        assert isinstance(get_type(self.Article.id), sa.Integer)
-
-    def test_column_property(self):
-        assert isinstance(get_type(self.Article.id.property), sa.Integer)
-
-    def test_column(self):
-        assert isinstance(get_type(self.Article.__table__.c.id), sa.Integer)
-
-    def test_calculated_column_property(self):
-        assert isinstance(get_type(self.Article.some_property), sa.Integer)
-
-    def test_relationship_property(self):
-        assert get_type(self.Article.author) == self.User
-
-    def test_scalar_select(self):
-        query = sa.select([self.Article.id]).as_scalar()
+    def test_scalar_select(self, Article):
+        query = sa.select([Article.id]).as_scalar()
         assert isinstance(get_type(query), sa.Integer)

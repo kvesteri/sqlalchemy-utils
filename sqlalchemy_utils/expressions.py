@@ -10,7 +10,7 @@ from sqlalchemy.sql.expression import (
 )
 from sqlalchemy.sql.functions import GenericFunction
 
-from sqlalchemy_utils.functions.orm import quote
+from .functions.orm import quote
 
 
 class explain(Executable, ClauseElement):

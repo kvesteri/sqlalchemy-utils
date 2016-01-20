@@ -1,59 +1,67 @@
 # -*- coding: utf-8 -*-
+import pytest
 import sqlalchemy as sa
-from pytest import mark
 
 from sqlalchemy_utils.types import json
-from tests import TestCase
 
 
-class JSONTestCase(TestCase):
-    def create_models(self):
-        class Document(self.Base):
-            __tablename__ = 'document'
-            id = sa.Column(sa.Integer, primary_key=True)
-            json = sa.Column(json.JSONType)
+@pytest.fixture
+def Document(Base):
+    class Document(Base):
+        __tablename__ = 'document'
+        id = sa.Column(sa.Integer, primary_key=True)
+        json = sa.Column(json.JSONType)
+    return Document
 
-        self.Document = Document
 
-    def test_list(self):
-        document = self.Document(
+@pytest.fixture
+def init_models(Document):
+    pass
+
+
+class JSONTestCase(object):
+
+    def test_list(self, session, Document):
+        document = Document(
             json=[1, 2, 3]
         )
 
-        self.session.add(document)
-        self.session.commit()
+        session.add(document)
+        session.commit()
 
-        document = self.session.query(self.Document).first()
+        document = session.query(Document).first()
         assert document.json == [1, 2, 3]
 
-    def test_parameter_processing(self):
-        document = self.Document(
+    def test_parameter_processing(self, session, Document):
+        document = Document(
             json={'something': 12}
         )
 
-        self.session.add(document)
-        self.session.commit()
+        session.add(document)
+        session.commit()
 
-        document = self.session.query(self.Document).first()
+        document = session.query(Document).first()
         assert document.json == {'something': 12}
 
-    def test_non_ascii_chars(self):
-        document = self.Document(
+    def test_non_ascii_chars(self, session, Document):
+        document = Document(
             json={'something': u'äääööö'}
         )
 
-        self.session.add(document)
-        self.session.commit()
+        session.add(document)
+        session.commit()
 
-        document = self.session.query(self.Document).first()
+        document = session.query(Document).first()
         assert document.json == {'something': u'äääööö'}
 
 
-@mark.skipif('json.json is None')
+@pytest.mark.skipif('json.json is None')
+@pytest.mark.usefixtures('sqlite_memory_dsn')
 class TestSqliteJSONType(JSONTestCase):
     pass
 
 
-@mark.skipif('json.json is None')
+@pytest.mark.skipif('json.json is None')
+@pytest.mark.usefixtures('postgresql_dsn')
 class TestPostgresJSONType(JSONTestCase):
-    dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
+    pass

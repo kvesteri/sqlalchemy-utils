@@ -1,76 +1,88 @@
+import pytest
 import sqlalchemy as sa
 
 from sqlalchemy_utils import aggregated
-from tests import TestCase
 
 
-class TestAggregateOneToManyAndManyToMany(TestCase):
-    dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
+@pytest.fixture
+def Category(Base):
+    class Category(Base):
+        __tablename__ = 'category'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
+    return Category
 
-    def create_models(self):
-        product_categories = sa.Table(
-            'category_product',
-            self.Base.metadata,
-            sa.Column('category_id', sa.Integer, sa.ForeignKey('category.id')),
-            sa.Column('product_id', sa.Integer, sa.ForeignKey('product.id'))
+
+@pytest.fixture
+def Catalog(Base, Category):
+    class Catalog(Base):
+        __tablename__ = 'catalog'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
+
+        @aggregated(
+            'products.categories',
+            sa.Column(sa.Integer, default=0)
+        )
+        def category_count(self):
+            return sa.func.count(sa.distinct(Category.id))
+    return Catalog
+
+
+@pytest.fixture
+def Product(Base, Catalog, Category):
+    product_categories = sa.Table(
+        'category_product',
+        Base.metadata,
+        sa.Column('category_id', sa.Integer, sa.ForeignKey('category.id')),
+        sa.Column('product_id', sa.Integer, sa.ForeignKey('product.id'))
+    )
+
+    class Product(Base):
+        __tablename__ = 'product'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
+        price = sa.Column(sa.Numeric)
+
+        catalog_id = sa.Column(
+            sa.Integer, sa.ForeignKey('catalog.id')
         )
 
-        class Catalog(self.Base):
-            __tablename__ = 'catalog'
-            id = sa.Column(sa.Integer, primary_key=True)
-            name = sa.Column(sa.Unicode(255))
+        catalog = sa.orm.relationship(
+            Catalog,
+            backref='products'
+        )
 
-            @aggregated(
-                'products.categories',
-                sa.Column(sa.Integer, default=0)
-            )
-            def category_count(self):
-                return sa.func.count(sa.distinct(Category.id))
+        categories = sa.orm.relationship(
+            Category,
+            backref='products',
+            secondary=product_categories
+        )
+    return Product
 
-        class Category(self.Base):
-            __tablename__ = 'category'
-            id = sa.Column(sa.Integer, primary_key=True)
-            name = sa.Column(sa.Unicode(255))
 
-        class Product(self.Base):
-            __tablename__ = 'product'
-            id = sa.Column(sa.Integer, primary_key=True)
-            name = sa.Column(sa.Unicode(255))
-            price = sa.Column(sa.Numeric)
+@pytest.fixture
+def init_models(Category, Catalog, Product):
+    pass
 
-            catalog_id = sa.Column(
-                sa.Integer, sa.ForeignKey('catalog.id')
-            )
 
-            catalog = sa.orm.relationship(
-                Catalog,
-                backref='products'
-            )
+@pytest.mark.usefixtures('postgresql_dsn')
+class TestAggregateOneToManyAndManyToMany(object):
 
-            categories = sa.orm.relationship(
-                Category,
-                backref='products',
-                secondary=product_categories
-            )
-
-        self.Catalog = Catalog
-        self.Category = Category
-        self.Product = Product
-
-    def test_insert(self):
-        category = self.Category()
+    def test_insert(self, session, Category, Catalog, Product):
+        category = Category()
         products = [
-            self.Product(categories=[category]),
-            self.Product(categories=[category])
+            Product(categories=[category]),
+            Product(categories=[category])
         ]
-        catalog = self.Catalog(products=products)
-        self.session.add(catalog)
+        catalog = Catalog(products=products)
+        session.add(catalog)
         products2 = [
-            self.Product(categories=[category]),
-            self.Product(categories=[category])
+            Product(categories=[category]),
+            Product(categories=[category])
         ]
-        catalog2 = self.Catalog(products=products2)
-        self.session.add(catalog)
-        self.session.commit()
+        catalog2 = Catalog(products=products2)
+        session.add(catalog)
+        session.commit()
         assert catalog.category_count == 1
         assert catalog2.category_count == 1

@@ -1,72 +1,81 @@
+import pytest
 import sqlalchemy as sa
 
 from sqlalchemy_utils.aggregates import aggregated
-from tests import TestCase
 
 
-class TestAggregatesWithManyToManyRelationships(TestCase):
-    dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
+@pytest.fixture
+def User(Base):
+    user_group = sa.Table(
+        'user_group',
+        Base.metadata,
+        sa.Column('user_id', sa.Integer, sa.ForeignKey('user.id')),
+        sa.Column('group_id', sa.Integer, sa.ForeignKey('group.id'))
+    )
 
-    def create_models(self):
-        user_group = sa.Table(
-            'user_group',
-            self.Base.metadata,
-            sa.Column('user_id', sa.Integer, sa.ForeignKey('user.id')),
-            sa.Column('group_id', sa.Integer, sa.ForeignKey('group.id'))
+    class User(Base):
+        __tablename__ = 'user'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
+
+        @aggregated('groups', sa.Column(sa.Integer, default=0))
+        def group_count(self):
+            return sa.func.count('1')
+
+        groups = sa.orm.relationship(
+            'Group',
+            backref='users',
+            secondary=user_group
         )
+    return User
 
-        class User(self.Base):
-            __tablename__ = 'user'
-            id = sa.Column(sa.Integer, primary_key=True)
-            name = sa.Column(sa.Unicode(255))
 
-            @aggregated('groups', sa.Column(sa.Integer, default=0))
-            def group_count(self):
-                return sa.func.count('1')
+@pytest.fixture
+def Group(Base):
+    class Group(Base):
+        __tablename__ = 'group'
+        id = sa.Column(sa.Integer, primary_key=True)
+        name = sa.Column(sa.Unicode(255))
+    return Group
 
-            groups = sa.orm.relationship(
-                'Group',
-                backref='users',
-                secondary=user_group
-            )
 
-        class Group(self.Base):
-            __tablename__ = 'group'
-            id = sa.Column(sa.Integer, primary_key=True)
-            name = sa.Column(sa.Unicode(255))
+@pytest.fixture
+def init_models(User, Group):
+    pass
 
-        self.User = User
-        self.Group = Group
 
-    def test_assigns_aggregates_on_insert(self):
-        user = self.User(
+@pytest.mark.usefixtures('postgresql_dsn')
+class TestAggregatesWithManyToManyRelationships(object):
+
+    def test_assigns_aggregates_on_insert(self, session, User, Group):
+        user = User(
             name=u'John Matrix'
         )
-        self.session.add(user)
-        self.session.commit()
-        group = self.Group(
+        session.add(user)
+        session.commit()
+        group = Group(
             name=u'Some group',
             users=[user]
         )
-        self.session.add(group)
-        self.session.commit()
-        self.session.refresh(user)
+        session.add(group)
+        session.commit()
+        session.refresh(user)
         assert user.group_count == 1
 
-    def test_updates_aggregates_on_delete(self):
-        user = self.User(
+    def test_updates_aggregates_on_delete(self, session, User, Group):
+        user = User(
             name=u'John Matrix'
         )
-        self.session.add(user)
-        self.session.commit()
-        group = self.Group(
+        session.add(user)
+        session.commit()
+        group = Group(
             name=u'Some group',
             users=[user]
         )
-        self.session.add(group)
-        self.session.commit()
-        self.session.refresh(user)
+        session.add(group)
+        session.commit()
+        session.refresh(user)
         user.groups = []
-        self.session.commit()
-        self.session.refresh(user)
+        session.commit()
+        session.refresh(user)
         assert user.group_count == 0

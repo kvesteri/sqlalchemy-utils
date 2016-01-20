@@ -1,15 +1,15 @@
+import pytest
 import sqlalchemy as sa
-from pytest import raises
 
 from sqlalchemy_utils.observer import observes
-from tests import TestCase
 
 
-class TestObservesForColumn(TestCase):
-    dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
+@pytest.mark.usefixtures('postgresql_dsn')
+class TestObservesForColumn(object):
 
-    def create_models(self):
-        class Product(self.Base):
+    @pytest.fixture
+    def Product(self, Base):
+        class Product(Base):
             __tablename__ = 'product'
             id = sa.Column(sa.Integer, primary_key=True)
             price = sa.Column(sa.Integer)
@@ -17,21 +17,25 @@ class TestObservesForColumn(TestCase):
             @observes('price')
             def product_price_observer(self, price):
                 self.price = price * 2
+        return Product
 
-        self.Product = Product
+    @pytest.fixture
+    def init_models(self, Product):
+        pass
 
-    def test_simple_insert(self):
-        product = self.Product(price=100)
-        self.session.add(product)
-        self.session.flush()
+    def test_simple_insert(self, session, Product):
+        product = Product(price=100)
+        session.add(product)
+        session.flush()
         assert product.price == 200
 
 
-class TestObservesForColumnWithoutActualChanges(TestCase):
-    dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
+@pytest.mark.usefixtures('postgresql_dsn')
+class TestObservesForColumnWithoutActualChanges(object):
 
-    def create_models(self):
-        class Product(self.Base):
+    @pytest.fixture
+    def Product(self, Base):
+        class Product(Base):
             __tablename__ = 'product'
             id = sa.Column(sa.Integer, primary_key=True)
             price = sa.Column(sa.Integer)
@@ -39,15 +43,18 @@ class TestObservesForColumnWithoutActualChanges(TestCase):
             @observes('price')
             def product_price_observer(self, price):
                 raise Exception('Trying to change price')
+        return Product
 
-        self.Product = Product
+    @pytest.fixture
+    def init_models(self, Product):
+        pass
 
-    def test_only_notifies_observer_on_actual_changes(self):
-        product = self.Product()
-        self.session.add(product)
-        self.session.flush()
+    def test_only_notifies_observer_on_actual_changes(self, session, Product):
+        product = Product()
+        session.add(product)
+        session.flush()
 
-        with raises(Exception) as e:
+        with pytest.raises(Exception) as e:
             product.price = 500
-            self.session.commit()
+            session.commit()
         assert str(e.value) == 'Trying to change price'

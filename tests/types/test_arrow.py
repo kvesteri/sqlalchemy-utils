@@ -1,52 +1,58 @@
 from datetime import datetime
 
+import pytest
 import sqlalchemy as sa
-from pytest import mark
 
 from sqlalchemy_utils.types import arrow
-from tests import TestCase
 
 
-@mark.skipif('arrow.arrow is None')
-class TestArrowDateTimeType(TestCase):
-    def create_models(self):
-        class Article(self.Base):
-            __tablename__ = 'article'
-            id = sa.Column(sa.Integer, primary_key=True)
-            created_at = sa.Column(arrow.ArrowType)
+@pytest.fixture
+def Article(Base):
+    class Article(Base):
+        __tablename__ = 'article'
+        id = sa.Column(sa.Integer, primary_key=True)
+        created_at = sa.Column(arrow.ArrowType)
+    return Article
 
-        self.Article = Article
 
-    def test_parameter_processing(self):
-        article = self.Article(
+@pytest.fixture
+def init_models(Article):
+    pass
+
+
+@pytest.mark.skipif('arrow.arrow is None')
+class TestArrowDateTimeType(object):
+
+    def test_parameter_processing(self, session, Article):
+        article = Article(
             created_at=arrow.arrow.get(datetime(2000, 11, 1))
         )
 
-        self.session.add(article)
-        self.session.commit()
+        session.add(article)
+        session.commit()
 
-        article = self.session.query(self.Article).first()
+        article = session.query(Article).first()
         assert article.created_at.datetime
 
-    def test_string_coercion(self):
-        article = self.Article(
+    def test_string_coercion(self, Article):
+        article = Article(
             created_at='1367900664'
         )
         assert article.created_at.year == 2013
 
-    def test_utc(self):
+    def test_utc(self, session, Article):
         time = arrow.arrow.utcnow()
-        article = self.Article(created_at=time)
-        self.session.add(article)
+        article = Article(created_at=time)
+        session.add(article)
         assert article.created_at == time
-        self.session.commit()
+        session.commit()
         assert article.created_at == time
 
-    def test_other_tz(self):
+    def test_other_tz(self, session, Article):
         time = arrow.arrow.utcnow()
         local = time.to('US/Pacific')
-        article = self.Article(created_at=local)
-        self.session.add(article)
+        article = Article(created_at=local)
+        session.add(article)
         assert article.created_at == time == local
-        self.session.commit()
+        session.commit()
         assert article.created_at == time

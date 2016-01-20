@@ -1,26 +1,27 @@
+import pytest
+
 from sqlalchemy_utils.relationships import chained_join
-from tests import TestCase
-from tests.mixins import (
+
+from ..mixins import (
     ThreeLevelDeepManyToMany,
     ThreeLevelDeepOneToMany,
     ThreeLevelDeepOneToOne
 )
 
 
-class TestChainedJoinFoDeepToManyToMany(ThreeLevelDeepManyToMany, TestCase):
-    dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
-    create_tables = False
+@pytest.mark.usefixtures('postgresql_dsn')
+class TestChainedJoinFoDeepToManyToMany(ThreeLevelDeepManyToMany):
 
-    def test_simple_join(self):
-        assert str(chained_join(self.Catalog.categories)) == (
+    def test_simple_join(self, Catalog):
+        assert str(chained_join(Catalog.categories)) == (
             'catalog_category JOIN category ON '
             'category._id = catalog_category.category_id'
         )
 
-    def test_two_relations(self):
+    def test_two_relations(self, Catalog, Category):
         sql = chained_join(
-            self.Catalog.categories,
-            self.Category.sub_categories
+            Catalog.categories,
+            Category.sub_categories
         )
         assert str(sql) == (
             'catalog_category JOIN category ON category._id = '
@@ -30,11 +31,11 @@ class TestChainedJoinFoDeepToManyToMany(ThreeLevelDeepManyToMany, TestCase):
             'category_subcategory.subcategory_id'
         )
 
-    def test_three_relations(self):
+    def test_three_relations(self, Catalog, Category, SubCategory):
         sql = chained_join(
-            self.Catalog.categories,
-            self.Category.sub_categories,
-            self.SubCategory.products
+            Catalog.categories,
+            Category.sub_categories,
+            SubCategory.products
         )
         assert str(sql) == (
             'catalog_category JOIN category ON category._id = '
@@ -47,28 +48,27 @@ class TestChainedJoinFoDeepToManyToMany(ThreeLevelDeepManyToMany, TestCase):
         )
 
 
-class TestChainedJoinForDeepOneToMany(ThreeLevelDeepOneToMany, TestCase):
-    dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
-    create_tables = False
+@pytest.mark.usefixtures('postgresql_dsn')
+class TestChainedJoinForDeepOneToMany(ThreeLevelDeepOneToMany):
 
-    def test_simple_join(self):
-        assert str(chained_join(self.Catalog.categories)) == 'category'
+    def test_simple_join(self, Catalog):
+        assert str(chained_join(Catalog.categories)) == 'category'
 
-    def test_two_relations(self):
+    def test_two_relations(self, Catalog, Category):
         sql = chained_join(
-            self.Catalog.categories,
-            self.Category.sub_categories
+            Catalog.categories,
+            Category.sub_categories
         )
         assert str(sql) == (
             'category JOIN sub_category ON category._id = '
             'sub_category._category_id'
         )
 
-    def test_three_relations(self):
+    def test_three_relations(self, Catalog, Category, SubCategory):
         sql = chained_join(
-            self.Catalog.categories,
-            self.Category.sub_categories,
-            self.SubCategory.products
+            Catalog.categories,
+            Category.sub_categories,
+            SubCategory.products
         )
         assert str(sql) == (
             'category JOIN sub_category ON category._id = '
@@ -77,28 +77,27 @@ class TestChainedJoinForDeepOneToMany(ThreeLevelDeepOneToMany, TestCase):
         )
 
 
-class TestChainedJoinForDeepOneToOne(ThreeLevelDeepOneToOne, TestCase):
-    dns = 'postgres://postgres@localhost/sqlalchemy_utils_test'
-    create_tables = False
+@pytest.mark.usefixtures('postgresql_dsn')
+class TestChainedJoinForDeepOneToOne(ThreeLevelDeepOneToOne):
 
-    def test_simple_join(self):
-        assert str(chained_join(self.Catalog.category)) == 'category'
+    def test_simple_join(self, Catalog):
+        assert str(chained_join(Catalog.category)) == 'category'
 
-    def test_two_relations(self):
+    def test_two_relations(self, Catalog, Category):
         sql = chained_join(
-            self.Catalog.category,
-            self.Category.sub_category
+            Catalog.category,
+            Category.sub_category
         )
         assert str(sql) == (
             'category JOIN sub_category ON category._id = '
             'sub_category._category_id'
         )
 
-    def test_three_relations(self):
+    def test_three_relations(self, Catalog, Category, SubCategory):
         sql = chained_join(
-            self.Catalog.category,
-            self.Category.sub_category,
-            self.SubCategory.product
+            Catalog.category,
+            Category.sub_category,
+            SubCategory.product
         )
         assert str(sql) == (
             'category JOIN sub_category ON category._id = '
