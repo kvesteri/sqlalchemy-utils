@@ -38,3 +38,8 @@ class TestCountryType(object):
     def test_scalar_attributes_get_coerced_to_objects(self, User):
         user = User(country='FI')
         assert isinstance(user.country, Country)
+
+    def test_literal_param(self, session, User):
+        clause = User.country == 'FI'
+        compiled = str(clause.compile(compile_kwargs={'literal_binds': True}))
+        assert compiled == '"user".country = \'FI\''

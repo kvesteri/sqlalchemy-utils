@@ -116,6 +116,11 @@ class TestNumericRangeOnPostgres(NumericRangeTestCase):
         )
         assert query.scalar() == length
 
+    def test_literal_param(self, session, Car):
+        clause = Car.price_range == [1, 3]
+        compiled = str(clause.compile(compile_kwargs={'literal_binds': True}))
+        assert compiled == "car.price_range = '[1, 3]'"
+
 
 @pytest.mark.skipif('intervals is None')
 class TestNumericRangeWithStep(object):

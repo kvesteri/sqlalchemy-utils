@@ -49,3 +49,8 @@ class TestCurrencyType(object):
     ):
         user = User(currency='USD')
         assert isinstance(user.currency, Currency)
+
+    def test_literal_param(self, session, User):
+        clause = User.currency == 'USD'
+        compiled = str(clause.compile(compile_kwargs={'literal_binds': True}))
+        assert compiled == '"user".currency = \'USD\''

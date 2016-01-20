@@ -106,7 +106,6 @@ class NumberRangeTestCase(object):
 
 @pytest.mark.usefixtures('postgresql_dsn')
 class TestIntRangeTypeOnPostgres(NumberRangeTestCase):
-
     @pytest.mark.parametrize(
         'number_range',
         (
@@ -390,6 +389,11 @@ class TestIntRangeTypeOnPostgres(NumberRangeTestCase):
             .filter(Building.persons_at_night < number_range)
         )
         assert query.count()
+
+    def test_literal_param(self, session, Building):
+        clause = Building.persons_at_night == [1, 3]
+        compiled = str(clause.compile(compile_kwargs={'literal_binds': True}))
+        assert compiled == "building.persons_at_night = '[1, 3]'"
 
 
 class TestNumberRangeTypeOnSqlite(NumberRangeTestCase):

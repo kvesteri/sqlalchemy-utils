@@ -115,3 +115,11 @@ class TestDateRangeOnPostgres(object):
             session.query(Booking.during.length)
         )
         assert query.scalar() == length
+
+    def test_literal_param(self, session, Booking):
+        clause = Booking.during == [
+            datetime(2015, 1, 1).date(),
+            datetime(2015, 1, 3).date()
+        ]
+        compiled = str(clause.compile(compile_kwargs={'literal_binds': True}))
+        assert compiled == "booking.during = '[2015-01-01, 2015-01-03]'"

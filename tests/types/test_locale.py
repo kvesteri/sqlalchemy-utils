@@ -55,3 +55,8 @@ class TestLocaleType(object):
     def test_unknown_locale_throws_exception(self, User):
         with pytest.raises(locale.babel.UnknownLocaleError):
             User(locale=u'unknown')
+
+    def test_literal_param(self, session, User):
+        clause = User.locale == 'en_US'
+        compiled = str(clause.compile(compile_kwargs={'literal_binds': True}))
+        assert compiled == '"user".locale = \'en_US\''

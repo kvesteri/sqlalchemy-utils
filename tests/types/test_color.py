@@ -24,7 +24,6 @@ def init_models(Document):
 
 @pytest.mark.skipif('types.color.python_colour_type is None')
 class TestColorType(object):
-
     def test_string_parameter_processing(self, session, Document):
         from colour import Color
 
@@ -44,10 +43,7 @@ class TestColorType(object):
     def test_color_parameter_processing(self, session, Document):
         from colour import Color
 
-        document = Document(
-            bg_color=Color(u'white')
-        )
-
+        document = Document(bg_color=Color(u'white'))
         session.add(document)
         session.commit()
 
@@ -58,5 +54,9 @@ class TestColorType(object):
         from colour import Color
 
         document = Document(bg_color='white')
-
         assert isinstance(document.bg_color, Color)
+
+    def test_literal_param(self, session, Document):
+        clause = Document.bg_color == 'white'
+        compiled = str(clause.compile(compile_kwargs={'literal_binds': True}))
+        assert compiled == "document.bg_color = 'white'"
