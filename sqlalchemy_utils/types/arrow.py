@@ -74,6 +74,9 @@ class ArrowType(types.TypeDecorator, ScalarCoercible):
             return arrow.get(value)
         return value
 
+    def process_literal_param(self, value, dialect):
+        return str(value)
+
     def _coerce(self, value):
         if value is None:
             return None
