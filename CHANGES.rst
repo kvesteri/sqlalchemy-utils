@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.31.6 (2015-01-xx)
+^^^^^^^^^^^^^^^^^^^
+
+- Added literal parameter processing for ArrowType (#182, pull request courtesy of jmagnusson)
+
+
 0.31.5 (2015-01-14)
 ^^^^^^^^^^^^^^^^^^^
 
