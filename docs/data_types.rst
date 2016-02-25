@@ -70,6 +70,14 @@ EncryptedType
 
 .. autoclass:: EncryptedType
 
+
+GenderType
+----------
+
+.. module:: sqlalchemy_utils.types.gender
+
+.. autoclass:: GenderType
+
 JSONType
 --------
 
