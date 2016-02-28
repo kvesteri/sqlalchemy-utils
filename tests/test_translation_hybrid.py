@@ -117,3 +117,17 @@ class TestTranslationHybrid(object):
             locale = sa.Column(sa.String)
 
         Article.name
+
+    def test_column_labeling(self, session, City):
+        expected = ("coalesce(city.name_translations -> 'fi', "
+                    "city.name_translations -> 'en') AS name")
+        assert expected in str(session.query(City.name))
+
+    def test_result_object_asdict_keys(self, session, City):
+        city = City(
+            name_translations={'en': 'Stockholm', 'fi': 'Tukholma'}
+        )
+        session.add(city)
+        session.commit()
+        dct = session.query(City.name).first()._asdict()
+        assert dct['name'] == 'Tukholma'
