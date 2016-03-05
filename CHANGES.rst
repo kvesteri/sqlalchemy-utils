@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.32.0 (2016-03-xx)
+^^^^^^^^^^^^^^^^^^^
+
+- Dropped py26 support
+
+
 0.31.6 (2016-01-21)
 ^^^^^^^^^^^^^^^^^^^
 

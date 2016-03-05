@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
-try:
-    from functools import total_ordering
-except ImportError:
-    # Python 2.6 port
-    from total_ordering import total_ordering
+from functools import total_ordering
+
 from .. import i18n
 from ..utils import str_coercible
 
