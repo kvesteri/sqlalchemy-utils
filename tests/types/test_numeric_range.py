@@ -51,7 +51,7 @@ class NumericRangeTestCase(object):
         'number_range',
         (
             [1, 3],
-            '1 - 3',
+            (1, 3)
         )
     )
     def test_save_number_range(self, create_car, number_range):
@@ -83,10 +83,6 @@ class NumericRangeTestCase(object):
 
         car = session.query(Car).first()
         assert car.price_range is None
-
-    def test_string_coercion(self, Car):
-        car = Car(price_range='[12, 18]')
-        assert isinstance(car.price_range, intervals.DecimalInterval)
 
     def test_integer_coercion(self, Car):
         car = Car(price_range=15)
@@ -124,7 +120,6 @@ class TestNumericRangeOnPostgres(NumericRangeTestCase):
 
 @pytest.mark.skipif('intervals is None')
 class TestNumericRangeWithStep(object):
-
     @pytest.fixture
     def Car(self, Base):
         class Car(Base):

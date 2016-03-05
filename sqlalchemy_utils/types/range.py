@@ -286,13 +286,17 @@ class RangeType(types.TypeDecorator, ScalarCoercible):
         return value
 
     def process_result_value(self, value, dialect):
+        if isinstance(value, six.string_types):
+            factory_func = self.interval_class.from_string
+        else:
+            factory_func = self.interval_class
         if value is not None:
             if self.interval_class.step is not None:
                 return self.canonicalize_result_value(
-                    self.interval_class(value, step=self.step)
+                    factory_func(value, step=self.step)
                 )
             else:
-                return self.interval_class(value, step=self.step)
+                return factory_func(value, step=self.step)
         return value
 
     def canonicalize_result_value(self, value):

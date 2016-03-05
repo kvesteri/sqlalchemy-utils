@@ -50,7 +50,7 @@ class NumberRangeTestCase(object):
         assert building.persons_at_night is None
 
     def test_update_with_none(self, session, create_building):
-        interval = intervals.IntInterval('(,)')
+        interval = intervals.IntInterval([None, None])
         building = create_building(interval)
         building.persons_at_night = None
         assert building.persons_at_night is None
@@ -61,7 +61,7 @@ class NumberRangeTestCase(object):
         'number_range',
         (
             [1, 3],
-            '1 - 3',
+            (0, 4),
         )
     )
     def test_save_number_range(self, create_building, number_range):
@@ -94,10 +94,6 @@ class NumberRangeTestCase(object):
         building = session.query(Building).first()
         assert building.persons_at_night is None
 
-    def test_string_coercion(self, Building):
-        building = Building(persons_at_night='[12, 18]')
-        assert isinstance(building.persons_at_night, intervals.IntInterval)
-
     def test_integer_coercion(self, Building):
         building = Building(persons_at_night=15)
         assert building.persons_at_night.lower == 15
@@ -110,7 +106,6 @@ class TestIntRangeTypeOnPostgres(NumberRangeTestCase):
         'number_range',
         (
             [1, 3],
-            '1 - 3',
             (0, 4)
         )
     )
@@ -158,7 +153,6 @@ class TestIntRangeTypeOnPostgres(NumberRangeTestCase):
         'number_range',
         (
             [[1, 3]],
-            ['1 - 3'],
             [(0, 4)],
         )
     )
@@ -180,7 +174,6 @@ class TestIntRangeTypeOnPostgres(NumberRangeTestCase):
         'number_range',
         (
             [1, 3],
-            '1 - 3',
             (0, 4),
         )
     )
@@ -202,7 +195,6 @@ class TestIntRangeTypeOnPostgres(NumberRangeTestCase):
         'number_range',
         (
             [1, 3],
-            '1 - 3',
             (0, 4),
         )
     )
@@ -224,7 +216,6 @@ class TestIntRangeTypeOnPostgres(NumberRangeTestCase):
         'number_range',
         (
             [1, 3],
-            '1 - 3',
             (1, 3),
             2
         )
@@ -247,7 +238,6 @@ class TestIntRangeTypeOnPostgres(NumberRangeTestCase):
         'number_range',
         (
             [1, 3],
-            '1 - 3',
             (0, 8),
             (-inf, inf)
         )
@@ -270,7 +260,6 @@ class TestIntRangeTypeOnPostgres(NumberRangeTestCase):
         'number_range',
         (
             [2, 5],
-            '0 - 2',
             0
         )
     )
@@ -303,7 +292,6 @@ class TestIntRangeTypeOnPostgres(NumberRangeTestCase):
         'number_range',
         (
             [1, 2],
-            '1 - 3',
             (0, 4),
             [0, 3],
             0,
