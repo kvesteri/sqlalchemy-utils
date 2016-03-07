@@ -74,7 +74,7 @@ class Currency(object):
         try:
             i18n.babel.Locale('en').currencies[code]
         except KeyError:
-            raise ValueError("{0}' is not valid currency code.")
+            raise ValueError("'{0}' is not valid currency code.".format(code))
 
     @property
     def symbol(self):
