@@ -13,7 +13,7 @@ except ImportError:
     babel = None
 
 try:
-    from flask.ext.babel import get_locale
+    from flask_babel import get_locale
 except ImportError:
     def get_locale():
         raise ImproperlyConfigured(
