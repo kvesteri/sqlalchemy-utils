@@ -6,7 +6,13 @@ from sqlalchemy_utils import Password, PasswordType, types  # noqa
 
 
 @pytest.fixture
-def User(Base):
+def extra_kwargs():
+    """PasswordType extra keyword arguments."""
+    return {}
+
+
+@pytest.fixture
+def User(Base, extra_kwargs):
     class User(Base):
         __tablename__ = 'user'
         id = sa.Column(sa.Integer, primary_key=True)
@@ -17,8 +23,8 @@ def User(Base):
                 'md5_crypt',
                 'hex_md5'
             ],
-
-            deprecated=['md5_crypt', 'hex_md5']
+            deprecated=['md5_crypt', 'hex_md5'],
+            **extra_kwargs
         ))
 
         def __repr__(self):
@@ -29,6 +35,17 @@ def User(Base):
 @pytest.fixture
 def init_models(User):
     pass
+
+
+def onload_callback(schemes, deprecated):
+    """
+    Get onload callback that takes the PasswordType arguments from the config.
+    """
+    def onload(**kwargs):
+        kwargs['schemes'] = schemes
+        kwargs['deprecated'] = deprecated
+        return kwargs
+    return onload
 
 
 @pytest.mark.skipif('types.password.passlib is None')
@@ -178,3 +195,25 @@ class TestPasswordType(object):
 
         assert obj.password.hash.decode('utf8').startswith('$pbkdf2-sha512$')
         assert obj.password == 'b'
+
+    @pytest.mark.parametrize(
+        'extra_kwargs',
+        [
+            dict(
+                onload=onload_callback(
+                    schemes=['pbkdf2_sha256'],
+                    deprecated=[],
+                )
+            )
+        ]
+    )
+    def test_lazy_configuration(self, User):
+        """
+        Field should be able to read the passlib attributes lazily from the
+        config (e.g. Flask config).
+        """
+        schemes = User.password.type.context.schemes()
+        assert tuple(schemes) == ('pbkdf2_sha256',)
+        obj = User()
+        obj.password = b'b'
+        assert obj.password.hash.decode('utf8').startswith('$pbkdf2-sha256$')

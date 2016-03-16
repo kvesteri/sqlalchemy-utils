@@ -11,7 +11,7 @@ from .scalar_coercible import ScalarCoercible
 passlib = None
 try:
     import passlib
-    from passlib.context import CryptContext
+    from passlib.context import LazyCryptContext
 except ImportError:
     pass
 
@@ -82,7 +82,7 @@ class PasswordType(types.TypeDecorator, ScalarCoercible):
     verifying them using a pythonic interface.
 
     All keyword arguments (aside from max_length) are forwarded to the
-    construction of a `passlib.context.CryptContext` object.
+    construction of a `passlib.context.LazyCryptContext` object.
 
     The following usage will create a password column that will
     automatically hash new passwords as `pbkdf2_sha512` but still compare
@@ -128,7 +128,7 @@ class PasswordType(types.TypeDecorator, ScalarCoercible):
             )
 
         # Construct the passlib crypt context.
-        self.context = CryptContext(**kwargs)
+        self.context = LazyCryptContext(**kwargs)
 
         if max_length is None:
             max_length = self.calculate_max_length()
