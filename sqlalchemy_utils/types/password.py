@@ -11,9 +11,13 @@ from .scalar_coercible import ScalarCoercible
 passlib = None
 try:
     import passlib
-    from passlib.context import CryptContext
 except ImportError:
     pass
+else:
+    try:
+        from passlib.context import LazyCryptContext as CryptContext
+    except ImportError:
+        from passlib.context import CryptContext
 
 
 class Password(Mutable, object):
