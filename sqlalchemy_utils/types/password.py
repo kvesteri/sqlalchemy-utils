@@ -82,7 +82,9 @@ class PasswordType(types.TypeDecorator, ScalarCoercible):
     verifying them using a pythonic interface.
 
     All keyword arguments (aside from max_length) are forwarded to the
-    construction of a `passlib.context.LazyCryptContext` object.
+    construction of a `passlib.context.LazyCryptContext` object, which
+    also supports deferred configuration via the `onload` callback.
+
 
     The following usage will create a password column that will
     automatically hash new passwords as `pbkdf2_sha512` but still compare
@@ -114,6 +116,29 @@ class PasswordType(types.TypeDecorator, ScalarCoercible):
 
         target.password == 'b'
         # True
+
+
+    Lazy configuration of the type with Flask config:
+
+    ::
+
+
+        import flask
+
+        class User(db.Model):
+            __tablename__ = 'user'
+
+            password = db.Column(
+                PasswordType(
+                    # The returned dictionary is forwarded to the CryptContext
+                    onload=lambda **kwargs: dict(
+                        schemes=flask.current_app.config['PASSWORD_SCHEMES'],
+                        **kwargs
+                    ),
+                ),
+                unique=False,
+                nullable=False,
+            )
 
     """
 
