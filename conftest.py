@@ -68,6 +68,11 @@ def sqlite_memory_dsn():
 
 
 @pytest.fixture
+def sqlite_none_database_dsn():
+    return 'sqlite://'
+
+
+@pytest.fixture
 def sqlite_file_dsn():
     return 'sqlite:///{0}.db'.format(db_name)
 

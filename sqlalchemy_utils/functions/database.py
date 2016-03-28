@@ -466,7 +466,12 @@ def database_exists(url):
         return bool(engine.execute(text).scalar())
 
     elif engine.dialect.name == 'sqlite':
-        return database == ':memory:' or os.path.exists(database)
+        if database:
+            return database == ':memory:' or os.path.exists(database)
+        else:
+            # The default SQLAlchemy database is in memory,
+            # and :memory is not required, thus we should support that use-case
+            return True
 
     else:
         text = 'SELECT 1'
@@ -538,7 +543,8 @@ def create_database(url, encoding='utf8', template=None):
         engine.execute(text)
 
     elif engine.dialect.name == 'sqlite' and database != ':memory:':
-        open(database, 'w').close()
+        if database:
+            open(database, 'w').close()
 
     else:
         text = 'CREATE DATABASE {0}'.format(quote(engine, database))
