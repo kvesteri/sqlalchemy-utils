@@ -575,8 +575,9 @@ def drop_database(url):
 
     engine = sa.create_engine(url)
 
-    if engine.dialect.name == 'sqlite' and url.database != ':memory:':
-        os.remove(url.database)
+    if engine.dialect.name == 'sqlite' and database != ':memory:':
+        if database:
+            os.remove(database)
 
     elif engine.dialect.name == 'postgresql' and engine.driver == 'psycopg2':
         from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
