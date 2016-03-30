@@ -8,6 +8,7 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 ^^^^^^^^^^^^^^^^^^^
 
 - Fix database helpers for sqlite (#208, pull request courtesy of RobertDeRose)
+- Fix TranslationHybrid aliased entities handling (#198, pull request courtesy of jmagnusson)
 
 
 0.32.0 (2016-03-17)
