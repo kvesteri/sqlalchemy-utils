@@ -2,6 +2,7 @@ import pytest
 import sqlalchemy as sa
 from flexmock import flexmock
 from sqlalchemy.dialects.postgresql import HSTORE
+from sqlalchemy.orm import aliased
 
 from sqlalchemy_utils import i18n, TranslationHybrid  # noqa
 
@@ -117,3 +118,10 @@ class TestTranslationHybrid(object):
             locale = sa.Column(sa.String)
 
         Article.name
+
+    def test_no_implicit_join_when_using_aliased_entities(self, session, City):
+        # Ensure that queried entities are taken from the alias so that
+        # there isn't an extra join to the original entity.
+        CityAlias = aliased(City)
+        query_str = str(session.query(CityAlias.name))
+        assert query_str.endswith('FROM city AS city_1')

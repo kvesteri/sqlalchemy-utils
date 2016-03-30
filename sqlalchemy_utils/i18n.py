@@ -97,9 +97,13 @@ class TranslationHybrid(object):
 
     def expr_factory(self, attr):
         def expr(cls):
+            cls_attr = getattr(cls, attr.key)
             current_locale = cast_locale_expr(cls, self.current_locale)
             default_locale = cast_locale_expr(cls, self.default_locale)
-            return sa.func.coalesce(attr[current_locale], attr[default_locale])
+            return sa.func.coalesce(
+                cls_attr[current_locale],
+                cls_attr[default_locale]
+            )
         return expr
 
     def __call__(self, attr):
