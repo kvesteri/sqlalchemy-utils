@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.32.1 (2016-03-30)
+^^^^^^^^^^^^^^^^^^^
+
+- Fix database helpers for sqlite (#208, pull request courtesy of RobertDeRose)
+
+
 0.32.0 (2016-03-17)
 ^^^^^^^^^^^^^^^^^^^
 
