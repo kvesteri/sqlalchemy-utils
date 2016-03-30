@@ -95,16 +95,27 @@ class TranslationHybrid(object):
             getattr(obj, attr.key)[locale] = value
         return setter
 
-    def expr_factory(self, attr):
+    def expr_factory(self, attr, prop):
         def expr(cls):
             current_locale = cast_locale_expr(cls, self.current_locale)
             default_locale = cast_locale_expr(cls, self.default_locale)
-            return sa.func.coalesce(attr[current_locale], attr[default_locale])
+            ret = sa.func.coalesce(attr[current_locale], attr[default_locale])
+            try:
+                label = [k for k, v in vars(cls).items() if v is prop][0]
+            except IndexError:
+                # Fall back to a non-aliased expression if the hybrid property
+                # is not found on the entity. This happens on aliased classes
+                # for example.
+                pass
+            else:
+                ret = ret.label(label)
+            return ret
         return expr
 
     def __call__(self, attr):
-        return hybrid_property(
+        prop = hybrid_property(
             fget=self.getter_factory(attr),
-            fset=self.setter_factory(attr),
-            expr=self.expr_factory(attr)
+            fset=self.setter_factory(attr)
         )
+        prop.expr = self.expr_factory(attr, prop)
+        return prop
