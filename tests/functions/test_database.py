@@ -27,6 +27,12 @@ class TestDatabaseSQLiteMemory(object):
         assert database_exists(dsn)
 
 
+@pytest.mark.usefixture('sqlite_none_database_dsn')
+class TestDatabaseSQLiteMemoryNoDatabaseString(object):
+    def test_exists_memory_none_database(self, sqlite_none_database_dsn):
+        assert database_exists(sqlite_none_database_dsn)
+
+
 @pytest.mark.usefixtures('sqlite_file_dsn')
 class TestDatabaseSQLiteFile(DatabaseTest):
     pass
