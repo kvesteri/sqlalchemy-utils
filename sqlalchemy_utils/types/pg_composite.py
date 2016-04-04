@@ -86,7 +86,7 @@ Arrays of composites
 
 
 .. _PostgreSQL composite types:
-    http://www.postgresql.org/docs/devel/static/rowtypes.html
+    http://www.postgresql.org/docs/current/static/rowtypes.html
 
 
 Related links:
