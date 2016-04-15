@@ -63,7 +63,7 @@ class TestDatabasePostgres(DatabaseTest):
     def db_name(self):
         return 'db_test_sqlalchemy_util'
 
-    def test_template(self):
+    def test_template(self, postgresql_db_user):
         (
             flexmock(sa.engine.Engine)
             .should_receive('execute')
@@ -72,10 +72,10 @@ class TestDatabasePostgres(DatabaseTest):
                 "TEMPLATE my_template"
             )
         )
-        create_database(
-            'postgres://postgres@localhost/db_test_sqlalchemy_util',
-            template='my_template'
+        dsn = 'postgres://{0}@localhost/db_test_sqlalchemy_util'.format(
+            postgresql_db_user
         )
+        create_database(dsn, template='my_template')
 
 
 @pytest.mark.usefixtures('postgresql_dsn')
@@ -85,7 +85,7 @@ class TestDatabasePostgresWithQuotedName(DatabaseTest):
     def db_name(self):
         return 'db_test_sqlalchemy-util'
 
-    def test_template(self):
+    def test_template(self, postgresql_db_user):
         (
             flexmock(sa.engine.Engine)
             .should_receive('execute')
@@ -95,7 +95,7 @@ class TestDatabasePostgresWithQuotedName(DatabaseTest):
                 'TEMPLATE "my-template"'
             )
         )
-        create_database(
-            'postgres://postgres@localhost/db_test_sqlalchemy-util',
-            template='my-template'
+        dsn = 'postgres://{0}@localhost/db_test_sqlalchemy-util'.format(
+            postgresql_db_user
         )
+        create_database(dsn, template='my-template')
