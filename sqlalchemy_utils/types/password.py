@@ -130,11 +130,15 @@ class PasswordType(types.TypeDecorator, ScalarCoercible):
         # Construct the passlib crypt context.
         self.context = LazyCryptContext(**kwargs)
 
-        if max_length is None:
-            max_length = self.calculate_max_length()
+        self._max_length = max_length
 
-        # Set the length to the now-calculated max length.
-        self.length = max_length
+    @property
+    def length(self):
+        """Get column length."""
+        if self._max_length is None:
+            self._max_length = self.calculate_max_length()
+
+        return self._max_length
 
     def calculate_max_length(self):
         # Calculate the largest possible encoded password.

@@ -29,6 +29,7 @@ extras_require = {
         'Jinja2>=2.3',
         'docutils>=0.10',
         'flexmock>=0.9.7',
+        'mock==2.0.0',
         'psycopg2>=2.5.1',
         'pytz>=2014.2',
         'python-dateutil>=2.2',
