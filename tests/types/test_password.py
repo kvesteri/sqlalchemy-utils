@@ -1,3 +1,4 @@
+import mock
 import pytest
 import sqlalchemy as sa
 from sqlalchemy import inspect
@@ -217,3 +218,19 @@ class TestPasswordType(object):
         obj = User()
         obj.password = b'b'
         assert obj.password.hash.decode('utf8').startswith('$pbkdf2-sha256$')
+
+    @pytest.mark.parametrize('max_length', [1, 103])
+    def test_constant_length(self, max_length):
+        """
+        Test that constant max_length is applied.
+        """
+        typ = PasswordType(max_length=max_length)
+        assert typ.length == max_length
+
+    def test_context_is_lazy(self):
+        """
+        Make sure the init doesn't evaluate the lazy context.
+        """
+        onload = mock.Mock(return_value={})
+        PasswordType(onload=onload)
+        assert not onload.called
