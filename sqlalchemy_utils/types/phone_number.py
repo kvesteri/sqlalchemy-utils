@@ -25,18 +25,46 @@ class PhoneNumber(BasePhoneNumber):
     .. _Python phonenumbers library:
        https://github.com/daviddrysdale/python-phonenumbers
 
+
+    ::
+
+        from sqlalchemy_utils import PhoneNumber
+
+
+        class User(self.Base):
+            __tablename__ = 'user'
+            id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
+            name = sa.Column(sa.Unicode(255))
+            _phone_number = sa.Column(sa.Unicode(20))
+            country_code = sa.Column(sa.Unicode(8))
+
+            phonenumber = sa.orm.composite(
+                PhoneNumber,
+                _phone_number,
+                country_code
+            )
+
+
+        user = User(phone_number=PhoneNumber('0401234567', 'FI'))
+
+        user.phone_number.e164  # u'+358401234567'
+        user.phone_number.international  # u'+358 40 1234567'
+        user.phone_number.national  # u'040 1234567'
+        user.country_code  # 'FI'
+
+
     :param raw_number:
         String representation of the phone number.
-    :param country_code:
-        Country code of the phone number.
+    :param region:
+        Region of the phone number.
     '''
-    def __init__(self, raw_number, country_code=None):
+    def __init__(self, raw_number, region=None):
         # Bail if phonenumbers is not found.
         if phonenumbers is None:
             raise ImproperlyConfigured(
                 "'phonenumbers' is required to use 'PhoneNumber'")
 
-        self._phone_number = phonenumbers.parse(raw_number, country_code)
+        self._phone_number = phonenumbers.parse(raw_number, region)
         super(PhoneNumber, self).__init__(
             country_code=self._phone_number.country_code,
             national_number=self._phone_number.national_number,
@@ -48,6 +76,7 @@ class PhoneNumber(BasePhoneNumber):
                 self._phone_number.preferred_domestic_carrier_code
             )
         )
+        self.region = region
         self.national = phonenumbers.format_number(
             self._phone_number,
             phonenumbers.PhoneNumberFormat.NATIONAL
@@ -60,6 +89,9 @@ class PhoneNumber(BasePhoneNumber):
             self._phone_number,
             phonenumbers.PhoneNumberFormat.E164
         )
+
+    def __composite_values__(self):
+        return self.national, self.region
 
     def is_valid_number(self):
         return phonenumbers.is_valid_number(self._phone_number)
@@ -96,20 +128,20 @@ class PhoneNumberType(types.TypeDecorator, ScalarCoercible):
     def python_type(self, text):
         return self._coerce(text)
 
-    def __init__(self, country_code='US', max_length=20, *args, **kwargs):
+    def __init__(self, region='US', max_length=20, *args, **kwargs):
         # Bail if phonenumbers is not found.
         if phonenumbers is None:
             raise ImproperlyConfigured(
                 "'phonenumbers' is required to use 'PhoneNumberType'")
 
         super(PhoneNumberType, self).__init__(*args, **kwargs)
-        self.country_code = country_code
+        self.region = region
         self.impl = types.Unicode(max_length)
 
     def process_bind_param(self, value, dialect):
         if value:
             if not isinstance(value, PhoneNumber):
-                value = PhoneNumber(value, country_code=self.country_code)
+                value = PhoneNumber(value, region=self.region)
 
             if self.STORE_FORMAT == 'e164' and value.extension:
                 return '%s;ext=%s' % (value.e164, value.extension)
@@ -120,11 +152,11 @@ class PhoneNumberType(types.TypeDecorator, ScalarCoercible):
 
     def process_result_value(self, value, dialect):
         if value:
-            return PhoneNumber(value, self.country_code)
+            return PhoneNumber(value, self.region)
         return value
 
     def _coerce(self, value):
         if value and not isinstance(value, PhoneNumber):
-            value = PhoneNumber(value, country_code=self.country_code)
+            value = PhoneNumber(value, region=self.region)
 
         return value or None

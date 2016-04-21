@@ -148,3 +148,40 @@ class TestPhoneNumberType(object):
         user = User(phone_number='050111222')
 
         assert isinstance(user.phone_number, PhoneNumber)
+
+
+@pytest.mark.skipif('types.phone_number.phonenumbers is None')
+class TestPhoneNumberComposite(object):
+    @pytest.fixture
+    def User(self, Base):
+        class User(Base):
+            __tablename__ = 'user'
+            id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
+            name = sa.Column(sa.String(255))
+            _phone_number = sa.Column(sa.String(255))
+            country = sa.Column(sa.String(255))
+            phone_number = sa.orm.composite(
+                PhoneNumber,
+                _phone_number,
+                country
+            )
+        return User
+
+    @pytest.fixture
+    def user(self, session, User):
+        user = User()
+        user.name = u'Someone'
+        user.phone_number = PhoneNumber('+35840111222', 'FI')
+        session.add(user)
+        session.commit()
+        return user
+
+    def test_query_returns_phone_number_object(
+        self,
+        session,
+        User,
+        user
+    ):
+        queried_user = session.query(User).first()
+        assert queried_user.phone_number.national == '040 111222'
+        assert queried_user.phone_number.region == 'FI'

@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.32.3 (2016-04-20)
+^^^^^^^^^^^^^^^^^^^
+
+- Added support for PhoneNumber objects as composites
+
+
 0.32.2 (2016-04-20)
 ^^^^^^^^^^^^^^^^^^^
 

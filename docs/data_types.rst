@@ -108,6 +108,8 @@ PhoneNumberType
 
 .. module:: sqlalchemy_utils.types.phone_number
 
+.. autoclass:: PhoneNumber
+
 .. autoclass:: PhoneNumberType
 
 
