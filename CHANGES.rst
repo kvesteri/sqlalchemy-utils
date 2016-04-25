@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.32.4 (2016-04-20)
+^^^^^^^^^^^^^^^^^^^
+
+- Added LtreeType for PostgreSQL ltree extension
+- Added Ltree primitive data type
+
+
 0.32.3 (2016-04-20)
 ^^^^^^^^^^^^^^^^^^^
 

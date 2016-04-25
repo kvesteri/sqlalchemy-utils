@@ -11,7 +11,6 @@ def set_get_locale():
 
 @pytest.fixture
 def User(Base):
-
     class User(Base):
         __tablename__ = 'user'
         id = sa.Column(sa.Integer, primary_key=True)

@@ -55,7 +55,7 @@ from .listeners import (  # noqa
 )
 from .models import Timestamp  # noqa
 from .observer import observes  # noqa
-from .primitives import Country, Currency, WeekDay, WeekDays  # noqa
+from .primitives import Country, Currency, Ltree, WeekDay, WeekDays  # noqa
 from .proxy_dict import proxy_dict, ProxyDict  # noqa
 from .query_chain import QueryChain  # noqa
 from .types import (  # noqa
@@ -77,6 +77,7 @@ from .types import (  # noqa
     IPAddressType,
     JSONType,
     LocaleType,
+    LtreeType,
     NumericRangeType,
     Password,
     PasswordType,
@@ -93,4 +94,4 @@ from .types import (  # noqa
     WeekDaysType
 )
 
-__version__ = '0.32.3'
+__version__ = '0.32.4'

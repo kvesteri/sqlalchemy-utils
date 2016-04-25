@@ -12,6 +12,7 @@ from .encrypted import EncryptedType  # noqa
 from .ip_address import IPAddressType  # noqa
 from .json import JSONType  # noqa
 from .locale import LocaleType  # noqa
+from .ltree import LtreeType  # noqa
 from .password import Password, PasswordType  # noqa
 from .pg_composite import (  # noqa
     CompositeArray,
