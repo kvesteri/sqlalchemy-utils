@@ -22,13 +22,21 @@ class Ltree(object):
         Ltree('1.2.3').path  # '1.2.3'
 
 
-    Ltree always validates the given code.
+    Ltree always validates the given path.
 
     ::
 
         Ltree(None)  # raises TypeError
 
         Ltree('..')  # raises ValueError
+
+
+    Validator is also available as class method.
+
+    ::
+
+        Ltree.validate('1.2.3')
+        Ltree.validate(None)  # raises ValueError
 
 
     Ltree supports equality operators.
