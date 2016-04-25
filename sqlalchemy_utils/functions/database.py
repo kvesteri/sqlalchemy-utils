@@ -250,7 +250,9 @@ def has_index(column_or_constraint):
         has_index(table.c.id)       # True
 
 
-    This function supports foreign key constraints as well:
+    This function supports foreign key constraints as well
+
+    ::
 
 
         class User(Base):
@@ -344,7 +346,9 @@ def has_unique_index(column_or_constraint):
         has_unique_index(table.c.id)           # True
 
 
-    This function supports foreign key constraints as well:
+    This function supports foreign key constraints as well
+
+    ::
 
 
         class User(Base):
