@@ -81,7 +81,7 @@ class Ltree(object):
         assert Ltree('1.2.3.4.5').lca('1.2', '1.2.3') == '1'
 
 
-    Ltree objects can be concatenated.1
+    Ltree objects can be concatenated.
 
     ::
 

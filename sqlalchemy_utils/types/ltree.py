@@ -19,6 +19,24 @@ class LtreeType(types.Concatenable, types.UserDefinedType, ScalarCoercible):
     in hierarchial tree-like structure. For more detailed information please
     refer to http://www.postgresql.org/docs/current/static/ltree.html
 
+    ::
+
+        from sqlalchemy_utils import LtreeType
+
+
+        class DocumentSection(Base):
+            __tablename__ = 'document_section'
+            id = sa.Column(sa.Integer, autoincrement=True)
+            path = sa.Column(LtreeType)
+
+
+        section = DocumentSection(name='Countries.Finland')
+        session.add(section)
+        session.commit()
+
+        section.path  # Ltree('Countries.Finland')
+
+
     .. note::
         Using :class:`LtreeType`, :class:`LQUERY` and :class:`LTXTQUERY` types
         may require installation of Postgresql ltree extension on the server
