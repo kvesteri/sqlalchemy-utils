@@ -87,6 +87,19 @@ LocaleType
 .. autoclass:: LocaleType
 
 
+LtreeType
+---------
+
+
+.. module:: sqlalchemy_utils.types.ltree
+
+.. autoclass:: LtreeType
+
+.. module:: sqlalchemy_utils.primitives.ltree
+
+.. autoclass:: Ltree
+
+
 IPAddressType
 -------------
 
