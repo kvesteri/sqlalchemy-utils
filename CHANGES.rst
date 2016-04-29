@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.32.5 (2016-04-29)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed import issue with latest version of SQLAlchemy (#215)
+
+
 0.32.4 (2016-04-25)
 ^^^^^^^^^^^^^^^^^^^
 
