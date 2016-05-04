@@ -65,7 +65,14 @@ def force_auto_coercion(mapper=None):
         document.background_color  # Color object
         session.commit()
 
-
+    A useful side-effect of this is that additional validation of data will be
+    done, as it sets an SQLAlchemy event listener.  Without this set, an
+    invalid :class:`sqlalchemy_utils.types.IPAddressType` (eg.
+    ``10.0.0 255.255``) would get through without an exception being raised.
+    The database wouldn't notice this (as most databases don't have a native
+    type for an IP address, so they're usually just stored as a string), and
+    the ``ipaddress/ipaddr`` package uses a string field as well.
+    
     :param mapper: The mapper which the automatic data type coercion should be
                    applied to
     """
