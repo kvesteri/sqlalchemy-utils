@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.32.6 (2016-05-11)
+^^^^^^^^^^^^^^^^^^^
+
+- Added support for timezones with ArrowType (#218, pull request courtesy of jmagnusson)
+
+
 0.32.5 (2016-04-29)
 ^^^^^^^^^^^^^^^^^^^
 
