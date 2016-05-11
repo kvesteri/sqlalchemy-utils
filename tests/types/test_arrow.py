@@ -2,6 +2,7 @@ from datetime import datetime
 
 import pytest
 import sqlalchemy as sa
+from dateutil import tz
 
 from sqlalchemy_utils.types import arrow
 
@@ -12,6 +13,8 @@ def Article(Base):
         __tablename__ = 'article'
         id = sa.Column(sa.Integer, primary_key=True)
         created_at = sa.Column(arrow.ArrowType)
+        published_at = sa.Column(arrow.ArrowType(timezone=True))
+        published_at_dt = sa.Column(sa.DateTime(timezone=True))
     return Article
 
 
@@ -61,3 +64,17 @@ class TestArrowDateTimeType(object):
         clause = Article.created_at > '2015-01-01'
         compiled = str(clause.compile(compile_kwargs={"literal_binds": True}))
         assert compiled == 'article.created_at > 2015-01-01'
+
+    @pytest.mark.usefixtures('postgresql_dsn')
+    def test_timezone(self, session, Article):
+        timezone = tz.gettz('Europe/Stockholm')
+        dt = arrow.arrow.get(datetime(2015, 1, 1, 15, 30, 45), timezone)
+        article = Article(published_at=dt, published_at_dt=dt.datetime)
+
+        session.add(article)
+        session.commit()
+        session.expunge_all()
+
+        item = session.query(Article).one()
+        assert item.published_at.datetime == item.published_at_dt
+        assert item.published_at.to(timezone) == dt
