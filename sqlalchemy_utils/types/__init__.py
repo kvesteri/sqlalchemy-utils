@@ -20,7 +20,11 @@ from .pg_composite import (  # noqa
     register_composites,
     remove_composite_listeners
 )
-from .phone_number import PhoneNumber, PhoneNumberType  # noqa
+from .phone_number import (  # noqa
+    PhoneNumber,
+    PhoneNumberParseException,
+    PhoneNumberType
+)
 from .range import (  # noqa
     DateRangeType,
     DateTimeRangeType,

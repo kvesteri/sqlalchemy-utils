@@ -82,6 +82,7 @@ from .types import (  # noqa
     Password,
     PasswordType,
     PhoneNumber,
+    PhoneNumberParseException,
     PhoneNumberType,
     register_composites,
     remove_composite_listeners,
