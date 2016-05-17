@@ -1,4 +1,5 @@
-from sqlalchemy import types
+import six
+from sqlalchemy import exc, types
 
 from ..exceptions import ImproperlyConfigured
 from ..utils import str_coercible
@@ -7,9 +8,22 @@ from .scalar_coercible import ScalarCoercible
 try:
     import phonenumbers
     from phonenumbers.phonenumber import PhoneNumber as BasePhoneNumber
+    from phonenumbers.phonenumberutil import NumberParseException
 except ImportError:
     phonenumbers = None
     BasePhoneNumber = object
+    NumberParseException = Exception
+
+
+class PhoneNumberParseException(NumberParseException, exc.DontWrapMixin):
+    '''
+    Wraps exceptions from phonenumbers with SQLAlchemy's DontWrapMixin
+    so we get more meaningful exceptions on validation failure instead of the
+    StatementException
+
+    Clients can catch this as either a PhoneNumberParseException or
+    NumberParseException from the phonenumbers library.
+    '''
 
 
 @str_coercible
@@ -64,7 +78,17 @@ class PhoneNumber(BasePhoneNumber):
             raise ImproperlyConfigured(
                 "'phonenumbers' is required to use 'PhoneNumber'")
 
-        self._phone_number = phonenumbers.parse(raw_number, region)
+        try:
+            self._phone_number = phonenumbers.parse(raw_number, region)
+        except NumberParseException as e:
+            # Wrap exception so SQLAlchemy doesn't swallow it as a
+            # StatementError
+            # XXX: Worth noting that if -1 shows up as the error_type
+            # it's likely because the API has changed upstream and these
+            # bindings need to be updated.
+            raise PhoneNumberParseException(getattr(e, 'error_type', -1),
+                                            six.text_type(e))
+
         super(PhoneNumber, self).__init__(
             country_code=self._phone_number.country_code,
             national_number=self._phone_number.national_number,

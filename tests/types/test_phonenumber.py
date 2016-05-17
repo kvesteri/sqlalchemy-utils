@@ -2,7 +2,17 @@ import pytest
 import six
 import sqlalchemy as sa
 
-from sqlalchemy_utils import PhoneNumber, PhoneNumberType, types  # noqa
+from sqlalchemy_utils import (  # noqa
+    PhoneNumber,
+    PhoneNumberParseException,
+    PhoneNumberType,
+    types
+)
+
+try:
+    from phonenumbers.phonenumberutil import NumberParseException
+except ImportError:
+    NumberParseException = PhoneNumberParseException
 
 
 @pytest.fixture
@@ -76,6 +86,26 @@ class TestPhoneNumber(object):
                 assert not number.is_valid_number()
             except:
                 pass
+
+    def test_invalid_phone_numbers_throw_dont_wrap_exception(
+            self, invalid_phone_numbers):
+        bad_number = invalid_phone_numbers[0]
+        try:
+            PhoneNumber(bad_number, 'FI')
+        except Exception as e:
+            assert sa.exc.DontWrapMixin in e.__class__.mro()
+        except:
+            assert False
+
+    def test_invalid_phone_numbers_caught_with_number_parse_exception(
+            self, invalid_phone_numbers):
+        bad_number = invalid_phone_numbers[0]
+        try:
+            PhoneNumber(bad_number, 'FI')
+        except NumberParseException:
+            pass
+        except:
+            assert False
 
     def test_phone_number_attributes(self):
         number = PhoneNumber('+358401234567')
