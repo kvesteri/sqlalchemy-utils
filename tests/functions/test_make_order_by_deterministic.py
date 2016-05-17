@@ -46,7 +46,8 @@ class TestMakeOrderByDeterministic(object):
     def test_column_property(self, session, User):
         query = session.query(User).order_by(User.email_lower)
         query = make_order_by_deterministic(query)
-        assert_contains('lower("user".name), "user".id ASC', query)
+        assert_contains('lower("user".name) AS lower_1', query)
+        assert_contains('lower_1, "user".id ASC', query)
 
     def test_unique_column(self, session, User):
         query = session.query(User).order_by(User.email)
