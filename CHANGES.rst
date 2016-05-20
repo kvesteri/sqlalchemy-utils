@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.32.7 (2016-05-20)
+^^^^^^^^^^^^^^^^^^^
+
+- Made PhoneNumber exceptions inherit SQLAlchemy's DontWrapMixin (#219, pull request courtesy of JackWink)
+
+
 0.32.6 (2016-05-11)
 ^^^^^^^^^^^^^^^^^^^
 
