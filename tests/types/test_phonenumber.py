@@ -90,8 +90,8 @@ class TestPhoneNumber(object):
         try:
             session.execute(
                 User.__table__.insert().values(
-                    name='Someone',
-                    phone_number='abc'
+                    name=u'Someone',
+                    phone_number=u'abc'
                 )
             )
         except PhoneNumberParseException:
