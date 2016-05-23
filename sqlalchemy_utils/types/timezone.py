@@ -70,6 +70,9 @@ class TimezoneType(types.TypeDecorator, ScalarCoercible):
                 "'TimezoneType'"
             )
 
+    def __repr__(self):
+        return 'TimezoneType(backend=\'{backend}\')'.format(backend=self.backend)
+
     def _coerce(self, value):
         if value and not isinstance(value, self.python_type):
             obj = self._to(value)
