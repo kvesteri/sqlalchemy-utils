@@ -10,7 +10,7 @@ Various utility functions, new data types and helpers for SQLAlchemy.
 Resources
 ---------
 
-- `Documentation <http://sqlalchemy-utils.readthedocs.org/>`_
+- `Documentation <https://sqlalchemy-utils.readthedocs.io/>`_
 - `Issue Tracker <http://github.com/kvesteri/sqlalchemy-utils/issues>`_
 - `Code <http://github.com/kvesteri/sqlalchemy-utils/>`_
 
