@@ -79,12 +79,13 @@ class Password(Mutable, object):
 class PasswordType(types.TypeDecorator, ScalarCoercible):
     """
     PasswordType hashes passwords as they come into the database and allows
-    verifying them using a pythonic interface.
+    verifying them using a Pythonic interface. This Pythonic interface
+    relies on setting up automatic data type coercison using the
+    :func:`~sqlalchemy_utils.listeners.force_auto_coercion` function.
 
     All keyword arguments (aside from max_length) are forwarded to the
     construction of a `passlib.context.LazyCryptContext` object, which
     also supports deferred configuration via the `onload` callback.
-
 
     The following usage will create a password column that will
     automatically hash new passwords as `pbkdf2_sha512` but still compare
@@ -124,6 +125,9 @@ class PasswordType(types.TypeDecorator, ScalarCoercible):
 
 
         import flask
+        from sqlalchemy_utils import PasswordType, force_auto_coercion
+
+        force_auto_coercion()
 
         class User(db.Model):
             __tablename__ = 'user'
