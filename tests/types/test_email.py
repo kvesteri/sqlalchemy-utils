@@ -10,6 +10,7 @@ def User(Base):
         __tablename__ = 'user'
         id = sa.Column(sa.Integer, primary_key=True)
         email = sa.Column(EmailType)
+        short_email = sa.Column(EmailType(length=70))
 
         def __repr__(self):
             return 'User(%r)' % self.id
@@ -30,3 +31,6 @@ class TestEmailType(object):
         clause = User.email == 'Someone@example.com'
         compiled = str(clause.compile(compile_kwargs={'literal_binds': True}))
         assert compiled == '"user".email = lower(\'Someone@example.com\')'
+
+    def test_custom_length(self, session, User):
+        assert User.short_email.type.impl.length == 70
