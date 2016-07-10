@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.32.8 (2016-05-20)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed EmailType to respect constructor args (#230, pull request courtesy of quantus)
+
+
 0.32.7 (2016-05-20)
 ^^^^^^^^^^^^^^^^^^^
 
