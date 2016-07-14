@@ -158,7 +158,7 @@ from .functions import getdotattr, has_changes
 from .path import AttrPath
 from .utils import is_sequence
 
-Callback = namedtuple('Callback', ['func', 'path', 'backref', 'fullpath'])
+Callback = namedtuple('Callback', ['func', 'backref', 'fullpath'])
 
 
 class PropertyObserver(object):
@@ -215,7 +215,6 @@ class PropertyObserver(object):
                 self.callback_map[class_].append(
                     Callback(
                         func=callback,
-                        path=path,
                         backref=None,
                         fullpath=path
                     )
@@ -229,7 +228,6 @@ class PropertyObserver(object):
                         self.callback_map[prop_class].append(
                             Callback(
                                 func=callback,
-                                path=path[i:],
                                 backref=~ (path[:i]),
                                 fullpath=path
                             )
