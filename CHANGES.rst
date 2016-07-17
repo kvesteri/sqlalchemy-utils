@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.32.9 (2016-07-17)
+^^^^^^^^^^^^^^^^^^^
+
+- Added support for multi-column observers (#231, pull request courtesy of quantus)
+
+
 0.32.8 (2016-05-20)
 ^^^^^^^^^^^^^^^^^^^
 
