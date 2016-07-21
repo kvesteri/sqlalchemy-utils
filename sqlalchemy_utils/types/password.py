@@ -169,6 +169,10 @@ class PasswordType(types.TypeDecorator, ScalarCoercible):
 
         return self._max_length
 
+    def __repr__(self):
+        # Ensure representation uses max_length, not length
+        return "PasswordType(max_length=%r)" % self.length
+
     def calculate_max_length(self):
         # Calculate the largest possible encoded password.
         # name + rounds + salt + hash + ($ * 4) of largest hash
