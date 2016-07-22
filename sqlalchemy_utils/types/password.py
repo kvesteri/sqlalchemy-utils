@@ -80,7 +80,7 @@ class PasswordType(types.TypeDecorator, ScalarCoercible):
     """
     PasswordType hashes passwords as they come into the database and allows
     verifying them using a Pythonic interface. This Pythonic interface
-    relies on setting up automatic data type coercison using the
+    relies on setting up automatic data type coercion using the
     :func:`~sqlalchemy_utils.listeners.force_auto_coercion` function.
 
     All keyword arguments (aside from max_length) are forwarded to the
