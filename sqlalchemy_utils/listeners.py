@@ -227,6 +227,8 @@ def auto_delete_orphans(attr):
             'The relationship argument given for auto_delete_orphans needs to '
             'have a backref relationship set.'
         )
+    if isinstance(backref, tuple):
+        backref = backref[0]
 
     @sa.event.listens_for(sa.orm.Session, 'after_flush')
     def delete_orphan_listener(session, ctx):
@@ -249,7 +251,7 @@ def auto_delete_orphans(attr):
             (
                 session.query(target_class)
                 .filter(
-                    ~getattr(target_class, attr.property.backref).any()
+                    ~getattr(target_class, backref).any()
                 )
                 .delete(synchronize_session=False)
             )
