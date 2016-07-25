@@ -1,5 +1,6 @@
 import pytest
 import sqlalchemy as sa
+from sqlalchemy.orm import backref
 
 from sqlalchemy_utils import auto_delete_orphans, ImproperlyConfigured
 
@@ -66,6 +67,22 @@ def EntryWithoutTagsBackref(Base, Tag, tagging_tbl):
     return EntryWithoutTagsBackref
 
 
+@pytest.fixture
+def EntryWithBackrefKeywords(Base, Tag, tagging_tbl):
+    class Entry(Base):
+        __tablename__ = 'entry'
+
+        id = sa.Column(sa.Integer, primary_key=True)
+
+        tags = sa.orm.relationship(
+            'Tag',
+            secondary=tagging_tbl,
+            backref=backref('entries', lazy='select')
+        )
+    auto_delete_orphans(Entry.tags)
+    return Entry
+
+
 class TestAutoDeleteOrphans(object):
 
     @pytest.fixture
@@ -106,3 +123,34 @@ class TestAutoDeleteOrphansWithoutBackref(object):
     def test_orphan_deletion(self, EntryWithoutTagsBackref):
         with pytest.raises(ImproperlyConfigured):
             auto_delete_orphans(EntryWithoutTagsBackref.tags)
+
+
+class TestAutoDeleteOrphansBackrefWithKeywords(object):
+
+    @pytest.fixture
+    def init_models(self, EntryWithBackrefKeywords, Tag):
+        pass
+
+    def test_orphan_deletion(self, session, EntryWithBackrefKeywords, Tag):
+        r1 = EntryWithBackrefKeywords()
+        r2 = EntryWithBackrefKeywords()
+        r3 = EntryWithBackrefKeywords()
+        t1, t2, t3, t4 = (
+            Tag('t1'),
+            Tag('t2'),
+            Tag('t3'),
+            Tag('t4')
+        )
+
+        r1.tags.extend([t1, t2])
+        r2.tags.extend([t2, t3])
+        r3.tags.extend([t4])
+        session.add_all([r1, r2, r3])
+
+        assert session.query(Tag).count() == 4
+        r2.tags.remove(t2)
+        assert session.query(Tag).count() == 4
+        r1.tags.remove(t2)
+        assert session.query(Tag).count() == 3
+        r1.tags.remove(t1)
+        assert session.query(Tag).count() == 2
