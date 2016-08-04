@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import sqlalchemy as sa
+from sqlalchemy.dialects import mysql
 
 
 class Timestamp(object):
@@ -22,8 +23,14 @@ class Timestamp(object):
             id = sa.Column(sa.Integer, primary_key=True)
     """
 
-    created = sa.Column(sa.DateTime, default=datetime.utcnow, nullable=False)
-    updated = sa.Column(sa.DateTime, default=datetime.utcnow, nullable=False)
+    created = sa.Column(
+        sa.DateTime().with_variant(mysql.DATETIME(fsp=6), "mysql"),
+        default=datetime.utcnow,
+        nullable=False)
+    updated = sa.Column(
+        sa.DateTime().with_variant(mysql.DATETIME(fsp=6), "mysql"),
+        default=datetime.utcnow,
+        nullable=False)
 
 
 @sa.event.listens_for(Timestamp, 'before_update', propagate=True)
