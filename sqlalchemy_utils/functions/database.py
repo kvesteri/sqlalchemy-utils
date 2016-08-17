@@ -453,23 +453,23 @@ def database_exists(url):
 
     url = copy(make_url(url))
     database = url.database
-    if url.drivername.startswith('postgresql'):
+    if url.drivername.startswith('postgres'):
         url.database = 'template1'
     else:
         url.database = None
 
     engine = sa.create_engine(url)
 
-    if engine.dialect.name == 'postgresql':
+    if engine.dialect.name.startswith('postgres'):
         text = "SELECT 1 FROM pg_database WHERE datname='%s'" % database
         return bool(engine.execute(text).scalar())
 
-    elif engine.dialect.name == 'mysql':
+    elif engine.dialect.name.startswith('mysql'):
         text = ("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA "
                 "WHERE SCHEMA_NAME = '%s'" % database)
         return bool(engine.execute(text).scalar())
 
-    elif engine.dialect.name == 'sqlite':
+    elif engine.dialect.name.startswith('sqlite'):
         if database:
             return database == ':memory:' or os.path.exists(database)
         else:
@@ -515,14 +515,14 @@ def create_database(url, encoding='utf8', template=None):
 
     database = url.database
 
-    if url.drivername.startswith('postgresql'):
+    if url.drivername.startswith('postgres'):
         url.database = 'template1'
     elif not url.drivername.startswith('sqlite'):
         url.database = None
 
     engine = sa.create_engine(url)
 
-    if engine.dialect.name == 'postgresql':
+    if engine.dialect.name.startswith('postgres'):
         if engine.driver == 'psycopg2':
             from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
             engine.raw_connection().set_isolation_level(
@@ -539,14 +539,14 @@ def create_database(url, encoding='utf8', template=None):
         )
         engine.execute(text)
 
-    elif engine.dialect.name == 'mysql':
+    elif engine.dialect.name.startswith('mysql'):
         text = "CREATE DATABASE {0} CHARACTER SET = '{1}'".format(
             quote(engine, database),
             encoding
         )
         engine.execute(text)
 
-    elif engine.dialect.name == 'sqlite' and database != ':memory:':
+    elif engine.dialect.name.startswith('sqlite') and database != ':memory:':
         if database:
             open(database, 'w').close()
 
@@ -579,11 +579,11 @@ def drop_database(url):
 
     engine = sa.create_engine(url)
 
-    if engine.dialect.name == 'sqlite' and database != ':memory:':
+    if engine.dialect.name.startswith('sqlite') and database != ':memory:':
         if database:
             os.remove(database)
 
-    elif engine.dialect.name == 'postgresql' and engine.driver == 'psycopg2':
+    elif engine.dialect.name.startswith('postgresql') and engine.driver == 'psycopg2':
         from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
         engine.raw_connection().set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
 
@@ -612,3 +612,4 @@ def drop_database(url):
     else:
         text = 'DROP DATABASE {0}'.format(quote(engine, database))
         engine.execute(text)
+
