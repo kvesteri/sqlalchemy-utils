@@ -52,9 +52,10 @@ class TimezoneType(types.TypeDecorator, ScalarCoercible):
 
         elif backend == 'pytz':
             try:
-                from pytz import tzfile, timezone
+                from pytz import timezone
+                from pytz.tzinfo import BaseTzInfo
 
-                self.python_type = tzfile.DstTzInfo
+                self.python_type = BaseTzInfo
                 self._to = timezone
                 self._from = six.text_type
 
@@ -71,13 +72,11 @@ class TimezoneType(types.TypeDecorator, ScalarCoercible):
             )
 
     def _coerce(self, value):
-        if value and not isinstance(value, self.python_type):
+        if value is not None and not isinstance(value, self.python_type):
             obj = self._to(value)
             if obj is None:
                 raise ValueError("unknown time zone '%s'" % value)
-
             return obj
-
         return value
 
     def process_bind_param(self, value, dialect):
