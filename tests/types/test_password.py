@@ -235,7 +235,7 @@ class TestPasswordType(object):
         PasswordType(onload=onload)
         assert not onload.called
 
-    def test_hash_compare(self):
+    def test_hash_compare(self, session, User):
         """
         Make sure passwords that are equal have the same hash.
         """
