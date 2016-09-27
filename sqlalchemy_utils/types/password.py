@@ -75,6 +75,9 @@ class Password(Mutable, object):
     def __ne__(self, value):
         return not (self == value)
 
+    def __hash__(self):
+        return hash(self.hash)
+
 
 class PasswordType(types.TypeDecorator, ScalarCoercible):
     """
