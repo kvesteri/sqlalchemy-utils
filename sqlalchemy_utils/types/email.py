@@ -4,6 +4,33 @@ from ..operators import CaseInsensitiveComparator
 
 
 class EmailType(sa.types.TypeDecorator):
+    """
+    Provides a way for storing emails in a lower case.
+
+    Example::
+
+
+        from sqlalchemy_utils import EmailType
+
+
+        class User(Base):
+            __tablename__ = 'user'
+            id = sa.Column(sa.Integer, primary_key=True)
+            name = sa.Column(sa.Unicode(255))
+            email = sa.Column(EmailType)
+
+
+        user = User()
+        user.email = 'John.Smith@foo.com'
+        user.name = 'John Smith'
+        session.add(user)
+        session.commit()
+        # Notice - email in filter() is lowercase.
+        user = (session.query(User)
+                       .filter(User.email == 'john.smith@foo.com')
+                       .one())
+        assert user.name == 'John Smith'
+    """
     impl = sa.Unicode
     comparator_factory = CaseInsensitiveComparator
 
