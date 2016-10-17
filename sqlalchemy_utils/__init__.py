@@ -53,7 +53,7 @@ from .listeners import (  # noqa
     force_auto_coercion,
     force_instant_defaults
 )
-from .models import Timestamp  # noqa
+from .models import generic_repr, Timestamp  # noqa
 from .observer import observes  # noqa
 from .primitives import Country, Currency, Ltree, WeekDay, WeekDays  # noqa
 from .proxy_dict import proxy_dict, ProxyDict  # noqa
