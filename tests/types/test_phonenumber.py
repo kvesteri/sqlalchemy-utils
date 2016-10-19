@@ -171,6 +171,10 @@ class TestPhoneNumberType(object):
 
         assert isinstance(user.phone_number, PhoneNumber)
 
+    def test_can_get_python_type(self):
+        pn_type = PhoneNumberType()
+        assert pn_type.python_type is PhoneNumber
+
 
 @pytest.mark.skipif('types.phone_number.phonenumbers is None')
 class TestPhoneNumberComposite(object):
