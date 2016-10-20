@@ -1,5 +1,6 @@
 import pytest
 import sqlalchemy as sa
+from sqlalchemy.orm import backref
 
 from sqlalchemy_utils import auto_delete_orphans, ImproperlyConfigured
 
@@ -36,17 +37,18 @@ def Tag(Base):
     return Tag
 
 
-@pytest.fixture
-def Entry(Base, Tag, tagging_tbl):
+@pytest.fixture(params=['entries', backref('entries', lazy='select')],
+                ids=['backref_string', 'backref_with_keywords'])
+def Entry(Base, Tag, tagging_tbl, request):
     class Entry(Base):
         __tablename__ = 'entry'
 
         id = sa.Column(sa.Integer, primary_key=True)
 
         tags = sa.orm.relationship(
-            'Tag',
+            Tag,
             secondary=tagging_tbl,
-            backref='entries'
+            backref=request.param
         )
     auto_delete_orphans(Entry.tags)
     return Entry
@@ -60,7 +62,7 @@ def EntryWithoutTagsBackref(Base, Tag, tagging_tbl):
         id = sa.Column(sa.Integer, primary_key=True)
 
         tags = sa.orm.relationship(
-            'Tag',
+            Tag,
             secondary=tagging_tbl
         )
     return EntryWithoutTagsBackref
