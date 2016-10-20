@@ -37,8 +37,10 @@ def Tag(Base):
     return Tag
 
 
-@pytest.fixture(params=['entries', backref('entries', lazy='select')],
-                ids=['backref_string', 'backref_with_keywords'])
+@pytest.fixture(
+    params=['entries', backref('entries', lazy='select')],
+    ids=['backref_string', 'backref_with_keywords']
+)
 def Entry(Base, Tag, tagging_tbl, request):
     class Entry(Base):
         __tablename__ = 'entry'
