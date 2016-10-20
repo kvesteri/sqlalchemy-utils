@@ -13,7 +13,6 @@ def ArticleTranslation(Base):
         id = sa.Column(
             sa.Integer,
             sa.ForeignKey('article.id'),
-            autoincrement=True,
             primary_key=True
         )
         locale = sa.Column(sa.String(10), primary_key=True)
