@@ -96,7 +96,7 @@ class TestTranslationHybrid(object):
 
         assert (
             'coalesce(article.name_translations -> article.locale'
-            in str(Article.name)
+            in str(Article.name.expression)
         )
 
     def test_locales_casted_only_in_compilation_phase(self, Base):
