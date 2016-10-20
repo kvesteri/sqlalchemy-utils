@@ -150,6 +150,9 @@ class TestPhoneNumberType(object):
         session.refresh(user)
         assert user.phone_number is None
 
+    def test_uses_phonenumber_class_as_python_type(self):
+        assert PhoneNumberType().python_type is PhoneNumber
+
     @pytest.mark.usefixtures('user')
     def test_phone_number_is_none(self, session, User):
         phone_number = None

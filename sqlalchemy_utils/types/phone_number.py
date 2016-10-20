@@ -153,9 +153,7 @@ class PhoneNumberType(types.TypeDecorator, ScalarCoercible):
     """
     STORE_FORMAT = 'e164'
     impl = types.Unicode(20)
-
-    def python_type(self, text):
-        return self._coerce(text)
+    python_type = PhoneNumber
 
     def __init__(self, region='US', max_length=20, *args, **kwargs):
         # Bail if phonenumbers is not found.
