@@ -63,6 +63,14 @@ CurrencyType
 .. autoclass:: Currency
 
 
+EmailType
+---------
+
+.. automodule:: sqlalchemy_utils.types.email
+
+.. autoclass:: EmailType
+
+
 EncryptedType
 -------------
 

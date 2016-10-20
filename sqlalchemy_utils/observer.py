@@ -152,7 +152,7 @@ Category has many Products.
 Observing multiple columns
 -----------------------
 
-You can also observe multiple columns by spesifying all the observable columns
+You can also observe multiple columns by specifying all the observable columns
 in the decorator.
 
 
