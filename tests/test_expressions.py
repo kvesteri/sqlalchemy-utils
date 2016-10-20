@@ -118,8 +118,9 @@ class TestAsterisk(object):
 
 class TestRowToJson(object):
     def test_compiler_with_default_dialect(self):
-        with pytest.raises(sa.exc.CompileError):
-            str(row_to_json(sa.text('article.*')))
+        assert str(row_to_json(sa.text('article.*'))) == (
+            'row_to_json(article.*)'
+        )
 
     def test_compiler_with_postgresql(self):
         assert str(row_to_json(sa.text('article.*')).compile(
@@ -135,13 +136,14 @@ class TestRowToJson(object):
 
 class TestArrayAgg(object):
     def test_compiler_with_default_dialect(self):
-        with pytest.raises(sa.exc.CompileError):
-            str(sa.func.array_agg(sa.text('u.name')))
+        assert str(sa.func.array_agg(sa.text('u.name'))) == (
+            'array_agg(u.name)'
+        )
 
     def test_compiler_with_postgresql(self):
         assert str(sa.func.array_agg(sa.text('u.name')).compile(
             dialect=postgresql.dialect()
-        )) == "array_agg(u.name)"
+        )) == 'array_agg(u.name)'
 
     def test_type(self):
         assert isinstance(
