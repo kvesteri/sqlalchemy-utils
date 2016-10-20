@@ -230,7 +230,7 @@ class TestSortQueryRelationshipCounts(object):
         )
         query = sort_query(query, 'aliased-full_name')
         assert_contains(
-            'concat(aliased.title, :param_1, aliased.name)', query
+            'concat(aliased.title, %(concat_1)s, aliased.name)', query
         )
 
 
