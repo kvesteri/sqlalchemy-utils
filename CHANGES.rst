@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.32.10 (2016-10-20)
+^^^^^^^^^^^^^^^^^^^^
+
+- Added PhoneNumber as the python_type for PhoneNumberType (#248)
+- Made auto_delete_orphans support backref tuples (#234, pull request courtesy of vToMy)
+
+
 0.32.9 (2016-07-17)
 ^^^^^^^^^^^^^^^^^^^
 
