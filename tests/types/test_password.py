@@ -1,6 +1,10 @@
 import mock
 import pytest
 import sqlalchemy as sa
+import sqlalchemy.dialects.mysql
+import sqlalchemy.dialects.oracle
+import sqlalchemy.dialects.postgresql
+import sqlalchemy.dialects.sqlite
 from sqlalchemy import inspect
 
 from sqlalchemy_utils import Password, PasswordType, types  # noqa
@@ -51,6 +55,23 @@ def onload_callback(schemes, deprecated):
 
 @pytest.mark.skipif('types.password.passlib is None')
 class TestPasswordType(object):
+
+    @pytest.mark.parametrize('dialect_module,impl', [
+        (sqlalchemy.dialects.sqlite, sa.dialects.sqlite.BLOB),
+        (sqlalchemy.dialects.postgresql, sa.dialects.postgresql.BYTEA),
+        (sqlalchemy.dialects.oracle, sa.dialects.oracle.RAW),
+        (sqlalchemy.dialects.mysql, sa.VARBINARY),
+    ])
+    def test_load_dialect_impl(self, dialect_module, impl):
+        """
+        Should produce the same impl type as Alembic would expect after
+        inspecing a database
+        """
+        password_type = PasswordType()
+        assert isinstance(
+            password_type.load_dialect_impl(dialect_module.dialect()),
+            impl
+        )
 
     def test_encrypt(self, User):
         """Should encrypt the password on setting the attribute."""
