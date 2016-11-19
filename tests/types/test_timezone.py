@@ -1,7 +1,9 @@
 import pytest
+import pytz
 import sqlalchemy as sa
+from dateutil.zoneinfo import getzoneinfofile_stream, tzfile, ZoneInfoFile
 
-from sqlalchemy_utils.types import timezone
+from sqlalchemy_utils.types import timezone, TimezoneType
 
 
 @pytest.fixture
@@ -46,3 +48,48 @@ class TestTimezoneType(object):
 
         assert visitor_dateutil is not None
         assert visitor_pytz is not None
+
+
+TIMEZONE_BACKENDS = ['dateutil', 'pytz']
+
+
+def test_can_coerce_pytz_DstTzInfo():
+    tzcol = TimezoneType(backend='pytz')
+    tz = pytz.timezone('America/New_York')
+    assert isinstance(tz, pytz.tzfile.DstTzInfo)
+    assert tzcol._coerce(tz) is tz
+
+
+def test_can_coerce_pytz_StaticTzInfo():
+    tzcol = TimezoneType(backend='pytz')
+    tz = pytz.timezone('Pacific/Truk')
+    assert isinstance(tz, pytz.tzfile.StaticTzInfo)
+    assert tzcol._coerce(tz) is tz
+
+
+@pytest.mark.parametrize('zone', pytz.all_timezones)
+def test_can_coerce_string_for_pytz_zone(zone):
+    tzcol = TimezoneType(backend='pytz')
+    assert tzcol._coerce(zone).zone == zone
+
+
+@pytest.mark.parametrize(
+    'zone', ZoneInfoFile(getzoneinfofile_stream()).zones.keys())
+def test_can_coerce_string_for_dateutil_zone(zone):
+    tzcol = TimezoneType(backend='dateutil')
+    assert isinstance(tzcol._coerce(zone), tzfile)
+
+
+@pytest.mark.parametrize('backend', TIMEZONE_BACKENDS)
+def test_can_coerce_and_raise_UnknownTimeZoneError_or_ValueError(backend):
+    tzcol = TimezoneType(backend=backend)
+    with pytest.raises((ValueError, pytz.exceptions.UnknownTimeZoneError)):
+        tzcol._coerce('SolarSystem/Mars')
+    with pytest.raises((ValueError, pytz.exceptions.UnknownTimeZoneError)):
+        tzcol._coerce('')
+
+
+@pytest.mark.parametrize('backend', TIMEZONE_BACKENDS)
+def test_can_coerce_None(backend):
+    tzcol = TimezoneType(backend=backend)
+    assert tzcol._coerce(None) is None
