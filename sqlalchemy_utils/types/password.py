@@ -2,7 +2,7 @@ import weakref
 
 import six
 from sqlalchemy import types
-from sqlalchemy.dialects import oracle, postgresql
+from sqlalchemy.dialects import oracle, postgresql, sqlite
 from sqlalchemy.ext.mutable import Mutable
 
 from ..exceptions import ImproperlyConfigured
@@ -192,14 +192,15 @@ class PasswordType(types.TypeDecorator, ScalarCoercible):
         if dialect.name == 'postgresql':
             # Use a BYTEA type for postgresql.
             impl = postgresql.BYTEA(self.length)
-            return dialect.type_descriptor(impl)
-        if dialect.name == 'oracle':
+        elif dialect.name == 'oracle':
             # Use a RAW type for oracle.
             impl = oracle.RAW(self.length)
-            return dialect.type_descriptor(impl)
-
-        # Use a VARBINARY for all other dialects.
-        impl = types.VARBINARY(self.length)
+        elif dialect.name == 'sqlite':
+            # Use a BLOB type for sqlite
+            impl = sqlite.BLOB(self.length)
+        else:
+            # Use a VARBINARY for all other dialects.
+            impl = types.VARBINARY(self.length)
         return dialect.type_descriptor(impl)
 
     def process_bind_param(self, value, dialect):
