@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.32.11 (2016-11-19)
+^^^^^^^^^^^^^^^^^^^^
+
+- TimeZoneType support for static timezones (#244, pull request courtesy of fuhrysteve)
+- Added SQLite support for PasswordType (#254, pull request courtesy of frol)
+
+
 0.32.10 (2016-10-20)
 ^^^^^^^^^^^^^^^^^^^^
 
