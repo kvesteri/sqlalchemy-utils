@@ -250,6 +250,9 @@ class CompositeType(UserDefinedType, SchemaType):
         ):
             bind.execute(DropCompositeType(self))
 
+    def __call__(self, *args, **kwargs):
+        return self.type_cls(*args, **kwargs)
+
 
 def register_psycopg2_composite(dbapi_connection, composite):
     psycopg2.extras.register_composite(
