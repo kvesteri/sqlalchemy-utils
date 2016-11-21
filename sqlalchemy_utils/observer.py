@@ -317,6 +317,7 @@ class PropertyObserver(object):
             for callback, objs in callback_objs.items():
                 callback(root_obj, *[objs[i] for i in range(len(objs))])
 
+
 observer = PropertyObserver()
 
 
