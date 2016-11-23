@@ -32,7 +32,7 @@ Usage
     from collections import OrderedDict
 
     import sqlalchemy as sa
-    from sqlalchemy_utils import Composite, CurrencyType
+    from sqlalchemy_utils import CompositeType, CurrencyType
 
 
     class Account(Base):
