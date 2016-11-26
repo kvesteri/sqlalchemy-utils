@@ -48,3 +48,12 @@ class TestEmailType(object):
 
     def test_custom_length(self, session, User):
         assert User.short_email.type.impl.length == 70
+
+    def test_raises_on_invalid_email(self, session, User):
+        """Raises ValueError if the provided value is not a valid email."""
+        invalid_email = u'invalid_email'
+        user = User(email=invalid_email)
+
+        session.add(user)
+        with pytest.raises(sa.exc.StatementError):
+            session.commit()

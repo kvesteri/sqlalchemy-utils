@@ -1,3 +1,4 @@
+import re
 import sqlalchemy as sa
 
 from ..operators import CaseInsensitiveComparator
@@ -34,14 +35,18 @@ class EmailType(sa.types.TypeDecorator):
     """
     impl = sa.Unicode
     comparator_factory = CaseInsensitiveComparator
+    EMAIL_REGEX = re.compile(r'^.*@.*$')
 
     def __init__(self, length=255, *args, **kwargs):
         self.lowercase = kwargs.pop('lowercase', True)
         super(EmailType, self).__init__(length=length, *args, **kwargs)
 
     def process_bind_param(self, value, dialect):
-        if value is not None and self.lowercase:
-            return value.lower()
+        if value is not None:
+            if self.EMAIL_REGEX.match(value) is None:
+                raise ValueError('Value is not an email.', value)
+            if self.lowercase:
+                return value.lower()
         return value
 
     @property
