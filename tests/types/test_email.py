@@ -11,6 +11,7 @@ def User(Base):
         id = sa.Column(sa.Integer, primary_key=True)
         email = sa.Column(EmailType)
         short_email = sa.Column(EmailType(length=70))
+        non_lowercase_email = sa.Column(EmailType(lowercase=False))
 
         def __repr__(self):
             return 'User(%r)' % self.id
@@ -26,6 +27,19 @@ class TestEmailType(object):
 
         user = session.query(User).first()
         assert user.email == u'someone@example.com'
+
+    def test_non_lowercase(self, session, User):
+        """If the column is configured to not convert emails to lowercase,
+        it does so.
+        """
+        expected_email = u'Someone@example.com'
+        user = User(non_lowercase_email=expected_email)
+
+        session.add(user)
+        session.commit()
+
+        user = session.query(User).first()
+        assert user.non_lowercase_email == expected_email
 
     def test_literal_param(self, session, User):
         clause = User.email == 'Someone@example.com'

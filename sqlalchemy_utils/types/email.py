@@ -4,7 +4,8 @@ from ..operators import CaseInsensitiveComparator
 
 
 class EmailType(sa.types.TypeDecorator):
-    """
+    """EmailType(length=255, lowercase=True, *args, **kwargs)
+
     Provides a way for storing emails in a lower case.
 
     Example::
@@ -35,10 +36,11 @@ class EmailType(sa.types.TypeDecorator):
     comparator_factory = CaseInsensitiveComparator
 
     def __init__(self, length=255, *args, **kwargs):
+        self.lowercase = kwargs.pop('lowercase', True)
         super(EmailType, self).__init__(length=length, *args, **kwargs)
 
     def process_bind_param(self, value, dialect):
-        if value is not None:
+        if value is not None and self.lowercase:
             return value.lower()
         return value
 
