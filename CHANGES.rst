@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.32.12 (2016-12-18)
+^^^^^^^^^^^^^^^^^^^
+
+- Added generic_repr decorator
+
+
 0.32.11 (2016-11-19)
 ^^^^^^^^^^^^^^^^^^^^
 
