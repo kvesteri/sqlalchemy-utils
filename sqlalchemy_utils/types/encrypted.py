@@ -3,7 +3,7 @@ import base64
 import datetime
 
 import six
-from sqlalchemy.types import Binary, String, TypeDecorator
+from sqlalchemy.types import LargeBinary, String, TypeDecorator
 
 from ..exceptions import ImproperlyConfigured
 from .scalar_coercible import ScalarCoercible
@@ -199,7 +199,7 @@ class EncryptedType(TypeDecorator, ScalarCoercible):
 
     """
 
-    impl = Binary
+    impl = LargeBinary
 
     def __init__(self, type_in=None, key=None, engine=None, **kwargs):
         """Initialization."""
