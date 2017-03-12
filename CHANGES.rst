@@ -4,8 +4,14 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.32.13 (2017-03-12)
+^^^^^^^^^^^^^^^^^^^^
+
+- Fixed a DeprecationWarning by using LargeBinary instead of Binary (#263, pull request courtesy of jacquerie)
+
+
 0.32.12 (2016-12-18)
-^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^
 
 - Added generic_repr decorator
 
