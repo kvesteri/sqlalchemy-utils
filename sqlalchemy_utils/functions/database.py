@@ -1,6 +1,7 @@
 import collections
 import itertools
 import os
+import re
 from copy import copy
 
 import sqlalchemy as sa
@@ -555,6 +556,17 @@ def create_database(url, encoding='utf8', template=None):
         engine.execute(text)
 
 
+_digit = re.compile('\d+')
+
+
+def _first_int(string):
+    m = _digit.match(string)
+    if m:
+        return int(m.group())
+    else:
+        return -1
+
+
 def drop_database(url):
     """Issue the appropriate DROP DATABASE statement.
 
@@ -590,7 +602,7 @@ def drop_database(url):
         # Disconnect all users from the database we are dropping.
         version = list(
             map(
-                int,
+                _first_int,
                 engine.execute('SHOW server_version').first()[0].split('.')
             )
         )
