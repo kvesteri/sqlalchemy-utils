@@ -100,7 +100,7 @@ def sort_query(query, *args, **kwargs):
         query = sort_query(query, 'name')
 
 
-    2. Appying descending sort
+    2. Applying descending sort
     ::
 
 
