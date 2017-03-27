@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.32.14 (2017-03-27)
+^^^^^^^^^^^^^^^^^^^^
+
+- Fixed drop_database version comparison
+
+
 0.32.13 (2017-03-12)
 ^^^^^^^^^^^^^^^^^^^^
 

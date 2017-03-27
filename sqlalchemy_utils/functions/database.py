@@ -585,17 +585,14 @@ def drop_database(url):
 
     elif engine.dialect.name == 'postgresql' and engine.driver == 'psycopg2':
         from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
-        engine.raw_connection().set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+
+        connection = engine.connect()
+        connection.connection.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
 
         # Disconnect all users from the database we are dropping.
-        version = list(
-            map(
-                int,
-                engine.execute('SHOW server_version').first()[0].split('.')
-            )
-        )
+        version = connection.dialect.server_version_info
         pid_column = (
-            'pid' if (version[0] >= 9 and version[1] >= 2) else 'procpid'
+            'pid' if (version >= (9, 2)) else 'procpid'
         )
         text = '''
         SELECT pg_terminate_backend(pg_stat_activity.%(pid_column)s)
@@ -603,12 +600,11 @@ def drop_database(url):
         WHERE pg_stat_activity.datname = '%(database)s'
           AND %(pid_column)s <> pg_backend_pid();
         ''' % {'pid_column': pid_column, 'database': database}
-        engine.execute(text)
+        connection.execute(text)
 
         # Drop the database.
-        text = 'DROP DATABASE {0}'.format(quote(engine, database))
-        engine.execute(text)
-
+        text = 'DROP DATABASE {0}'.format(quote(connection, database))
+        connection.execute(text)
     else:
         text = 'DROP DATABASE {0}'.format(quote(engine, database))
         engine.execute(text)
