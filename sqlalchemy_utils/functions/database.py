@@ -453,8 +453,8 @@ def database_exists(url):
 
     url = copy(make_url(url))
     database = url.database
-    if url.drivername.startswith('postgresql'):
-        url.database = 'template1'
+    if url.drivername.startswith('postgresql') or url.drivername.startswith('postgres'):
+        url.database = database
     else:
         url.database = None
 
