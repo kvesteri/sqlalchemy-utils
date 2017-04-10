@@ -161,6 +161,9 @@ class PasswordType(types.TypeDecorator, ScalarCoercible):
 
         self._max_length = max_length
 
+    def __repr__(self):
+        return 'PasswordType(max_length={length})'.format(length=self.length)
+
     @property
     def length(self):
         """Get column length."""
