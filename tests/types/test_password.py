@@ -255,3 +255,28 @@ class TestPasswordType(object):
         onload = mock.Mock(return_value={})
         PasswordType(onload=onload)
         assert not onload.called
+
+    def test_hash_compare(self, session, User):
+        """
+        Make sure passwords that are equal have the same hash.
+        """
+        from passlib.hash import md5_crypt
+
+        obj = User()
+        obj.password = 'b'
+
+        assert obj.password == 'b'
+        assert hash(obj.password) == hash('b')
+
+        obj.password = Password(md5_crypt.encrypt('b'))
+
+        session.add(obj)
+        session.commit()
+
+        assert obj.password == 'b'
+        assert hash(obj.password) == hash('b')
+
+        obj = session.query(User).get(obj.id)
+
+        assert obj.password == 'b'
+        assert hash(obj.password) == hash('b')
