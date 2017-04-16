@@ -42,12 +42,12 @@ extras_require = {
     'arrow': ['arrow>=0.3.4'],
     'intervals': ['intervals>=0.7.1'],
     'phone': ['phonenumbers>=5.9.2'],
-    'password': ['passlib >= 1.6, < 2.0'],
+    'password': ['passlib>=1.6,<2.0'],
     'color': ['colour>=0.0.4'],
     'ipaddress': ['ipaddr'] if not PY3 else [],
     'enum': ['enum34'] if sys.version_info < (3, 4) else [],
     'timezone': ['python-dateutil'],
-    'url': ['furl >= 0.4.1'],
+    'url': ['furl>=0.4.1'],
     'encrypted': ['cryptography>=0.6']
 }
 
