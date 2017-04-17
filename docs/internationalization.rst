@@ -88,7 +88,7 @@ fetch a the locale returned by `default_locale`.
 Translation hybrids can also be used as expressions.
 ::
 
-    session.query(Article).filter(Article.name['en'] == 'Some article')
+    session.query(Article).filter(Article.name_translations['en'] == 'Some article')
 
 
 By default if no value is found for either current or default locale the
