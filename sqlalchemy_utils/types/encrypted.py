@@ -86,7 +86,10 @@ class AesEngine(EncryptionDecryptionBaseEngine):
         decrypted = decryptor.update(decrypted) + decryptor.finalize()
         decrypted = decrypted.rstrip(self.PADDING)
         if not isinstance(decrypted, six.string_types):
-            decrypted = decrypted.decode('utf-8')
+            try:
+                decrypted = decrypted.decode('utf-8')
+            except UnicodeDecodeError:
+                raise ValueError('Invalid decryption key')
         return decrypted
 
 

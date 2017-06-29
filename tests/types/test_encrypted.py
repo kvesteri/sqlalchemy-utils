@@ -289,6 +289,16 @@ class TestAesEncryptedTypeTestcase(EncryptedTypeTestCase):
 
         assert test.username == user.username
 
+    def test_decrypt_raises_value_error_with_invalid_key(self, session, Team):
+        self._team_key = 'one'
+        team = Team(key=self._team_key, name=u'One')
+        session.add(team)
+        session.commit()
+
+        self._team_key = 'notone'
+        with pytest.raises(ValueError):
+            assert team.name == u'One'
+
 
 class TestFernetEncryptedTypeTestCase(EncryptedTypeTestCase):
 
