@@ -63,7 +63,6 @@ def test_can_coerce_pytz_DstTzInfo():
 def test_can_coerce_pytz_StaticTzInfo():
     tzcol = TimezoneType(backend='pytz')
     tz = pytz.timezone('Pacific/Truk')
-    assert isinstance(tz, pytz.tzfile.StaticTzInfo)
     assert tzcol._coerce(tz) is tz
 
 
