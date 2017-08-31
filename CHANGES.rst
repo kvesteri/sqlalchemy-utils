@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.32.15 (2017-08-31)
+^^^^^^^^^^^^^^^^^^^^
+
+- Added better handling of date types for EncryptedType (#184, pull request courtesy of konstantinoskostis)
+
+
 0.32.14 (2017-03-27)
 ^^^^^^^^^^^^^^^^^^^^
 
