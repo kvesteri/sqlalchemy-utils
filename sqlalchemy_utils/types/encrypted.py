@@ -21,6 +21,14 @@ except ImportError:
     pass
 
 
+dateutil = None
+try:
+    import dateutil
+    from dateutil.parser import parse as datetime_parse
+except ImportError:
+    pass
+
+
 class EncryptionDecryptionBaseEngine(object):
     """A base encryption and decryption engine.
 
@@ -270,23 +278,15 @@ class EncryptedType(TypeDecorator, ScalarCoercible):
 
                 # Handle 'boolean' and 'dates'
                 type_ = self.underlying_type.python_type
+                date_types = [datetime.datetime, datetime.time, datetime.date]
+
                 if issubclass(type_, bool):
                     return decrypted_value == 'true'
 
-                elif issubclass(type_, datetime.datetime):
-                    return datetime.datetime.strptime(
-                        decrypted_value, '%Y-%m-%dT%H:%M:%S'
+                elif type_ in date_types:
+                    return DatetimeHandler.process_value(
+                        decrypted_value, type_
                     )
-
-                elif issubclass(type_, datetime.time):
-                    return datetime.datetime.strptime(
-                        decrypted_value, '%H:%M:%S'
-                    ).time()
-
-                elif issubclass(type_, datetime.date):
-                    return datetime.datetime.strptime(
-                        decrypted_value, '%Y-%m-%d'
-                    ).date()
 
                 # Handle all others
                 return self.underlying_type.python_type(decrypted_value)
@@ -296,3 +296,31 @@ class EncryptedType(TypeDecorator, ScalarCoercible):
             return self.underlying_type._coerce(value)
 
         return value
+
+
+class DatetimeHandler(object):
+    """
+    DatetimeHandler is responsible for parsing strings and
+    returning the appropriate date, datetime or time objects.
+    """
+
+    @classmethod
+    def process_value(cls, value, python_type):
+        """
+        process_value returns a datetime, date
+        or time object according to a given string
+        value and a python type.
+        """
+        if not dateutil:
+            raise ImproperlyConfigured(
+                "'python-dateutil' is required to process datetimes"
+            )
+
+        return_value = datetime_parse(value)
+
+        if issubclass(python_type, datetime.datetime):
+            return return_value
+        elif issubclass(python_type, datetime.time):
+            return return_value.time()
+        elif issubclass(python_type, datetime.date):
+            return return_value.date()
