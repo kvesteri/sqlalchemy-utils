@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.32.16 (2017-09-01)
+^^^^^^^^^^^^^^^^^^^^
+
+- Added more hints when decrypting AES with an invalid key (#275, pull request courtesy of xrmx)
+
+
 0.32.15 (2017-08-31)
 ^^^^^^^^^^^^^^^^^^^^
 
