@@ -4,8 +4,6 @@ import six
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql.base import ischema_names
 
-from ..exceptions import ImproperlyConfigured
-
 json = None
 try:
     import anyjson as json
@@ -56,15 +54,12 @@ class JSONType(sa.types.TypeDecorator):
     """
     impl = sa.UnicodeText
 
-    def __init__(self, *args, **kwargs):
-        if json is None:
-            raise ImproperlyConfigured(
-                'JSONType needs anyjson package installed.'
-            )
+    def __init__(self, native=True, *args, **kwargs):
         super(JSONType, self).__init__(*args, **kwargs)
+        self.native = native
 
     def load_dialect_impl(self, dialect):
-        if dialect.name == 'postgresql':
+        if dialect.name == 'postgresql' and self.native:
             # Use the native JSON type.
             if has_postgres_json:
                 return dialect.type_descriptor(JSON())
@@ -74,14 +69,14 @@ class JSONType(sa.types.TypeDecorator):
             return dialect.type_descriptor(self.impl)
 
     def process_bind_param(self, value, dialect):
-        if dialect.name == 'postgresql' and has_postgres_json:
+        if dialect.name == 'postgresql' and has_postgres_json and self.native:
             return value
         if value is not None:
             value = six.text_type(json.dumps(value))
         return value
 
     def process_result_value(self, value, dialect):
-        if dialect.name == 'postgresql':
+        if dialect.name == 'postgresql' and self.native:
             return value
         if value is not None:
             value = json.loads(value)
