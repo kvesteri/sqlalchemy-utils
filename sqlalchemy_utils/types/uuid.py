@@ -3,7 +3,7 @@ from __future__ import absolute_import
 import uuid
 
 from sqlalchemy import types
-from sqlalchemy.dialects import postgresql
+from sqlalchemy.dialects import mssql, postgresql
 
 from .scalar_coercible import ScalarCoercible
 
@@ -40,6 +40,10 @@ class UUIDType(types.TypeDecorator, ScalarCoercible):
             # Use the native UUID type.
             return dialect.type_descriptor(postgresql.UUID())
 
+        if dialect.name == 'mssql' and self.native:
+            # Use the native UNIQUEIDENTIFIER type.
+            return dialect.type_descriptor(mssql.mssql.UNIQUEIDENTIFIER())
+
         else:
             # Fallback to either a BINARY or a CHAR.
             kind = self.impl if self.binary else types.CHAR(32)
@@ -63,7 +67,7 @@ class UUIDType(types.TypeDecorator, ScalarCoercible):
         if not isinstance(value, uuid.UUID):
             value = self._coerce(value)
 
-        if self.native and dialect.name == 'postgresql':
+        if self.native and dialect.name in ('postgresql', 'mssql'):
             return str(value)
 
         return value.bytes if self.binary else value.hex
@@ -72,7 +76,7 @@ class UUIDType(types.TypeDecorator, ScalarCoercible):
         if value is None:
             return value
 
-        if self.native and dialect.name == 'postgresql':
+        if self.native and dialect.name in ('postgresql', 'mssql'):
             if isinstance(value, uuid.UUID):
                 # Some drivers convert PostgreSQL's uuid values to
                 # Python's uuid.UUID objects by themselves
