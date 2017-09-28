@@ -42,7 +42,7 @@ class UUIDType(types.TypeDecorator, ScalarCoercible):
 
         if dialect.name == 'mssql' and self.native:
             # Use the native UNIQUEIDENTIFIER type.
-            return dialect.type_descriptor(mssql.mssql.UNIQUEIDENTIFIER())
+            return dialect.type_descriptor(mssql.UNIQUEIDENTIFIER())
 
         else:
             # Fallback to either a BINARY or a CHAR.
