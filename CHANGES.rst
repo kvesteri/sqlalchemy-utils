@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.32.17 (2017-09-29)
+^^^^^^^^^^^^^^^^^^^^
+
+- Added support for MSSQL uniqueidentifier type (#283, pull request courtesy of nHurD)
+
+
 0.32.16 (2017-09-01)
 ^^^^^^^^^^^^^^^^^^^^
 
