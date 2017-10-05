@@ -13,7 +13,7 @@ def Product(Base):
         id = sa.Column(sa.Integer, primary_key=True)
         name = sa.Column(sa.Unicode(255))
         price = sa.Column(sa.Numeric)
-        type = sa.Column(sa.Unicode(255))
+        type = sa.Column(sa.String(255))
 
         __mapper_args__ = {
             'polymorphic_on': type,
