@@ -13,9 +13,32 @@ def Product(Base):
         id = sa.Column(sa.Integer, primary_key=True)
         name = sa.Column(sa.Unicode(255))
         price = sa.Column(sa.Numeric)
+        type = sa.Column(sa.Unicode(255))
+
+        __mapper_args__ = {
+            'polymorphic_on': type,
+            'polymorphic_identity': 'simple'
+        }
 
         catalog_id = sa.Column(sa.Integer, sa.ForeignKey('catalog.id'))
     return Product
+
+
+@pytest.fixture(params=['simple', 'child'])
+def AnyProduct(Product, request):
+    if request.param == 'simple':
+        return Product
+
+    class ChildProduct(Product):
+        __tablename__ = 'child_product'
+        id = sa.Column(
+            sa.Integer, sa.ForeignKey(Product.id), primary_key=True
+        )
+
+        __mapper_args__ = {
+            'polymorphic_identity': 'child',
+        }
+    return ChildProduct
 
 
 @pytest.fixture
@@ -86,13 +109,13 @@ class TestLazyEvaluatedSelectExpressionsForAggregates(object):
         assert not hasattr(CarCatalog.__table__.c, 'net_worth')
         assert not hasattr(CostumeCatalog.__table__.c, 'net_worth')
 
-    def test_assigns_aggregates_on_insert(self, session, Product, Catalog):
+    def test_assigns_aggregates_on_insert(self, session, AnyProduct, Catalog):
         catalog = Catalog(
             name=u'Some catalog'
         )
         session.add(catalog)
         session.commit()
-        product = Product(
+        product = AnyProduct(
             name=u'Some product',
             price=Decimal('1000'),
             catalog=catalog
@@ -102,13 +125,13 @@ class TestLazyEvaluatedSelectExpressionsForAggregates(object):
         session.refresh(catalog)
         assert catalog.net_worth == Decimal('1000')
 
-    def test_assigns_aggregates_on_update(self, session, Catalog, Product):
+    def test_assigns_aggregates_on_update(self, session, Catalog, AnyProduct):
         catalog = Catalog(
             name=u'Some catalog'
         )
         session.add(catalog)
         session.commit()
-        product = Product(
+        product = AnyProduct(
             name=u'Some product',
             price=Decimal('1000'),
             catalog=catalog
