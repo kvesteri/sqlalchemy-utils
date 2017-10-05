@@ -534,9 +534,9 @@ class AggregationManager(object):
     def construct_aggregate_queries(self, session, ctx):
         object_dict = defaultdict(list)
         for obj in session:
-            class_ = obj.__class__
-            if class_ in self.generator_registry:
-                object_dict[class_].append(obj)
+            for class_ in self.generator_registry:
+                if isinstance(obj, class_):
+                    object_dict[class_].append(obj)
 
         for class_, objects in object_dict.items():
             for aggregate_value in self.generator_registry[class_]:
