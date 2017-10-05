@@ -90,7 +90,7 @@ def CarCatalog(Catalog):
 
 
 @pytest.fixture
-def init_models(Product, Catalog, CostumeCatalog, CarCatalog):
+def init_models(AnyProduct, Catalog, CostumeCatalog, CarCatalog):
     pass
 
 
