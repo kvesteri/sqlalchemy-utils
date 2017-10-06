@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.32.18 (2017-10-06)
+^^^^^^^^^^^^^^^^^^^^
+
+- Made aggregated attributes to work with subclass objects (#287, pull request courtesy of fayazkhan)
+
+
 0.32.17 (2017-09-29)
 ^^^^^^^^^^^^^^^^^^^^
 
