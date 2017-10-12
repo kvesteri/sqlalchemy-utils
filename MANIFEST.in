@@ -5,3 +5,6 @@ recursive-include docs *
 recursive-exclude docs *.pyc
 prune docs/_build
 exclude docs/_themes/.git
+include tox.ini
+include *.rst
+exclude .git
