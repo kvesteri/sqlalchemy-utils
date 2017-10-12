@@ -5,7 +5,6 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.sql.expression import ColumnElement
 from sqlalchemy.orm.attributes import flag_modified
 
-
 from .exceptions import ImproperlyConfigured
 
 try:
