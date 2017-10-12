@@ -93,6 +93,7 @@ class TranslationHybrid(object):
                 setattr(obj, attr.key, {})
             locale = cast_locale(obj, self.current_locale)
             getattr(obj, attr.key)[locale] = value
+            flag_modified(obj, attr.key)
         return setter
 
     def expr_factory(self, attr):
