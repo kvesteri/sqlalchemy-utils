@@ -379,6 +379,25 @@ class TestSelectCorrelatedExpression(object):
         ).order_by(model.id)
         assert query.all() == result
 
+    def test_order_by_intermediate_table_column(
+        self,
+        session,
+        model_mapping,
+        group_user_tbl
+    ):
+        model = model_mapping['users']
+        alias = sa.orm.aliased(model_mapping['groups'])
+        aggregate = select_correlated_expression(
+            model,
+            sa.func.json_build_object('id', alias.id),
+            'groups',
+            alias,
+            order_by=[group_user_tbl.c.user_id]
+        ).alias('test')
+        # Just check that the query execution doesn't fail because of wrongly
+        # constructed aliases
+        assert session.execute(aggregate)
+
     def test_with_non_aggregate_function(
         self,
         session,

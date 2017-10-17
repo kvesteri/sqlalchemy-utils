@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.32.19 (2017-10-17)
+^^^^^^^^^^^^^^^^^^^^
+
+- Fixed select_correlated_expression order by for intermediate table aliases
+
+
 0.32.18 (2017-10-06)
 ^^^^^^^^^^^^^^^^^^^^
 

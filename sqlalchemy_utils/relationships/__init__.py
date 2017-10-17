@@ -95,14 +95,20 @@ def select_correlated_expression(
     relationships = list(reversed(path_to_relationships(path, root_model)))
 
     query = sa.select([expr])
-    selectable = sa.inspect(leaf_model).selectable
+
+    join_expr, aliases = chained_inverse_join(relationships, leaf_model)
 
     if order_by:
         query = query.order_by(
-            *[adapt_expr(o, selectable) for o in order_by]
+            *[
+                adapt_expr(
+                    o,
+                    *(sa.inspect(alias).selectable for alias in aliases)
+                )
+                for o in order_by
+            ]
         )
 
-    join_expr, aliases = chained_inverse_join(relationships, leaf_model)
     condition = relationship_to_correlation(
         relationships[-1],
         aliases[-1]
