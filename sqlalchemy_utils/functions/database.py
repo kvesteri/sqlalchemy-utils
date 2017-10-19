@@ -462,20 +462,20 @@ def database_exists(url):
 
     if engine.dialect.name == 'postgresql':
         text = "SELECT 1 FROM pg_database WHERE datname='%s'" % database
-        return bool(engine.execute(text).scalar())
+        result = bool(engine.execute(text).scalar())
 
     elif engine.dialect.name == 'mysql':
         text = ("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA "
                 "WHERE SCHEMA_NAME = '%s'" % database)
-        return bool(engine.execute(text).scalar())
+        result = bool(engine.execute(text).scalar())
 
     elif engine.dialect.name == 'sqlite':
         if database:
-            return database == ':memory:' or os.path.exists(database)
+            result = (database == ':memory:' or os.path.exists(database))
         else:
             # The default SQLAlchemy database is in memory,
             # and :memory is not required, thus we should support that use-case
-            return True
+            result = True
 
     else:
         text = 'SELECT 1'
@@ -483,10 +483,13 @@ def database_exists(url):
             url.database = database
             engine = sa.create_engine(url)
             engine.execute(text)
-            return True
+            result = True
 
         except (ProgrammingError, OperationalError):
-            return False
+            result = False
+
+    engine.dispose()
+    return result
 
 
 def create_database(url, encoding='utf8', template=None):
@@ -553,6 +556,8 @@ def create_database(url, encoding='utf8', template=None):
     else:
         text = 'CREATE DATABASE {0}'.format(quote(engine, database))
         engine.execute(text)
+
+    engine.dispose()
 
 
 def drop_database(url):
