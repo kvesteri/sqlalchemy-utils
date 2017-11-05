@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.32.20 (2017-11-04)
+^^^^^^^^^^^^^^^^^^^^
+
+- Added `__hash__` method for choice objects
+
+
 0.32.19 (2017-10-17)
 ^^^^^^^^^^^^^^^^^^^^
 
