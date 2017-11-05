@@ -16,6 +16,9 @@ class TestChoice(object):
         assert Choice(1, 1) != 2
         assert not (Choice(1, 1) != 1)
 
+    def test_hash(self):
+        assert hash(Choice(1, 1)) == hash(1)
+
 
 class TestChoiceType(object):
 

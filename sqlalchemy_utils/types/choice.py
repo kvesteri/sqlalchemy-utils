@@ -20,6 +20,9 @@ class Choice(object):
             return self.code == other.code
         return other == self.code
 
+    def __hash__(self):
+        return hash(self.code)
+
     def __ne__(self, other):
         return not (self == other)
 
