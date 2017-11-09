@@ -10,27 +10,22 @@ from sqlalchemy_utils import (  # noqa
 )
 
 
-@pytest.fixture
-def valid_phone_numbers():
-    return [
-        '040 1234567',
-        '+358 401234567',
-        '09 2501234',
-        '+358 92501234',
-        '0800 939393',
-        '09 4243 0456',
-        '0600 900 500'
-    ]
+VALID_PHONE_NUMBERS = (
+    '040 1234567',
+    '+358 401234567',
+    '09 2501234',
+    '+358 92501234',
+    '0800 939393',
+    '09 4243 0456',
+    '0600 900 500'
+)
 
 
-@pytest.fixture
-def invalid_phone_numbers():
-    return [
-        'abc',
-        '+040 1234567',
-        '0111234567',
-        '358'
-    ]
+INVALID_PHONE_NUMBERS = (
+    '+040 1234567',
+    '0111234567',
+    '358'
+)
 
 
 @pytest.fixture
@@ -69,15 +64,19 @@ def user(session, User, phone_number):
 @pytest.mark.skipif('types.phone_number.phonenumbers is None')
 class TestPhoneNumber(object):
 
-    def test_valid_phone_numbers(self, valid_phone_numbers):
-        for raw_number in valid_phone_numbers:
-            number = PhoneNumber(raw_number, 'FI')
-            assert number.is_valid_number()
+    @pytest.mark.parametrize('raw_number', VALID_PHONE_NUMBERS)
+    def test_valid_phone_numbers(self, raw_number):
+        number = PhoneNumber(raw_number, 'FI')
+        assert number.is_valid_number()
 
-    def test_invalid_phone_numbers(self, invalid_phone_numbers):
-        for raw_number in invalid_phone_numbers:
-            with pytest.raises(PhoneNumberParseException):
-                PhoneNumber(raw_number, 'FI')
+    def test_invalid_phone_number_non_numeric(self):
+        with pytest.raises(PhoneNumberParseException):
+            PhoneNumber('abc', 'FI')
+
+    @pytest.mark.parametrize('raw_number', INVALID_PHONE_NUMBERS)
+    def test_invalid_phone_numbers(self, raw_number):
+        number = PhoneNumber(raw_number, 'FI')
+        assert not number.is_valid_number()
 
     def test_invalid_phone_numbers_throw_dont_wrap_exception(
         self,
