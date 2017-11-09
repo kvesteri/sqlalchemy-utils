@@ -21,13 +21,6 @@ VALID_PHONE_NUMBERS = (
 )
 
 
-INVALID_PHONE_NUMBERS = (
-    '+040 1234567',
-    '0111234567',
-    '358'
-)
-
-
 @pytest.fixture
 def User(Base):
     class User(Base):
@@ -69,12 +62,13 @@ class TestPhoneNumber(object):
         number = PhoneNumber(raw_number, 'FI')
         assert number.is_valid_number()
 
-    def test_invalid_phone_number_non_numeric(self):
+    @pytest.mark.parametrize('raw_number', ('abc', '+040 1234567'))
+    def test_invalid_phone_numbers__constructor_fails(self, raw_number):
         with pytest.raises(PhoneNumberParseException):
-            PhoneNumber('abc', 'FI')
+            PhoneNumber(raw_number, 'FI')
 
-    @pytest.mark.parametrize('raw_number', INVALID_PHONE_NUMBERS)
-    def test_invalid_phone_numbers(self, raw_number):
+    @pytest.mark.parametrize('raw_number', ('0111234567', '358'))
+    def test_invalid_phone_numbers__is_valid_number(self, raw_number):
         number = PhoneNumber(raw_number, 'FI')
         assert not number.is_valid_number()
 
