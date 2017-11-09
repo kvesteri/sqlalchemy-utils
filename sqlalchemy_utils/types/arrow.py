@@ -12,7 +12,7 @@ from .scalar_coercible import ScalarCoercible
 arrow = None
 try:
     import arrow
-except:
+except ImportError:
     pass
 
 
