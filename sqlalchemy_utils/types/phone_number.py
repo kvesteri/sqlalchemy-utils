@@ -123,10 +123,7 @@ class PhoneNumber(BasePhoneNumber):
         return self.national, self.region
 
     def is_valid_number(self):
-        try:
-            return phonenumbers.is_valid_number(self._phone_number)
-        except NumberParseException:
-            return False
+        return phonenumbers.is_valid_number(self._phone_number)
 
     def __unicode__(self):
         return self.national
