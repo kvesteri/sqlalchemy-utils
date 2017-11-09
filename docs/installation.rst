@@ -22,7 +22,7 @@ Installing an official release
 You can install the most recent official SQLAlchemy-Utils version using
 pip_::
 
-    pip install sqlalchemy-utils
+    pip install sqlalchemy-utils    # Use `pip3` instead of `pip` for Python 3.x
 
 .. _pip: http://www.pip-installer.org/
 
@@ -34,11 +34,10 @@ copy of the source. You can do that by cloning the git_ repository::
 
     git clone git://github.com/kvesteri/sqlalchemy-utils.git
 
-Then you can install the source distribution using the ``setup.py``
-script::
+Then you can install the source distribution using pip::
 
     cd sqlalchemy-utils
-    python setup.py install
+    pip install -e .    # Use `pip3` instead of `pip` for Python 3.x
 
 .. _git: http://git-scm.org/
 
