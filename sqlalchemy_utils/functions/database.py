@@ -451,10 +451,10 @@ def database_exists(url):
 
     """
 
-    def get_result_scalar(engine, sql):
-        conn_resource = engine.execute(sql)
-        result = bool(conn_resource.scalar())
-        conn_resource.close()
+    def get_scalar_result(engine, sql):
+        result_proxy = engine.execute(sql)
+        result = result_proxy.scalar()
+        result_proxy.close()
         engine.dispose()
         return result
 
@@ -469,12 +469,12 @@ def database_exists(url):
 
     if engine.dialect.name == 'postgresql':
         text = "SELECT 1 FROM pg_database WHERE datname='%s'" % database
-        return get_result_scalar(engine, text)
+        return bool(get_scalar_result(engine, text))
 
     elif engine.dialect.name == 'mysql':
         text = ("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA "
                 "WHERE SCHEMA_NAME = '%s'" % database)
-        return get_result_scalar(engine, text)
+        return bool(get_scalar_result(engine, text))
 
     elif engine.dialect.name == 'sqlite':
         if database:
@@ -534,7 +534,7 @@ def create_database(url, encoding='utf8', template=None):
         url.database = None
 
     engine = sa.create_engine(url)
-    conn_resource = None
+    result_proxy = None
 
     if engine.dialect.name == 'postgresql':
         if engine.driver == 'psycopg2':
@@ -551,14 +551,14 @@ def create_database(url, encoding='utf8', template=None):
             encoding,
             quote(engine, template)
         )
-        conn_resource = engine.execute(text)
+        result_proxy = engine.execute(text)
 
     elif engine.dialect.name == 'mysql':
         text = "CREATE DATABASE {0} CHARACTER SET = '{1}'".format(
             quote(engine, database),
             encoding
         )
-        conn_resource = engine.execute(text)
+        result_proxy = engine.execute(text)
 
     elif engine.dialect.name == 'sqlite' and database != ':memory:':
         if database:
@@ -566,10 +566,10 @@ def create_database(url, encoding='utf8', template=None):
 
     else:
         text = 'CREATE DATABASE {0}'.format(quote(engine, database))
-        conn_resource = engine.execute(text)
+        result_proxy = engine.execute(text)
 
-    if conn_resource is not None:
-        conn_resource.close()
+    if result_proxy is not None:
+        result_proxy.close()
     engine.dispose()
 
 
