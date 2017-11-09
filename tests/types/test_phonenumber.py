@@ -76,8 +76,8 @@ class TestPhoneNumber(object):
 
     def test_invalid_phone_numbers(self, invalid_phone_numbers):
         for raw_number in invalid_phone_numbers:
-            number = PhoneNumber(raw_number, 'FI')
-            assert not number.is_valid_number()
+            with pytest.raises(PhoneNumberParseException):
+                PhoneNumber(raw_number, 'FI')
 
     def test_invalid_phone_numbers_throw_dont_wrap_exception(
         self,
