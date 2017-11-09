@@ -13,6 +13,7 @@ SQLAlchemy-Utils has been tested against the following Python platforms.
 - cPython 3.3
 - cPython 3.4
 - cPython 3.5
+- cPython 3.6
 
 
 Installing an official release
