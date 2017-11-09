@@ -76,28 +76,21 @@ class TestPhoneNumber(object):
 
     def test_invalid_phone_numbers(self, invalid_phone_numbers):
         for raw_number in invalid_phone_numbers:
-            try:
-                number = PhoneNumber(raw_number, 'FI')
-                assert not number.is_valid_number()
-            except:
-                pass
+            number = PhoneNumber(raw_number, 'FI')
+            assert not number.is_valid_number()
 
     def test_invalid_phone_numbers_throw_dont_wrap_exception(
         self,
         session,
         User
     ):
-        try:
+        with pytest.raises(PhoneNumberParseException):
             session.execute(
                 User.__table__.insert().values(
                     name=u'Someone',
                     phone_number=u'abc'
                 )
             )
-        except PhoneNumberParseException:
-            pass
-        except:
-            assert False
 
     def test_phone_number_attributes(self):
         number = PhoneNumber('+358401234567')
