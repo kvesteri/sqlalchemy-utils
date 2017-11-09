@@ -48,7 +48,8 @@ extras_require = {
     'enum': ['enum34'] if sys.version_info < (3, 4) else [],
     'timezone': ['python-dateutil'],
     'url': ['furl >= 0.4.1'],
-    'encrypted': ['cryptography>=0.6']
+    'encrypted': ['cryptography>=0.6'],
+    'jsonschema': ['jsonschema>=2.6.0'],
 }
 
 
