@@ -9,7 +9,6 @@ from sqlalchemy_utils import (  # noqa
     types
 )
 
-
 VALID_PHONE_NUMBERS = (
     '040 1234567',
     '+358 401234567',
