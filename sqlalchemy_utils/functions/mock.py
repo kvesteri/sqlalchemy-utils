@@ -82,7 +82,7 @@ def mock_engine(engine, stream=None):
             target = frame.f_locals['__target']
             break
 
-        except:
+        except Exception:
             pass
 
     else:

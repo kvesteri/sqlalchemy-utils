@@ -79,7 +79,7 @@ class TestPhoneNumber(object):
             try:
                 number = PhoneNumber(raw_number, 'FI')
                 assert not number.is_valid_number()
-            except:
+            except Exception:
                 pass
 
     def test_invalid_phone_numbers_throw_dont_wrap_exception(
@@ -96,7 +96,7 @@ class TestPhoneNumber(object):
             )
         except PhoneNumberParseException:
             pass
-        except:
+        except Exception:
             assert False
 
     def test_phone_number_attributes(self):

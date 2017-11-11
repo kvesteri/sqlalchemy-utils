@@ -451,6 +451,13 @@ def database_exists(url):
 
     """
 
+    def get_scalar_result(engine, sql):
+        result_proxy = engine.execute(sql)
+        result = result_proxy.scalar()
+        result_proxy.close()
+        engine.dispose()
+        return result
+
     url = copy(make_url(url))
     database = url.database
     if url.drivername.startswith('postgres'):
@@ -462,12 +469,12 @@ def database_exists(url):
 
     if engine.dialect.name == 'postgresql':
         text = "SELECT 1 FROM pg_database WHERE datname='%s'" % database
-        return bool(engine.execute(text).scalar())
+        return bool(get_scalar_result(engine, text))
 
     elif engine.dialect.name == 'mysql':
         text = ("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA "
                 "WHERE SCHEMA_NAME = '%s'" % database)
-        return bool(engine.execute(text).scalar())
+        return bool(get_scalar_result(engine, text))
 
     elif engine.dialect.name == 'sqlite':
         if database:
@@ -478,15 +485,21 @@ def database_exists(url):
             return True
 
     else:
+        engine.dispose()
+        engine = None
         text = 'SELECT 1'
         try:
             url.database = database
             engine = sa.create_engine(url)
-            engine.execute(text)
+            result = engine.execute(text)
+            result.close()
             return True
 
         except (ProgrammingError, OperationalError):
             return False
+        finally:
+            if engine is not None:
+                engine.dispose()
 
 
 def create_database(url, encoding='utf8', template=None):
@@ -521,6 +534,7 @@ def create_database(url, encoding='utf8', template=None):
         url.database = None
 
     engine = sa.create_engine(url)
+    result_proxy = None
 
     if engine.dialect.name == 'postgresql':
         if engine.driver == 'psycopg2':
@@ -537,14 +551,14 @@ def create_database(url, encoding='utf8', template=None):
             encoding,
             quote(engine, template)
         )
-        engine.execute(text)
+        result_proxy = engine.execute(text)
 
     elif engine.dialect.name == 'mysql':
         text = "CREATE DATABASE {0} CHARACTER SET = '{1}'".format(
             quote(engine, database),
             encoding
         )
-        engine.execute(text)
+        result_proxy = engine.execute(text)
 
     elif engine.dialect.name == 'sqlite' and database != ':memory:':
         if database:
@@ -552,7 +566,11 @@ def create_database(url, encoding='utf8', template=None):
 
     else:
         text = 'CREATE DATABASE {0}'.format(quote(engine, database))
-        engine.execute(text)
+        result_proxy = engine.execute(text)
+
+    if result_proxy is not None:
+        result_proxy.close()
+    engine.dispose()
 
 
 def drop_database(url):
@@ -578,6 +596,7 @@ def drop_database(url):
         url.database = None
 
     engine = sa.create_engine(url)
+    conn_resource = None
 
     if engine.dialect.name == 'sqlite' and database != ':memory:':
         if database:
@@ -605,6 +624,11 @@ def drop_database(url):
         # Drop the database.
         text = 'DROP DATABASE {0}'.format(quote(connection, database))
         connection.execute(text)
+        conn_resource = connection
     else:
         text = 'DROP DATABASE {0}'.format(quote(engine, database))
-        engine.execute(text)
+        conn_resource = engine.execute(text)
+
+    if conn_resource is not None:
+        conn_resource.close()
+    engine.dispose()
