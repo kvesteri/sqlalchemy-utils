@@ -5,32 +5,18 @@ import sqlalchemy as sa
 from sqlalchemy_utils import (  # noqa
     PhoneNumber,
     PhoneNumberParseException,
-    PhoneNumberType,
-    types
+    PhoneNumberType
 )
 
-
-@pytest.fixture
-def valid_phone_numbers():
-    return [
-        '040 1234567',
-        '+358 401234567',
-        '09 2501234',
-        '+358 92501234',
-        '0800 939393',
-        '09 4243 0456',
-        '0600 900 500'
-    ]
-
-
-@pytest.fixture
-def invalid_phone_numbers():
-    return [
-        'abc',
-        '+040 1234567',
-        '0111234567',
-        '358'
-    ]
+VALID_PHONE_NUMBERS = (
+    '040 1234567',
+    '+358 401234567',
+    '09 2501234',
+    '+358 92501234',
+    '0800 939393',
+    '09 4243 0456',
+    '0600 900 500'
+)
 
 
 @pytest.fixture
@@ -69,35 +55,33 @@ def user(session, User, phone_number):
 @pytest.mark.skipif('types.phone_number.phonenumbers is None')
 class TestPhoneNumber(object):
 
-    def test_valid_phone_numbers(self, valid_phone_numbers):
-        for raw_number in valid_phone_numbers:
-            number = PhoneNumber(raw_number, 'FI')
-            assert number.is_valid_number()
+    @pytest.mark.parametrize('raw_number', VALID_PHONE_NUMBERS)
+    def test_valid_phone_numbers(self, raw_number):
+        number = PhoneNumber(raw_number, 'FI')
+        assert number.is_valid_number()
 
-    def test_invalid_phone_numbers(self, invalid_phone_numbers):
-        for raw_number in invalid_phone_numbers:
-            try:
-                number = PhoneNumber(raw_number, 'FI')
-                assert not number.is_valid_number()
-            except Exception:
-                pass
+    @pytest.mark.parametrize('raw_number', ('abc', '+040 1234567'))
+    def test_invalid_phone_numbers__constructor_fails(self, raw_number):
+        with pytest.raises(PhoneNumberParseException):
+            PhoneNumber(raw_number, 'FI')
+
+    @pytest.mark.parametrize('raw_number', ('0111234567', '358'))
+    def test_invalid_phone_numbers__is_valid_number(self, raw_number):
+        number = PhoneNumber(raw_number, 'FI')
+        assert not number.is_valid_number()
 
     def test_invalid_phone_numbers_throw_dont_wrap_exception(
         self,
         session,
         User
     ):
-        try:
+        with pytest.raises(PhoneNumberParseException):
             session.execute(
                 User.__table__.insert().values(
                     name=u'Someone',
                     phone_number=u'abc'
                 )
             )
-        except PhoneNumberParseException:
-            pass
-        except Exception:
-            assert False
 
     def test_phone_number_attributes(self):
         number = PhoneNumber('+358401234567')
