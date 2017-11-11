@@ -5,7 +5,8 @@ import sqlalchemy as sa
 from sqlalchemy_utils import (  # noqa
     PhoneNumber,
     PhoneNumberParseException,
-    PhoneNumberType
+    PhoneNumberType,
+    types
 )
 
 VALID_PHONE_NUMBERS = (
