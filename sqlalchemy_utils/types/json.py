@@ -61,8 +61,8 @@ class JSONType(sa.types.TypeDecorator):
         session.commit()
 
 
-    If you have jsonschema_ installed, you may provide a schema :class:`dict` to the
-    `schema` keyword and enjoy validation on commit.
+    If you have jsonschema_ installed, you may provide a schema :class:`dict`
+    to the `schema` keyword and enjoy validation on commit.
 
     ::
 
