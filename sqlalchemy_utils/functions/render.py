@@ -37,7 +37,7 @@ def render_expression(expression, bind, stream=None):
             local['engine'] = engine
             six.exec_(expression, frame.f_globals, local)
             break
-        except:
+        except Exception:
             pass
     else:
         raise ValueError('Not a valid python expression', engine)

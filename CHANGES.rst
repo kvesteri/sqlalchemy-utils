@@ -4,10 +4,16 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.32.21 (2017-11-11)
+^^^^^^^^^^^^^^^^^^^^
+
+- Close connections on exists, create and drop database functions (#295, pull request courtesy of Terseus)
+
+
 0.32.20 (2017-11-04)
 ^^^^^^^^^^^^^^^^^^^^
 
-- Added `__hash__` method for choice objects
+- Added `__hash__` method for choice objects (#294, pull request courtesy of havelock)
 
 
 0.32.19 (2017-10-17)

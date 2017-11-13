@@ -99,3 +99,22 @@ class TestDatabasePostgresWithQuotedName(DatabaseTest):
             postgresql_db_user
         )
         create_database(dsn, template='my-template')
+
+
+class TestDatabasePostgresCreateDatabaseCloseConnection(object):
+    def test_create_database_twice(self, postgresql_db_user):
+        dsn_list = [
+            'postgres://{0}@localhost/db_test_sqlalchemy-util-a'.format(
+                postgresql_db_user
+            ),
+            'postgres://{0}@localhost/db_test_sqlalchemy-util-b'.format(
+                postgresql_db_user
+            ),
+        ]
+        for dsn_item in dsn_list:
+            assert not database_exists(dsn_item)
+            create_database(dsn_item, template="template1")
+            assert database_exists(dsn_item)
+        for dsn_item in dsn_list:
+            drop_database(dsn_item)
+            assert not database_exists(dsn_item)
