@@ -73,7 +73,9 @@ class TestGenericRelationship(GenericRelationshipTestCase):
 
         event = Event()
         event.object_id = user.id
-        event.object_type = Event.object.property.type2discriminator(six.text_type(type(user).__name__))
+        event.object_type = Event.object.property.type2discriminator(
+            six.text_type(type(user).__name__)
+        )
 
         assert event.object is None
 

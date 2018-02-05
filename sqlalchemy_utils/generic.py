@@ -7,8 +7,8 @@ from sqlalchemy.orm import attributes, class_mapper, ColumnProperty
 from sqlalchemy.orm.interfaces import MapperProperty, PropComparator
 from sqlalchemy.orm.session import _state_session
 from sqlalchemy.util import set_creation_order
-from sqlalchemy_utils.functions import identity
 
+from sqlalchemy_utils.functions import identity
 from .exceptions import ImproperlyConfigured
 
 
@@ -95,24 +95,37 @@ class GenericRelationshipProperty(MapperProperty):
         Mapping between the model class name and the discriminator stored.
     """
 
-    def __init__(self, discriminator, id, doc=None, map_type2discriminator=None):
+    def __init__(self, discriminator, id, doc=None,
+                 map_type2discriminator=None):
         super(GenericRelationshipProperty, self).__init__()
         self._discriminator_col = discriminator
         self._id_cols = id
         self._id = None
         self._discriminator = None
         if map_type2discriminator is None:
-            self.type2discriminator = lambda x: x
-            self.discriminator2type = lambda x: x
+            self._map_type2discriminator = None
+            self._map_discriminator2type = None
         else:
             self._map_type2discriminator = map_type2discriminator
-            self._map_discriminator2type = {v: k for k, v in map_type2discriminator.items()}
-            self.type2discriminator = lambda x: self._map_type2discriminator[x]
-            self.discriminator2type = lambda x: self._map_discriminator2type[x]
+            self._map_discriminator2type = {
+                v: k for k, v in map_type2discriminator.items()
+            }
 
         self.doc = doc
 
         set_creation_order(self)
+
+    def type2discriminator(self, type):
+        if self._map_type2discriminator:
+            return self._map_type2discriminator[type]
+        else:
+            return type
+
+    def discriminator2type(self, discriminator):
+        if self._map_discriminator2type:
+            return self._map_discriminator2type[discriminator]
+        else:
+            return discriminator
 
     def _column_to_property(self, column):
         if isinstance(column, hybrid_property):
@@ -178,8 +191,8 @@ class GenericRelationshipProperty(MapperProperty):
                 for submapper in mapper._inheriting_mappers
             ])
             discriminators = [self.property.type2discriminator(cn)
-                                   for cn in class_names
-                                   ]
+                              for cn in class_names
+                              ]
             return self.property._discriminator_col.in_(discriminators)
 
     def instrument_class(self, mapper):
