@@ -8,8 +8,8 @@ from sqlalchemy.orm.interfaces import MapperProperty, PropComparator
 from sqlalchemy.orm.session import _state_session
 from sqlalchemy.util import set_creation_order
 
-from sqlalchemy_utils.functions import identity
 from .exceptions import ImproperlyConfigured
+from .functions import identity
 
 
 class GenericAttributeImpl(attributes.ScalarAttributeImpl):

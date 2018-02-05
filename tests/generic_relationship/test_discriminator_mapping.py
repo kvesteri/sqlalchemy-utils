@@ -3,7 +3,8 @@ import six
 import sqlalchemy as sa
 
 from sqlalchemy_utils import generic_relationship
-from ..generic_relationship import GenericRelationshipTestCase
+
+from . import GenericRelationshipTestCase
 
 
 @pytest.fixture
