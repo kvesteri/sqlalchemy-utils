@@ -8,6 +8,8 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 ^^^^^^^^^^^^^^^^^^^
 
 - Added support for materialized views in PostgreSQL
+- Added Ltree.descendant_of and Ltree.ancestor_of (#311, pull request courtesy of kageurufu)
+- Dropped Python 3.3 support
 
 
 0.32.21 (2017-11-11)
