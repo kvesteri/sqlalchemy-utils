@@ -141,6 +141,37 @@ class TestLtree(object):
     def test_contains(self, path, other, result):
         assert (other in Ltree(path)) == result
 
+    @pytest.mark.parametrize(
+        ('path', 'other', 'result'),
+        (
+            ('1', '1.2.3', True),
+            ('1.2', '1.2.3', True),
+            ('1.2.3', '1.2.3', True),
+            ('1.2.3', '1', False),
+            ('1.2.3', '1.2', False),
+            ('1', '1', True),
+            ('1', '2', False),
+        )
+    )
+    def test_ancestor_of(self, path, other, result):
+        assert Ltree(path).ancestor_of(other) == result
+
+    @pytest.mark.parametrize(
+        ('path', 'other', 'result'),
+        (
+            ('1', '1.2.3', False),
+            ('1.2', '1.2.3', False),
+            ('1.2', '1.2.3', False),
+            ('1.2.3', '1', True),
+            ('1.2.3', '1.2', True),
+            ('1.2.3', '1.2.3', True),
+            ('1', '1', True),
+            ('1', '2', False),
+        )
+    )
+    def test_descendant_of(self, path, other, result):
+        assert Ltree(path).descendant_of(other) == result
+
     def test_getitem_with_other_than_slice_or_in(self):
         with pytest.raises(TypeError):
             Ltree('1.2')['something']

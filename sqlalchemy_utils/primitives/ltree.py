@@ -128,6 +128,28 @@ class Ltree(object):
                 return index
         raise ValueError('subpath not found')
 
+    def descendant_of(self, other):
+        """
+        is left argument a descendant of right (or equal)?
+
+        ::
+
+            assert Ltree('1.2.3.4.5').descendant_of('1.2.3')
+        """
+        subpath = self[:len(Ltree(other))]
+        return subpath == other
+
+    def ancestor_of(self, other):
+        """
+        is left argument an ancestor of right (or equal)?
+
+        ::
+
+            assert Ltree('1.2.3').ancestor_of('1.2.3.4.5')
+        """
+        subpath = Ltree(other)[:len(self)]
+        return subpath == self
+
     def __getitem__(self, key):
         if isinstance(key, int):
             return Ltree(self.path.split('.')[key])
