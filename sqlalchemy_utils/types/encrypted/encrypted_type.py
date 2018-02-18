@@ -5,8 +5,9 @@ import datetime
 import six
 from sqlalchemy.types import LargeBinary, String, TypeDecorator
 
-from ..exceptions import ImproperlyConfigured
-from .scalar_coercible import ScalarCoercible
+from sqlalchemy_utils.exceptions import ImproperlyConfigured
+from sqlalchemy_utils.types.encrypted.padding import PADDING_MECHANISM
+from sqlalchemy_utils.types.scalar_coercible import ScalarCoercible
 
 cryptography = None
 try:
@@ -56,7 +57,6 @@ class AesEngine(EncryptionDecryptionBaseEngine):
     """Provide AES encryption and decryption methods."""
 
     BLOCK_SIZE = 16
-    PADDING = six.b('*')
 
     def _initialize_engine(self, parent_class_key):
         self.secret_key = parent_class_key
@@ -67,12 +67,21 @@ class AesEngine(EncryptionDecryptionBaseEngine):
             backend=default_backend()
         )
 
-    def _pad(self, value):
-        """Pad the message to be encrypted, if needed."""
-        BS = self.BLOCK_SIZE
-        P = self.PADDING
-        padded = (value + (BS - len(value) % BS) * P)
-        return padded
+    def _set_padding_mechanism(self, padding_mechanism=None):
+        """Set the padding mechanism."""
+        if isinstance(padding_mechanism, six.string_types):
+            if padding_mechanism not in PADDING_MECHANISM.keys():
+                raise ImproperlyConfigured(
+                    "There is not padding mechanism with name {}".format(
+                        padding_mechanism
+                    )
+                )
+
+        if padding_mechanism is None:
+            padding_mechanism = 'naive'
+
+        padding_class = PADDING_MECHANISM[padding_mechanism]
+        self.padding_engine = padding_class(self.BLOCK_SIZE)
 
     def encrypt(self, value):
         if not isinstance(value, six.string_types):
@@ -80,7 +89,7 @@ class AesEngine(EncryptionDecryptionBaseEngine):
         if isinstance(value, six.text_type):
             value = str(value)
         value = value.encode()
-        value = self._pad(value)
+        value = self.padding_engine.pad(value)
         encryptor = self.cipher.encryptor()
         encrypted = encryptor.update(value) + encryptor.finalize()
         encrypted = base64.b64encode(encrypted)
@@ -92,7 +101,7 @@ class AesEngine(EncryptionDecryptionBaseEngine):
         decryptor = self.cipher.decryptor()
         decrypted = base64.b64decode(value)
         decrypted = decryptor.update(decrypted) + decryptor.finalize()
-        decrypted = decrypted.rstrip(self.PADDING)
+        decrypted = self.padding_engine.unpad(decrypted)
         if not isinstance(decrypted, six.string_types):
             try:
                 decrypted = decrypted.decode('utf-8')
@@ -135,18 +144,38 @@ class EncryptedType(TypeDecorator, ScalarCoercible):
     is decrypted.
 
     EncryptedType needs Cryptography_ library in order to work.
-    A simple example is given below.
+
+    When declaring a column which will be of type EncryptedType
+    it is better to be as precise as possible and follow the pattern
+    below.
 
     .. _Cryptography: https://cryptography.io/en/latest/
 
     ::
 
-        import sqlalchemy as sa
-        from sqlalchemy.ext.declarative import declarative_base
-        from sqlalchemy import create_engine
-        from sqlalchemy.orm import sessionmaker
-        from sqlalchemy_utils import EncryptedType
 
+        a_column = sa.Column(EncryptedType(sa.Unicode,
+                                           secret_key,
+                                           FernetEngine))
+
+        another_column = sa.Column(EncryptedType(sa.Unicode,
+                                           secret_key,
+                                           AesEngine,
+                                           'pkcs5'))
+
+
+    A more complete example is given below.
+
+    ::
+
+
+        import sqlalchemy as sa
+        from sqlalchemy import create_engine
+        from sqlalchemy.ext.declarative import declarative_base
+        from sqlalchemy.orm import sessionmaker
+
+        from sqlalchemy_utils import EncryptedType
+        from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
 
         secret_key = 'secretkey1234'
         # setup
@@ -154,14 +183,27 @@ class EncryptedType(TypeDecorator, ScalarCoercible):
         connection = engine.connect()
         Base = declarative_base()
 
+
         class User(Base):
             __tablename__ = "user"
             id = sa.Column(sa.Integer, primary_key=True)
-            username = sa.Column(EncryptedType(sa.Unicode, secret_key))
-            access_token = sa.Column(EncryptedType(sa.String, secret_key))
-            is_active = sa.Column(EncryptedType(sa.Boolean, secret_key))
+            username = sa.Column(EncryptedType(sa.Unicode,
+                                               secret_key,
+                                               AesEngine,
+                                               'pkcs5'))
+            access_token = sa.Column(EncryptedType(sa.String,
+                                                   secret_key,
+                                                   AesEngine,
+                                                   'pkcs5'))
+            is_active = sa.Column(EncryptedType(sa.Boolean,
+                                                secret_key,
+                                                AesEngine,
+                                                'zeroes'))
             number_of_accounts = sa.Column(EncryptedType(sa.Integer,
-                                                         secret_key))
+                                                         secret_key,
+                                                         AesEngine,
+                                                         'oneandzeroes'))
+
 
         sa.orm.configure_mappers()
         Base.metadata.create_all(connection)
@@ -179,15 +221,21 @@ class EncryptedType(TypeDecorator, ScalarCoercible):
         num_of_accounts = 2
 
         user = User(username=user_name, access_token=test_token,
-                    is_active=active, accounts_num=accounts)
+                    is_active=active, number_of_accounts=num_of_accounts)
         session.add(user)
         session.commit()
 
-        print('id: {}'.format(user.id))
-        print('username: {}'.format(user.username))
-        print('token: {}'.format(user.access_token))
-        print('active: {}'.format(user.is_active))
-        print('accounts: {}'.format(user.accounts_num))
+        user_id = user.id
+
+        session.expunge_all()
+
+        user_instance = session.query(User).get(user_id)
+
+        print('id: {}'.format(user_instance.id))
+        print('username: {}'.format(user_instance.username))
+        print('token: {}'.format(user_instance.access_token))
+        print('active: {}'.format(user_instance.is_active))
+        print('accounts: {}'.format(user_instance.number_of_accounts))
 
         # teardown
         session.close_all()
@@ -196,9 +244,11 @@ class EncryptedType(TypeDecorator, ScalarCoercible):
         engine.dispose()
 
     The key parameter accepts a callable to allow for the key to change
-    per-row instead of be fixed for the whole table.
+    per-row instead of being fixed for the whole table.
 
     ::
+
+
         def get_key():
             return 'dynamic-key'
 
@@ -212,7 +262,8 @@ class EncryptedType(TypeDecorator, ScalarCoercible):
 
     impl = LargeBinary
 
-    def __init__(self, type_in=None, key=None, engine=None, **kwargs):
+    def __init__(self, type_in=None, key=None,
+                 engine=None, padding=None, **kwargs):
         """Initialization."""
         if not cryptography:
             raise ImproperlyConfigured(
@@ -229,6 +280,8 @@ class EncryptedType(TypeDecorator, ScalarCoercible):
         if not engine:
             engine = AesEngine
         self.engine = engine()
+        if isinstance(self.engine, AesEngine):
+            self.engine._set_padding_mechanism(padding)
 
     @property
     def key(self):

@@ -74,7 +74,7 @@ EmailType
 EncryptedType
 -------------
 
-.. module:: sqlalchemy_utils.types.encrypted
+.. module:: sqlalchemy_utils.types.encrypted.encrypted_type
 
 .. autoclass:: EncryptedType
 
@@ -183,4 +183,3 @@ WeekDaysType
 .. module:: sqlalchemy_utils.types.weekdays
 
 .. autoclass:: WeekDaysType
-

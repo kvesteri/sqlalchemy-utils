@@ -4,7 +4,7 @@ import pytest
 import sqlalchemy as sa
 
 from sqlalchemy_utils import ColorType, EncryptedType, PhoneNumberType
-from sqlalchemy_utils.types.encrypted import (
+from sqlalchemy_utils.types.encrypted.encrypted_type import (
     AesEngine,
     DatetimeHandler,
     FernetEngine
@@ -18,7 +18,7 @@ except ImportError:
 
 
 @pytest.fixture
-def User(Base, encryption_engine, test_key):
+def User(Base, encryption_engine, test_key, padding_mechanism):
     class User(Base):
         __tablename__ = 'user'
         id = sa.Column(sa.Integer, primary_key=True)
@@ -26,61 +26,71 @@ def User(Base, encryption_engine, test_key):
         username = sa.Column(EncryptedType(
             sa.Unicode,
             test_key,
-            encryption_engine)
+            encryption_engine,
+            padding_mechanism)
         )
 
         access_token = sa.Column(EncryptedType(
             sa.String,
             test_key,
-            encryption_engine)
+            encryption_engine,
+            padding_mechanism)
         )
 
         is_active = sa.Column(EncryptedType(
             sa.Boolean,
             test_key,
-            encryption_engine)
+            encryption_engine,
+            padding_mechanism)
         )
 
         accounts_num = sa.Column(EncryptedType(
             sa.Integer,
             test_key,
-            encryption_engine)
+            encryption_engine,
+            padding_mechanism)
         )
 
         phone = sa.Column(EncryptedType(
             PhoneNumberType,
             test_key,
-            encryption_engine)
+            encryption_engine,
+            padding_mechanism)
         )
 
         color = sa.Column(EncryptedType(
             ColorType,
             test_key,
-            encryption_engine)
+            encryption_engine,
+            padding_mechanism)
         )
 
         date = sa.Column(EncryptedType(
             sa.Date,
             test_key,
-            encryption_engine)
+            encryption_engine,
+            padding_mechanism)
         )
 
         time = sa.Column(EncryptedType(
             sa.Time,
             test_key,
-            encryption_engine)
+            encryption_engine,
+            padding_mechanism)
         )
 
         datetime = sa.Column(EncryptedType(
             sa.DateTime,
             test_key,
-            encryption_engine)
+            encryption_engine,
+            padding_mechanism)
         )
 
         enum = sa.Column(EncryptedType(
             sa.Enum('One', name='user_enum_t'),
             test_key,
-            encryption_engine)
+            encryption_engine,
+            padding_mechanism)
         )
 
     return User
@@ -217,7 +227,7 @@ def date_simple():
 class EncryptedTypeTestCase(object):
 
     @pytest.fixture
-    def Team(self, Base, encryption_engine):
+    def Team(self, Base, encryption_engine, padding_mechanism):
         self._team_key = None
 
         class Team(Base):
@@ -227,7 +237,8 @@ class EncryptedTypeTestCase(object):
             name = sa.Column(EncryptedType(
                 sa.Unicode,
                 lambda: self._team_key,
-                encryption_engine)
+                encryption_engine,
+                padding_mechanism)
             )
         return Team
 
@@ -289,9 +300,6 @@ class EncryptedTypeTestCase(object):
 
         assert team.name == u'One'
 
-        with pytest.raises(Exception):
-            session.query(Team).get(team_2_id)
-
         session.expunge_all()
 
         self._team_key = session.query(Team.key).filter_by(
@@ -302,9 +310,6 @@ class EncryptedTypeTestCase(object):
 
         assert team.name == u'Two'
 
-        with pytest.raises(Exception):
-            session.query(Team).get(team_1_id)
-
         session.expunge_all()
 
         # Remove teams
@@ -312,7 +317,7 @@ class EncryptedTypeTestCase(object):
         session.commit()
 
 
-class TestAesEncryptedTypeTestcase(EncryptedTypeTestCase):
+class AesEncryptedTypeTestCase(EncryptedTypeTestCase):
 
     @pytest.fixture
     def encryption_engine(self):
@@ -324,6 +329,34 @@ class TestAesEncryptedTypeTestcase(EncryptedTypeTestCase):
         ).first()
 
         assert test.username == user.username
+
+
+class TestAesEncryptedTypeWithPKCS5Padding(AesEncryptedTypeTestCase):
+
+    @pytest.fixture
+    def padding_mechanism(self):
+        return 'pkcs5'
+
+
+class TestAesEncryptedTypeWithOneAndZeroesPadding(AesEncryptedTypeTestCase):
+
+    @pytest.fixture
+    def padding_mechanism(self):
+        return 'oneandzeroes'
+
+
+class TestAesEncryptedTypeWithZeroesPadding(AesEncryptedTypeTestCase):
+
+    @pytest.fixture
+    def padding_mechanism(self):
+        return 'zeroes'
+
+
+class TestAesEncryptedTypeTestcaseWithNaivePadding(AesEncryptedTypeTestCase):
+
+    @pytest.fixture
+    def padding_mechanism(self):
+        return 'naive'
 
     def test_decrypt_raises_value_error_with_invalid_key(self, session, Team):
         self._team_key = 'one'
@@ -341,6 +374,10 @@ class TestFernetEncryptedTypeTestCase(EncryptedTypeTestCase):
     @pytest.fixture
     def encryption_engine(self):
         return FernetEngine
+
+    @pytest.fixture
+    def padding_mechanism(self):
+        return None
 
 
 class TestDatetimeHandler(object):
