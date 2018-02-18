@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.33.0 (2018-02-18)
+^^^^^^^^^^^^^^^^^^^
+
+- Added support for materialized views in PostgreSQL
+
+
 0.32.21 (2017-11-11)
 ^^^^^^^^^^^^^^^^^^^^
 

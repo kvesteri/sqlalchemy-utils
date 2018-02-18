@@ -53,6 +53,10 @@ from .listeners import (  # noqa
     force_auto_coercion,
     force_instant_defaults
 )
+from .materialized_view import (  # noqa
+    create_materialized_view,
+    refresh_materialized_view
+)
 from .models import generic_repr, Timestamp  # noqa
 from .observer import observes  # noqa
 from .primitives import Country, Currency, Ltree, WeekDay, WeekDays  # noqa
