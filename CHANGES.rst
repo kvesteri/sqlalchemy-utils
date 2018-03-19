@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.33.1 (2018-03-19)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed EncryptedType for Oracle padding attack (#316, pull request courtesy of manishahluwalia)
+
+
 0.33.0 (2018-02-18)
 ^^^^^^^^^^^^^^^^^^^
 
