@@ -1,6 +1,10 @@
 import six
 
 
+class InvalidPaddingError(Exception):
+    pass
+
+
 class Padding(object):
     """Base class for padding and unpadding."""
 
@@ -27,10 +31,27 @@ class PKCS5Padding(Padding):
         return value_with_padding
 
     def unpad(self, value):
+        # Perform some input validations.
+        # In case of error, we throw a generic InvalidPaddingError()
+        if not value or len(value) < self.block_size:
+            # PKCS5 padded output will always be at least 1 block size
+            raise InvalidPaddingError()
+        if len(value) % self.block_size != 0:
+            # PKCS5 padded output will be a multiple of the block size
+            raise InvalidPaddingError()
         if isinstance(value, six.binary_type):
             padding_length = value[-1]
         if isinstance(value, six.string_types):
             padding_length = ord(value[-1])
+        if padding_length == 0 or padding_length > self.block_size:
+            raise InvalidPaddingError()
+
+        def convert_byte_or_char_to_number(x):
+            return ord(x) if isinstance(x, six.string_types) else x
+        if any([padding_length != convert_byte_or_char_to_number(x)
+               for x in value[-padding_length:]]):
+            raise InvalidPaddingError()
+
         value_without_padding = value[0:-padding_length]
 
         return value_without_padding
