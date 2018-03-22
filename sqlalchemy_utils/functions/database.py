@@ -461,7 +461,7 @@ def database_exists(url):
     url = copy(make_url(url))
     database = url.database
     if url.drivername.startswith('postgres'):
-        url.database = 'template1'
+        url.database = 'postgres'
     else:
         url.database = None
 
@@ -529,7 +529,7 @@ def create_database(url, encoding='utf8', template=None):
     database = url.database
 
     if url.drivername.startswith('postgres'):
-        url.database = 'template1'
+        url.database = 'postgres'
     elif not url.drivername.startswith('sqlite'):
         url.database = None
 
@@ -544,7 +544,7 @@ def create_database(url, encoding='utf8', template=None):
             )
 
         if not template:
-            template = 'template0'
+            template = 'template1'
 
         text = "CREATE DATABASE {0} ENCODING '{1}' TEMPLATE {2}".format(
             quote(engine, database),
@@ -591,7 +591,7 @@ def drop_database(url):
     database = url.database
 
     if url.drivername.startswith('postgres'):
-        url.database = 'template1'
+        url.database = 'postgres'
     elif not url.drivername.startswith('sqlite'):
         url.database = None
 
