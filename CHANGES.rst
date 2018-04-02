@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.33.2 (2018-04-02)
+^^^^^^^^^^^^^^^^^^^
+
+- Added support for universal wheels (#312, pull request courtesy of nsoranzo)
+- Fixed usage of template0 and template1 with postgres database functions. (#286, pull request courtesy of funkybob)
+
+
 0.33.1 (2018-03-19)
 ^^^^^^^^^^^^^^^^^^^
 
