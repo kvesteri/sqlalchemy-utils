@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import base64
 import datetime
+import os
 
 import six
 from sqlalchemy.types import LargeBinary, String, TypeDecorator
@@ -18,6 +19,7 @@ try:
         Cipher, algorithms, modes
     )
     from cryptography.fernet import Fernet
+    from cryptography.exceptions import InvalidTag
 except ImportError:
     pass
 
@@ -27,6 +29,10 @@ try:
     import dateutil
     from dateutil.parser import parse as datetime_parse
 except ImportError:
+    pass
+
+
+class InvalidCiphertextError(Exception):
     pass
 
 
@@ -54,7 +60,18 @@ class EncryptionDecryptionBaseEngine(object):
 
 
 class AesEngine(EncryptionDecryptionBaseEngine):
-    """Provide AES encryption and decryption methods."""
+    """Provide AES encryption and decryption methods.
+
+    You may also consider using the AesGcmEngine instead -- that may be
+    a better fit for some cases.
+
+    You should NOT use the AesGcmEngine if you want to be able to search
+    for a row based on the value of an encrypted column. Use AesEngine
+    instead, since that allows you to perform such searches.
+
+    If you don't need to search by the value of an encypted column, the
+    AesGcmEngine provides better security.
+    """
 
     BLOCK_SIZE = 16
 
@@ -107,6 +124,73 @@ class AesEngine(EncryptionDecryptionBaseEngine):
                 decrypted = decrypted.decode('utf-8')
             except UnicodeDecodeError:
                 raise ValueError('Invalid decryption key')
+        return decrypted
+
+
+class AesGcmEngine(EncryptionDecryptionBaseEngine):
+    """Provide AES/GCM encryption and decryption methods.
+
+    You may also consider using the AesEngine instead -- that may be
+    a better fit for some cases.
+
+    You should NOT use this AesGcmEngine if you want to be able to search
+    for a row based on the value of an encrypted column. Use AesEngine
+    instead, since that allows you to perform such searches.
+
+    If you don't need to search by the value of an encypted column, the
+    AesGcmEngine provides better security.
+    """
+
+    BLOCK_SIZE = 16
+    IV_BYTES_NEEDED = 12
+    TAG_SIZE_BYTES = BLOCK_SIZE
+
+    def _initialize_engine(self, parent_class_key):
+        self.secret_key = parent_class_key
+
+    def encrypt(self, value):
+        if not isinstance(value, six.string_types):
+            value = repr(value)
+        if isinstance(value, six.text_type):
+            value = str(value)
+        value = value.encode()
+        iv = os.urandom(self.IV_BYTES_NEEDED)
+        cipher = Cipher(
+            algorithms.AES(self.secret_key),
+            modes.GCM(iv),
+            backend=default_backend()
+        )
+        encryptor = cipher.encryptor()
+        encrypted = encryptor.update(value) + encryptor.finalize()
+        assert len(encryptor.tag) == self.TAG_SIZE_BYTES
+        encrypted = base64.b64encode(iv + encryptor.tag + encrypted)
+        return encrypted
+
+    def decrypt(self, value):
+        if isinstance(value, six.text_type):
+            value = str(value)
+        decrypted = base64.b64decode(value)
+        if len(decrypted) < self.IV_BYTES_NEEDED + self.TAG_SIZE_BYTES:
+            raise InvalidCiphertextError()
+        iv = decrypted[:self.IV_BYTES_NEEDED]
+        tag = decrypted[self.IV_BYTES_NEEDED:
+                        self.IV_BYTES_NEEDED + self.TAG_SIZE_BYTES]
+        decrypted = decrypted[self.IV_BYTES_NEEDED + self.TAG_SIZE_BYTES:]
+        cipher = Cipher(
+            algorithms.AES(self.secret_key),
+            modes.GCM(iv, tag),
+            backend=default_backend()
+        )
+        decryptor = cipher.decryptor()
+        try:
+            decrypted = decryptor.update(decrypted) + decryptor.finalize()
+        except InvalidTag:
+            raise InvalidCiphertextError()
+        if not isinstance(decrypted, six.string_types):
+            try:
+                decrypted = decrypted.decode('utf-8')
+            except UnicodeDecodeError:
+                raise InvalidCiphertextError()
         return decrypted
 
 
