@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.33.3 (2018-04-29)
+^^^^^^^^^^^^^^^^^^^
+
+- Added new AesGcmEngine (#322, pull request courtesy of manishahluwalia)
+
+
 0.33.2 (2018-04-02)
 ^^^^^^^^^^^^^^^^^^^
 
