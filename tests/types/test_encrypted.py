@@ -6,8 +6,10 @@ import sqlalchemy as sa
 from sqlalchemy_utils import ColorType, EncryptedType, PhoneNumberType
 from sqlalchemy_utils.types.encrypted.encrypted_type import (
     AesEngine,
+    AesGcmEngine,
     DatetimeHandler,
-    FernetEngine
+    FernetEngine,
+    InvalidCiphertextError
 )
 
 cryptography = None
@@ -441,3 +443,93 @@ class TestDatetimeHandler(object):
             original_date_isoformat,
             python_type
         ) == original_date
+
+
+@pytest.mark.skipif('cryptography is None')
+class TestAesGcmEngine(object):
+    KEY = b'0123456789ABCDEF'
+
+    def setup_method(self):
+        self.engine = AesGcmEngine()
+        self.engine._initialize_engine(TestAesGcmEngine.KEY)
+
+    def test_roundtrip(self):
+        for l in range(0, 36):
+            plaintext = '0123456789abcdefghijklmnopqrstuvwxyz'[:l]
+            encrypted = self.engine.encrypt(plaintext)
+            decrypted = self.engine.decrypt(encrypted)
+            assert plaintext == decrypted, "Round-trip failed for len: %d" % l
+
+    def test_modified_iv_fails_to_decrypt(self):
+        plaintext = 'abcdefgh'
+        encrypted = self.engine.encrypt(plaintext)
+        # 3rd char will be IV. Modify it
+        POS = 3
+        encrypted = encrypted[:POS] + \
+            (b'A' if encrypted[POS] != b'A' else b'B') + \
+            encrypted[POS + 1:]
+        with pytest.raises(InvalidCiphertextError):
+            self.engine.decrypt(encrypted)
+
+    def test_modified_tag_fails_to_decrypt(self):
+        plaintext = 'abcdefgh'
+        encrypted = self.engine.encrypt(plaintext)
+        # 19th char will be tag. Modify it
+        POS = 19
+        encrypted = encrypted[:POS] + \
+            (b'A' if encrypted[POS] != b'A' else b'B') + \
+            encrypted[POS + 1:]
+        with pytest.raises(InvalidCiphertextError):
+            self.engine.decrypt(encrypted)
+
+    def test_modified_ciphertext_fails_to_decrypt(self):
+        plaintext = 'abcdefgh'
+        encrypted = self.engine.encrypt(plaintext)
+        # 43rd char will be ciphertext. Modify it
+        POS = 43
+        encrypted = encrypted[:POS] + \
+            (b'A' if encrypted[POS] != b'A' else b'B') + \
+            encrypted[POS + 1:]
+        with pytest.raises(InvalidCiphertextError):
+            self.engine.decrypt(encrypted)
+
+    def test_too_short_ciphertext_fails_to_decrypt(self):
+        plaintext = 'abcdefgh'
+        encrypted = self.engine.encrypt(plaintext)[:20]
+        with pytest.raises(InvalidCiphertextError):
+            self.engine.decrypt(encrypted)
+
+    def test_different_ciphertexts_each_time(self):
+        plaintext = 'abcdefgh'
+        encrypted1 = self.engine.encrypt(plaintext)
+        encrypted2 = self.engine.encrypt(plaintext)
+        assert self.engine.decrypt(encrypted1) == \
+            self.engine.decrypt(encrypted2)
+        # The following has a very low probability of failing
+        # accidentally (2^-96)
+        assert encrypted1 != encrypted2
+
+
+class TestAesGcmEncryptedType(EncryptedTypeTestCase):
+
+    @pytest.fixture
+    def encryption_engine(self):
+        return AesGcmEngine
+
+    # GCM doesn't need padding. This is here just because we're reusing test
+    # code that requires this
+    @pytest.fixture
+    def padding_mechanism(self):
+        return 'pkcs5'
+
+    def test_lookup_by_encrypted_string(self, session, User, user, user_name):
+        test = session.query(User).filter(
+            User.username == "someonex"
+        ).first()
+
+        # With probability 1-2^-96, the 2 different encryptions will choose a
+        # different IV, and will therefore result in different ciphertexts.
+        # Thus, the 2 values will almost certainly be different, even though
+        # we're really searching for the same username. Hence, the above search
+        # will fail
+        assert test is None
