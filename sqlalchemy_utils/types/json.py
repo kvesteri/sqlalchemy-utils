@@ -77,12 +77,22 @@ class JSONType(sa.types.TypeDecorator):
         if dialect.name == 'postgresql' and has_postgres_json:
             return value
         if value is not None:
-            value = six.text_type(json.dumps(value))
+            if (hasattr(dialect, "_json_serializer")
+               and dialect._json_serializer):
+                serializer = dialect._json_serializer
+            else:
+                serializer = json.dumps
+            value = six.text_type(serializer(value))
         return value
 
     def process_result_value(self, value, dialect):
         if dialect.name == 'postgresql':
             return value
         if value is not None:
-            value = json.loads(value)
+            if (hasattr(dialect, "_json_deserializer")
+               and dialect._json_deserializer):
+                deserializer = dialect._json_deserializer
+            else:
+                deserializer = json.loads
+            value = deserializer(value)
         return value
