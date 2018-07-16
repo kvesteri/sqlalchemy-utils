@@ -25,7 +25,8 @@ class Country(object):
 
         Country(Country('FI')).code  # 'FI'
 
-    Country always validates the given code.
+    Country always validates the given code if you use at least the optional
+    dependency list 'babel', otherwise no validation are performed.
 
     ::
 
@@ -76,6 +77,9 @@ class Country(object):
             raise ValueError(
                 'Could not convert string to country code: {0}'.format(code)
             )
+        except AttributeError:
+            # As babel is optional, we may raise an AttributeError accessing it
+            pass
 
     def __eq__(self, other):
         if isinstance(other, Country):
