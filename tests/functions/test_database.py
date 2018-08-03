@@ -118,3 +118,12 @@ class TestDatabasePostgresCreateDatabaseCloseConnection(object):
         for dsn_item in dsn_list:
             drop_database(dsn_item)
             assert not database_exists(dsn_item)
+
+
+@pytest.mark.usefixtures('mssql_dsn')
+class TestDatabaseMssql(DatabaseTest):
+
+    @pytest.fixture
+    def db_name(self):
+        pytest.importorskip('pyodbc')
+        return 'db_test_sqlalchemy_util'

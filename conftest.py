@@ -78,11 +78,37 @@ def sqlite_file_dsn():
 
 
 @pytest.fixture
+def mssql_db_user():
+    return os.environ.get('SQLALCHEMY_UTILS_TEST_MSSQL_USER', 'sa')
+
+
+@pytest.fixture
+def mssql_db_password():
+    return os.environ.get('SQLALCHEMY_UTILS_TEST_MSSQL_PASSWORD',
+                          'Strong!Passw0rd')
+
+
+@pytest.fixture
+def mssql_db_driver():
+    driver = os.environ.get('SQLALCHEMY_UTILS_TEST_MSSQL_DRIVER',
+                            'ODBC Driver 17 for SQL Server')
+    return driver.replace(' ', '+')
+
+
+@pytest.fixture
+def mssql_dsn(mssql_db_user, mssql_db_password, mssql_db_driver, db_name):
+    return 'mssql+pyodbc://{0}:{1}@localhost/{2}?driver={3}'\
+        .format(mssql_db_user, mssql_db_password, db_name, mssql_db_driver)
+
+
+@pytest.fixture
 def dsn(request):
     if 'postgresql_dsn' in request.fixturenames:
         return request.getfuncargvalue('postgresql_dsn')
     elif 'mysql_dsn' in request.fixturenames:
         return request.getfuncargvalue('mysql_dsn')
+    elif 'mssql_dsn' in request.fixturenames:
+        return request.getfuncargvalue('mssql_dsn')
     elif 'sqlite_file_dsn' in request.fixturenames:
         return request.getfuncargvalue('sqlite_file_dsn')
     elif 'sqlite_memory_dsn' in request.fixturenames:
