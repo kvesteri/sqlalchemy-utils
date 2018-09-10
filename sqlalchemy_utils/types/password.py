@@ -205,16 +205,16 @@ class PasswordType(types.TypeDecorator, ScalarCoercible):
 
     def process_bind_param(self, value, dialect):
         if isinstance(value, Password):
-            # If were given a password secret; encrypt it.
+            # If were given a password secret; hash it.
             if value.secret is not None:
-                return self.context.encrypt(value.secret).encode('utf8')
+                return self.context.hash(value.secret).encode('utf8')
 
             # Value has already been hashed.
             return value.hash
 
         if isinstance(value, six.string_types):
             # Assume value has not been hashed.
-            return self.context.encrypt(value).encode('utf8')
+            return self.context.hash(value).encode('utf8')
 
     def process_result_value(self, value, dialect):
         if value is not None:
@@ -227,16 +227,16 @@ class PasswordType(types.TypeDecorator, ScalarCoercible):
 
         if not isinstance(value, Password):
             # Hash the password using the default scheme.
-            value = self.context.encrypt(value).encode('utf8')
+            value = self.context.hash(value).encode('utf8')
             return Password(value, context=self.context)
 
         else:
             # If were given a password object; ensure the context is right.
             value.context = weakref.proxy(self.context)
 
-            # If were given a password secret; encrypt it.
+            # If were given a password secret; hash it.
             if value.secret is not None:
-                value.hash = self.context.encrypt(value.secret).encode('utf8')
+                value.hash = self.context.hash(value.secret).encode('utf8')
                 value.secret = None
 
         return value
