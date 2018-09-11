@@ -3,6 +3,11 @@ Changelog
 
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
+0.33.4 (2018-09-11)
+^^^^^^^^^^^^^^^^^^^
+
+- Made PasswordType use `hash` function instead of deprecated `encrypt` function (#341, pull request courtesy of libre-man)
+
 
 0.33.3 (2018-04-29)
 ^^^^^^^^^^^^^^^^^^^
