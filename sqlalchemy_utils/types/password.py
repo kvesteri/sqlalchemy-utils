@@ -158,7 +158,7 @@ class PasswordType(types.TypeDecorator, ScalarCoercible):
 
         # Construct the passlib crypt context.
         self.context = LazyCryptContext(**kwargs)
-
+        self.hashing_method = 'hash' if hasattr(self, 'hash') else 'encrypt'
         self._max_length = max_length
 
     @property
@@ -207,18 +207,21 @@ class PasswordType(types.TypeDecorator, ScalarCoercible):
         if isinstance(value, Password):
             # If were given a password secret; hash it.
             if value.secret is not None:
-                return self.context.hash(value.secret).encode('utf8')
+                return self._hash(value.secret).encode('utf8')
 
             # Value has already been hashed.
             return value.hash
 
         if isinstance(value, six.string_types):
             # Assume value has not been hashed.
-            return self.context.hash(value).encode('utf8')
+            return self._hash(value).encode('utf8')
 
     def process_result_value(self, value, dialect):
         if value is not None:
             return Password(value, self.context)
+
+    def _hash(self, value):
+        return getattr(self.context, self.hashing_method)(value)
 
     def _coerce(self, value):
 
@@ -227,7 +230,7 @@ class PasswordType(types.TypeDecorator, ScalarCoercible):
 
         if not isinstance(value, Password):
             # Hash the password using the default scheme.
-            value = self.context.hash(value).encode('utf8')
+            value = self._hash(value).encode('utf8')
             return Password(value, context=self.context)
 
         else:
@@ -236,7 +239,7 @@ class PasswordType(types.TypeDecorator, ScalarCoercible):
 
             # If were given a password secret; hash it.
             if value.secret is not None:
-                value.hash = self.context.hash(value.secret).encode('utf8')
+                value.hash = self._hash(value.secret).encode('utf8')
                 value.secret = None
 
         return value
