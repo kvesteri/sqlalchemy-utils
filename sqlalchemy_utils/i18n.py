@@ -1,3 +1,5 @@
+import inspect
+
 import six
 import sqlalchemy as sa
 from sqlalchemy.ext.compiler import compiles
@@ -23,7 +25,22 @@ except ImportError:
         )
 
 
-def cast_locale(obj, locale):
+if six.PY2:
+    def get_args_count(func):
+        if (
+            callable(func) and
+            not inspect.isfunction(func) and
+            not inspect.ismethod(func)
+        ):
+            func = func.__call__
+        args = inspect.getargspec(func).args
+        return len(args) - 1 if inspect.ismethod(func) else len(args)
+else:
+    def get_args_count(func):
+        return len(inspect.signature(func).parameters)
+
+
+def cast_locale(obj, locale, attr):
     """
     Cast given locale to string. Supports also callbacks that return locales.
 
@@ -33,24 +50,28 @@ def cast_locale(obj, locale):
         Locale object or string or callable that returns a locale.
     """
     if callable(locale):
-        try:
+        args_count = get_args_count(locale)
+        if args_count == 0:
             locale = locale()
-        except TypeError:
+        elif args_count == 1:
             locale = locale(obj)
+        elif args_count == 2:
+            locale = locale(obj, attr.key)
     if isinstance(locale, babel.Locale):
         return str(locale)
     return locale
 
 
 class cast_locale_expr(ColumnElement):
-    def __init__(self, cls, locale):
+    def __init__(self, cls, locale, attr):
         self.cls = cls
         self.locale = locale
+        self.attr = attr
 
 
 @compiles(cast_locale_expr)
 def compile_cast_locale_expr(element, compiler, **kw):
-    locale = cast_locale(element.cls, element.locale)
+    locale = cast_locale(element.cls, element.locale, element.attr)
     if isinstance(locale, six.string_types):
         return "'{0}'".format(locale)
     return compiler.process(locale)
@@ -74,13 +95,11 @@ class TranslationHybrid(object):
         is no translation found for default locale it returns None.
         """
         def getter(obj):
-            current_locale = cast_locale(obj, self.current_locale)
+            current_locale = cast_locale(obj, self.current_locale, attr)
             try:
                 return getattr(obj, attr.key)[current_locale]
             except (TypeError, KeyError):
-                default_locale = cast_locale(
-                    obj, self.default_locale
-                )
+                default_locale = cast_locale(obj, self.default_locale, attr)
                 try:
                     return getattr(obj, attr.key)[default_locale]
                 except (TypeError, KeyError):
@@ -91,15 +110,15 @@ class TranslationHybrid(object):
         def setter(obj, value):
             if getattr(obj, attr.key) is None:
                 setattr(obj, attr.key, {})
-            locale = cast_locale(obj, self.current_locale)
+            locale = cast_locale(obj, self.current_locale, attr)
             getattr(obj, attr.key)[locale] = value
         return setter
 
     def expr_factory(self, attr):
         def expr(cls):
             cls_attr = getattr(cls, attr.key)
-            current_locale = cast_locale_expr(cls, self.current_locale)
-            default_locale = cast_locale_expr(cls, self.default_locale)
+            current_locale = cast_locale_expr(cls, self.current_locale, attr)
+            default_locale = cast_locale_expr(cls, self.default_locale, attr)
             return sa.func.coalesce(
                 cls_attr[current_locale],
                 cls_attr[default_locale]

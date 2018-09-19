@@ -59,6 +59,17 @@ class TestTranslationHybrid(object):
 
         assert city.name == 'Helsinki'
 
+    def test_fallback_to_attr_dependent_locale(self, City, translation_hybrid):
+        translation_hybrid.current_locale = 'en'
+        translation_hybrid.default_locale = (
+            lambda obj, attr: sorted(getattr(obj, attr).keys())[0]
+        )
+        city = City(name_translations={})
+        city.name_translations['fi'] = 'Helsinki'
+        assert city.name == 'Helsinki'
+        city.name_translations['de'] = 'Stadt Helsinki'
+        assert city.name == 'Stadt Helsinki'
+
     @pytest.mark.parametrize(
         ('name_translations', 'name'),
         (
