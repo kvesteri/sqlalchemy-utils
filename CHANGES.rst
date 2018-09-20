@@ -7,6 +7,7 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 0.33.5 (2018-09-19)
 ^^^^^^^^^^^^^^^^^^^
 
+- Added optional attr parameter for locale calleble in TranslationHybrid
 - Fixed an issue with PasswordType so that it is compatible with older versions of passlib (#342)
 
 
