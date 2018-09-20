@@ -120,7 +120,9 @@ Dynamic locales
 ---------------
 
 Sometimes locales need to be dynamic. The following example illustrates how to setup
-dynamic locales.
+dynamic locales. You can pass a callable of either 0, 1 or 2 args as a constructor parameter for TranslationHybrid.
+
+The first argument should be the associated object and second parameter the name of the translations attribute.
 
 
 ::
@@ -142,10 +144,22 @@ dynamic locales.
 
 
     article = Article(name_translations={'en': 'Some article'})
+    article.locale = 'en'
     session.add(article)
     session.commit()
 
     article.name  # Some article (even if current locale is other than 'en')
+
+
+The locales can also be attribute dependent so you can set up translation hybrid in a way that
+it is guaranteed to return a translation.
+
+::
+
+    translation_hybrid.default_locale = lambda obj, attr: sorted(getattr(obj, attr).keys())[0]
+
+
+    article.name  # Some article
 
 
 
