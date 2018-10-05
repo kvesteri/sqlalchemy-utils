@@ -35,7 +35,7 @@ extras_require = {
         'python-dateutil>=2.2',
         'pymysql',
         'flake8>=2.4.0',
-        'isort>=4.2.2',
+        'isort>=4.2.2, <4.3.0',
     ],
     'anyjson': ['anyjson>=0.3.3'],
     'babel': ['Babel>=1.3'],

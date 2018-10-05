@@ -2,6 +2,7 @@ import six
 
 
 class GenericRelationshipTestCase(object):
+
     def test_set_as_none(self, Event):
         event = Event()
         event.object = None
@@ -33,7 +34,9 @@ class GenericRelationshipTestCase(object):
         event = Event(object=user)
 
         assert event.object_id == user.id
-        assert event.object_type == type(user).__name__
+        assert event.object_type == Event.object.property.type2discriminator(
+            type(user).__name__
+        )
 
         session.add(event)
         session.commit()
