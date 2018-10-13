@@ -3,28 +3,32 @@ from sqlalchemy.ext import compiler
 from sqlalchemy.schema import DDLElement, PrimaryKeyConstraint
 
 
-class CreateMaterializedView(DDLElement):
-    def __init__(self, name, selectable):
+class CreateView(DDLElement):
+    def __init__(self, name, selectable, materialized=False):
         self.name = name
         self.selectable = selectable
+        self.materialized = materialized
 
 
-@compiler.compiles(CreateMaterializedView)
+@compiler.compiles(CreateView)
 def compile_create_materialized_view(element, compiler, **kw):
-    return 'CREATE MATERIALIZED VIEW %s AS %s' % (
+    return 'CREATE {}VIEW {} AS {}'.format(
+        'MATERIALIZED ' if element.materialized else '',
         element.name,
         compiler.sql_compiler.process(element.selectable, literal_binds=True),
     )
 
 
-class DropMateralizedView(DDLElement):
-    def __init__(self, name):
+class DropView(DDLElement):
+    def __init__(self, name, materialized=False):
         self.name = name
+        self.materialized = materialized
 
 
-@compiler.compiles(DropMateralizedView)
+@compiler.compiles(DropView)
 def compile_drop_materialized_view(element, compiler, **kw):
-    return 'DROP MATERIALIZED VIEW IF EXISTS {} CASCADE'.format(
+    return 'DROP {}VIEW IF EXISTS {} CASCADE'.format(
+        'MATERIALIZED ' if element.materialized else '',
         element.name
     )
 
@@ -68,7 +72,7 @@ def create_materialized_view(
     sa.event.listen(
         metadata,
         'after_create',
-        CreateMaterializedView(name, selectable)
+        CreateView(name, selectable, materialized=True)
     )
 
     @sa.event.listens_for(metadata, 'after_create')
@@ -76,7 +80,33 @@ def create_materialized_view(
         for idx in table.indexes:
             idx.create(connection)
 
-    sa.event.listen(metadata, 'before_drop', DropMateralizedView(name))
+    sa.event.listen(
+        metadata,
+        'before_drop',
+        DropView(name, materialized=True)
+    )
+    return table
+
+
+def create_view(
+    name,
+    selectable,
+    metadata
+):
+    table = create_table_from_selectable(
+        name=name,
+        selectable=selectable,
+        metadata=None
+    )
+
+    sa.event.listen(metadata, 'after_create', CreateView(name, selectable))
+
+    @sa.event.listens_for(metadata, 'after_create')
+    def create_indexes(target, connection, **kw):
+        for idx in table.indexes:
+            idx.create(connection)
+
+    sa.event.listen(metadata, 'before_drop', DropView(name))
     return table
 
 
