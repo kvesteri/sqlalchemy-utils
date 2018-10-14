@@ -502,7 +502,7 @@ def database_exists(url):
                 engine.dispose()
 
 
-def create_database(url, encoding='utf8', template=None):
+def create_database(url, encoding='utf8', template=None,collate=None):
     """Issue the appropriate CREATE DATABASE statement.
 
     :param url: A SQLAlchemy engine URL.
@@ -554,10 +554,17 @@ def create_database(url, encoding='utf8', template=None):
         result_proxy = engine.execute(text)
 
     elif engine.dialect.name == 'mysql':
-        text = "CREATE DATABASE {0} CHARACTER SET = '{1}'".format(
-            quote(engine, database),
-            encoding
-        )
+        if collate:
+            text = "CREATE DATABASE {0} CHARACTER SET = '{1}' COLLATE {2}".format(
+                quote(engine, database),
+                encoding,
+                collate
+            )
+        else:
+            text = "CREATE DATABASE {0} CHARACTER SET = '{1}'".format(
+                quote(engine, database),
+                encoding
+            )
         result_proxy = engine.execute(text)
 
     elif engine.dialect.name == 'sqlite' and database != ':memory:':
