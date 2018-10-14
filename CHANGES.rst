@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.33.6 (2018-10-14)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed passlib compatibility issue (again) (#342)
+- Added support for SQL VIEWs
+
+
 0.33.5 (2018-09-19)
 ^^^^^^^^^^^^^^^^^^^
 
