@@ -158,12 +158,15 @@ class PasswordType(types.TypeDecorator, ScalarCoercible):
 
         # Construct the passlib crypt context.
         self.context = LazyCryptContext(**kwargs)
-        self.hashing_method = (
+        self._max_length = max_length
+
+    @property
+    def hashing_method(self):
+        return (
             'hash'
             if hasattr(self.context, 'hash')
             else 'encrypt'
         )
-        self._max_length = max_length
 
     @property
     def length(self):
