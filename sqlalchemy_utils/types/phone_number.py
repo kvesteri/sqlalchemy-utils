@@ -29,7 +29,7 @@ class PhoneNumberParseException(NumberParseException, exc.DontWrapMixin):
 
 @str_coercible
 class PhoneNumber(BasePhoneNumber):
-    '''
+    """
     Extends a PhoneNumber class from `Python phonenumbers library`_. Adds
     different phone number formats to attributes, so they can be easily used
     in templates. Phone number validation method is also implemented.
@@ -72,8 +72,12 @@ class PhoneNumber(BasePhoneNumber):
         String representation of the phone number.
     :param region:
         Region of the phone number.
-    '''
-    def __init__(self, raw_number, region=None):
+    :param check_region:
+        Whether to check the supplied region parameter;
+        should always be True for external callers.
+        Can be useful for short codes or toll free
+    """
+    def __init__(self, raw_number, region=None, check_region=True):
         # Bail if phonenumbers is not found.
         if phonenumbers is None:
             raise ImproperlyConfigured(
@@ -81,7 +85,11 @@ class PhoneNumber(BasePhoneNumber):
             )
 
         try:
-            self._phone_number = phonenumbers.parse(raw_number, region)
+            self._phone_number = phonenumbers.parse(
+                raw_number,
+                region,
+                _check_region=check_region
+            )
         except NumberParseException as e:
             # Wrap exception so SQLAlchemy doesn't swallow it as a
             # StatementError
