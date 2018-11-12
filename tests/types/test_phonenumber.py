@@ -90,6 +90,18 @@ class TestPhoneNumber(object):
         assert number.international == u'+358 40 1234567'
         assert number.national == u'040 1234567'
 
+    def test_phone_number_attributes_for_short_code(self):
+        """
+        For international and national shortcode remains the same, if we pass
+        short code to PhoneNumber library without giving check_region it will
+        raise exception
+        :return:
+        """
+        number = PhoneNumber('72404', check_region=False)
+        assert number.e164 == u'+072404'
+        assert number.international == u'72404'
+        assert number.national == u'72404'
+
     def test_phone_number_str_repr(self):
         number = PhoneNumber('+358401234567')
         if six.PY2:
