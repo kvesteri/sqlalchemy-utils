@@ -384,8 +384,10 @@ class TestFernetEncryptedTypeTestCase(EncryptedTypeTestCase):
 
 class TestDatetimeHandler(object):
 
-    def test_datetime_with_micro_and_timezone(self):
-        original_datetime = datetime_with_micro_and_timezone()
+    def test_datetime_with_micro_and_timezone(
+        self, datetime_with_micro_and_timezone
+    ):
+        original_datetime = datetime_with_micro_and_timezone
         original_datetime_isoformat = original_datetime.isoformat()
         python_type = datetime
 
@@ -394,8 +396,8 @@ class TestDatetimeHandler(object):
             python_type
         ) == original_datetime
 
-    def test_datetime_with_micro(self):
-        original_datetime = datetime_with_micro()
+    def test_datetime_with_micro(self, datetime_with_micro):
+        original_datetime = datetime_with_micro
         original_datetime_isoformat = original_datetime.isoformat()
         python_type = datetime
 
@@ -404,8 +406,8 @@ class TestDatetimeHandler(object):
             python_type
         ) == original_datetime
 
-    def test_datetime_simple(self):
-        original_datetime = datetime_simple()
+    def test_datetime_simple(self, datetime_simple):
+        original_datetime = datetime_simple
         original_datetime_isoformat = original_datetime.isoformat()
         python_type = datetime
 
@@ -414,8 +416,8 @@ class TestDatetimeHandler(object):
             python_type
         ) == original_datetime
 
-    def test_time_with_micro(self):
-        original_time = time_with_micro()
+    def test_time_with_micro(self, time_with_micro):
+        original_time = time_with_micro
         original_time_isoformat = original_time.isoformat()
         python_type = time
 
@@ -424,8 +426,8 @@ class TestDatetimeHandler(object):
             python_type
         ) == original_time
 
-    def test_time_simple(self):
-        original_time = time_simple()
+    def test_time_simple(self, time_simple):
+        original_time = time_simple
         original_time_isoformat = original_time.isoformat()
         python_type = time
 
@@ -434,8 +436,8 @@ class TestDatetimeHandler(object):
             python_type
         ) == original_time
 
-    def test_date_simple(self):
-        original_date = date_simple()
+    def test_date_simple(self, date_simple):
+        original_date = date_simple
         original_date_isoformat = original_date.isoformat()
         python_type = date
 

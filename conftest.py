@@ -104,16 +104,16 @@ def mssql_dsn(mssql_db_user, mssql_db_password, mssql_db_driver, db_name):
 @pytest.fixture
 def dsn(request):
     if 'postgresql_dsn' in request.fixturenames:
-        return request.getfuncargvalue('postgresql_dsn')
+        return request.getfixturevalue('postgresql_dsn')
     elif 'mysql_dsn' in request.fixturenames:
-        return request.getfuncargvalue('mysql_dsn')
+        return request.getfixturevalue('mysql_dsn')
     elif 'mssql_dsn' in request.fixturenames:
-        return request.getfuncargvalue('mssql_dsn')
+        return request.getfixturevalue('mssql_dsn')
     elif 'sqlite_file_dsn' in request.fixturenames:
-        return request.getfuncargvalue('sqlite_file_dsn')
+        return request.getfixturevalue('sqlite_file_dsn')
     elif 'sqlite_memory_dsn' in request.fixturenames:
         pass  # Return default
-    return request.getfuncargvalue('sqlite_memory_dsn')
+    return request.getfixturevalue('sqlite_memory_dsn')
 
 
 @pytest.fixture
