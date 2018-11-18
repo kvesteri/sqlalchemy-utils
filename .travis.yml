@@ -4,6 +4,9 @@ language: python
 addons:
   postgresql: "9.4"
 
+services:
+  - docker
+
 before_script:
   - psql -c 'create database sqlalchemy_utils_test;' -U postgres
   - psql -c 'create extension hstore;' -U postgres -d sqlalchemy_utils_test
@@ -28,6 +31,7 @@ matrix:
       - "TOXENV=lint"
 
 install:
+  - source $TRAVIS_BUILD_DIR/.travis/install_mssql.sh
   - pip install tox
 
 script:
