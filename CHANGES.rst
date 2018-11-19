@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.33.8 (2018-11-19)
+^^^^^^^^^^^^^^^^^^^
+
+- Added support of short-code in PhoneNumberType (#348, pull request courtesy of anandtripathi5)
+
+
 0.33.7 (2018-11-19)
 ^^^^^^^^^^^^^^^^^^^
 
