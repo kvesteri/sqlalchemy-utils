@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.33.7 (2018-11-19)
+^^^^^^^^^^^^^^^^^^^
+
+- Added MSSQL support for create_database and drop_database (#337, pull request courtesy of jomasti)
+
+
 0.33.6 (2018-10-14)
 ^^^^^^^^^^^^^^^^^^^
 
