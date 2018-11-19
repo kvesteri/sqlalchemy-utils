@@ -530,10 +530,15 @@ def create_database(url, encoding='utf8', template=None):
 
     if url.drivername.startswith('postgres'):
         url.database = 'postgres'
+    elif url.drivername.startswith('mssql'):
+        url.database = 'master'
     elif not url.drivername.startswith('sqlite'):
         url.database = None
 
-    engine = sa.create_engine(url)
+    if url.drivername == 'mssql+pyodbc':
+        engine = sa.create_engine(url, connect_args={'autocommit': True})
+    else:
+        engine = sa.create_engine(url)
     result_proxy = None
 
     if engine.dialect.name == 'postgresql':
@@ -592,10 +597,15 @@ def drop_database(url):
 
     if url.drivername.startswith('postgres'):
         url.database = 'postgres'
+    elif url.drivername.startswith('mssql'):
+        url.database = 'master'
     elif not url.drivername.startswith('sqlite'):
         url.database = None
 
-    engine = sa.create_engine(url)
+    if url.drivername == 'mssql+pyodbc':
+        engine = sa.create_engine(url, connect_args={'autocommit': True})
+    else:
+        engine = sa.create_engine(url)
     conn_resource = None
 
     if engine.dialect.name == 'sqlite' and database != ':memory:':
