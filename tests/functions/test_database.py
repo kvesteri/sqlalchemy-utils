@@ -35,7 +35,10 @@ class TestDatabaseSQLiteMemoryNoDatabaseString(object):
 
 @pytest.mark.usefixtures('sqlite_file_dsn')
 class TestDatabaseSQLiteFile(DatabaseTest):
-    pass
+    def test_existing_non_sqlite_file(self, dsn):
+        database = sa.engine.url.make_url(dsn).database
+        open(database, 'w').close()
+        self.test_create_and_drop(dsn)
 
 
 @pytest.mark.skipif('pymysql is None')

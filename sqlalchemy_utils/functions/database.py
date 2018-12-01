@@ -458,6 +458,15 @@ def database_exists(url):
         engine.dispose()
         return result
 
+    def sqlite_file_exists(database):
+        if not os.path.isfile(database) or os.path.getsize(database) < 100:
+            return False
+
+        with open(database, 'rb') as f:
+            header = f.read(100)
+
+        return header[:16] == b'SQLite format 3\x00'
+
     url = copy(make_url(url))
     database = url.database
     if url.drivername.startswith('postgres'):
@@ -478,7 +487,7 @@ def database_exists(url):
 
     elif engine.dialect.name == 'sqlite':
         if database:
-            return database == ':memory:' or os.path.exists(database)
+            return database == ':memory:' or sqlite_file_exists(database)
         else:
             # The default SQLAlchemy database is in memory,
             # and :memory is not required, thus we should support that use-case
@@ -567,7 +576,8 @@ def create_database(url, encoding='utf8', template=None):
 
     elif engine.dialect.name == 'sqlite' and database != ':memory:':
         if database:
-            open(database, 'w').close()
+            engine.execute("CREATE TABLE DB(id int);")
+            engine.execute("DROP TABLE DB;")
 
     else:
         text = 'CREATE DATABASE {0}'.format(quote(engine, database))
