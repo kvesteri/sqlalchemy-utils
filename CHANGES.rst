@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.33.9 (2018-11-19)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed SQLite database_exists to check for correct file format (#306, pull request courtesy of jomasti)
+
+
 0.33.8 (2018-11-19)
 ^^^^^^^^^^^^^^^^^^^
 
