@@ -73,7 +73,7 @@ def sqlite_none_database_dsn():
 
 
 @pytest.fixture
-def sqlite_file_dsn():
+def sqlite_file_dsn(db_name):
     return 'sqlite:///{0}.db'.format(db_name)
 
 
