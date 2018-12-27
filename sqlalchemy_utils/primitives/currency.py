@@ -26,7 +26,8 @@ class Currency(object):
 
         Currency(Currency('USD')).code  # 'USD'
 
-    Currency always validates the given code.
+    Currency always validates the given code if you use at least the optional
+    dependency list 'babel', otherwise no validation are performed.
 
     ::
 
@@ -75,6 +76,9 @@ class Currency(object):
             i18n.babel.Locale('en').currencies[code]
         except KeyError:
             raise ValueError("'{0}' is not valid currency code.".format(code))
+        except AttributeError:
+            # As babel is optional, we may raise an AttributeError accessing it
+            pass
 
     @property
     def symbol(self):
