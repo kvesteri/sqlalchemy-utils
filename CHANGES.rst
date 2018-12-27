@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.33.10 (2018-12-27)
+^^^^^^^^^^^^^^^^^^^^
+
+- Removed optional dependency to Flask-Babel. Now using Babel instead. (#333, pull request courtesy of aveuiller)
+
+
 0.33.9 (2018-11-19)
 ^^^^^^^^^^^^^^^^^^^
 
