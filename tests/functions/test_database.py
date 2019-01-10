@@ -104,6 +104,18 @@ class TestDatabasePostgresWithQuotedName(DatabaseTest):
         create_database(dsn, template='my-template')
 
 
+class TestDatabasePostgresPg8000(object):
+
+    def test_create_database_pg8000_driver(self, postgresql_db_user, db_name):
+        dsn = 'postgresql+pg8000://{0}@localhost/{1}'.format(
+            postgresql_db_user,
+            db_name
+        )
+        assert not database_exists(dsn)
+        create_database(dsn)
+        assert database_exists(dsn)
+
+
 class TestDatabasePostgresCreateDatabaseCloseConnection(object):
     def test_create_database_twice(self, postgresql_db_user):
         dsn_list = [

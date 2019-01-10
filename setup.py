@@ -31,6 +31,7 @@ extras_require = {
         'flexmock>=0.9.7',
         'mock==2.0.0',
         'psycopg2>=2.5.1',
+        'pg8000>=1.12.4',
         'pytz>=2014.2',
         'python-dateutil>=2.2',
         'pymysql',
