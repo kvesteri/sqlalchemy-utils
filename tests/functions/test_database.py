@@ -109,7 +109,7 @@ class TestDatabasePostgresPg8000(object):
     def test_create_database_pg8000_driver(self, postgresql_db_user, db_name):
         dsn = 'postgresql+pg8000://{0}@localhost/{1}'.format(
             postgresql_db_user,
-            db_name
+            '{}_to_test_pg8000_driver'.format(db_name)
         )
         assert not database_exists(dsn)
         create_database(dsn)
