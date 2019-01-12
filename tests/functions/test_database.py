@@ -81,6 +81,16 @@ class TestDatabasePostgres(DatabaseTest):
         create_database(dsn, template='my_template')
 
 
+class TestDatabasePostgresPg8000(DatabaseTest):
+
+    @pytest.fixture
+    def dsn(self, postgresql_db_user):
+        return 'postgresql+pg8000://{0}@localhost/{1}'.format(
+            postgresql_db_user,
+            'db_to_test_create_and_drop_via_pg8000_driver'
+        )
+
+
 @pytest.mark.usefixtures('postgresql_dsn')
 class TestDatabasePostgresWithQuotedName(DatabaseTest):
 
@@ -102,18 +112,6 @@ class TestDatabasePostgresWithQuotedName(DatabaseTest):
             postgresql_db_user
         )
         create_database(dsn, template='my-template')
-
-
-class TestDatabasePostgresPg8000(object):
-
-    def test_create_database_pg8000_driver(self, postgresql_db_user, db_name):
-        dsn = 'postgresql+pg8000://{0}@localhost/{1}'.format(
-            postgresql_db_user,
-            '{}_to_test_pg8000_driver'.format(db_name)
-        )
-        assert not database_exists(dsn)
-        create_database(dsn)
-        assert database_exists(dsn)
 
 
 class TestDatabasePostgresCreateDatabaseCloseConnection(object):
