@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.33.11 (2019-01-13)
+^^^^^^^^^^^^^^^^^^^^
+
+- Added support for creating and dropping a PostgreSQL database when using pg8000 driver (#303, pull request courtesy of mohaseeb)
+
+
 0.33.10 (2018-12-27)
 ^^^^^^^^^^^^^^^^^^^^
 
