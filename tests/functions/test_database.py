@@ -81,6 +81,16 @@ class TestDatabasePostgres(DatabaseTest):
         create_database(dsn, template='my_template')
 
 
+class TestDatabasePostgresPg8000(DatabaseTest):
+
+    @pytest.fixture
+    def dsn(self, postgresql_db_user):
+        return 'postgresql+pg8000://{0}@localhost/{1}'.format(
+            postgresql_db_user,
+            'db_to_test_create_and_drop_via_pg8000_driver'
+        )
+
+
 @pytest.mark.usefixtures('postgresql_dsn')
 class TestDatabasePostgresWithQuotedName(DatabaseTest):
 

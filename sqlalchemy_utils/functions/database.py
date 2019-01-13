@@ -546,6 +546,8 @@ def create_database(url, encoding='utf8', template=None):
 
     if url.drivername == 'mssql+pyodbc':
         engine = sa.create_engine(url, connect_args={'autocommit': True})
+    elif url.drivername == 'postgresql+pg8000':
+        engine = sa.create_engine(url, isolation_level='AUTOCOMMIT')
     else:
         engine = sa.create_engine(url)
     result_proxy = None
@@ -614,6 +616,8 @@ def drop_database(url):
 
     if url.drivername == 'mssql+pyodbc':
         engine = sa.create_engine(url, connect_args={'autocommit': True})
+    elif url.drivername == 'postgresql+pg8000':
+        engine = sa.create_engine(url, isolation_level='AUTOCOMMIT')
     else:
         engine = sa.create_engine(url)
     conn_resource = None
