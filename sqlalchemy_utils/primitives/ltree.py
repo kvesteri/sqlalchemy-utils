@@ -36,7 +36,7 @@ class Ltree(object):
     ::
 
         Ltree.validate('1.2.3')
-        Ltree.validate(None)  # raises ValueError
+        Ltree.validate(None)  # raises TypeError
 
 
     Ltree supports equality operators.
@@ -59,7 +59,7 @@ class Ltree(object):
 
     ::
 
-        assert len(Ltree('1.2'))  2
+        assert len(Ltree('1.2')) == 2
         assert len(Ltree('some.one.some.where'))  # 4
 
 

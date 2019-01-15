@@ -18,16 +18,16 @@ class LtreeType(types.Concatenable, types.UserDefinedType, ScalarCoercible):
 
     ::
 
-        from sqlalchemy_utils import LtreeType
+        from sqlalchemy_utils import LtreeType, Ltree
 
 
         class DocumentSection(Base):
             __tablename__ = 'document_section'
-            id = sa.Column(sa.Integer, autoincrement=True)
+            id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
             path = sa.Column(LtreeType)
 
 
-        section = DocumentSection(name='Countries.Finland')
+        section = DocumentSection(path=Ltree('Countries.Finland'))
         session.add(section)
         session.commit()
 
