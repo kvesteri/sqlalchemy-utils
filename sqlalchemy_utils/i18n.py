@@ -15,11 +15,11 @@ except ImportError:
     babel = None
 
 
-try:
-    def get_locale(): return babel.Locale('en')
-except AttributeError:
-    # As babel is optional, we may raise an AttributeError accessing it
-    def get_locale():
+def get_locale():
+    try:
+        return babel.Locale('en')
+    except AttributeError:
+        # As babel is optional, we may raise an AttributeError accessing it
         raise ImproperlyConfigured(
             'Could not load get_locale function using Babel. Either '
             'install Babel or make a similar function and override it '
