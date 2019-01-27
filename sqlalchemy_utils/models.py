@@ -55,7 +55,7 @@ def _generic_repr_method(self, fields):
 
 
 def generic_repr(*fields):
-    """Adds generic ``__repr__()`` method to a decalrative SQLAlchemy model.
+    """Adds generic ``__repr__()`` method to a declarative SQLAlchemy model.
 
     In case if some fields are not loaded from a database, it doesn't
     force their loading and instead repesents them as ``<not loaded>``.
