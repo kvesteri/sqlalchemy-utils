@@ -98,8 +98,30 @@ class Country(object):
     def __lt__(self, other):
         if isinstance(other, Country):
             return self.code < other.code
-        if isinstance(other, str):
+        elif isinstance(other, six.string_types):
             return self.code < other
+        return NotImplemented
+
+    def __le__(self, other):
+        if isinstance(other, Country):
+            return self.code <= other.code
+        elif isinstance(other, six.string_types):
+            return self.code <= other
+        return NotImplemented
+
+    def __ge__(self, other):
+        if isinstance(other, Country):
+            return self.code >= other.code
+        elif isinstance(other, six.string_types):
+            return self.code >= other
+        return NotImplemented
+
+    def __gt__(self, other):
+        if isinstance(other, Country):
+            return self.code > other.code
+        elif isinstance(other, six.string_types):
+            return self.code > other
+        return NotImplemented
 
     def __repr__(self):
         return '%s(%r)' % (self.__class__.__name__, self.code)
