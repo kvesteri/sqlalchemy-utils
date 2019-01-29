@@ -95,6 +95,12 @@ class Country(object):
     def __ne__(self, other):
         return not (self == other)
 
+    def __lt__(self, other):
+        if isinstance(other, Country):
+            return self.code < other.code
+        if isinstance(other, str):
+            return self.code < other
+
     def __repr__(self):
         return '%s(%r)' % (self.__class__.__name__, self.code)
 
