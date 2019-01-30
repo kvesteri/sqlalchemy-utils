@@ -1,3 +1,5 @@
+import operator
+
 import pytest
 import six
 
@@ -56,59 +58,32 @@ class TestCountry(object):
         assert Country(u'FI') != u'sv'
         assert not (Country(u'FI') != u'FI')
 
-    def test_lt_operator(self):
-        assert (Country(u'ES') < u'FI') is True
-        assert (u'ES' < Country(u'FI')) is True
-        assert (Country(u'ES') < Country(u'FI')) is True
+    @pytest.mark.parametrize(
+        'op, code_left, code_right, is_',
+        [
+            (operator.lt, u'ES', u'FI', True),
+            (operator.lt, u'FI', u'ES', False),
+            (operator.lt, u'ES', u'ES', False),
 
-        assert (u'FI' < Country(u'ES')) is False
-        assert (u'FI' < Country(u'ES')) is False
-        assert (Country(u'FI') < Country(u'ES')) is False
+            (operator.le, u'ES', u'FI', True),
+            (operator.le, u'FI', u'ES', False),
+            (operator.le, u'ES', u'ES', True),
 
-        assert (Country(u'ES') < Country(u'ES')) is False
-        assert (u'ES' < Country(u'ES')) is False
-        assert (Country(u'ES') < u'ES') is False
+            (operator.ge, u'ES', u'FI', False),
+            (operator.ge, u'FI', u'ES', True),
+            (operator.ge, u'ES', u'ES', True),
 
-        assert type(Country(u'ES').__lt__(34)) == type(NotImplemented)
-
-    def test_le_operator(self):
-        assert (Country(u'ES') <= u'FI') is True
-        assert (u'ES' <= Country(u'FI')) is True
-        assert (Country(u'ES') <= Country(u'FI')) is True
-
-        assert (u'FI' <= Country(u'ES')) is False
-        assert (u'FI' <= Country(u'ES')) is False
-        assert (Country(u'FI') <= Country(u'ES')) is False
-
-        assert (Country(u'ES') <= Country(u'ES')) is True
-        assert (u'ES' <= Country(u'ES')) is True
-        assert (Country(u'ES') <= u'ES') is True
-
-    def test_ge_operator(self):
-        assert (Country(u'ES') >= u'FI') is False
-        assert (u'ES' >= Country(u'FI')) is False
-        assert (Country(u'ES') >= Country(u'FI')) is False
-
-        assert (u'FI' >= Country(u'ES')) is True
-        assert (u'FI' >= Country(u'ES')) is True
-        assert (Country(u'FI') >= Country(u'ES')) is True
-
-        assert (Country(u'ES') >= Country(u'ES')) is True
-        assert (u'ES' >= Country(u'ES')) is True
-        assert (Country(u'ES') >= u'ES') is True
-
-    def test_gt_operator(self):
-        assert (Country(u'ES') > u'FI') is False
-        assert (u'ES' > Country(u'FI')) is False
-        assert (Country(u'ES') > Country(u'FI')) is False
-
-        assert (u'FI' > Country(u'ES')) is True
-        assert (u'FI' > Country(u'ES')) is True
-        assert (Country(u'FI') > Country(u'ES')) is True
-
-        assert (Country(u'ES') > Country(u'ES')) is False
-        assert (u'ES' > Country(u'ES')) is False
-        assert (Country(u'ES') > u'ES') is False
+            (operator.gt, u'ES', u'FI', False),
+            (operator.gt, u'FI', u'ES', True),
+            (operator.gt, u'ES', u'ES', False),
+        ]
+    )
+    def test_ordering(self, op, code_left, code_right, is_):
+        country_left = Country(code_left)
+        country_right = Country(code_right)
+        assert op(country_left, country_right) is is_
+        assert op(country_left, code_right) is is_
+        assert op(code_left, country_right) is is_
 
     def test_hash(self):
         return hash(Country('FI')) == hash('FI')
