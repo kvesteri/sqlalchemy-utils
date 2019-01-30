@@ -1,9 +1,12 @@
+from functools import total_ordering
+
 import six
 
 from .. import i18n
 from ..utils import str_coercible
 
 
+@total_ordering
 @str_coercible
 class Country(object):
     """
@@ -100,27 +103,6 @@ class Country(object):
             return self.code < other.code
         elif isinstance(other, six.string_types):
             return self.code < other
-        return NotImplemented
-
-    def __le__(self, other):
-        if isinstance(other, Country):
-            return self.code <= other.code
-        elif isinstance(other, six.string_types):
-            return self.code <= other
-        return NotImplemented
-
-    def __ge__(self, other):
-        if isinstance(other, Country):
-            return self.code >= other.code
-        elif isinstance(other, six.string_types):
-            return self.code >= other
-        return NotImplemented
-
-    def __gt__(self, other):
-        if isinstance(other, Country):
-            return self.code > other.code
-        elif isinstance(other, six.string_types):
-            return self.code > other
         return NotImplemented
 
     def __repr__(self):
