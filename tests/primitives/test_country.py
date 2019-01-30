@@ -84,8 +84,6 @@ class TestCountry(object):
         assert (u'ES' <= Country(u'ES')) is True
         assert (Country(u'ES') <= u'ES') is True
 
-        assert type(Country(u'ES').__le__(34)) == type(NotImplemented)
-
     def test_ge_operator(self):
         assert (Country(u'ES') >= u'FI') is False
         assert (u'ES' >= Country(u'FI')) is False
@@ -99,8 +97,6 @@ class TestCountry(object):
         assert (u'ES' >= Country(u'ES')) is True
         assert (Country(u'ES') >= u'ES') is True
 
-        assert type(Country(u'ES').__ge__(34)) == type(NotImplemented)
-
     def test_gt_operator(self):
         assert (Country(u'ES') > u'FI') is False
         assert (u'ES' > Country(u'FI')) is False
@@ -113,8 +109,6 @@ class TestCountry(object):
         assert (Country(u'ES') > Country(u'ES')) is False
         assert (u'ES' > Country(u'ES')) is False
         assert (Country(u'ES') > u'ES') is False
-
-        assert type(Country(u'ES').__gt__(34)) == type(NotImplemented)
 
     def test_hash(self):
         return hash(Country('FI')) == hash('FI')
