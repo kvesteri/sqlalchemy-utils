@@ -57,17 +57,17 @@ class TestCountry(object):
         assert not (Country(u'FI') != u'FI')
 
     def test_lt_operator(self):
-        assert Country(u'ES') < u'FI' is True
-        assert u'ES' < Country(u'FI') is True
-        assert Country(u'ES') < Country(u'FI') is True
+        assert (Country(u'ES') < u'FI') is True
+        assert (u'ES' < Country(u'FI')) is True
+        assert (Country(u'ES') < Country(u'FI')) is True
 
-        assert u'FI' < Country(u'ES') is False
-        assert u'FI' < Country(u'ES') is False
-        assert Country(u'FI') < Country(u'ES') is False
+        assert (u'FI' < Country(u'ES')) is False
+        assert (u'FI' < Country(u'ES')) is False
+        assert (Country(u'FI') < Country(u'ES')) is False
 
-        assert Country(u'ES') < Country(u'ES') is False
-        assert u'ES' < Country(u'ES') is False
-        assert Country(u'ES') < u'ES' is False
+        assert (Country(u'ES') < Country(u'ES')) is False
+        assert (u'ES' < Country(u'ES')) is False
+        assert (Country(u'ES') < u'ES') is False
 
         with pytest.raises(NotImplemented):
             Country(u'ES') < 34
@@ -75,17 +75,17 @@ class TestCountry(object):
             34 < Country(u'ES')
 
     def test_le_operator(self):
-        assert Country(u'ES') <= u'FI' is True
-        assert u'ES' <= Country(u'FI') is True
-        assert Country(u'ES') <= Country(u'FI') is True
+        assert (Country(u'ES') <= u'FI') is True
+        assert (u'ES' <= Country(u'FI')) is True
+        assert (Country(u'ES') <= Country(u'FI')) is True
 
-        assert u'FI' <= Country(u'ES') is False
-        assert u'FI' <= Country(u'ES') is False
-        assert Country(u'FI') <= Country(u'ES') is False
+        assert (u'FI' <= Country(u'ES')) is False
+        assert (u'FI' <= Country(u'ES')) is False
+        assert (Country(u'FI') <= Country(u'ES')) is False
 
-        assert Country(u'ES') <= Country(u'ES') is True
-        assert u'ES' <= Country(u'ES') is True
-        assert Country(u'ES') <= u'ES' is True
+        assert (Country(u'ES') <= Country(u'ES')) is True
+        assert (u'ES' <= Country(u'ES')) is True
+        assert (Country(u'ES') <= u'ES') is True
 
         with pytest.raises(NotImplemented):
             Country(u'ES') <= 34
@@ -93,17 +93,17 @@ class TestCountry(object):
             34 <= Country(u'ES')
 
     def test_ge_operator(self):
-        assert Country(u'ES') >= u'FI' is False
-        assert u'ES' >= Country(u'FI') is False
-        assert Country(u'ES') >= Country(u'FI') is False
+        assert (Country(u'ES') >= u'FI') is False
+        assert (u'ES' >= Country(u'FI')) is False
+        assert (Country(u'ES') >= Country(u'FI')) is False
 
-        assert u'FI' >= Country(u'ES') is True
-        assert u'FI' >= Country(u'ES') is True
-        assert Country(u'FI') >= Country(u'ES') is True
+        assert (u'FI' >= Country(u'ES')) is True
+        assert (u'FI' >= Country(u'ES')) is True
+        assert (Country(u'FI') >= Country(u'ES')) is True
 
-        assert Country(u'ES') >= Country(u'ES') is True
-        assert u'ES' >= Country(u'ES') is True
-        assert Country(u'ES') >= u'ES' is True
+        assert (Country(u'ES') >= Country(u'ES')) is True
+        assert (u'ES' >= Country(u'ES')) is True
+        assert (Country(u'ES') >= u'ES') is True
 
         with pytest.raises(NotImplemented):
             Country(u'ES') >= 34
@@ -111,17 +111,17 @@ class TestCountry(object):
             34 >= Country(u'ES')
 
     def test_gt_operator(self):
-        assert Country(u'ES') > u'FI' is False
-        assert u'ES' > Country(u'FI') is False
-        assert Country(u'ES') > Country(u'FI') is False
+        assert (Country(u'ES') > u'FI') is False
+        assert (u'ES' > Country(u'FI')) is False
+        assert (Country(u'ES') > Country(u'FI')) is False
 
-        assert u'FI' > Country(u'ES') is True
-        assert u'FI' > Country(u'ES') is True
-        assert Country(u'FI') > Country(u'ES') is True
+        assert (u'FI' > Country(u'ES')) is True
+        assert (u'FI' > Country(u'ES')) is True
+        assert (Country(u'FI') > Country(u'ES')) is True
 
-        assert Country(u'ES') > Country(u'ES') is False
-        assert u'ES' > Country(u'ES') is False
-        assert Country(u'ES') > u'ES' is False
+        assert (Country(u'ES') > Country(u'ES')) is False
+        assert (u'ES' > Country(u'ES')) is False
+        assert (Country(u'ES') > u'ES') is False
 
         with pytest.raises(NotImplemented):
             Country(u'ES') > 34
