@@ -69,10 +69,7 @@ class TestCountry(object):
         assert (u'ES' < Country(u'ES')) is False
         assert (Country(u'ES') < u'ES') is False
 
-        with pytest.raises(NotImplemented):
-            Country(u'ES') < 34
-        with pytest.raises(NotImplemented):
-            34 < Country(u'ES')
+        assert type(Country(u'ES').__lt__(34)) == type(NotImplemented)
 
     def test_le_operator(self):
         assert (Country(u'ES') <= u'FI') is True
@@ -87,10 +84,7 @@ class TestCountry(object):
         assert (u'ES' <= Country(u'ES')) is True
         assert (Country(u'ES') <= u'ES') is True
 
-        with pytest.raises(NotImplemented):
-            Country(u'ES') <= 34
-        with pytest.raises(NotImplemented):
-            34 <= Country(u'ES')
+        assert type(Country(u'ES').__le__(34)) == type(NotImplemented)
 
     def test_ge_operator(self):
         assert (Country(u'ES') >= u'FI') is False
@@ -105,10 +99,7 @@ class TestCountry(object):
         assert (u'ES' >= Country(u'ES')) is True
         assert (Country(u'ES') >= u'ES') is True
 
-        with pytest.raises(NotImplemented):
-            Country(u'ES') >= 34
-        with pytest.raises(NotImplemented):
-            34 >= Country(u'ES')
+        assert type(Country(u'ES').__ge__(34)) == type(NotImplemented)
 
     def test_gt_operator(self):
         assert (Country(u'ES') > u'FI') is False
@@ -123,10 +114,7 @@ class TestCountry(object):
         assert (u'ES' > Country(u'ES')) is False
         assert (Country(u'ES') > u'ES') is False
 
-        with pytest.raises(NotImplemented):
-            Country(u'ES') > 34
-        with pytest.raises(NotImplemented):
-            34 > Country(u'ES')
+        assert type(Country(u'ES').__gt__(34)) == type(NotImplemented)
 
     def test_hash(self):
         return hash(Country('FI')) == hash('FI')
