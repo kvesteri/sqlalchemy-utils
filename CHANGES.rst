@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.33.12 (2019-02-02)
+^^^^^^^^^^^^^^^^^^^^
+
+- Added ordering support for Country primitive (#361, pull request courtesy of TrilceAC)
+
+
 0.33.11 (2019-01-13)
 ^^^^^^^^^^^^^^^^^^^^
 
