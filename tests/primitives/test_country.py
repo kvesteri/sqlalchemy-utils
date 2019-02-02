@@ -1,3 +1,5 @@
+import operator
+
 import pytest
 import six
 
@@ -55,6 +57,33 @@ class TestCountry(object):
     def test_non_equality_operator(self):
         assert Country(u'FI') != u'sv'
         assert not (Country(u'FI') != u'FI')
+
+    @pytest.mark.parametrize(
+        'op, code_left, code_right, is_',
+        [
+            (operator.lt, u'ES', u'FI', True),
+            (operator.lt, u'FI', u'ES', False),
+            (operator.lt, u'ES', u'ES', False),
+
+            (operator.le, u'ES', u'FI', True),
+            (operator.le, u'FI', u'ES', False),
+            (operator.le, u'ES', u'ES', True),
+
+            (operator.ge, u'ES', u'FI', False),
+            (operator.ge, u'FI', u'ES', True),
+            (operator.ge, u'ES', u'ES', True),
+
+            (operator.gt, u'ES', u'FI', False),
+            (operator.gt, u'FI', u'ES', True),
+            (operator.gt, u'ES', u'ES', False),
+        ]
+    )
+    def test_ordering(self, op, code_left, code_right, is_):
+        country_left = Country(code_left)
+        country_right = Country(code_right)
+        assert op(country_left, country_right) is is_
+        assert op(country_left, code_right) is is_
+        assert op(code_left, country_right) is is_
 
     def test_hash(self):
         return hash(Country('FI')) == hash('FI')
