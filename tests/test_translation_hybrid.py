@@ -43,7 +43,7 @@ class TestTranslationHybrid(object):
     def test_custom_default_value(self, City, translation_hybrid):
         translation_hybrid.default_value = 'Some value'
         city = City()
-        assert city.name is 'Some value'
+        assert city.name == 'Some value'
 
     def test_fall_back_to_default_translation(self, City, translation_hybrid):
         city = City(name_translations={'en': 'Helsinki'})
