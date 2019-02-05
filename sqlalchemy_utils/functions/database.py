@@ -112,9 +112,9 @@ def escape_like(string, escape_char='*'):
     """
     return (
         string
-        .replace(escape_char, escape_char * 2)
-        .replace('%', escape_char + '%')
-        .replace('_', escape_char + '_')
+            .replace(escape_char, escape_char * 2)
+            .replace('%', escape_char + '%')
+            .replace('_', escape_char + '_')
     )
 
 
@@ -484,7 +484,20 @@ def database_exists(url):
         text = ("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA "
                 "WHERE SCHEMA_NAME = '%s'" % database)
         return bool(get_scalar_result(engine, text))
+    elif engine.dialect.name == 'oracle':
+        text = ("SELECT 1 FROM dual WHERE sys_context('userenv','instance_name') = '%s'" % database)
+        try:
+            url.database = database
+            engine = sa.create_engine(url)
+            result = engine.execute(text)
+            result.close()
+            return True
 
+        except (ProgrammingError, OperationalError):
+            return False
+        finally:
+            if engine is not None:
+                engine.dispose()
     elif engine.dialect.name == 'sqlite':
         if database:
             return database == ':memory:' or sqlite_file_exists(database)
