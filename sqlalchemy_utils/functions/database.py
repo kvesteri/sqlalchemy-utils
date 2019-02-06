@@ -484,8 +484,9 @@ def database_exists(url):
         text = ("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA "
                 "WHERE SCHEMA_NAME = '%s'" % database)
         return bool(get_scalar_result(engine, text))
+
     elif engine.dialect.name == 'oracle':
-        text = ("SELECT 1 FROM dual WHERE sys_context('userenv','instance_name') = '%s'" % database)
+        text = ("SELECT 1 FROM dual")
         try:
             url.database = database
             engine = sa.create_engine(url)
