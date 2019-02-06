@@ -595,6 +595,9 @@ def create_database(url, encoding='utf8', template=None):
             engine.execute("CREATE TABLE DB(id int);")
             engine.execute("DROP TABLE DB;")
 
+    elif engine.dialect.name == 'oracle':
+        # We do not need any action in Oracle with create database - it is impossible
+        result_proxy = True
     else:
         text = 'CREATE DATABASE {0}'.format(quote(engine, database))
         result_proxy = engine.execute(text)
@@ -663,6 +666,9 @@ def drop_database(url):
         text = 'DROP DATABASE {0}'.format(quote(connection, database))
         connection.execute(text)
         conn_resource = connection
+    elif engine.dialect.name == 'oracle':
+        # We do not need any action in Oracle with drop database - it is impossible
+        pass
     else:
         text = 'DROP DATABASE {0}'.format(quote(engine, database))
         conn_resource = engine.execute(text)
