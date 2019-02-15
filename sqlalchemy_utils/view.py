@@ -62,6 +62,19 @@ def create_materialized_view(
     metadata,
     indexes=None
 ):
+    """ Create a view on a given metadata
+
+    :param name: The name of the view to create.
+    :param selectable: An SQLAlchemy selectable e.g. a select() statement.
+    :param metadata:
+        An SQLAlchemy Metadata instance that stores the features of the
+        database being described.
+    :param indexes: An optional list of SQLAlchemy Index instances.
+
+    Same as for ``create_view`` except that a ``CREATE MATERIALIZED VIEW``
+    statement is emitted instead of a ``CREATE VIEW``.
+
+    """
     table = create_table_from_selectable(
         name=name,
         selectable=selectable,
@@ -93,6 +106,36 @@ def create_view(
     selectable,
     metadata
 ):
+    """ Create a view on a given metadata
+
+    :param name: The name of the view to create.
+    :param selectable: An SQLAlchemy selectable e.g. a select() statement.
+    :param metadata:
+        An SQLAlchemy Metadata instance that stores the features of the
+        database being described.
+
+    The process for creating a view is similar to the standard way that a
+    table is constructed, except that a selectable is provided instead of
+    a set of columns. The view is created once a ``CREATE`` statement is
+    executed against the supplied metadata (e.g. ``metadata.create_all(..)``),
+    and dropped when a ``DROP`` is executed against the metadata.
+
+    To create a view that performs basic filtering on a table. ::
+
+        metadata = MetaData()
+        users = Table('users', metadata,
+                Column('id', Integer, primary_key=True),
+                Column('name', String),
+                Column('fullname', String),
+                Column('premium_user', Boolean, default=False),
+            )
+
+        premium_members = select([users]).where(users.c.premium_user == True)
+        create_view('premium_users', premium_members, metadata)
+
+        metadata.create_all(engine) # View is created at this point
+
+    """
     table = create_table_from_selectable(
         name=name,
         selectable=selectable,
@@ -111,6 +154,14 @@ def create_view(
 
 
 def refresh_materialized_view(session, name, concurrently=False):
+    """ Refreshes an already existing materialized view
+
+    :param session: An SQLAlchemy Session instance.
+    :param name: The name of the materialized view to refresh.
+    :param concurrently:
+        Optional flag that causes the ``CONCURRENTLY`` parameter
+        to be specified when the materialized view is refreshed.
+    """
     # Since session.execute() bypasses autoflush, we must manually flush in
     # order to include newly-created/modified objects in the refresh.
     session.flush()

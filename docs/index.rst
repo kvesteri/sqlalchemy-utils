@@ -21,5 +21,6 @@ SQLAlchemy-Utils provides custom data types and various utility functions for SQ
    orm_helpers
    utility_classes
    models
+   view
    testing
    license
