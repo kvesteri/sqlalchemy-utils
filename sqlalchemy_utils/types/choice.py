@@ -169,7 +169,7 @@ class ChoiceType(types.TypeDecorator, ScalarCoercible):
         return self.type_impl.process_bind_param(value, dialect)
 
     def process_result_value(self, value, dialect):
-        return self.type_impl.process_result_value(value, dialect)
+        return self.type_impl.process_result_value(self.python_type(value), dialect)
 
 
 class ChoiceTypeImpl(object):
