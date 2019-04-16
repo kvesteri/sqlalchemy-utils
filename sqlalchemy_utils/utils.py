@@ -1,7 +1,10 @@
 import sys
-from collections.abc import Iterable
-
 import six
+
+if sys.version_info.major == 2:
+    from collections import Iterable
+else:
+    from collections.abc import Iterable
 
 
 def str_coercible(cls):
