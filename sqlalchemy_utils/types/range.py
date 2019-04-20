@@ -134,7 +134,11 @@ than 500.
 
 .. _intervals: https://github.com/kvesteri/intervals
 """
-from collections import Iterable
+try:
+    from collections.abc import Iterable
+except ImportError:
+    from collections import Iterable
+
 from datetime import timedelta
 
 import six

@@ -173,7 +173,12 @@ in the decorator.
 
 """
 import itertools
-from collections import defaultdict, Iterable, namedtuple
+from collections import defaultdict, namedtuple
+
+try:
+    from collections.abc import Iterable
+except ImportError:
+    from collections import Iterable
 
 import sqlalchemy as sa
 
