@@ -49,37 +49,45 @@ class TestExplain(object):
 
     def test_with_string_as_stmt_param(self, assert_startswith):
         assert_startswith(
-            explain('SELECT 1 FROM article'),
+            explain(sa.text('SELECT 1 FROM article')),
             'EXPLAIN SELECT'
         )
 
     def test_format(self, assert_startswith):
         assert_startswith(
-            explain('SELECT 1 FROM article', format='json'),
+            explain(sa.text('SELECT 1 FROM article'), format='json'),
             'EXPLAIN (FORMAT json) SELECT'
         )
 
     def test_timing(self, assert_startswith):
         assert_startswith(
-            explain('SELECT 1 FROM article', analyze=True, timing=False),
+            explain(
+                sa.text('SELECT 1 FROM article'),
+                analyze=True,
+                timing=False
+            ),
             'EXPLAIN (ANALYZE true, TIMING false) SELECT'
         )
 
     def test_verbose(self, assert_startswith):
         assert_startswith(
-            explain('SELECT 1 FROM article', verbose=True),
+            explain(sa.text('SELECT 1 FROM article'), verbose=True),
             'EXPLAIN (VERBOSE true) SELECT'
         )
 
     def test_buffers(self, assert_startswith):
         assert_startswith(
-            explain('SELECT 1 FROM article', analyze=True, buffers=True),
+            explain(
+                sa.text('SELECT 1 FROM article'),
+                analyze=True,
+                buffers=True
+            ),
             'EXPLAIN (ANALYZE true, BUFFERS true) SELECT'
         )
 
     def test_costs(self, assert_startswith):
         assert_startswith(
-            explain('SELECT 1 FROM article', costs=False),
+            explain(sa.text('SELECT 1 FROM article'), costs=False),
             'EXPLAIN (COSTS false) SELECT'
         )
 
