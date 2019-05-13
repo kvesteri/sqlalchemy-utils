@@ -468,7 +468,7 @@ def database_exists(url):
         return header[:16] == b'SQLite format 3\x00'
 
     url = copy(make_url(url))
-    database = url.database
+    database, url.database = url.database, None
     engine = sa.create_engine(url)
 
     if engine.dialect.name == 'postgresql':
