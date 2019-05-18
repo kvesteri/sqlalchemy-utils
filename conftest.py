@@ -7,6 +7,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base, synonym_for
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm.session import close_all_sessions
 from sqlalchemy_utils import (
     aggregates,
     coercion_listener,
@@ -218,7 +219,7 @@ def session(request, engine, connection, Base, init_models):
 
     def teardown():
         aggregates.manager.reset()
-        session.close_all()
+        close_all_sessions()
         Base.metadata.drop_all(connection)
         remove_composite_listeners()
         connection.close()
