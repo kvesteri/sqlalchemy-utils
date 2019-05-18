@@ -55,7 +55,7 @@ def mysql_db_user():
 
 @pytest.fixture
 def postgresql_dsn(postgresql_db_user, db_name):
-    return 'postgres://{0}@localhost/{1}'.format(postgresql_db_user, db_name)
+    return 'postgresql://{0}@localhost/{1}'.format(postgresql_db_user, db_name)
 
 
 @pytest.fixture
