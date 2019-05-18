@@ -38,10 +38,10 @@ class TimezoneType(types.TypeDecorator, ScalarCoercible):
         if backend == 'dateutil':
             try:
                 from dateutil.tz import tzfile
-                from dateutil.zoneinfo import gettz
+                from dateutil.zoneinfo import get_zonefile_instance
 
                 self.python_type = tzfile
-                self._to = gettz
+                self._to = get_zonefile_instance().zones.get
                 self._from = lambda x: six.text_type(x._filename)
 
             except ImportError:
