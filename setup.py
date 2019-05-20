@@ -33,7 +33,7 @@ extras_require = {
         'psycopg2>=2.5.1',
         'pg8000>=1.12.4',
         'pytz>=2014.2',
-        'python-dateutil>=2.2',
+        'python-dateutil>=2.6',
         'pymysql',
         'flake8>=2.4.0',
         'isort>=4.2.2',

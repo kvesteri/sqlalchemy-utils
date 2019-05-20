@@ -438,13 +438,13 @@ def database_exists(url):
     Performs backend-specific testing to quickly determine if a database
     exists on the server. ::
 
-        database_exists('postgres://postgres@localhost/name')  #=> False
-        create_database('postgres://postgres@localhost/name')
-        database_exists('postgres://postgres@localhost/name')  #=> True
+        database_exists('postgresql://postgres@localhost/name')  #=> False
+        create_database('postgresql://postgres@localhost/name')
+        database_exists('postgresql://postgres@localhost/name')  #=> True
 
     Supports checking against a constructed URL as well. ::
 
-        engine = create_engine('postgres://postgres@localhost/name')
+        engine = create_engine('postgresql://postgres@localhost/name')
         database_exists(engine.url)  #=> False
         create_database(engine.url)
         database_exists(engine.url)  #=> True
@@ -523,7 +523,7 @@ def create_database(url, encoding='utf8', template=None):
     To create a database, you can pass a simple URL that would have
     been passed to ``create_engine``. ::
 
-        create_database('postgres://postgres@localhost/name')
+        create_database('postgresql://postgres@localhost/name')
 
     You may also pass the url from an existing engine. ::
 
@@ -598,7 +598,7 @@ def drop_database(url):
     Works similar to the :ref:`create_database` method in that both url text
     and a constructed url are accepted. ::
 
-        drop_database('postgres://postgres@localhost/name')
+        drop_database('postgresql://postgres@localhost/name')
         drop_database(engine.url)
 
     """
