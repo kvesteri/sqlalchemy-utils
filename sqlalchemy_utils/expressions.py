@@ -112,27 +112,6 @@ def compile_json_array_length(element, compiler, **kw):
     return "%s(%s)" % (element.name, compiler.process(element.clauses))
 
 
-class array_agg(GenericFunction):
-    name = 'array_agg'
-    type = postgresql.ARRAY
-
-    def __init__(self, arg, default=None, **kw):
-        self.type = postgresql.ARRAY(arg.type)
-        self.default = default
-        GenericFunction.__init__(self, arg, **kw)
-
-
-@compiles(array_agg, 'postgresql')
-def compile_array_agg(element, compiler, **kw):
-    compiled = "%s(%s)" % (element.name, compiler.process(element.clauses))
-    if element.default is None:
-        return compiled
-    return str(sa.func.coalesce(
-        sa.text(compiled),
-        sa.cast(postgresql.array(element.default), element.type)
-    ).compile(compiler))
-
-
 class Asterisk(ColumnElement):
     def __init__(self, selectable):
         self.selectable = selectable
