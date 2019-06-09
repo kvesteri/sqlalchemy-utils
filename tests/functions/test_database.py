@@ -27,7 +27,7 @@ class TestDatabaseSQLiteMemory(object):
         assert database_exists(dsn)
 
 
-@pytest.mark.usefixture('sqlite_none_database_dsn')
+@pytest.mark.usefixtures('sqlite_none_database_dsn')
 class TestDatabaseSQLiteMemoryNoDatabaseString(object):
     def test_exists_memory_none_database(self, sqlite_none_database_dsn):
         assert database_exists(sqlite_none_database_dsn)
@@ -75,7 +75,7 @@ class TestDatabasePostgres(DatabaseTest):
                 "TEMPLATE my_template"
             )
         )
-        dsn = 'postgres://{0}@localhost/db_test_sqlalchemy_util'.format(
+        dsn = 'postgresql://{0}@localhost/db_test_sqlalchemy_util'.format(
             postgresql_db_user
         )
         create_database(dsn, template='my_template')
@@ -108,7 +108,7 @@ class TestDatabasePostgresWithQuotedName(DatabaseTest):
                 'TEMPLATE "my-template"'
             )
         )
-        dsn = 'postgres://{0}@localhost/db_test_sqlalchemy-util'.format(
+        dsn = 'postgresql://{0}@localhost/db_test_sqlalchemy-util'.format(
             postgresql_db_user
         )
         create_database(dsn, template='my-template')
@@ -117,7 +117,7 @@ class TestDatabasePostgresWithQuotedName(DatabaseTest):
 class TestDatabasePostgresCreateDatabaseCloseConnection(object):
     def test_create_database_twice(self, postgresql_db_user):
         dsn_list = [
-            'postgres://{0}@localhost/db_test_sqlalchemy-util-a'.format(
+            'postgresql://{0}@localhost/db_test_sqlalchemy-util-a'.format(
                 postgresql_db_user
             ),
             'postgres://{0}@localhost/db_test_sqlalchemy-util-b'.format(
