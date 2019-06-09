@@ -9,6 +9,7 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
 - Removed array_agg compilation which was never a good idea and collided with the latest version of SA. (#374)
+- Removed deprecation warnings (#373, pull request courtesy of pbasista)
 
 
 0.33.12 (2019-02-02)
