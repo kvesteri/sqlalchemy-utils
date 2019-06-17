@@ -48,6 +48,62 @@ class TestGenericRepr:
             name = sa.Column(sa.Unicode(255), default=u'Some article')
         return Article
 
+    @pytest.fixture
+    def Point(self):
+        class Point:
+            """
+            A pair of integers.
+
+            A contrived type that raises an exception when compared to other types.
+            """
+            def __init__(self, x, y):
+                self.x = x
+                self.y = y
+
+            def __eq__(self, other):
+                # NOTE: this raises an AttributeError when compared with other types
+                return self.x == other.x and self.y == other.y
+
+            def __repr__(self):
+                return "Point({!r},{!r})".format(self.x, self.y)
+        return Point
+            
+    @pytest.fixture
+    def PointTable(self, Base, Point):
+
+        class PointType(sa.types.TypeDecorator):
+            """
+            Stores a pair of integers as a comma separated string "x,y"
+            """
+
+            impl = sa.types.VARCHAR
+
+            def process_bind_param(self, value, dialect):
+                if value is not None:
+                    return repr(value)
+                return value
+
+            def process_result_value(self, value, dialect):
+                if value is not None:
+                    vals = value.split(",")
+                    if len(vals) != 2:
+                        raise ValueError("Invalid DB string - should be 'x,y'")
+                    try:
+                        x = int(vals[0])
+                        y = int(vals[1])
+                    except TypeError:
+                        raise ValueError("Invalid DB string - not valid ints")
+                    return Point(x, y)
+                return value
+
+        class PointTable(Base):
+            __tablename__ = 'point'
+            id = sa.Column(sa.Integer, primary_key=True)
+            name = sa.Column(sa.Unicode(255), default=u'Some point')
+            value = sa.Column(PointType)
+
+        return PointTable
+
     def test_repr(self, Article):
         """Representation of a basic model."""
         Article = generic_repr(Article)
@@ -85,4 +141,20 @@ class TestGenericRepr:
         actual_repr = repr(article)
 
         expected_repr = u'Article(id={}, name=<not loaded>)'.format(article.id)
+        assert actual_repr == expected_repr
+
+    def test_repr_weird_eq(self, PointTable, Point):
+        """:py:func:`~sqlalchemy_utils.models.generic_repr` uses ``is`` to
+        check if a field is not loaded, instead of ``==``, which can have
+        side-effects."""
+        PointTable = generic_repr(PointTable)
+
+        table = PointTable(id=1, name=u'Foo', value=Point(5,4))
+        actual_repr = repr(table)
+        if sys.version_info[0] == 2:
+            expected_repr = u'PointTable(id=1, name=u\'Foo\', value=Point(5,4))'
+        elif sys.version_info[0] == 3:
+            expected_repr = u'PointTable(id=1, name=\'Foo\', value=Point(5,4))'
+        else:
+            raise AssertionError
         assert actual_repr == expected_repr
