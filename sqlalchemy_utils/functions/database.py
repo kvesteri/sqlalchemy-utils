@@ -118,7 +118,7 @@ def escape_like(string, escape_char='*'):
     )
 
 
-def json_sql(value, scalars_to_json=True):
+def json_sql(value, scalars_to_json=True, jsonb=False):
     """
     Convert python data structures to PostgreSQL specific SQLAlchemy JSON
     constructs. This function is extremly useful if you need to build
@@ -161,6 +161,8 @@ def json_sql(value, scalars_to_json=True):
 
     :param value:
         value to be converted to SQLAlchemy PostgreSQL function constructs
+    :boolean jsonb:
+        Flag to alternatively convert the return with a to_json construct
     """
     scalar_convert = sa.text
     if scalars_to_json:
@@ -168,12 +170,20 @@ def json_sql(value, scalars_to_json=True):
             return sa.func.to_json(sa.text(a))
 
     if isinstance(value, collections.Mapping):
-        return sa.func.json_build_object(
-            *(
-                json_sql(v, scalars_to_json=False)
-                for v in itertools.chain(*value.items())
+        if jsonb:
+            return sa.func.jsonb_build_object(
+                *(
+                    json_sql(v, scalars_to_json=False)
+                    for v in itertools.chain(*value.items())
+                )
             )
-        )
+        else:
+            return sa.func.json_build_object(
+                *(
+                    json_sql(v, scalars_to_json=False)
+                    for v in itertools.chain(*value.items())
+                )
+            )
     elif isinstance(value, str):
         return scalar_convert("'{0}'".format(value))
     elif isinstance(value, collections.Sequence):
