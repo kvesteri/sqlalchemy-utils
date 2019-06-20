@@ -22,6 +22,7 @@ from .orm import (  # noqa
     cast_if,
     get_bind,
     get_class_by_table,
+    get_class_by_tablename,
     get_column_key,
     get_columns,
     get_declarative_base,

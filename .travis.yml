@@ -11,6 +11,10 @@ before_script:
   - psql -c 'create extension hstore;' -U postgres -d sqlalchemy_utils_test
   - mysql -e 'create database sqlalchemy_utils_test;'
 
+# blocklist
+branches:
+  only: get_class_by_tablename
+
 matrix:
   include:
   - python: 2.7
