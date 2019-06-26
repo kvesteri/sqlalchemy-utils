@@ -1,4 +1,7 @@
-import collections
+try:
+    from collections.abc import Mapping
+except ImportError:  # For python 2.7 support
+    from collections import Mapping
 import itertools
 import os
 from copy import copy
@@ -167,7 +170,7 @@ def json_sql(value, scalars_to_json=True):
         def scalar_convert(a):
             return sa.func.to_json(sa.text(a))
 
-    if isinstance(value, collections.Mapping):
+    if isinstance(value, Mapping):
         return sa.func.json_build_object(
             *(
                 json_sql(v, scalars_to_json=False)

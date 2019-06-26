@@ -2,6 +2,7 @@
 import pytest
 import sqlalchemy as sa
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm.session import close_all_sessions
 
 from sqlalchemy_utils import (
     CompositeArray,
@@ -324,7 +325,7 @@ class TestCompositeTypeWhenTypeAlreadyExistsInDatabase(object):
             session.execute('DROP TABLE account')
             session.execute('DROP TYPE money_type')
             session.commit()
-            session.close_all()
+            close_all_sessions()
             connection.close()
             remove_composite_listeners()
             engine.dispose()
