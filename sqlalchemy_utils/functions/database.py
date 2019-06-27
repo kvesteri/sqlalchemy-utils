@@ -1,7 +1,7 @@
 try:
-    from collections.abc import Mapping
+    from collections.abc import Mapping, Sequence
 except ImportError:  # For python 2.7 support
-    from collections import Mapping
+    from collections import Mapping, Sequence
 import itertools
 import os
 from copy import copy
@@ -179,7 +179,7 @@ def json_sql(value, scalars_to_json=True):
         )
     elif isinstance(value, str):
         return scalar_convert("'{0}'".format(value))
-    elif isinstance(value, collections.Sequence):
+    elif isinstance(value, Sequence):
         return sa.func.json_build_array(
             *(
                 json_sql(v, scalars_to_json=False)
