@@ -109,7 +109,7 @@ class TestPasswordType(object):
         from passlib.hash import md5_crypt
 
         obj = User()
-        obj.password = Password(md5_crypt.encrypt('b'))
+        obj.password = Password(md5_crypt.hash('b'))
 
         assert obj.password.hash.decode('utf8').startswith('$1$')
         assert obj.password == 'b'
@@ -139,10 +139,10 @@ class TestPasswordType(object):
         from passlib.hash import md5_crypt
 
         obj = User()
-        obj.password = Password(md5_crypt.encrypt('b'))
+        obj.password = Password(md5_crypt.hash('b'))
 
         other = User()
-        other.password = Password(md5_crypt.encrypt('b'))
+        other.password = Password(md5_crypt.hash('b'))
 
         # Not sure what to assert here; the test raised an error before.
         assert obj.password != other.password
@@ -203,7 +203,7 @@ class TestPasswordType(object):
         from passlib.hash import md5_crypt
 
         obj = User()
-        obj.password = Password(md5_crypt.encrypt('b'))
+        obj.password = Password(md5_crypt.hash('b'))
 
         session.add(obj)
         session.commit()
