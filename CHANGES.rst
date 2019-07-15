@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.34.1 (2019-07-15)
+^^^^^^^^^^^^^^^^^^^
+
+- Remove deprecation warnings (#379, pull request courtesy of Le-Stagiaire)
+- Drop py34 support
+
+
 0.34.0 (2019-06-09)
 ^^^^^^^^^^^^^^^^^^^
 
