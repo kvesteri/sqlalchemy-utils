@@ -42,6 +42,7 @@ extras_require = {
     'anyjson': ['anyjson>=0.3.3'],
     'babel': ['Babel>=1.3'],
     'arrow': ['arrow>=0.3.4'],
+    'pendulum': ['pendulum>=2.0.5'],
     'intervals': ['intervals>=0.7.1'],
     'phone': ['phonenumbers>=5.9.2'],
     'password': ['passlib >= 1.6, < 2.0'],

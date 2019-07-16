@@ -14,6 +14,7 @@ from .json import JSONType  # noqa
 from .locale import LocaleType  # noqa
 from .ltree import LtreeType  # noqa
 from .password import Password, PasswordType  # noqa
+from .pendulum import PendulumDateTimeType, PendulumDateType  # noqa
 from .pg_composite import (  # noqa
     CompositeArray,
     CompositeType,
