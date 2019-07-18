@@ -5,7 +5,7 @@ from datetime import date, datetime
 import pytest
 import sqlalchemy as sa
 
-from sqlalchemy_utils.types import pendulum
+from sqlalchemy_utils.types import enriched_datetime
 
 
 @pytest.fixture
@@ -13,8 +13,10 @@ def User(Base):
     class User(Base):
         __tablename__ = 'users'
         id = sa.Column(sa.Integer, primary_key=True)
-        birthday = sa.Column(pendulum.PendulumDateType)
-        created_at = sa.Column(pendulum.PendulumDateTimeType)
+        birthday = sa.Column(
+            enriched_datetime.EnrichedDateType(type="pendulum"))
+        created_at = sa.Column(
+            enriched_datetime.EnrichedDateTimeType(type="pendulum"))
     return User
 
 
@@ -23,12 +25,12 @@ def init_models(User):
     pass
 
 
-@pytest.mark.skipif('pendulum.pendulum is None')
+@pytest.mark.skipif('enriched_datetime.pendulum is None')
 class TestPendulumDateType(object):
 
     def test_parameter_processing(self, session, User):
         user = User(
-            birthday=pendulum.pendulum.date(1995, 7, 11)
+            birthday=enriched_datetime.pendulum.date(1995, 7, 11)
         )
 
         session.add(user)
@@ -50,7 +52,7 @@ class TestPendulumDateType(object):
         assert user.birthday.year == 2013
 
     def test_utc(self, session, User):
-        time = pendulum.pendulum.now("UTC")
+        time = enriched_datetime.pendulum.now("UTC")
         user = User(birthday=time)
         session.add(user)
         assert user.birthday == time
@@ -63,12 +65,12 @@ class TestPendulumDateType(object):
         assert compiled == 'users.birthday > 2015-01-01'
 
 
-@pytest.mark.skipif('pendulum.pendulum is None')
+@pytest.mark.skipif('enriched_datetime.pendulum is None')
 class TestPendulumDateTimeType(object):
 
     def test_parameter_processing(self, session, User):
         user = User(
-            created_at=pendulum.pendulum.datetime(1995, 7, 11)
+            created_at=enriched_datetime.pendulum.datetime(1995, 7, 11)
         )
 
         session.add(user)
@@ -90,7 +92,7 @@ class TestPendulumDateTimeType(object):
         assert user.created_at.year == 2013
 
     def test_utc(self, session, User):
-        time = pendulum.pendulum.now("UTC")
+        time = enriched_datetime.pendulum.now("UTC")
         user = User(created_at=time)
         session.add(user)
         assert user.created_at == time
@@ -98,7 +100,7 @@ class TestPendulumDateTimeType(object):
         assert user.created_at == time
 
     def test_other_tz(self, session, User):
-        time = pendulum.pendulum.now("UTC")
+        time = enriched_datetime.pendulum.now("UTC")
         local = time.in_tz('Asia/Tokyo')
         user = User(created_at=local)
         session.add(user)

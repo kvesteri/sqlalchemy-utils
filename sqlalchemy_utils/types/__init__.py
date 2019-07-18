@@ -9,12 +9,12 @@ from .country import CountryType  # noqa
 from .currency import CurrencyType  # noqa
 from .email import EmailType  # noqa
 from .encrypted.encrypted_type import EncryptedType  # noqa
+from .enriched_datetime import EnrichedDateTimeType, EnrichedDateType  # noqa
 from .ip_address import IPAddressType  # noqa
 from .json import JSONType  # noqa
 from .locale import LocaleType  # noqa
 from .ltree import LtreeType  # noqa
 from .password import Password, PasswordType  # noqa
-from .pendulum import PendulumDateTimeType, PendulumDateType  # noqa
 from .pg_composite import (  # noqa
     CompositeArray,
     CompositeType,
