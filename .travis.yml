@@ -5,6 +5,7 @@ addons:
 
 services:
   - docker
+  - mysql
 
 before_script:
   - psql -c 'create database sqlalchemy_utils_test;' -U postgres
