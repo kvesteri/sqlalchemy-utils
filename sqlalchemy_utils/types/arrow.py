@@ -1,6 +1,9 @@
 from __future__ import absolute_import
 
-from collections.abc import Iterable
+try:
+    from collections.abc import Mapping, Sequence
+except ImportError:  # For python 2.7 support
+    from collections import Mapping, Sequence
 from datetime import datetime
 
 import six

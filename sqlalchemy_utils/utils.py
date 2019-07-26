@@ -1,5 +1,8 @@
 import sys
-from collections.abc import Iterable
+try:
+    from collections.abc import Mapping, Sequence
+except ImportError:  # For python 2.7 support
+    from collections import Mapping, Sequence
 
 import six
 
