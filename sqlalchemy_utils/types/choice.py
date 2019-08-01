@@ -191,7 +191,8 @@ class ChoiceTypeImpl(object):
 
     def process_bind_param(self, value, dialect):
         if value and isinstance(value, Choice):
-            return value.code
+            value = value.code
+        self.choices_dict[value]
         return value
 
     def process_result_value(self, value, dialect):
