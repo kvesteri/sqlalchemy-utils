@@ -6,6 +6,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import attributes, class_mapper, ColumnProperty
 from sqlalchemy.orm.interfaces import MapperProperty, PropComparator
 from sqlalchemy.orm.session import _state_session
+from sqlalchemy.sql.util import ClauseAdapter
 from sqlalchemy.util import set_creation_order
 
 from .exceptions import ImproperlyConfigured
@@ -138,9 +139,10 @@ class GenericRelationshipProperty(MapperProperty):
         self.id = list(map(self._column_to_property, self._id_cols))
 
     class Comparator(PropComparator):
-        def __init__(self, prop, parentmapper):
-            self.property = prop
+        def __init__(self, prop, parentmapper, adapt_to_entity=None):
+            self.prop = self.property = prop
             self._parententity = parentmapper
+            self._adapt_to_entity = adapt_to_entity
 
         def __eq__(self, other):
             discriminator = six.text_type(type(other).__name__)
@@ -162,6 +164,13 @@ class GenericRelationshipProperty(MapperProperty):
                 six.text_type(submapper.class_.__name__)
                 for submapper in mapper._inheriting_mappers
             ])
+
+            if self._adapt_to_entity:
+                criterion = self.property._discriminator_col.in_(class_names)
+                return (
+                    ClauseAdapter(self._adapt_to_entity.selectable)
+                    .traverse(criterion)
+                )
 
             return self.property._discriminator_col.in_(class_names)
 
