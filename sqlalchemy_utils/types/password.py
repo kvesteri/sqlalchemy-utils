@@ -205,6 +205,9 @@ class PasswordType(types.TypeDecorator, ScalarCoercible):
         elif dialect.name == 'sqlite':
             # Use a BLOB type for sqlite
             impl = sqlite.BLOB(self.length)
+        elif dialect.name == 'mssql':
+            # Use a VARCHAR type for mssql
+            impl = types.VARCHAR(self.length)
         else:
             # Use a VARBINARY for all other dialects.
             impl = types.VARBINARY(self.length)
