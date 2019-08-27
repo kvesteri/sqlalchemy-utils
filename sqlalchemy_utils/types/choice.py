@@ -65,7 +65,7 @@ class ChoiceType(types.TypeDecorator, ScalarCoercible):
 
 
         user = User(type=u'admin')
-        user.type  # Choice(type='admin', value=u'Admin')
+        user.type  # Choice(code='admin', value=u'Admin')
 
     Or::
 
@@ -109,7 +109,7 @@ class ChoiceType(types.TypeDecorator, ScalarCoercible):
 
 
         user = User(type=u'admin')
-        user.type  # Choice(type='admin', value=u'Admin')
+        user.type  # Choice(code='admin', value=u'Admin')
 
         print user.type  # u'Admin'
 
