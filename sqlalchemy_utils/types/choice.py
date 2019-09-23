@@ -29,6 +29,9 @@ class Choice(object):
     def __unicode__(self):
         return six.text_type(self.value)
 
+    def __str__(self):
+        return six.ensure_str(self.__unicode__())
+
     def __repr__(self):
         return 'Choice(code={code}, value={value})'.format(
             code=self.code,
