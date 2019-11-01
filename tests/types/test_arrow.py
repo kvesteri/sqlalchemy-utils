@@ -39,7 +39,7 @@ class TestArrowDateTimeType(object):
 
     def test_string_coercion(self, Article):
         article = Article(
-            created_at='1367900664'
+            created_at='2013-01-01'
         )
         assert article.created_at.year == 2013
 
