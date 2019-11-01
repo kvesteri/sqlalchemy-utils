@@ -29,6 +29,7 @@ from .range import (  # noqa
     DateRangeType,
     DateTimeRangeType,
     IntRangeType,
+    Int8RangeType,
     NumericRangeType
 )
 from .scalar_list import ScalarListException, ScalarListType  # noqa

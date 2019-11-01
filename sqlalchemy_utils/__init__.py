@@ -74,6 +74,7 @@ from .types import (  # noqa
     instrumented_list,
     InstrumentedList,
     IntRangeType,
+    Int8RangeType,
     IPAddressType,
     JSONType,
     LocaleType,
