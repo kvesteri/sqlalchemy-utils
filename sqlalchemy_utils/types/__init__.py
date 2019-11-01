@@ -28,8 +28,8 @@ from .phone_number import (  # noqa
 from .range import (  # noqa
     DateRangeType,
     DateTimeRangeType,
-    IntRangeType,
     Int8RangeType,
+    IntRangeType,
     NumericRangeType
 )
 from .scalar_list import ScalarListException, ScalarListType  # noqa
