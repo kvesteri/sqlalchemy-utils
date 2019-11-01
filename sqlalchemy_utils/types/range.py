@@ -412,7 +412,7 @@ class Int8RangeType(RangeType):
     comparator_factory = IntRangeComparator
 
     def __init__(self, *args, **kwargs):
-        super(IntRangeType, self).__init__(*args, **kwargs)
+        super(Int8RangeType, self).__init__(*args, **kwargs)
         self.interval_class = intervals.IntInterval
 
 
