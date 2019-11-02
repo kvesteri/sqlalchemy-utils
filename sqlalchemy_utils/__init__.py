@@ -75,6 +75,7 @@ from .types import (  # noqa
     EnrichedDateType,
     instrumented_list,
     InstrumentedList,
+    Int8RangeType,
     IntRangeType,
     IPAddressType,
     JSONType,
@@ -102,4 +103,4 @@ from .view import (  # noqa
     refresh_materialized_view
 )
 
-__version__ = '0.34.1'
+__version__ = '0.35.0'

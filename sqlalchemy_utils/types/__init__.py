@@ -29,6 +29,7 @@ from .phone_number import (  # noqa
 from .range import (  # noqa
     DateRangeType,
     DateTimeRangeType,
+    Int8RangeType,
     IntRangeType,
     NumericRangeType
 )

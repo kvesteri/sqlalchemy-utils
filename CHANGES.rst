@@ -4,6 +4,19 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.35.0 (2019-11-01)
+^^^^^^^^^^^^^^^^^^^
+
+- Removed some deprecation warnings
+- Added Int8RangeType (#401, pull request courtesy of lpsinger)
+
+
+0.34.2 (2019-08-20)
+^^^^^^^^^^^^^^^^^^^
+
+- Remove ABC deprecation warnings (#386, pull request courtesy of VizualAbstract)
+
+
 0.34.1 (2019-07-15)
 ^^^^^^^^^^^^^^^^^^^
 
