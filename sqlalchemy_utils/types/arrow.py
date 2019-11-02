@@ -3,11 +3,6 @@ from __future__ import absolute_import
 from ..exceptions import ImproperlyConfigured
 from .enriched_datetime import EnrichedDateTimeType
 
-try:
-    from collections.abc import Iterable
-except ImportError:  # For python 2.7 support
-    from collections import Iterable
-
 arrow = None
 try:
     import arrow
