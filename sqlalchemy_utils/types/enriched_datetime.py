@@ -1,6 +1,10 @@
 from __future__ import absolute_import
 
-from collections import Iterable
+try:
+    from collections.abc import Iterable
+except ImportError:  # For python 2.7 support
+    from collections import Iterable
+
 from datetime import datetime
 
 import six
