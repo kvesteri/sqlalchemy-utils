@@ -16,7 +16,7 @@ def Article(Base):
             enriched_datetime_type.EnrichedDateTimeType(type="arrow"))
         published_at = sa.Column(
             enriched_datetime_type.EnrichedDateTimeType(type="arrow",
-                                                   timezone=True))
+                                                        timezone=True))
         published_at_dt = sa.Column(sa.DateTime(timezone=True))
     return Article
 
@@ -72,7 +72,7 @@ class TestArrowDateTimeType(object):
     def test_timezone(self, session, Article):
         timezone = tz.gettz('Europe/Stockholm')
         dt = enriched_datetime_type.arrow.get(datetime(2015, 1, 1, 15, 30, 45),
-                                         timezone)
+                                              timezone)
         article = Article(published_at=dt, published_at_dt=dt.datetime)
 
         session.add(article)

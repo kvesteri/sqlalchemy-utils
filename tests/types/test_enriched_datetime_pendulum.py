@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from datetime import date, datetime
+from datetime import datetime
 
 import pytest
 import sqlalchemy as sa
@@ -23,7 +23,7 @@ def init_models(User):
     pass
 
 
-@pytest.mark.skipif('enriched_date_type.pendulum is None')
+@pytest.mark.skipif('enriched_datetime_type.pendulum is None')
 class TestPendulumDateTimeType(object):
 
     def test_parameter_processing(self, session, User):
