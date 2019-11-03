@@ -25,6 +25,7 @@ class PendulumDatetime():
                                           value.second, value.microsecond)
             else:
                 value = pendulum.parse(value)
+        return value
 
     def process_bind_param(self, impl, value, dialect):
         if value:
