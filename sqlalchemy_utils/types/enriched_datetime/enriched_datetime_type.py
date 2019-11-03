@@ -64,13 +64,13 @@ class EnrichedDateTimeType(types.TypeDecorator, ScalarCoercible):
                 self.dt_object = ArrowDatetime()
 
     def _coerce(self, value):
-        return self.dt_object._coerce(value)
+        return self.dt_object._coerce(self.impl, value)
 
     def process_bind_param(self, value, dialect):
-        return self.dt_object.process_bind_param(value, dialect)
+        return self.dt_object.process_bind_param(self.impl, value, dialect)
 
     def process_result_value(self, value, dialect):
-        return self.dt_object.process_result_value(value, dialect)
+        return self.dt_object.process_result_value(self.impl, value, dialect)
 
     def process_literal_param(self, value, dialect):
         return str(value)

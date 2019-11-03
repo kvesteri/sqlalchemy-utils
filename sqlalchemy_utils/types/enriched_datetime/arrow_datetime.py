@@ -15,7 +15,7 @@ except ImportError:
 
 
 class ArrowDatetime():
-    def _coerce(self, value):
+    def _coerce(self, impl, value):
         if isinstance(value, six.string_types):
             value = arrow.get(value)
         elif isinstance(value, Iterable):
@@ -24,14 +24,14 @@ class ArrowDatetime():
             value = arrow.get(value)
         return value
 
-    def process_bind_param(self, value, dialect):
+    def process_bind_param(self, impl, value, dialect):
         if value:
             utc_val = self._coerce(value).to('UTC')
             return utc_val.datetime\
-                if self.impl.timezone else utc_val.naive
+                if impl.timezone else utc_val.naive
         return value
 
-    def process_result_value(self, value, dialect):
+    def process_result_value(self, impl, value, dialect):
         if value:
             return arrow.get(value)
         return value

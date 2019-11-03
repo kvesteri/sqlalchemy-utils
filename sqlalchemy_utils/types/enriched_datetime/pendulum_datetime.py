@@ -10,7 +10,7 @@ except ImportError:
 
 
 class PendulumDatetime():
-    def _coerce(self, value):
+    def _coerce(self, impl, value):
         if value is not None:
             if isinstance(value, pendulum.DateTime):
                 pass
@@ -26,12 +26,12 @@ class PendulumDatetime():
             else:
                 value = pendulum.parse(value)
 
-    def process_bind_param(self, value, dialect):
+    def process_bind_param(self, impl, value, dialect):
         if value:
             return self._coerce(value).in_tz("UTC")
         return value
 
-    def process_result_value(self, value, dialect):
+    def process_result_value(self, impl, value, dialect):
         if value:
             return pendulum.parse(value.isoformat())
         return value
