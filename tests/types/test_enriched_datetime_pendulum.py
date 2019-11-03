@@ -13,8 +13,6 @@ def User(Base):
     class User(Base):
         __tablename__ = 'users'
         id = sa.Column(sa.Integer, primary_key=True)
-        birthday = sa.Column(
-            enriched_datetime_type.EnrichedDateType(type="pendulum"))
         created_at = sa.Column(
             enriched_datetime_type.EnrichedDateTimeType(type="pendulum"))
     return User

@@ -15,8 +15,6 @@ def User(Base):
         id = sa.Column(sa.Integer, primary_key=True)
         birthday = sa.Column(
             enriched_date_type.EnrichedDateType(type="pendulum"))
-        created_at = sa.Column(
-            enriched_date_type.EnrichedDateTimeType(type="pendulum"))
     return User
 
 
