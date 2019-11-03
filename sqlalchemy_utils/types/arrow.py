@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 from ..exceptions import ImproperlyConfigured
-from .enriched_datetime.enriched_datetime import EnrichedDateTimeType
+from .enriched_datetime.enriched_datetime_type import EnrichedDateTimeType
 
 arrow = None
 try:
