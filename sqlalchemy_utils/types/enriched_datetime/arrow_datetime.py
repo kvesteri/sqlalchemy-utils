@@ -14,7 +14,7 @@ except ImportError:
     pass
 
 
-class ArrowDatetime():
+class ArrowDatetime(object):
     def _coerce(self, impl, value):
         if isinstance(value, six.string_types):
             value = arrow.get(value)

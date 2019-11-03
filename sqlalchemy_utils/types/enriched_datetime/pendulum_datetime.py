@@ -9,7 +9,7 @@ except ImportError:
     pass
 
 
-class PendulumDatetime():
+class PendulumDatetime(object):
     def _coerce(self, impl, value):
         if value is not None:
             if isinstance(value, pendulum.DateTime):
