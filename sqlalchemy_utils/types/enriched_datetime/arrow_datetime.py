@@ -26,7 +26,7 @@ class ArrowDatetime():
 
     def process_bind_param(self, impl, value, dialect):
         if value:
-            utc_val = self._coerce(value).to('UTC')
+            utc_val = self._coerce(impl, value).to('UTC')
             return utc_val.datetime\
                 if impl.timezone else utc_val.naive
         return value
