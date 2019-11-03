@@ -10,8 +10,9 @@ from .currency import CurrencyType  # noqa
 from .email import EmailType  # noqa
 from .encrypted.encrypted_type import EncryptedType  # noqa
 from .enriched_datetime.enriched_date_type import EnrichedDateType  # noqa
-from .enriched_datetime.enriched_datetime_type import \
-    EnrichedDateTimeType  # noqa
+from .enriched_datetime.enriched_datetime_type import (  # noqa
+    EnrichedDateTimeType
+)
 from .ip_address import IPAddressType  # noqa
 from .json import JSONType  # noqa
 from .locale import LocaleType  # noqa
