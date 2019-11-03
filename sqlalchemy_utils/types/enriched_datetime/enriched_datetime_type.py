@@ -53,7 +53,7 @@ class EnrichedDateTimeType(types.TypeDecorator, ScalarCoercible):
                 )
             else:
                 super(EnrichedDateTimeType, self).__init__(*args, **kwargs)
-                self.dt_object = PendulumDatetime(*args, **kwargs)
+                self.dt_object = PendulumDatetime()
         elif type == "arrow":
             if not arrow:
                 raise ImproperlyConfigured(
@@ -61,7 +61,7 @@ class EnrichedDateTimeType(types.TypeDecorator, ScalarCoercible):
                 )
             else:
                 super(EnrichedDateTimeType, self).__init__(*args, **kwargs)
-                self.dt_object = ArrowDatetime(*args, **kwargs)
+                self.dt_object = ArrowDatetime()
 
     def _coerce(self, value):
         return self.dt_object._coerce(value)

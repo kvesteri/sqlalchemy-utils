@@ -46,7 +46,7 @@ class EnrichedDateType(types.TypeDecorator, ScalarCoercible):
                 )
             else:
                 super(EnrichedDateType, self).__init__(*args, **kwargs)
-                self.date_object = PendulumDate(*args, **kwargs)
+                self.date_object = PendulumDate()
 
     def _coerce(self, value):
         return self.date_object._coerce(value)
