@@ -29,7 +29,7 @@ class PendulumDatetime():
 
     def process_bind_param(self, impl, value, dialect):
         if value:
-            return self._coerce(value).in_tz("UTC")
+            return self._coerce(impl, value).in_tz("UTC")
         return value
 
     def process_result_value(self, impl, value, dialect):
