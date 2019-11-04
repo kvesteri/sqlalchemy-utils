@@ -53,7 +53,7 @@ Inheritance
 
 ::
 
-    class Employee(self.Base):
+    class Employee(Base):
         __tablename__ = 'employee'
         id = sa.Column(sa.Integer, primary_key=True)
         name = sa.Column(sa.String(50))
@@ -74,7 +74,7 @@ Inheritance
             'polymorphic_identity': 'engineer'
         }
 
-    class Activity(self.Base):
+    class Activity(Base):
         __tablename__ = 'event'
         id = sa.Column(sa.Integer, primary_key=True)
 
@@ -116,15 +116,15 @@ Generic relationships also allows using string arguments. When using generic_rel
 ::
 
 
-    class Building(self.Base):
+    class Building(Base):
         __tablename__ = 'building'
         id = sa.Column(sa.Integer, primary_key=True)
 
-    class User(self.Base):
+    class User(Base):
         __tablename__ = 'user'
         id = sa.Column(sa.Integer, primary_key=True)
 
-    class EventBase(self.Base):
+    class EventBase(Base):
         __abstract__ = True
 
         object_type = sa.Column(sa.Unicode(255))
