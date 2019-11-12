@@ -80,30 +80,7 @@ class TestChoiceTypeWithCustomUnderlyingType(TestCase):
         assert type_.impl == sa.Integer
 
 
-@mark.skipif('Enum is None')
-class TestEnumType(TestCase):
-    def create_models(self):
-        class OrderStatus(Enum):
-            unpaid = 1
-            paid = 2
-
-        class Order(self.Base):
-            __tablename__ = 'order'
-            id_ = sa.Column(sa.Integer, primary_key=True)
-            status = sa.Column(
-                ChoiceType(OrderStatus, impl=sa.Integer()),
-                default=OrderStatus.unpaid
-            )
-
-            def __repr__(self):
-                return 'Order(%r, %r)' % (self.id_, self.status)
-
-            def pay(self):
-                self.status = OrderStatus.paid
-
-        self.OrderStatus = OrderStatus
-        self.Order = Order
-
+class TestEnumType(object):
     def test_parameter_processing(self):
         order = self.Order()
 
@@ -129,3 +106,53 @@ class TestEnumType(TestCase):
         self.session.commit()
 
         assert order.status is self.OrderStatus.paid
+
+@mark.skipif('Enum is None')
+class TestEnumIntType(TestCase, TestEnumType):
+    def create_models(self):
+        class OrderStatus(Enum):
+            unpaid = 1
+            paid = 2
+
+        class Order(self.Base):
+            __tablename__ = 'order'
+            id_ = sa.Column(sa.Integer, primary_key=True)
+            status = sa.Column(
+                ChoiceType(OrderStatus, impl=sa.Integer()),
+                default=OrderStatus.unpaid
+            )
+
+            def __repr__(self):
+                return 'Order(%r, %r)' % (self.id_, self.status)
+
+            def pay(self):
+                self.status = OrderStatus.paid
+
+        self.OrderStatus = OrderStatus
+        self.Order = Order
+
+@mark.skipif('Enum is None')
+class TestEnumStringType(TestCase, TestEnumType):
+    def create_models(self):
+        class OrderStatus(Enum):
+            unpaid = 1
+            paid = 2
+
+        OrderStatus.unpaid.dbvalue = 'unpaid'
+
+        class Order(self.Base):
+            __tablename__ = 'order'
+            id_ = sa.Column(sa.Integer, primary_key=True)
+            status = sa.Column(
+                ChoiceType(OrderStatus, impl=sa.Enum('unpaid', 'paid')),
+                default=OrderStatus.unpaid
+            )
+
+            def __repr__(self):
+                return 'Order(%r, %r)' % (self.id_, self.status)
+
+            def pay(self):
+                self.status = OrderStatus.paid
+
+        self.OrderStatus = OrderStatus
+        self.Order = Order
