@@ -114,3 +114,67 @@ class TestMaterializedViews:
         row = session.query(ArticleView).first()
         assert row.name == 'Some article'
         assert row.author_name == 'Some user'
+
+
+class TrivialViewTestCases:
+    def life_cycle(
+        self,
+        engine,
+        metadata,
+        column,
+        cascade_on_drop
+    ):
+        __table__ = create_view(
+            name='trivial_view',
+            selectable=sa.select([column]),
+            metadata=metadata,
+            cascade_on_drop=cascade_on_drop
+        )
+        __table__.create(engine)
+        __table__.drop(engine)
+
+
+class SupportsCascade(TrivialViewTestCases):
+    def test_life_cycle_cascade(
+        self,
+        connection,
+        engine,
+        Base,
+        User
+    ):
+        self.life_cycle(engine, Base.metadata, User.id, cascade_on_drop=True)
+
+
+class DoesntSupportCascade(SupportsCascade):
+    @pytest.mark.xfail
+    def test_life_cycle_cascade(self, *args, **kwargs):
+        super(DoesntSupportCascade, self).test_life_cycle_cascade(
+            *args,
+            **kwargs
+        )
+
+
+class SupportsNoCascade(TrivialViewTestCases):
+    def test_life_cycle_no_cascade(
+        self,
+        connection,
+        engine,
+        Base,
+        User
+    ):
+        self.life_cycle(engine, Base.metadata, User.id, cascade_on_drop=False)
+
+
+@pytest.mark.usefixtures('postgresql_dsn')
+class TestPostgresTrivialView(SupportsCascade, SupportsNoCascade):
+    pass
+
+
+@pytest.mark.usefixtures('mysql_dsn')
+class TestMySqlTrivialView(SupportsCascade, SupportsNoCascade):
+    pass
+
+
+@pytest.mark.usefixtures('sqlite_none_database_dsn')
+class TestSqliteTrivialView(DoesntSupportCascade, SupportsNoCascade):
+    pass

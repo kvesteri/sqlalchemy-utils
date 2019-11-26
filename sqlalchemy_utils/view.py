@@ -20,16 +20,18 @@ def compile_create_materialized_view(element, compiler, **kw):
 
 
 class DropView(DDLElement):
-    def __init__(self, name, materialized=False):
+    def __init__(self, name, materialized=False, cascade=True):
         self.name = name
         self.materialized = materialized
+        self.cascade = cascade
 
 
 @compiler.compiles(DropView)
 def compile_drop_materialized_view(element, compiler, **kw):
-    return 'DROP {}VIEW IF EXISTS {} CASCADE'.format(
+    return 'DROP {}VIEW IF EXISTS {} {}'.format(
         'MATERIALIZED ' if element.materialized else '',
-        element.name
+        element.name,
+        'CASCADE' if element.cascade else ''
     )
 
 
@@ -104,7 +106,8 @@ def create_materialized_view(
 def create_view(
     name,
     selectable,
-    metadata
+    metadata,
+    cascade_on_drop=True
 ):
     """ Create a view on a given metadata
 
@@ -149,7 +152,11 @@ def create_view(
         for idx in table.indexes:
             idx.create(connection)
 
-    sa.event.listen(metadata, 'before_drop', DropView(name))
+    sa.event.listen(
+        metadata,
+        'before_drop',
+        DropView(name, cascade=cascade_on_drop)
+    )
     return table
 
 
