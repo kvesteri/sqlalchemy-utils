@@ -3,7 +3,6 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 from sqlalchemy_utils import Asterisk, row_to_json
-from sqlalchemy_utils.expressions import explain, explain_analyze
 
 
 @pytest.fixture
@@ -25,81 +24,6 @@ def Article(Base):
         name = sa.Column(sa.Unicode(255))
         content = sa.Column(sa.UnicodeText)
     return Article
-
-
-@pytest.mark.usefixtures('postgresql_dsn')
-class TestExplain(object):
-
-    def test_render_explain(self, session, assert_startswith, Article):
-        assert_startswith(
-            explain(session.query(Article)),
-            'EXPLAIN SELECT'
-        )
-
-    def test_render_explain_with_analyze(
-        self,
-        session,
-        assert_startswith,
-        Article
-    ):
-        assert_startswith(
-            explain(session.query(Article), analyze=True),
-            'EXPLAIN (ANALYZE true) SELECT'
-        )
-
-    def test_with_string_as_stmt_param(self, assert_startswith):
-        assert_startswith(
-            explain(sa.text('SELECT 1 FROM article')),
-            'EXPLAIN SELECT'
-        )
-
-    def test_format(self, assert_startswith):
-        assert_startswith(
-            explain(sa.text('SELECT 1 FROM article'), format='json'),
-            'EXPLAIN (FORMAT json) SELECT'
-        )
-
-    def test_timing(self, assert_startswith):
-        assert_startswith(
-            explain(
-                sa.text('SELECT 1 FROM article'),
-                analyze=True,
-                timing=False
-            ),
-            'EXPLAIN (ANALYZE true, TIMING false) SELECT'
-        )
-
-    def test_verbose(self, assert_startswith):
-        assert_startswith(
-            explain(sa.text('SELECT 1 FROM article'), verbose=True),
-            'EXPLAIN (VERBOSE true) SELECT'
-        )
-
-    def test_buffers(self, assert_startswith):
-        assert_startswith(
-            explain(
-                sa.text('SELECT 1 FROM article'),
-                analyze=True,
-                buffers=True
-            ),
-            'EXPLAIN (ANALYZE true, BUFFERS true) SELECT'
-        )
-
-    def test_costs(self, assert_startswith):
-        assert_startswith(
-            explain(sa.text('SELECT 1 FROM article'), costs=False),
-            'EXPLAIN (COSTS false) SELECT'
-        )
-
-
-class TestExplainAnalyze(object):
-    def test_render_explain_analyze(self, session, Article):
-        assert str(
-            explain_analyze(session.query(Article))
-            .compile(
-                dialect=postgresql.dialect()
-            )
-        ).startswith('EXPLAIN (ANALYZE true) SELECT')
 
 
 class TestAsterisk(object):
