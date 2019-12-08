@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.36.0 (2019-12-08)
+^^^^^^^^^^^^^^^^^^^
+
+- Removed explain and explain_analyze due to the internal changes in SQLAlchemy version 1.3.
+
+
 0.35.0 (2019-11-01)
 ^^^^^^^^^^^^^^^^^^^
 
