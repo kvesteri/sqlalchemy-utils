@@ -45,6 +45,7 @@ def ArticleMV(Base, Article, User):
                     .join(User, Article.author_id == User.id)
                 )
             ),
+            aliases={'name': 'article_name'},
             metadata=Base.metadata,
             indexes=[sa.Index('article_mv_id_idx', 'id')]
         )
@@ -95,7 +96,7 @@ class TestMaterializedViews:
         session.commit()
         refresh_materialized_view(session, 'article_mv')
         materialized = session.query(ArticleMV).first()
-        assert materialized.name == 'Some article'
+        assert materialized.article_name == 'Some article'
         assert materialized.author_name == 'Some user'
 
     def test_querying_view(

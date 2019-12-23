@@ -37,14 +37,22 @@ def create_table_from_selectable(
     name,
     selectable,
     indexes=None,
-    metadata=None
+    metadata=None,
+    aliases=None
 ):
     if indexes is None:
         indexes = []
     if metadata is None:
         metadata = sa.MetaData()
+    if aliases is None:
+        aliases = {}
     args = [
-        sa.Column(c.name, c.type, primary_key=c.primary_key)
+        sa.Column(
+            c.name,
+            c.type,
+            key=aliases.get(c.name, c.name),
+            primary_key=c.primary_key
+        )
         for c in selectable.c
     ] + indexes
     table = sa.Table(name, metadata, *args)
@@ -60,7 +68,8 @@ def create_materialized_view(
     name,
     selectable,
     metadata,
-    indexes=None
+    indexes=None,
+    aliases=None
 ):
     """ Create a view on a given metadata
 
@@ -70,6 +79,9 @@ def create_materialized_view(
         An SQLAlchemy Metadata instance that stores the features of the
         database being described.
     :param indexes: An optional list of SQLAlchemy Index instances.
+    :param aliases:
+        An optional dictionary containing with keys as column names and values
+        as column aliases.
 
     Same as for ``create_view`` except that a ``CREATE MATERIALIZED VIEW``
     statement is emitted instead of a ``CREATE VIEW``.
@@ -79,7 +91,8 @@ def create_materialized_view(
         name=name,
         selectable=selectable,
         indexes=indexes,
-        metadata=None
+        metadata=None,
+        aliases=aliases
     )
 
     sa.event.listen(
