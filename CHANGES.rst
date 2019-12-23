@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.36.1 (2019-12-23)
+^^^^^^^^^^^^^^^^^^^
+
+- Added `aliases` parameter to create_materialized_view function.
+
+
 0.36.0 (2019-12-08)
 ^^^^^^^^^^^^^^^^^^^
 
