@@ -7,6 +7,7 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 0.36.1 (2019-12-23)
 ^^^^^^^^^^^^^^^^^^^
 
+- Added support for CASCADE option when dropping views (#406, pull request courtesy of amicks)
 - Added `aliases` parameter to create_materialized_view function.
 
 
