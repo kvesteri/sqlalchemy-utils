@@ -412,6 +412,9 @@ def get_tables(mixed):
         return mixed.parent.tables
     elif isinstance(mixed, sa.orm.query._ColumnEntity):
         mixed = mixed.expr
+	
+        if isinstance(mixed, sa.Column):
+	    return [mixed.table]
 
     mapper = get_mapper(mixed)
 
