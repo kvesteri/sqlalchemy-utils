@@ -496,6 +496,12 @@ def database_exists(url):
                     pass
             return False
 
+        elif dialect_name == 'mssql':
+            url = _set_url_database(url, database='master')
+            engine = sa.create_engine(url)
+            text = "SELECT DB_ID('%s')" % database
+            return bool(_get_scalar_result(engine, text))
+
         elif dialect_name == 'mysql':
             url = _set_url_database(url, database=None)
             engine = sa.create_engine(url)
