@@ -159,7 +159,15 @@ def merge_references(from_, to, foreign_keys=None):
         raise TypeError('The tables of given arguments do not match.')
 
     session = object_session(from_)
-    foreign_keys = get_referencing_foreign_keys(from_)
+    if foreign_keys is None:
+        foreign_keys = get_referencing_foreign_keys(from_)
+    else:
+        tables = get_tables(from_)
+        bad_keys = [str(fk.parent) for fk in foreign_keys
+                    if fk.column.table not in tables]
+        if bad_keys:
+            raise ValueError(f'One or more foreign keys do not refer to our'
+                             f' tables: {bad_keys}')
 
     for fk in foreign_keys:
         old_values = get_foreign_key_values(fk, from_)

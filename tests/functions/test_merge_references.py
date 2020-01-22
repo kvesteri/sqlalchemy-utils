@@ -30,23 +30,81 @@ class TestMergeReferences(object):
         return BlogPost
 
     @pytest.fixture
-    def init_models(self, User, BlogPost):
+    def Address(self, Base, User):
+        class Address(Base):
+            __tablename__ = 'address'
+            id = sa.Column(sa.Integer, primary_key=True)
+            city = sa.Column(sa.UnicodeText)
+            user_id = sa.Column(sa.Integer, sa.ForeignKey('user.id'))
+
+            user = sa.orm.relationship(User)
+        return Address
+
+    @pytest.fixture
+    def Comment(self, Base, User, BlogPost):
+        class Comment(Base):
+            __tablename__ = 'comment'
+            id = sa.Column(sa.Integer, primary_key=True)
+            content = sa.Column(sa.UnicodeText)
+            blog_post_id = sa.Column(sa.Integer, sa.ForeignKey('blog_post.id'))
+            user_id = sa.Column(sa.Integer, sa.ForeignKey('user.id'))
+
+            blog_post = sa.orm.relationship(BlogPost)
+            user = sa.orm.relationship(User)
+        return Comment
+
+    @pytest.fixture
+    def init_models(self, User, BlogPost, Address, Comment):
         pass
 
-    def test_updates_foreign_keys(self, session, User, BlogPost):
+    def test_updates_foreign_keys(self, session, User, BlogPost, Address):
         john = User(name=u'John')
         jack = User(name=u'Jack')
         post = BlogPost(title=u'Some title', author=john)
         post2 = BlogPost(title=u'Other title', author=jack)
+        address1 = Address(city='New York', user=john)
+        address2 = Address(city='Los Angeles', user=jack)
         session.add(john)
         session.add(jack)
         session.add(post)
         session.add(post2)
+        session.add(address1)
+        session.add(address2)
         session.commit()
         merge_references(john, jack)
         session.commit()
         assert post.author == jack
         assert post2.author == jack
+        assert address1.user == jack
+        assert address2.user == jack
+
+    def test_with_bad_foreign_keys(self, session, User, Comment):
+        john = User(name=u'John')
+        jack = User(name=u'Jack')
+        with pytest.raises(ValueError):
+            merge_references(
+                john, jack, foreign_keys=Comment.__table__.foreign_keys)
+
+    def test_with_foreign_keys(self, session, User, BlogPost, Address):
+        john = User(name=u'John')
+        jack = User(name=u'Jack')
+        post = BlogPost(title=u'Some title', author=john)
+        post2 = BlogPost(title=u'Other title', author=jack)
+        address1 = Address(city=u'New York', user=john)
+        address2 = Address(city=u'Los Angeles', user=jack)
+        session.add(john)
+        session.add(jack)
+        session.add(post)
+        session.add(post2)
+        session.add(address1)
+        session.add(address2)
+        session.commit()
+        merge_references(
+            john, jack, foreign_keys=BlogPost.__table__.foreign_keys)
+        assert post.author_id == jack.id
+        assert post2.author_id == jack.id
+        assert address1.user_id == john.id
+        assert address2.user_id == jack.id
 
     def test_object_merging_whenever_possible(self, session, User, BlogPost):
         john = User(name=u'John')
