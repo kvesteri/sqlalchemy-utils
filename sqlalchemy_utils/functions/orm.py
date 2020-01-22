@@ -405,11 +405,11 @@ def get_tables(mixed):
         a SA Alias object wrapping any of these objects.
     """
     if isinstance(mixed, sa.Table):
-        return [mixed]
+        return {mixed}
     elif isinstance(mixed, sa.Column):
-        return [mixed.table]
+        return {mixed.table}
     elif isinstance(mixed, sa.orm.attributes.InstrumentedAttribute):
-        return mixed.parent.tables
+        return set(mixed.parent.tables)
     elif isinstance(mixed, sa.orm.query._ColumnEntity):
         mixed = mixed.expr
 
@@ -420,7 +420,7 @@ def get_tables(mixed):
         tables = sum((m.tables for m in polymorphic_mappers), [])
     else:
         tables = mapper.tables
-    return tables
+    return set(tables)
 
 
 def get_columns(mixed):

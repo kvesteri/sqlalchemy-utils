@@ -192,7 +192,7 @@ def make_order_by_deterministic(query):
         except TypeError:
             pass
 
-    base_table = get_tables(query._entities[0])[0]
+    base_table = next(iter(get_tables(query._entities[0])))
     query = query.order_by(
         *(order_by_func(c) for c in base_table.c if c.primary_key)
     )
