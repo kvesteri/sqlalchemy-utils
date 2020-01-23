@@ -47,3 +47,5 @@ Session.vim
 
 # Sublime Text
 *.sublime-*
+
+.idea

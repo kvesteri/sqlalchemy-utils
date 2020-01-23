@@ -50,14 +50,19 @@ def group_foreign_keys(foreign_keys):
     return groupby(foreign_keys, lambda key: key.constraint.table)
 
 
-def get_referencing_foreign_keys(mixed):
+def get_referencing_foreign_keys(mixed, *, self_reference=False, primary_keys=False):
     """
     Returns referencing foreign keys for given Table object or declarative
     class.
 
     :param mixed:
         SA Table object or SA declarative class
-
+    :param self_reference:
+        Include foreign keys from self-referencing tables.
+        Defaults to False for backward compatibility.
+    :param primary_keys:
+        Include foreign keys that use primary key columns.
+        Defaults to False as these keys are usually used for table inheritance.
     ::
 
         get_referencing_foreign_keys(User)  # set([ForeignKey('user.id')])
@@ -80,19 +85,17 @@ def get_referencing_foreign_keys(mixed):
 
     .. seealso:: :func:`get_tables`
     """
-    if isinstance(mixed, sa.Table):
-        tables = [mixed]
-    else:
-        tables = get_tables(mixed)
+    tables = get_tables(mixed)
 
     referencing_foreign_keys = set()
 
     for table in mixed.metadata.tables.values():
-        if table not in tables:
+        if self_reference or table not in tables:
             for constraint in table.constraints:
                 if isinstance(constraint, sa.sql.schema.ForeignKeyConstraint):
                     for fk in constraint.elements:
-                        if any(fk.references(t) for t in tables):
+                        if (primary_keys or not fk.parent.primary_key) \
+                                and any(fk.references(t) for t in tables):
                             referencing_foreign_keys.add(fk)
     return referencing_foreign_keys
 
