@@ -165,8 +165,8 @@ def merge_references(from_, to, foreign_keys=None):
         bad_keys = [str(fk.parent) for fk in foreign_keys
                     if fk.column.table not in tables]
         if bad_keys:
-            raise ValueError(f'One or more foreign keys do not refer to our'
-                             f' tables: {bad_keys}')
+            raise ValueError('One or more foreign keys do not refer to our'
+                             ' tables: %r' % bad_keys)
 
     for fk in foreign_keys:
         old_values = get_foreign_key_values(fk, from_)
