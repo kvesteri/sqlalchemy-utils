@@ -50,7 +50,7 @@ def group_foreign_keys(foreign_keys):
     return groupby(foreign_keys, lambda key: key.constraint.table)
 
 
-def get_referencing_foreign_keys(mixed, *, self_reference=False):
+def get_referencing_foreign_keys(mixed, self_reference=False):
     """
     Returns referencing foreign keys for given Table object or declarative
     class.

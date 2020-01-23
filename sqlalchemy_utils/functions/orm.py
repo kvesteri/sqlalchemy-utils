@@ -626,7 +626,8 @@ def get_polymorphic_mappers(mixed):
     if isinstance(mixed, AliasedInsp):
         return mixed.with_polymorphic_mappers
     else:
-        return [x for x in mixed.polymorphic_map.values() if issubclass(mixed.class_, x.class_)]
+        return [x for x in mixed.polymorphic_map.values()
+                if issubclass(mixed.class_, x.class_)]
 
 
 def get_query_descriptor(query, entity, attr):
