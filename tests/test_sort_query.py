@@ -288,9 +288,9 @@ class TestSortQueryWithPolymorphicInheritance(object):
         )
         assert_contains('ORDER BY item_count', query)
 
-    def test_child_class_attribute(self, session, TextItem):
+    def test_child_class_attribute(self, session, Article):
         query = sort_query(
-            session.query(TextItem),
+            session.query(Article),
             'category'
         )
         assert_contains('ORDER BY article.category ASC', query)
