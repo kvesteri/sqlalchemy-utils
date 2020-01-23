@@ -52,6 +52,9 @@ class TestGetReferencingFksWithInheritance(object):
             type = sa.Column(sa.Unicode)
             first_name = sa.Column(sa.Unicode(255))
             last_name = sa.Column(sa.Unicode(255))
+            editor_id = sa.Column(sa.Integer, sa.ForeignKey('user.id'))
+
+            editor = sa.orm.relationship('User')
 
             __mapper_args__ = {
                 'polymorphic_on': 'type'
@@ -102,3 +105,9 @@ class TestGetReferencingFksWithInheritance(object):
     def test_with_table(self, Admin):
         fks = get_referencing_foreign_keys(Admin.__table__)
         assert fks == set([])
+
+    def test_with_self_reference(self, User, Admin, TextItem):
+        fks = get_referencing_foreign_keys(User, self_reference=True)
+        assert User.__table__.foreign_keys \
+            | Admin.__table__.foreign_keys \
+            | TextItem.__table__.foreign_keys == fks
