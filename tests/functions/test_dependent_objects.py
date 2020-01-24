@@ -65,7 +65,8 @@ class TestDependentObjects(object):
     def test_with_bad_foreign_keys(self, session, Article, BlogPost):
         post = BlogPost()
         with pytest.raises(ValueError):
-            dependent_objects(post, foreign_keys=Article.__table__.foreign_keys)
+            dependent_objects(
+                post, foreign_keys=Article.__table__.foreign_keys)
 
     def test_with_foreign_keys_parameter(
         self,
