@@ -96,6 +96,15 @@ def get_referencing_foreign_keys(mixed, self_reference=False):
     return referencing_foreign_keys
 
 
+def check_foreign_keys(mixed, foreign_keys):
+    tables = get_tables(mixed)
+    bad_keys = [str(fk.parent) for fk in foreign_keys
+                if fk.column.table not in tables]
+    if bad_keys:
+        raise ValueError('One or more foreign keys do not refer to our'
+                         ' tables: %r' % bad_keys)
+
+
 def merge_references(from_, to, foreign_keys=None):
     """
     Merge the references of an entity into another entity.
@@ -158,15 +167,10 @@ def merge_references(from_, to, foreign_keys=None):
         raise TypeError('The tables of given arguments do not match.')
 
     session = object_session(from_)
-    if foreign_keys is None:
-        foreign_keys = get_referencing_foreign_keys(from_)
+    if foreign_keys:
+        check_foreign_keys(from_, foreign_keys)
     else:
-        tables = get_tables(from_)
-        bad_keys = [str(fk.parent) for fk in foreign_keys
-                    if fk.column.table not in tables]
-        if bad_keys:
-            raise ValueError('One or more foreign keys do not refer to our'
-                             ' tables: %r' % bad_keys)
+        foreign_keys = get_referencing_foreign_keys(from_)
 
     for fk in foreign_keys:
         old_values = get_foreign_key_values(fk, from_)
@@ -266,7 +270,9 @@ def dependent_objects(obj, foreign_keys=None):
 
     .. versionadded: 0.26.0
     """
-    if foreign_keys is None:
+    if foreign_keys:
+        check_foreign_keys(obj, foreign_keys)
+    else:
         foreign_keys = get_referencing_foreign_keys(obj)
 
     session = object_session(obj)

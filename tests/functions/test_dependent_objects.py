@@ -62,6 +62,11 @@ class TestDependentObjects(object):
         assert articles[2] in deps
         assert articles[3] in deps
 
+    def test_with_bad_foreign_keys(self, session, Article, BlogPost):
+        post = BlogPost()
+        with pytest.raises(ValueError):
+            dependent_objects(post, foreign_keys=Article.__table__.foreign_keys)
+
     def test_with_foreign_keys_parameter(
         self,
         session,
@@ -83,10 +88,10 @@ class TestDependentObjects(object):
         deps = list(
             dependent_objects(
                 user,
-                (
+                [
                     fk for fk in get_referencing_foreign_keys(User)
                     if fk.ondelete == 'RESTRICT' or fk.ondelete is None
-                )
+                ]
             ).limit(5)
         )
         assert len(deps) == 2
@@ -177,10 +182,10 @@ class TestDependentObjectsWithColumnAliases(object):
         deps = list(
             dependent_objects(
                 user,
-                (
+                [
                     fk for fk in get_referencing_foreign_keys(User)
                     if fk.ondelete == 'RESTRICT' or fk.ondelete is None
-                )
+                ]
             ).limit(5)
         )
         assert len(deps) == 2
