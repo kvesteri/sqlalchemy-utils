@@ -35,17 +35,10 @@ class EnrichedDateType(types.TypeDecorator, ScalarCoercible):
     """
     impl = types.Date
 
-    def __init__(self, type="pendulum", *args, **kwargs):
+    def __init__(self, date_processor=PendulumDateTime, *args, **kwargs):
         self.type = type
-        if type == "pendulum":
-            if not pendulum:
-                raise ImproperlyConfigured(
-                    "'pendulum' package is required"
-                    " to use 'EnrichedDateTimeType'"
-                )
-            else:
-                super(EnrichedDateType, self).__init__(*args, **kwargs)
-                self.date_object = PendulumDate()
+        super(EnrichedDateType, self).__init__(*args, **kwargs)
+        self.date_object = date_processor()
 
     def _coerce(self, value):
         return self.date_object._coerce(self.impl, value)
