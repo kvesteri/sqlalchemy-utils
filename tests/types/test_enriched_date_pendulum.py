@@ -5,7 +5,10 @@ from datetime import date
 import pytest
 import sqlalchemy as sa
 
-from sqlalchemy_utils.types.enriched_datetime import enriched_date_type
+from sqlalchemy_utils.types.enriched_datetime import (
+    enriched_date_type,
+    pendulum_date
+)
 
 
 @pytest.fixture
@@ -14,7 +17,9 @@ def User(Base):
         __tablename__ = 'users'
         id = sa.Column(sa.Integer, primary_key=True)
         birthday = sa.Column(
-            enriched_date_type.EnrichedDateType(type="pendulum"))
+            enriched_date_type.EnrichedDateType(
+                date_processor=pendulum_date.PendulumDate
+            ))
     return User
 
 
