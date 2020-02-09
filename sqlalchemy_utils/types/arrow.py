@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 from ..exceptions import ImproperlyConfigured
+from .enriched_datetime import ArrowDateTime
 from .enriched_datetime.enriched_datetime_type import EnrichedDateTimeType
 
 arrow = None
@@ -54,4 +55,5 @@ class ArrowType(EnrichedDateTimeType):
                 "'arrow' package is required to use 'ArrowType'"
             )
 
-        super(ArrowType, self).__init__(type="arrow", *args, **kwargs)
+        super(ArrowType, self).__init__(datetime_processor=ArrowDateTime,
+                                        *args, **kwargs)

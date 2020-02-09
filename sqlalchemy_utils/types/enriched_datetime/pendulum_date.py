@@ -1,4 +1,5 @@
-from .pendulum_datetime import PendulumDatetime
+from ...exceptions import ImproperlyConfigured
+from .pendulum_datetime import PendulumDateTime
 
 pendulum = None
 try:
@@ -7,7 +8,13 @@ except ImportError:
     pass
 
 
-class PendulumDate(PendulumDatetime):
+class PendulumDate(PendulumDateTime):
+    def __init__(self):
+        if not pendulum:
+            raise ImproperlyConfigured(
+                "'pendulum' package is required to use 'PendulumDate'"
+            )
+
     def _coerce(self, impl, value):
         if value:
             if not isinstance(value, pendulum.Date):

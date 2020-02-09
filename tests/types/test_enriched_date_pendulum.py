@@ -28,12 +28,12 @@ def init_models(User):
     pass
 
 
-@pytest.mark.skipif('enriched_date_type.pendulum is None')
+@pytest.mark.skipif('pendulum_date.pendulum is None')
 class TestPendulumDateType(object):
 
     def test_parameter_processing(self, session, User):
         user = User(
-            birthday=enriched_date_type.pendulum.date(1995, 7, 11)
+            birthday=pendulum_date.pendulum.date(1995, 7, 11)
         )
 
         session.add(user)
@@ -55,7 +55,7 @@ class TestPendulumDateType(object):
         assert user.birthday.year == 2013
 
     def test_utc(self, session, User):
-        time = enriched_date_type.pendulum.now("UTC")
+        time = pendulum_date.pendulum.now("UTC")
         user = User(birthday=time)
         session.add(user)
         assert user.birthday == time
