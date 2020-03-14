@@ -1,4 +1,4 @@
-from collections import OrderedDict
+from collections import OrderedDict, Sequence
 from functools import partial
 from inspect import isclass
 from operator import attrgetter
@@ -7,7 +7,7 @@ import six
 import sqlalchemy as sa
 from sqlalchemy.engine.interfaces import Dialect
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import mapperlib
+from sqlalchemy.orm import Mapper, mapperlib
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.orm.exc import UnmappedInstanceError
 from sqlalchemy.orm.properties import ColumnProperty, RelationshipProperty
@@ -373,7 +373,7 @@ def get_primary_keys(mixed):
     )
 
 
-def get_tables(mixed):
+def get_tables(mixed, classes=None):
     """
     Return a set of tables associated with given SQLAlchemy object.
 
@@ -403,6 +403,10 @@ def get_tables(mixed):
     :param mixed:
         SQLAlchemy Mapper, Declarative class, Column, InstrumentedAttribute or
         a SA Alias object wrapping any of these objects.
+    :param classes:
+        When :mixed: is a mapped class or a mapper, this matches semantics of
+        classes arg to sqlalchemy.orm.with_polymorphic()
+        Default to None and will look up classes from the mapper
     """
     if isinstance(mixed, sa.Table):
         return {mixed}
@@ -415,7 +419,7 @@ def get_tables(mixed):
 
     mapper = get_mapper(mixed)
 
-    polymorphic_mappers = get_polymorphic_mappers(mapper)
+    polymorphic_mappers = get_polymorphic_mappers(mapper, classes=classes)
     if polymorphic_mappers:
         tables = sum((m.tables for m in polymorphic_mappers), [])
     else:
@@ -622,12 +626,24 @@ def get_query_entity_by_alias(query, alias):
             return entity
 
 
-def get_polymorphic_mappers(mixed):
+def get_polymorphic_mappers(mixed, classes=None):
     if isinstance(mixed, AliasedInsp):
         return mixed.with_polymorphic_mappers
     else:
-        return [x for x in mixed.polymorphic_map.values()
-                if issubclass(mixed.class_, x.class_)]
+        if classes is None and mixed.with_polymorphic:
+            classes = mixed.with_polymorphic[0]
+        values = mixed.polymorphic_map.values()
+        if classes:
+            if classes == '*':
+                return values
+            else:
+                if not isinstance(classes, Sequence):
+                    classes = classes,
+                classes = [(x.class_ if isinstance(x, Mapper) else x)
+                           for x in classes]
+                return [x for x in values if x.class_ in classes]
+        else:
+            return [x for x in values if issubclass(mixed.class_, x.class_)]
 
 
 def get_query_descriptor(query, entity, attr):

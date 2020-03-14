@@ -48,6 +48,7 @@ class TestGetTables(object):
     def test_entity_using_with_polymorphic(self, TextItem, Article):
         assert get_tables(TextItem) == {
             TextItem.__table__,
+            Article.__table__,
         }
 
     def test_instrumented_attribute(self, TextItem):
