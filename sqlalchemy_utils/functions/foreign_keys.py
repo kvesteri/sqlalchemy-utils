@@ -50,7 +50,7 @@ def group_foreign_keys(foreign_keys):
     return groupby(foreign_keys, lambda key: key.constraint.table)
 
 
-def get_referencing_foreign_keys(mixed, self_reference=False):
+def get_referencing_foreign_keys(mixed, self_reference=False, classes=None):
     """
     Returns referencing foreign keys for given Table object or declarative
     class.
@@ -60,6 +60,12 @@ def get_referencing_foreign_keys(mixed, self_reference=False):
     :param self_reference:
         Include foreign keys from self-referencing tables.
         Defaults to False for backward compatibility.
+    :param classes:
+        When :mixed: is a mapped class, this matches the semantics of the
+        classes arg to sqlalchemy.orm.with_polymorphic()
+        Defaults to None and will look up classes from the mapper
+        This is useful if you want to also retrieve foreign_key references to
+        id columns of subclasses in a joined table inheritance hierarchy
     ::
 
         get_referencing_foreign_keys(User)  # set([ForeignKey('user.id')])
@@ -82,7 +88,7 @@ def get_referencing_foreign_keys(mixed, self_reference=False):
 
     .. seealso:: :func:`get_tables`
     """
-    tables = get_tables(mixed)
+    tables = get_tables(mixed, classes=classes)
 
     referencing_foreign_keys = set()
 

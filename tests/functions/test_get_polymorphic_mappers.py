@@ -78,33 +78,33 @@ def init_models(TextItem, Article, Comment, TextItem1, Article1):
 
 
 def test_with_polymorphic(TextItem, Article, Comment):
-    assert list(get_polymorphic_mappers(get_mapper(TextItem))) == [
+    assert set(get_polymorphic_mappers(get_mapper(TextItem))) == {
         Article.__mapper__,
         Comment.__mapper__,
-    ]
+    }
 
 
 def test_no_with_polymorphic(TextItem1, Article1):
-    assert list(get_polymorphic_mappers(get_mapper(TextItem1))) == []
-    assert list(get_polymorphic_mappers(get_mapper(Article1))) == [
+    assert set(get_polymorphic_mappers(get_mapper(TextItem1))) == set()
+    assert set(get_polymorphic_mappers(get_mapper(Article1))) == {
         Article1.__mapper__,
-    ]
+    }
 
 
 def test_classes(TextItem, Article, Comment):
-    assert list(
+    assert set(
         get_polymorphic_mappers(get_mapper(TextItem), classes=Article)
-    ) == [
+    ) == {
         Article.__mapper__,
-    ]
-    assert list(
+    }
+    assert set(
         get_polymorphic_mappers(get_mapper(TextItem), classes=Comment)
-    ) == [
+    ) == {
         Comment.__mapper__,
-    ]
-    assert list(
+    }
+    assert set(
         get_polymorphic_mappers(get_mapper(TextItem), classes='*')
-    ) == [
+    ) == {
         Article.__mapper__,
         Comment.__mapper__,
-    ]
+    }
