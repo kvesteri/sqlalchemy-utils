@@ -4,7 +4,7 @@ import datetime
 import os
 
 import six
-from sqlalchemy.types import LargeBinary, String, TypeDecorator
+from sqlalchemy.types import String, TypeDecorator
 
 from sqlalchemy_utils.exceptions import ImproperlyConfigured
 from sqlalchemy_utils.types.encrypted.padding import PADDING_MECHANISM
