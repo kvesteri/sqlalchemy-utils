@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.36.2 (2019-03-16)
+^^^^^^^^^^^^^^^^^^^
+
+- Added repr for UUIDType (#424, pull request courtesy of ziima)
+
+
 0.36.1 (2019-12-23)
 ^^^^^^^^^^^^^^^^^^^
 
