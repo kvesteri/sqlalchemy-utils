@@ -136,6 +136,9 @@ class PhoneNumber(BasePhoneNumber):
     def __unicode__(self):
         return self.national
 
+    def __hash__(self):
+        return hash(self.e164)
+
 
 class PhoneNumberType(types.TypeDecorator, ScalarCoercible):
     """
