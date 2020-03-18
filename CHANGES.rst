@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.36.3 (2019-03-18)
+^^^^^^^^^^^^^^^^^^^
+
+- Added hash method for PhoneNumberType (#428, pull request courtesy of hanc1208)
+
+
 0.36.2 (2019-03-16)
 ^^^^^^^^^^^^^^^^^^^
 
