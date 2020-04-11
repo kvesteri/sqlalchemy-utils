@@ -467,19 +467,13 @@ def create_database(url, encoding='utf8', template=None):
 
     if url.drivername == 'mssql+pyodbc':
         engine = sa.create_engine(url, connect_args={'autocommit': True})
-    elif url.drivername == 'postgresql+pg8000':
+    elif url.drivername.startswith('postgresql'):
         engine = sa.create_engine(url, isolation_level='AUTOCOMMIT')
     else:
         engine = sa.create_engine(url)
     result_proxy = None
 
     if engine.dialect.name == 'postgresql':
-        if engine.driver == 'psycopg2':
-            from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
-            engine.raw_connection().set_isolation_level(
-                ISOLATION_LEVEL_AUTOCOMMIT
-            )
-
         if not template:
             template = 'template1'
 
