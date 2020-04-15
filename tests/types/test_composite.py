@@ -66,6 +66,39 @@ class TestCompositeTypeWithRegularTypes(object):
         assert account.balance.currency == u'ääöö'
         assert account.balance.amount == 15
 
+    def test_dict_input(self, session, Account):
+        account = Account(
+            balance={'currency': 'USD', 'amount': 15}
+        )
+
+        session.add(account)
+        session.commit()
+
+        account = session.query(Account).first()
+        assert account.balance.currency == 'USD'
+        assert account.balance.amount == 15
+
+    def test_incomplete_dict(self, session, Account):
+        """
+        Postgres doesn't allow non-nullabe fields in Composite Types:
+
+        "no constraints (such as NOT NULL) can presently be included"
+        (https://www.postgresql.org/docs/10/rowtypes.html)
+
+        So this should be allowed.
+        """
+
+        account = Account(
+            balance={'amount': 15}
+        )
+
+        session.add(account)
+        session.commit()
+
+        account = session.query(Account).first()
+        assert account.balance.currency is None
+        assert account.balance.amount == 15
+
 
 @pytest.mark.skipif('i18n.babel is None')
 @pytest.mark.usefixtures('postgresql_dsn')
@@ -116,6 +149,18 @@ class TestCompositeTypeWithTypeDecorators(object):
         assert account.balance.currency == Currency('USD')
         assert account.balance.amount == 15
 
+    def test_dict_input(self, session, Account):
+        account = Account(
+            balance={'currency': Currency('USD'), 'amount': 15}
+        )
+
+        session.add(account)
+        session.commit()
+
+        account = session.query(Account).first()
+        assert account.balance.currency == 'USD'
+        assert account.balance.amount == 15
+
 
 @pytest.mark.skipif('i18n.babel is None')
 @pytest.mark.usefixtures('postgresql_dsn')
@@ -151,6 +196,23 @@ class TestCompositeTypeInsideArray(object):
             balances=[
                 type_.type_cls(Currency('USD'), 15),
                 type_.type_cls(Currency('AUD'), 20)
+            ]
+        )
+
+        session.add(account)
+        session.commit()
+
+        account = session.query(Account).first()
+        assert account.balances[0].currency == Currency('USD')
+        assert account.balances[0].amount == 15
+        assert account.balances[1].currency == Currency('AUD')
+        assert account.balances[1].amount == 20
+
+    def test_dict_input(self, session, type_, Account):
+        account = Account(
+            balances=[
+                {'currency': Currency('USD'), 'amount': 15},
+                {'currency': Currency('AUD'), 'amount': 20}
             ]
         )
 
