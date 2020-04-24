@@ -1,6 +1,5 @@
 from __future__ import absolute_import
 
-from collections import Iterable
 from datetime import datetime
 
 import six
@@ -8,6 +7,11 @@ from sqlalchemy import types
 
 from ..exceptions import ImproperlyConfigured
 from .scalar_coercible import ScalarCoercible
+
+try:
+    from collections.abc import Iterable
+except ImportError:  # For python 2.7 support
+    from collections import Iterable
 
 arrow = None
 try:

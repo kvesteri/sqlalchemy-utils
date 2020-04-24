@@ -1,4 +1,7 @@
-import collections
+try:
+    from collections.abc import Mapping, Sequence
+except ImportError:  # For python 2.7 support
+    from collections import Mapping, Sequence
 import itertools
 import os
 from copy import copy
@@ -7,90 +10,8 @@ import sqlalchemy as sa
 from sqlalchemy.engine.url import make_url
 from sqlalchemy.exc import OperationalError, ProgrammingError
 
-from ..expressions import explain_analyze
 from ..utils import starts_with
 from .orm import quote
-
-
-class PlanAnalysis(object):
-    def __init__(self, plan):
-        self.plan = plan
-
-    @property
-    def node_types(self):
-        types = [self.plan['Node Type']]
-        if 'Plans' in self.plan:
-            for plan in self.plan['Plans']:
-                analysis = PlanAnalysis(plan)
-                types.extend(analysis.node_types)
-        return types
-
-
-class QueryAnalysis(object):
-    def __init__(self, result_set):
-        self.plan = result_set[0]['Plan']
-        if 'Total Runtime' in result_set[0]:
-            # PostgreSQL versions < 9.4
-            self.runtime = result_set[0]['Total Runtime']
-        else:
-            # PostgreSQL versions >= 9.4
-            self.runtime = (
-                result_set[0]['Execution Time'] +
-                result_set[0]['Planning Time']
-            )
-
-    @property
-    def node_types(self):
-        return list(PlanAnalysis(self.plan).node_types)
-
-    def __repr__(self):
-        return '<QueryAnalysis runtime=%r>' % self.runtime
-
-
-def analyze(conn, query):
-    """
-    Analyze query using given connection and return :class:`QueryAnalysis`
-    object. Analysis is performed using database specific EXPLAIN ANALYZE
-    construct and then examining the results into structured format. Currently
-    only PostgreSQL is supported.
-
-
-    Getting query runtime (in database level) ::
-
-
-        from sqlalchemy_utils import analyze
-
-
-        analysis = analyze(conn, 'SELECT * FROM article')
-        analysis.runtime  # runtime as milliseconds
-
-
-    Analyze can be very useful when testing that query doesn't issue a
-    sequential scan (scanning all rows in table). You can for example write
-    simple performance tests this way.::
-
-
-        query = (
-            session.query(Article.name)
-            .order_by(Article.name)
-            .limit(10)
-        )
-        analysis = analyze(self.connection, query)
-        analysis.node_types  # [u'Limit', u'Index Only Scan']
-
-        assert 'Seq Scan' not in analysis.node_types
-
-
-    .. versionadded: 0.26.17
-
-    :param conn: SQLAlchemy Connection object
-    :param query: SQLAlchemy Query object or query as a string
-    """
-    return QueryAnalysis(
-        conn.execute(
-            explain_analyze(query, buffers=True, format='json')
-        ).scalar()
-    )
 
 
 def escape_like(string, escape_char='*'):
@@ -167,7 +88,7 @@ def json_sql(value, scalars_to_json=True):
         def scalar_convert(a):
             return sa.func.to_json(sa.text(a))
 
-    if isinstance(value, collections.Mapping):
+    if isinstance(value, Mapping):
         return sa.func.json_build_object(
             *(
                 json_sql(v, scalars_to_json=False)
@@ -176,7 +97,7 @@ def json_sql(value, scalars_to_json=True):
         )
     elif isinstance(value, str):
         return scalar_convert("'{0}'".format(value))
-    elif isinstance(value, collections.Sequence):
+    elif isinstance(value, Sequence):
         return sa.func.json_build_array(
             *(
                 json_sql(v, scalars_to_json=False)

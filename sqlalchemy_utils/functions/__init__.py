@@ -1,5 +1,4 @@
 from .database import (  # noqa
-    analyze,
     create_database,
     database_exists,
     drop_database,

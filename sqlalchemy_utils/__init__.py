@@ -9,7 +9,6 @@ from .asserts import (  # noqa
 from .exceptions import ImproperlyConfigured  # noqa
 from .expressions import Asterisk, row_to_json  # noqa
 from .functions import (  # noqa
-    analyze,
     cast_if,
     create_database,
     create_mock_engine,
@@ -74,6 +73,7 @@ from .types import (  # noqa
     EncryptedType,
     instrumented_list,
     InstrumentedList,
+    Int8RangeType,
     IntRangeType,
     IPAddressType,
     JSONType,
@@ -101,4 +101,4 @@ from .view import (  # noqa
     refresh_materialized_view
 )
 
-__version__ = '0.34.0'
+__version__ = '0.36.3'

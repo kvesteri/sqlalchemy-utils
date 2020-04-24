@@ -53,7 +53,7 @@ class PhoneNumber(BasePhoneNumber):
             _phone_number = sa.Column(sa.Unicode(20))
             country_code = sa.Column(sa.Unicode(8))
 
-            phonenumber = sa.orm.composite(
+            phone_number = sa.orm.composite(
                 PhoneNumber,
                 _phone_number,
                 country_code
@@ -135,6 +135,9 @@ class PhoneNumber(BasePhoneNumber):
 
     def __unicode__(self):
         return self.national
+
+    def __hash__(self):
+        return hash(self.e164)
 
 
 class PhoneNumberType(types.TypeDecorator, ScalarCoercible):

@@ -24,6 +24,16 @@ def init_models(User):
 
 class TestUUIDType(object):
 
+    def test_repr(self):
+        plain = UUIDType()
+        assert repr(plain) == 'UUIDType()'
+
+        text = UUIDType(binary=False)
+        assert repr(text) == 'UUIDType(binary=False)'
+
+        not_native = UUIDType(native=False)
+        assert repr(not_native) == 'UUIDType(native=False)'
+
     def test_commit(self, session, User):
         obj = User()
         obj.id = uuid.uuid4().hex
