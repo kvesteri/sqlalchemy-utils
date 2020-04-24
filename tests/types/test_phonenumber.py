@@ -110,6 +110,13 @@ class TestPhoneNumber(object):
         else:
             assert str(number) == number.national
 
+    def test_phone_number_hash(self):
+        number1 = PhoneNumber('+821023456789')
+        number2 = PhoneNumber('+82 10-2345-6789')
+        assert hash(number1) == hash(number2)
+        assert hash(number1) == hash(number1.e164)
+        assert {number1} == {number2}
+
 
 @pytest.mark.skipif('types.phone_number.phonenumbers is None')
 class TestPhoneNumberType(object):

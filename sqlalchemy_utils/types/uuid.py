@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 import uuid
 
-from sqlalchemy import types
+from sqlalchemy import types, util
 from sqlalchemy.dialects import mssql, postgresql
 
 from .scalar_coercible import ScalarCoercible
@@ -34,6 +34,9 @@ class UUIDType(types.TypeDecorator, ScalarCoercible):
         """
         self.binary = binary
         self.native = native
+
+    def __repr__(self):
+        return util.generic_repr(self)
 
     def load_dialect_impl(self, dialect):
         if dialect.name == 'postgresql' and self.native:

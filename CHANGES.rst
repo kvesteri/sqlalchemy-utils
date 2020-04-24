@@ -4,6 +4,51 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.36.3 (2020-03-18)
+^^^^^^^^^^^^^^^^^^^
+
+- Added hash method for PhoneNumberType (#428, pull request courtesy of hanc1208)
+
+
+0.36.2 (2020-03-16)
+^^^^^^^^^^^^^^^^^^^
+
+- Added repr for UUIDType (#424, pull request courtesy of ziima)
+
+
+0.36.1 (2019-12-23)
+^^^^^^^^^^^^^^^^^^^
+
+- Added support for CASCADE option when dropping views (#406, pull request courtesy of amicks)
+- Added `aliases` parameter to create_materialized_view function.
+
+
+0.36.0 (2019-12-08)
+^^^^^^^^^^^^^^^^^^^
+
+- Removed explain and explain_analyze due to the internal changes in SQLAlchemy version 1.3.
+
+
+0.35.0 (2019-11-01)
+^^^^^^^^^^^^^^^^^^^
+
+- Removed some deprecation warnings
+- Added Int8RangeType (#401, pull request courtesy of lpsinger)
+
+
+0.34.2 (2019-08-20)
+^^^^^^^^^^^^^^^^^^^
+
+- Remove ABC deprecation warnings (#386, pull request courtesy of VizualAbstract)
+
+
+0.34.1 (2019-07-15)
+^^^^^^^^^^^^^^^^^^^
+
+- Remove deprecation warnings (#379, pull request courtesy of Le-Stagiaire)
+- Drop py34 support
+
+
 0.34.0 (2019-06-09)
 ^^^^^^^^^^^^^^^^^^^
 

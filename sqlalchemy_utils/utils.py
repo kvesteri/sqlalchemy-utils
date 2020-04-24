@@ -1,7 +1,11 @@
 import sys
-from collections import Iterable
 
 import six
+
+try:
+    from collections.abc import Iterable
+except ImportError:  # For python 2.7 support
+    from collections import Iterable
 
 
 def str_coercible(cls):
