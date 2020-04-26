@@ -2,6 +2,7 @@
 import base64
 import datetime
 import os
+import ast
 
 import six
 from sqlalchemy.types import LargeBinary, String, TypeDecorator
@@ -400,6 +401,9 @@ class EncryptedType(TypeDecorator, ScalarCoercible):
                 elif issubclass(type_, (datetime.date, datetime.time)):
                     value = value.isoformat()
 
+                elif issubclass(type_, dict):
+                    value = ast(value)
+
             return self.engine.encrypt(value)
 
     def process_result_value(self, value, dialect):
@@ -427,6 +431,9 @@ class EncryptedType(TypeDecorator, ScalarCoercible):
                     return DatetimeHandler.process_value(
                         decrypted_value, type_
                     )
+
+                elif issubclass(type_, dict):
+                    return decrypted_value
 
                 # Handle all others
                 return self.underlying_type.python_type(decrypted_value)
