@@ -63,7 +63,7 @@ class TestArrowDateTimeType(object):
     def test_literal_param(self, session, Article):
         clause = Article.created_at > '2015-01-01'
         compiled = str(clause.compile(compile_kwargs={"literal_binds": True}))
-        assert compiled == 'article.created_at > 2015-01-01'
+        assert compiled == "article.created_at > '2015-01-01'"
 
     @pytest.mark.usefixtures('postgresql_dsn')
     def test_timezone(self, session, Article):
