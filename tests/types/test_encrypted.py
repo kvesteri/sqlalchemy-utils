@@ -5,6 +5,7 @@ import json
 import sqlalchemy as sa
 
 from sqlalchemy_utils import ColorType, EncryptedType, PhoneNumberType
+from sqlalchemy_utils.types import JSONType
 from sqlalchemy_utils.types.encrypted.encrypted_type import (
     AesEngine,
     AesGcmEngine,
@@ -97,7 +98,7 @@ def User(Base, encryption_engine, test_key, padding_mechanism):
         )
 
         json = sa.Column(EncryptedType(
-            sa.JSON(),
+            JSONType,
             test_key,
             encryption_engine,
             padding_mechanism)
@@ -133,7 +134,7 @@ def user_enum():
 
 @pytest.fixture
 def user_json():
-    return json.dumps({"key": "value"})
+    return {"key": "value"}
 
 
 @pytest.fixture
