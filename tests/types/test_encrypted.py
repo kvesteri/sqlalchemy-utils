@@ -1,7 +1,6 @@
 from datetime import date, datetime, time
 
 import pytest
-import json
 import sqlalchemy as sa
 
 from sqlalchemy_utils import ColorType, EncryptedType, PhoneNumberType
