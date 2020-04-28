@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import base64
 import datetime
+import json
 import os
-import ast
 
 import six
 from sqlalchemy.types import LargeBinary, String, TypeDecorator
@@ -10,6 +10,7 @@ from sqlalchemy.types import LargeBinary, String, TypeDecorator
 from sqlalchemy_utils.exceptions import ImproperlyConfigured
 from sqlalchemy_utils.types.encrypted.padding import PADDING_MECHANISM
 from sqlalchemy_utils.types.scalar_coercible import ScalarCoercible
+from sqlalchemy_utils.types.json import JSONType
 
 cryptography = None
 try:
@@ -401,8 +402,8 @@ class EncryptedType(TypeDecorator, ScalarCoercible):
                 elif issubclass(type_, (datetime.date, datetime.time)):
                     value = value.isoformat()
 
-                elif issubclass(type_, dict):
-                    value = ast(value)
+                elif issubclass(type_, JSONType):
+                    value = six.text_type(json.dumps(value))
 
             return self.engine.encrypt(value)
 
@@ -432,8 +433,8 @@ class EncryptedType(TypeDecorator, ScalarCoercible):
                         decrypted_value, type_
                     )
 
-                elif issubclass(type_, dict):
-                    return decrypted_value
+                elif issubclass(type_, JSONType):
+                    return json.loads(decrypted_value)
 
                 # Handle all others
                 return self.underlying_type.python_type(decrypted_value)
