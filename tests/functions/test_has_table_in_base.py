@@ -23,6 +23,5 @@ class TestGetTableByName(object):
             first_name = sa.Column(sa.Unicode(255), primary_key=True)
             last_name = sa.Column(sa.Unicode(255), primary_key=True)
 
-        
         with pytest.raises(ValueError):
-            table = get_class_by_tablename(Base, 'not_user')
+            get_class_by_tablename(Base, 'not_user')
