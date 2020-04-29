@@ -39,7 +39,7 @@ def escape_like(string, escape_char='*'):
     )
 
 
-def json_sql(value, scalars_to_json=True, jsonb=False):
+def json_sql(value, scalars_to_json=True):
     """
     Convert python data structures to PostgreSQL specific SQLAlchemy JSON
     constructs. This function is extremly useful if you need to build
@@ -82,8 +82,6 @@ def json_sql(value, scalars_to_json=True, jsonb=False):
 
     :param value:
         value to be converted to SQLAlchemy PostgreSQL function constructs
-    :boolean jsonb:
-        Flag to alternatively convert the return with a to_json construct
     """
     scalar_convert = sa.text
     if scalars_to_json:
@@ -91,20 +89,12 @@ def json_sql(value, scalars_to_json=True, jsonb=False):
             return sa.func.to_json(sa.text(a))
 
     if isinstance(value, Mapping):
-        if jsonb:
-            return sa.func.jsonb_build_object(
-                *(
-                    json_sql(v, scalars_to_json=False)
-                    for v in itertools.chain(*value.items())
-                )
+        return sa.func.json_build_object(
+            *(
+                json_sql(v, scalars_to_json=False)
+                for v in itertools.chain(*value.items())
             )
-        else:
-            return sa.func.json_build_object(
-                *(
-                    json_sql(v, scalars_to_json=False)
-                    for v in itertools.chain(*value.items())
-                )
-            )
+        )
     elif isinstance(value, str):
         return scalar_convert("'{0}'".format(value))
     elif isinstance(value, Sequence):
@@ -118,6 +108,77 @@ def json_sql(value, scalars_to_json=True, jsonb=False):
         return scalar_convert(str(value))
     return value
 
+
+def jsonb_sql(value, scalars_to_jsonb=True):
+    """
+    Convert python data structures to PostgreSQL specific SQLAlchemy JSONB
+    constructs. This function is extremly useful if you need to build
+    PostgreSQL JSONB on python side.
+
+    .. note::
+
+        This function needs PostgreSQL >= 9.4
+
+    Scalars are converted to to_jsonb SQLAlchemy function objects
+
+    ::
+
+        jsonb_sql(1)     # Equals SQL: to_jsonb(1)
+
+        jsonb_sql('a')   # to_jsonb('a')
+
+
+    Mappings are converted to jsonb_build_object constructs
+
+    ::
+
+        jsonb_sql({'a': 'c', '2': 5})  # jsonb_build_object('a', 'c', '2', 5)
+
+
+    Sequences (other than strings) are converted to jsonb_build_array constructs
+
+    ::
+
+        jsonb_sql([1, 2, 3])  # jsonb_build_array(1, 2, 3)
+
+
+    You can also nest these data structures
+
+    ::
+
+        jsonb_sql({'a': [1, 2, 3]})
+        # jsonb_build_object('a', jsonb_build_array[1, 2, 3])
+
+
+    :param value:
+        value to be converted to SQLAlchemy PostgreSQL function constructs
+    :boolean jsonbb:
+        Flag to alternatively convert the return with a to_jsonb construct
+    """
+    scalar_convert = sa.text
+    if scalars_to_jsonb:
+        def scalar_convert(a):
+            return sa.func.to_jsonb(sa.text(a))
+
+    if isinstance(value, Mapping):
+        return sa.func.jsonb_build_object(
+            *(
+                jsonb_sql(v, scalars_to_jsonb=False)
+                for v in itertools.chain(*value.items())
+            )
+        )
+    elif isinstance(value, str):
+        return scalar_convert("'{0}'".format(value))
+    elif isinstance(value, Sequence):
+        return sa.func.jsonb_build_array(
+            *(
+                jsonb_sql(v, scalars_to_jsonb=False)
+                for v in value
+            )
+        )
+    elif isinstance(value, (int, float)):
+        return scalar_convert(str(value))
+    return value
 
 def has_index(column_or_constraint):
     """

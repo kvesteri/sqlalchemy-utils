@@ -36,6 +36,7 @@ from .functions import (  # noqa
     identity,
     is_loaded,
     json_sql,
+    jsonb_sql,
     merge_references,
     mock_engine,
     naturally_equivalent,
