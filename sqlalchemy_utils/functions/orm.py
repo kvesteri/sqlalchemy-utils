@@ -104,7 +104,7 @@ def get_class_by_table(base, table, data=None):
 def get_class_by_tablename(base_object, tablename):
     """Return the SQLAlchemy table object that matches
 
-    :param base_object: A SQLAlchemy base object - 
+    :param base_object: A SQLAlchemy base object -
             both declarative and automap types are accepted
     :param tablename: A string of the name of the table to be extracted
     :return: Class reference or None.
@@ -114,7 +114,7 @@ def get_class_by_tablename(base_object, tablename):
         if hasattr(_class, '__tablename__') and \
                 _class.__tablename__ == tablename:
             return _class
-        raise ValueError('Base does not contain class')
+    raise ValueError('Base does not contain class')
 
 
 def get_type(expr):
