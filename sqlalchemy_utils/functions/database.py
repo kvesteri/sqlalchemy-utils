@@ -135,7 +135,7 @@ def jsonb_sql(value, scalars_to_jsonb=True):
         jsonb_sql({'a': 'c', '2': 5})  # jsonb_build_object('a', 'c', '2', 5)
 
 
-    Sequences (other than strings) are converted to jsonb_build_array constructs
+    Sequences (other than strings) converted to jsonb_build_array constructs
 
     ::
 
@@ -179,6 +179,7 @@ def jsonb_sql(value, scalars_to_jsonb=True):
     elif isinstance(value, (int, float)):
         return scalar_convert(str(value))
     return value
+
 
 def has_index(column_or_constraint):
     """
