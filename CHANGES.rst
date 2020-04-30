@@ -8,6 +8,7 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 ^^^^^^^^^^^^^^^^^^^
 
 - Added jsonb_sql function (#377, pull request courtesy of getglad)
+- Drop py27 support
 
 
 0.36.3 (2020-03-18)
