@@ -6,7 +6,8 @@ from .database import (  # noqa
     has_index,
     has_unique_index,
     is_auto_assigned_date_column,
-    json_sql
+    json_sql,
+    jsonb_sql
 )
 from .foreign_keys import (  # noqa
     dependent_objects,

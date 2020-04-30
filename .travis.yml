@@ -3,7 +3,7 @@ sudo: required
 dist: xenial
 
 addons:
-  postgresql: "9.4"
+  postgresql: "9.5"
 
 services:
   - docker
