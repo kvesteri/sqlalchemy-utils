@@ -10,6 +10,7 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 - Added support for dictionary input in CompositeType (#435, pull request courtesy of cozos)
 - Added new EnrichedDateTime and EnrichedDate types (#403, pull request courtesy of yk-lab)
 - Using String instead of LargeBinary for impl of EncryptedType (#426, pull request courtesy of aicioara)
+- Added support for JSONType in EncryptedType (#439, pull request courtesy of rushilsrivastava)
 
 
 0.36.4 (2020-04-30)
