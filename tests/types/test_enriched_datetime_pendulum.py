@@ -80,4 +80,4 @@ class TestPendulumDateTimeType(object):
     def test_literal_param(self, session, User):
         clause = User.created_at > '2015-01-01'
         compiled = str(clause.compile(compile_kwargs={"literal_binds": True}))
-        assert compiled == 'users.created_at > 2015-01-01'
+        assert compiled == "users.created_at > '2015-01-01'"
