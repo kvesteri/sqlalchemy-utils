@@ -4,6 +4,7 @@ import pytest
 import sqlalchemy as sa
 
 from sqlalchemy_utils import ColorType, EncryptedType, PhoneNumberType
+from sqlalchemy_utils.types import JSONType
 from sqlalchemy_utils.types.encrypted.encrypted_type import (
     AesEngine,
     AesGcmEngine,
@@ -95,6 +96,13 @@ def User(Base, encryption_engine, test_key, padding_mechanism):
             padding_mechanism)
         )
 
+        json = sa.Column(EncryptedType(
+            JSONType,
+            test_key,
+            encryption_engine,
+            padding_mechanism)
+        )
+
     return User
 
 
@@ -121,6 +129,11 @@ def user_color():
 @pytest.fixture
 def user_enum():
     return 'One'
+
+
+@pytest.fixture
+def user_json():
+    return {"key": "value"}
 
 
 @pytest.fixture
@@ -170,6 +183,7 @@ def user(
     user_date,
     user_time,
     user_enum,
+    user_json,
     user_datetime,
     test_token,
     active,
@@ -183,6 +197,7 @@ def user(
     user.date = user_date
     user.time = user_time
     user.enum = user_enum
+    user.json = user_json
     user.datetime = user_datetime
     user.access_token = test_token
     user.is_active = active
@@ -277,6 +292,9 @@ class EncryptedTypeTestCase(object):
 
     def test_enum(self, user, user_enum):
         assert user.enum == user_enum
+
+    def test_json(self, user, user_json):
+        assert user.json == user_json
 
     def test_lookup_key(self, session, Team):
         # Add teams
