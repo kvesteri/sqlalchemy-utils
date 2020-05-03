@@ -103,4 +103,4 @@ from .view import (  # noqa
     refresh_materialized_view
 )
 
-__version__ = '0.36.4'
+__version__ = '0.36.5'

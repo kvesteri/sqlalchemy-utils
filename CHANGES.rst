@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.36.5 (2020-05-03)
+^^^^^^^^^^^^^^^^^^^
+
+- Added support for dictionary input in CompositeType (#435, pull request courtesy of cozos)
+- Added new EnrichedDateTime and EnrichedDate types (#403, pull request courtesy of yk-lab)
+
+
 0.36.4 (2020-04-30)
 ^^^^^^^^^^^^^^^^^^^
 
