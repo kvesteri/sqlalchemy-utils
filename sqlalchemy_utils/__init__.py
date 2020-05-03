@@ -71,6 +71,8 @@ from .types import (  # noqa
     DateTimeRangeType,
     EmailType,
     EncryptedType,
+    EnrichedDateTimeType,
+    EnrichedDateType,
     instrumented_list,
     InstrumentedList,
     Int8RangeType,

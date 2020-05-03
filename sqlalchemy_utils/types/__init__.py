@@ -9,6 +9,7 @@ from .country import CountryType  # noqa
 from .currency import CurrencyType  # noqa
 from .email import EmailType  # noqa
 from .encrypted.encrypted_type import EncryptedType  # noqa
+from .enriched_datetime.enriched_date_type import EnrichedDateType  # noqa
 from .ip_address import IPAddressType  # noqa
 from .json import JSONType  # noqa
 from .locale import LocaleType  # noqa
@@ -38,6 +39,8 @@ from .ts_vector import TSVectorType  # noqa
 from .url import URLType  # noqa
 from .uuid import UUIDType  # noqa
 from .weekdays import WeekDaysType  # noqa
+
+from .enriched_datetime.enriched_datetime_type import EnrichedDateTimeType  # noqa isort:skip
 
 
 class InstrumentedList(_InstrumentedList):
