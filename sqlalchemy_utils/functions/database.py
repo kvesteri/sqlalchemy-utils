@@ -611,6 +611,8 @@ def drop_database(url):
         engine = sa.create_engine(url, connect_args={'autocommit': True})
     elif url.drivername == 'postgresql+pg8000':
         engine = sa.create_engine(url, isolation_level='AUTOCOMMIT')
+    elif url.drivername == "postgresql+psycopg2cffi":
+        engine = sa.create_engine(url, isolation_level='AUTOCOMMIT')
     else:
         engine = sa.create_engine(url)
     conn_resource = None
