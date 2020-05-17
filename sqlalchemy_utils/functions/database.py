@@ -619,11 +619,19 @@ def drop_database(url):
         if database:
             os.remove(database)
 
-    elif engine.dialect.name == 'postgresql' and engine.driver == 'psycopg2':
-        from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
-
-        connection = engine.connect()
-        connection.connection.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+    elif (
+                engine.dialect.name == 'postgresql' and
+                engine.driver in {'psycopg2', 'psycopg2cffi'}
+    ):
+        if engine.driver == 'psycopg2':
+            from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
+            connection = engine.connect()
+            connection.connection.set_isolation_level(
+                ISOLATION_LEVEL_AUTOCOMMIT
+            )
+        else:
+            connection = engine.connect()
+            connection.connection.set_session(autocommit=True)
 
         # Disconnect all users from the database we are dropping.
         version = connection.dialect.server_version_info
