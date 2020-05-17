@@ -546,12 +546,6 @@ def create_database(url, encoding='utf8', template=None):
     result_proxy = None
 
     if engine.dialect.name == 'postgresql':
-        if engine.driver == 'psycopg2':
-            from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
-            engine.raw_connection().set_isolation_level(
-                ISOLATION_LEVEL_AUTOCOMMIT
-            )
-
         if not template:
             template = 'template1'
 
@@ -560,7 +554,19 @@ def create_database(url, encoding='utf8', template=None):
             encoding,
             quote(engine, template)
         )
-        result_proxy = engine.execute(text)
+
+        if engine.driver == 'psycopg2cffi':
+            connection = engine.connect()
+            connection.connection.set_session(autocommit=True)
+            connection.execute(text)
+        else:
+            if engine.driver == 'psycopg2':
+                from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
+                engine.raw_connection().set_isolation_level(
+                    ISOLATION_LEVEL_AUTOCOMMIT
+                )
+
+            result_proxy = engine.execute(text)
 
     elif engine.dialect.name == 'mysql':
         text = "CREATE DATABASE {0} CHARACTER SET = '{1}'".format(
