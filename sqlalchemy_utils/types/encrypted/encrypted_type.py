@@ -449,13 +449,13 @@ class StringEncryptedType(TypeDecorator, ScalarCoercible):
 class EncryptedType(StringEncryptedType):
     impl = LargeBinary
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, **kwargs):
         warnings.warn(
             "The 'EncryptedType' class will change implementation from "
             "'LargeBinary' to 'String' in a future version. Use "
             "'StringEncryptedType' to use the 'String' implementation.",
             DeprecationWarning)
-        StringEncryptedType.__init__(*args, **kwargs)
+        super(EncryptedType, self).__init__(**kwargs)
 
     def process_bind_param(self, value, dialect):
         value = super().process_bind_param(value=value, dialect=dialect)
