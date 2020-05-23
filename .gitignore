@@ -47,3 +47,15 @@ Session.vim
 
 # Sublime Text
 *.sublime-*
+
+# JetBrains
+.idea/
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
