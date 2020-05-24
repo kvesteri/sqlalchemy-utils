@@ -12,11 +12,11 @@ class TestPkcs5Padding(object):
         self.padder = PKCS5Padding(self.BLOCK_SIZE)
 
     def test_various_lengths_roundtrip(self):
-        for l in range(0, 3 * self.BLOCK_SIZE):
-            val = b'*' * l
+        for number in range(0, 3 * self.BLOCK_SIZE):
+            val = b'*' * number
             padded = self.padder.pad(val)
             unpadded = self.padder.unpad(padded)
-            assert val == unpadded, 'Round trip error for length %d' % l
+            assert val == unpadded, 'Round trip error for length %d' % number
 
     def test_invalid_unpad(self):
         with pytest.raises(InvalidPaddingError):

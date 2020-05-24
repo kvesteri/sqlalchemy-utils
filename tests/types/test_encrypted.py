@@ -474,11 +474,13 @@ class TestAesGcmEngine(object):
         self.engine._initialize_engine(TestAesGcmEngine.KEY)
 
     def test_roundtrip(self):
-        for l in range(0, 36):
-            plaintext = '0123456789abcdefghijklmnopqrstuvwxyz'[:l]
+        for number in range(0, 36):
+            plaintext = '0123456789abcdefghijklmnopqrstuvwxyz'[:number]
             encrypted = self.engine.encrypt(plaintext)
             decrypted = self.engine.decrypt(encrypted)
-            assert plaintext == decrypted, "Round-trip failed for len: %d" % l
+            assert plaintext == decrypted, (
+                "Round-trip failed for len: %d" % number
+            )
 
     def test_modified_iv_fails_to_decrypt(self):
         plaintext = 'abcdefgh'
