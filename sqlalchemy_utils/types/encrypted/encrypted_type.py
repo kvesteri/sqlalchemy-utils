@@ -3,9 +3,10 @@ import base64
 import datetime
 import json
 import os
+import warnings
 
 import six
-from sqlalchemy.types import String, TypeDecorator
+from sqlalchemy.types import LargeBinary, String, TypeDecorator
 
 from sqlalchemy_utils.exceptions import ImproperlyConfigured
 from sqlalchemy_utils.types.encrypted.padding import PADDING_MECHANISM
@@ -24,7 +25,6 @@ try:
     from cryptography.exceptions import InvalidTag
 except ImportError:
     pass
-
 
 dateutil = None
 try:
@@ -221,7 +221,7 @@ class FernetEngine(EncryptionDecryptionBaseEngine):
         return decrypted
 
 
-class EncryptedType(TypeDecorator, ScalarCoercible):
+class StringEncryptedType(TypeDecorator, ScalarCoercible):
     """
     EncryptedType provides a way to encrypt and decrypt values,
     to and from databases, that their type is a basic SQLAlchemy type.
@@ -355,7 +355,7 @@ class EncryptedType(TypeDecorator, ScalarCoercible):
             raise ImproperlyConfigured(
                 "'cryptography' is required to use EncryptedType"
             )
-        super(EncryptedType, self).__init__(**kwargs)
+        super(StringEncryptedType, self).__init__(**kwargs)
         # set the underlying type
         if type_in is None:
             type_in = String()
@@ -443,6 +443,30 @@ class EncryptedType(TypeDecorator, ScalarCoercible):
         if isinstance(self.underlying_type, ScalarCoercible):
             return self.underlying_type._coerce(value)
 
+        return value
+
+
+class EncryptedType(StringEncryptedType):
+    impl = LargeBinary
+
+    def __init__(self, *args, **kwargs):
+        warnings.warn(
+            "The 'EncryptedType' class will change implementation from "
+            "'LargeBinary' to 'String' in a future version. Use "
+            "'StringEncryptedType' to use the 'String' implementation.",
+            DeprecationWarning)
+        super().__init__(*args, **kwargs)
+
+    def process_bind_param(self, value, dialect):
+        value = super().process_bind_param(value=value, dialect=dialect)
+        if isinstance(value, str):
+            value = value.encode()
+        return value
+
+    def process_result_value(self, value, dialect):
+        if isinstance(value, bytes):
+            value = value.decode()
+            value = super().process_result_value(value=value, dialect=dialect)
         return value
 
 
