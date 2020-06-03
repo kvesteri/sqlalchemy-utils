@@ -22,7 +22,7 @@ class UUIDType(types.TypeDecorator, ScalarCoercible):
             __tablename__ = 'user'
 
             # Pass `binary=False` to fallback to CHAR instead of BINARY
-            id = sa.Column(UUIDType(binary=False), primary_key=True)
+            id = sa.Column(UUIDType(binary=False), primary_key=True, default=uuid.uuid4)
     """
     impl = types.BINARY(16)
 
