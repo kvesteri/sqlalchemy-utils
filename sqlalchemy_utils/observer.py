@@ -174,17 +174,13 @@ in the decorator.
 """
 import itertools
 from collections import defaultdict, namedtuple
+from collections.abc import Iterable
 
 import sqlalchemy as sa
 
 from .functions import getdotattr, has_changes
 from .path import AttrPath
 from .utils import is_sequence
-
-try:
-    from collections.abc import Iterable
-except ImportError:  # For python 2.7 support
-    from collections import Iterable
 
 Callback = namedtuple('Callback', ['func', 'backref', 'fullpath'])
 

@@ -1,9 +1,6 @@
-try:
-    from collections.abc import Mapping, Sequence
-except ImportError:  # For python 2.7 support
-    from collections import Mapping, Sequence
 import itertools
 import os
+from collections.abc import Mapping, Sequence
 from copy import copy
 
 import sqlalchemy as sa
