@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.36.7 (2020-07-02)
+^^^^^^^^^^^^^^^^^^^
+
+- Fix dynamic relationships for observables (#455)
+
+
 0.36.6 (2020-05-24)
 ^^^^^^^^^^^^^^^^^^^
 
