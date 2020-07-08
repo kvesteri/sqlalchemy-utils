@@ -458,12 +458,7 @@ def database_exists(url):
         return header[:16] == b'SQLite format 3\x00'
 
     url = copy(make_url(url))
-    database = url.database
-    if url.drivername.startswith('postgres'):
-        url.database = 'postgres'
-    else:
-        url.database = None
-
+    database, url.database = url.database, None
     engine = sa.create_engine(url)
 
     if engine.dialect.name == 'postgresql':
