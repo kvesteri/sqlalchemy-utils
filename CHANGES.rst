@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.36.8 (2020-07-08)
+^^^^^^^^^^^^^^^^^^^
+
+- Don't connect to 'postgres' data base for database existence check (#372, pull request courtesy of bernt-matthias)
+
+
 0.36.7 (2020-07-02)
 ^^^^^^^^^^^^^^^^^^^
 
