@@ -461,49 +461,49 @@ def database_exists(url, postgres_db=['postgres', 'template0', 'template1',
 
     url = copy(make_url(url))
     database, url.database = url.database, None
-    engine = sa.create_engine(url)
+    engine = None
 
     if engine.dialect.name.startswith('postgresql'):
-        engine.dispose()
+        ret = False
         for pdb in postgres_db:
             url.database = pdb
             engine = sa.create_engine(url)
             text = "SELECT 1 FROM pg_database WHERE datname='%s'" % database
             try:
-                return bool(get_scalar_result(engine, text))
+                ret = bool(get_scalar_result(engine, text))
             except OperationalError:
-                continue
-        return False
+                pass
+            engine.dispose()
 
     elif engine.dialect.name == 'mysql':
+        engine = sa.create_engine(url)
         text = ("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA "
                 "WHERE SCHEMA_NAME = '%s'" % database)
-        return bool(get_scalar_result(engine, text))
+        ret = bool(get_scalar_result(engine, text))
 
     elif engine.dialect.name == 'sqlite':
+        engine = sa.create_engine(url)
         if database:
-            return database == ':memory:' or sqlite_file_exists(database)
+            ret = database == ':memory:' or sqlite_file_exists(database)
         else:
             # The default SQLAlchemy database is in memory,
             # and :memory is not required, thus we should support that use-case
-            return True
-
+            ret = True
     else:
-        engine.dispose()
-        engine = None
         text = 'SELECT 1'
         try:
             url.database = database
             engine = sa.create_engine(url)
             result = engine.execute(text)
             result.close()
-            return True
+            ret = True
 
         except (ProgrammingError, OperationalError):
-            return False
-        finally:
-            if engine is not None:
-                engine.dispose()
+            ret = False
+    
+    if engine is not None:
+        engine.dispose()
+    return ret
 
 
 def create_database(url, encoding='utf8', template=None):
