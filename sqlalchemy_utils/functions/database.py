@@ -463,8 +463,9 @@ def database_exists(url, postgres_db=['postgres', 'template0', 'template1',
     url = copy(make_url(url))
     database, url.database = url.database, None
     engine = None
+    dialect_name = url.get_dialect().name
 
-    if engine.dialect.name.startswith('postgresql'):
+    if dialect_name == 'postgresql':
         ret = False
         for pdb in postgres_db:
             url.database = pdb
@@ -472,17 +473,17 @@ def database_exists(url, postgres_db=['postgres', 'template0', 'template1',
             text = "SELECT 1 FROM pg_database WHERE datname='%s'" % database
             try:
                 ret = bool(get_scalar_result(engine, text))
-            except OperationalError:
+            except (ProgrammingError, OperationalError):
                 pass
             engine.dispose()
 
-    elif engine.dialect.name == 'mysql':
+    elif dialect_name == 'mysql':
         engine = sa.create_engine(url)
         text = ("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA "
                 "WHERE SCHEMA_NAME = '%s'" % database)
         ret = bool(get_scalar_result(engine, text))
 
-    elif engine.dialect.name == 'sqlite':
+    elif dialect_name == 'sqlite':
         engine = sa.create_engine(url)
         if database:
             ret = database == ':memory:' or sqlite_file_exists(database)
@@ -501,7 +502,7 @@ def database_exists(url, postgres_db=['postgres', 'template0', 'template1',
 
         except (ProgrammingError, OperationalError):
             ret = False
-    
+
     if engine is not None:
         engine.dispose()
     return ret
