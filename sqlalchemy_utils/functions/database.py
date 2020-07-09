@@ -425,7 +425,8 @@ def database_exists(url, postgres_db=['postgres', 'template0', 'template1',
     """Check if a database exists.
 
     :param url: A SQLAlchemy engine URL.
-    :postgres_db: TODO.
+    :postgres_db: Only applies to postgres. List of databases to try to connect
+        to.
 
     Performs backend-specific testing to quickly determine if a database
     exists on the server. ::
