@@ -34,6 +34,15 @@ class TestScalarIntegerList(object):
         user = session.query(User).first()
         assert user.some_list == [1, 2, 3, 4]
 
+    def test_save_integer_list_invalid(self, session, User):
+        user = User(
+            some_list=[1, 2, 'invalid', 4]
+        )
+
+        session.add(user)
+        with pytest.raises(sa.exc.StatementError):
+            session.commit()
+
 
 class TestScalarUnicodeList(object):
 
@@ -92,3 +101,48 @@ class TestScalarUnicodeList(object):
 
         user = session.query(User).first()
         assert user.some_list == []
+
+
+def custom_int(value):
+    return int(value)
+
+
+@pytest.mark.filterwarnings(
+    "ignore:ScalarListType has new required argument 'inner_type'")
+class TestScalarListCoerceFunc(object):
+    """Test deprecated behaviour with single argument which is not a type."""
+
+    @pytest.fixture
+    def User(self, Base):
+        class User(Base):
+            __tablename__ = 'user'
+            id = sa.Column(sa.Integer, primary_key=True)
+            some_list = sa.Column(ScalarListType(custom_int))
+
+            def __repr__(self):
+                return 'User(%r)' % self.id
+
+        return User
+
+    @pytest.fixture
+    def init_models(self, User):
+        pass
+
+    def test_save_integer_list(self, session, User):
+        user = User(some_list=[1, 2, 3, 4])
+
+        session.add(user)
+        session.commit()
+
+        user = session.query(User).first()
+        assert user.some_list == [1, 2, 3, 4]
+
+    def test_save_integer_list_invalid(self, session, User):
+        user = User(some_list=[1, 2, 'invalid', 4])
+
+        session.add(user)
+        session.commit()
+
+        # It stores invalid value to database and fails on coerce after read.
+        with pytest.raises(ValueError, match='invalid literal for int'):
+            session.query(User).first()
