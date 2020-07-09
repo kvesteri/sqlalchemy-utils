@@ -420,10 +420,12 @@ def is_auto_assigned_date_column(column):
     )
 
 
-def database_exists(url):
+def database_exists(url, postgres_db=['postgres', 'template0', 'template1',
+                                      None]):
     """Check if a database exists.
 
     :param url: A SQLAlchemy engine URL.
+    :postgres_db: TODO.
 
     Performs backend-specific testing to quickly determine if a database
     exists on the server. ::
@@ -461,9 +463,17 @@ def database_exists(url):
     database, url.database = url.database, None
     engine = sa.create_engine(url)
 
-    if engine.dialect.name == 'postgresql':
-        text = "SELECT 1 FROM pg_database WHERE datname='%s'" % database
-        return bool(get_scalar_result(engine, text))
+    if engine.dialect.name.startswith('postgresql'):
+        engine.dispose()
+        for pdb in postgres_db:
+            url.database = pdb
+            engine = sa.create_engine(url)
+            text = "SELECT 1 FROM pg_database WHERE datname='%s'" % database
+            try:
+                return bool(get_scalar_result(engine, text))
+            except OperationalError:
+                continue
+        return False
 
     elif engine.dialect.name == 'mysql':
         text = ("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA "
