@@ -420,8 +420,8 @@ def is_auto_assigned_date_column(column):
     )
 
 
-def database_exists(url, postgres_db=['postgres', 'template0', 'template1',
-                                      None]):
+def database_exists(url, postgres_db=('postgres', 'template0', 'template1',
+                                      None)):
     """Check if a database exists.
 
     :param url: A SQLAlchemy engine URL.
@@ -476,6 +476,8 @@ def database_exists(url, postgres_db=['postgres', 'template0', 'template1',
             except (ProgrammingError, OperationalError):
                 pass
             engine.dispose()
+            if ret:
+                return ret
 
     elif dialect_name == 'mysql':
         engine = sa.create_engine(url)
