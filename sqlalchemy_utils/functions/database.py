@@ -467,10 +467,10 @@ def database_exists(url, postgres_db=('postgres', 'template0', 'template1',
 
     if dialect_name == 'postgresql':
         ret = False
+        text = "SELECT 1 FROM pg_database WHERE datname='%s'" % database
         for pdb in postgres_db:
             url.database = pdb
             engine = sa.create_engine(url)
-            text = "SELECT 1 FROM pg_database WHERE datname='%s'" % database
             try:
                 ret = bool(get_scalar_result(engine, text))
             except (ProgrammingError, OperationalError):
