@@ -474,11 +474,11 @@ def database_exists(url, postgres_db=None):
             engine = sa.create_engine(url)
             try:
                 ret = bool(get_scalar_result(engine, text))
+                break
             except (ProgrammingError, OperationalError):
                 pass
-            engine.dispose()
-            if ret:
-                return ret
+            finally:
+                engine.dispose()
 
     elif dialect_name == 'mysql':
         engine = sa.create_engine(url)
