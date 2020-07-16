@@ -5,12 +5,6 @@ Database helpers
 .. module:: sqlalchemy_utils.functions
 
 
-analyze
--------
-
-.. autofunction:: analyze
-
-
 database_exists
 ---------------
 
