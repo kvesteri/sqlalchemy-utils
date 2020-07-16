@@ -8,8 +8,8 @@ from sqlalchemy.engine.url import make_url
 from sqlalchemy.exc import OperationalError, ProgrammingError
 from sqlalchemy.pool import NullPool
 
-from .orm import quote
 from ..utils import starts_with
+from .orm import quote
 
 
 def escape_like(string, escape_char='*'):

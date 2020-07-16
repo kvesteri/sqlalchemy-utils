@@ -134,8 +134,8 @@ AsIs = None
 register_adapter = None
 try:
     import psycopg2
-    from psycopg2.extras import CompositeCaster
     from psycopg2.extensions import adapt, AsIs, register_adapter
+    from psycopg2.extras import CompositeCaster
 except ImportError:
     pass
 
