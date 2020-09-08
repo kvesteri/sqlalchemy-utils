@@ -153,8 +153,8 @@ def user_datetime():
 
 @pytest.fixture
 def test_token():
-    import string
     import random
+    import string
     token = ''
     characters = string.ascii_letters + string.digits
     for i in range(60):

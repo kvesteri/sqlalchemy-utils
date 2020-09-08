@@ -16,13 +16,15 @@ from sqlalchemy_utils.types.scalar_coercible import ScalarCoercible
 cryptography = None
 try:
     import cryptography
+    from cryptography.exceptions import InvalidTag
+    from cryptography.fernet import Fernet
     from cryptography.hazmat.backends import default_backend
     from cryptography.hazmat.primitives import hashes
     from cryptography.hazmat.primitives.ciphers import (
-        Cipher, algorithms, modes
+        algorithms,
+        Cipher,
+        modes
     )
-    from cryptography.fernet import Fernet
-    from cryptography.exceptions import InvalidTag
 except ImportError:
     pass
 
