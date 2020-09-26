@@ -18,7 +18,7 @@ class ArrowType(EnrichedDateTimeType):
     datetime objects back to Arrow_ objects on the way out (when querying
     database). ArrowType needs Arrow_ library installed.
 
-    .. _Arrow: http://crsmithdev.com/arrow/
+    .. _Arrow: https://github.com/arrow-py/arrow
 
     ::
 
