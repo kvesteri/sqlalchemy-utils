@@ -529,7 +529,7 @@ def create_database(url, encoding='utf8', template=None):
     elif not url.drivername.startswith('sqlite'):
         url.database = None
 
-    if url.drivername == 'mssql+pyodbc':
+    if url.drivername in ('mssql+pyodbc', 'mssql+pymssql'):
         engine = sa.create_engine(url, connect_args={'autocommit': True})
     elif url.drivername == 'postgresql+pg8000':
         engine = sa.create_engine(url, isolation_level='AUTOCOMMIT')
@@ -605,7 +605,7 @@ def drop_database(url):
     elif not url.drivername.startswith('sqlite'):
         url.database = None
 
-    if url.drivername == 'mssql+pyodbc':
+    if url.drivername in ('mssql+pyodbc', 'mssql+pymssql'):
         engine = sa.create_engine(url, connect_args={'autocommit': True})
     elif url.drivername == 'postgresql+pg8000':
         engine = sa.create_engine(url, isolation_level='AUTOCOMMIT')
