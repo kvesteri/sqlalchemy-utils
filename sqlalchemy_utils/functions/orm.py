@@ -11,7 +11,7 @@ from sqlalchemy.orm import mapperlib
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.orm.exc import UnmappedInstanceError
 from sqlalchemy.orm.properties import ColumnProperty, RelationshipProperty
-from sqlalchemy.orm.query import _ColumnEntity
+from sqlalchemy.orm.context import _ColumnEntity
 from sqlalchemy.orm.session import object_session
 from sqlalchemy.orm.util import AliasedInsp
 
