@@ -11,7 +11,11 @@ from sqlalchemy.orm import mapperlib
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.orm.exc import UnmappedInstanceError
 from sqlalchemy.orm.properties import ColumnProperty, RelationshipProperty
-from sqlalchemy.orm.query import _ColumnEntity
+
+try:
+    from sqlalchemy.orm.query import _ColumnEntity
+except ImportError:  # SQAlchemy >= 1.4
+    from sqlalchemy.orm.context import _ColumnEntity
 from sqlalchemy.orm.session import object_session
 from sqlalchemy.orm.util import AliasedInsp
 
@@ -70,17 +74,16 @@ def get_class_by_table(base, table, data=None):
     :return: Declarative class or None.
     """
     found_classes = set(
-        c for c in base._decl_class_registry.values()
-        if hasattr(c, '__table__') and c.__table__ is table
+        c
+        for c in base._decl_class_registry.values()
+        if hasattr(c, "__table__") and c.__table__ is table
     )
     if len(found_classes) > 1:
         if not data:
             raise ValueError(
                 "Multiple declarative classes found for table '{0}'. "
                 "Please provide data parameter for this function to be able "
-                "to determine polymorphic scenarios.".format(
-                    table.name
-                )
+                "to determine polymorphic scenarios.".format(table.name)
             )
         else:
             for cls in found_classes:
@@ -92,9 +95,7 @@ def get_class_by_table(base, table, data=None):
             raise ValueError(
                 "Multiple declarative classes found for table '{0}'. Given "
                 "data row does not match any polymorphic identity of the "
-                "found classes.".format(
-                    table.name
-                )
+                "found classes.".format(table.name)
             )
     elif found_classes:
         return found_classes.pop()
@@ -137,7 +138,7 @@ def get_type(expr):
 
     .. versionadded: 0.30.9
     """
-    if hasattr(expr, 'type'):
+    if hasattr(expr, "type"):
         return expr.type
     elif isinstance(expr, InstrumentedAttribute):
         expr = expr.property
@@ -230,8 +231,7 @@ def get_column_key(model, column):
             if c.name == column.name and c.table is column.table:
                 return key
     raise sa.orm.exc.UnmappedColumnError(
-        'No column %s is configured on mapper %s...' %
-        (column, mapper)
+        "No column %s is configured on mapper %s..." % (column, mapper)
     )
 
 
@@ -283,17 +283,12 @@ def get_mapper(mixed):
         mixed = mixed.class_
     if isinstance(mixed, sa.Table):
         mappers = [
-            mapper for mapper in mapperlib._mapper_registry
-            if mixed in mapper.tables
+            mapper for mapper in mapperlib._mapper_registry if mixed in mapper.tables
         ]
         if len(mappers) > 1:
-            raise ValueError(
-                "Multiple mappers found for table '%s'." % mixed.name
-            )
+            raise ValueError("Multiple mappers found for table '%s'." % mixed.name)
         elif not mappers:
-            raise ValueError(
-                "Could not get mapper for table '%s'." % mixed.name
-            )
+            raise ValueError("Could not get mapper for table '%s'." % mixed.name)
         else:
             return mappers[0]
     if not isclass(mixed):
@@ -318,7 +313,7 @@ def get_bind(obj):
         get_bind(user)
 
     """
-    if hasattr(obj, 'bind'):
+    if hasattr(obj, "bind"):
         conn = obj.bind
     else:
         try:
@@ -326,10 +321,10 @@ def get_bind(obj):
         except UnmappedInstanceError:
             conn = obj
 
-    if not hasattr(conn, 'execute'):
+    if not hasattr(conn, "execute"):
         raise TypeError(
-            'This method accepts only Session, Engine, Connection and '
-            'declarative model objects.'
+            "This method accepts only Session, Engine, Connection and "
+            "declarative model objects."
         )
     return conn
 
@@ -367,7 +362,8 @@ def get_primary_keys(mixed):
     """
     return OrderedDict(
         (
-            (key, column) for key, column in get_columns(mixed).items()
+            (key, column)
+            for key, column in get_columns(mixed).items()
             if column.primary_key
         )
     )
@@ -472,7 +468,7 @@ def table_name(obj):
     Return table name of given target, declarative class or the
     table name where the declarative attribute is bound to.
     """
-    class_ = getattr(obj, 'class_', obj)
+    class_ = getattr(obj, "class_", obj)
 
     try:
         return class_.__tablename__
@@ -534,7 +530,8 @@ def query_labels(query):
     :param query: SQLAlchemy Query object
     """
     return [
-        entity._label_name for entity in query._entities
+        entity._label_name
+        for entity in query._entities
         if isinstance(entity, _ColumnEntity) and entity._label_name
     ]
 
@@ -574,25 +571,20 @@ def get_query_entities(query):
     :param query: SQLAlchemy Query object
     """
     exprs = [
-        d['expr']
-        if is_labeled_query(d['expr']) or isinstance(d['expr'], sa.Column)
-        else d['entity']
+        d["expr"]
+        if is_labeled_query(d["expr"]) or isinstance(d["expr"], sa.Column)
+        else d["entity"]
         for d in query.column_descriptions
     ]
-    return [
-        get_query_entity(expr) for expr in exprs
-    ] + [
+    return [get_query_entity(expr) for expr in exprs] + [
         get_query_entity(entity) for entity in query._join_entities
     ]
 
 
 def is_labeled_query(expr):
-    return (
-        isinstance(expr, sa.sql.elements.Label) and
-        isinstance(
-            list(expr.base_columns)[0],
-            (sa.sql.selectable.Select, sa.sql.selectable.ScalarSelect)
-        )
+    return isinstance(expr, sa.sql.elements.Label) and isinstance(
+        list(expr.base_columns)[0],
+        (sa.sql.selectable.Select, sa.sql.selectable.ScalarSelect),
     )
 
 
@@ -636,9 +628,8 @@ def get_query_descriptor(query, entity, attr):
         entity = get_query_entity_by_alias(query, entity)
         if entity:
             descriptor = get_descriptor(entity, attr)
-            if (
-                hasattr(descriptor, 'property') and
-                isinstance(descriptor.property, sa.orm.RelationshipProperty)
+            if hasattr(descriptor, "property") and isinstance(
+                descriptor.property, sa.orm.RelationshipProperty
             ):
                 return
             return descriptor
@@ -649,11 +640,7 @@ def get_descriptor(entity, attr):
 
     for key, descriptor in get_all_descriptors(mapper).items():
         if attr == key:
-            prop = (
-                descriptor.property
-                if hasattr(descriptor, 'property')
-                else None
-            )
+            prop = descriptor.property if hasattr(descriptor, "property") else None
             if isinstance(prop, ColumnProperty):
                 if isinstance(entity, sa.orm.util.AliasedClass):
                     for c in mapper.selectable.c:
@@ -789,7 +776,7 @@ def getdotattr(obj_or_class, dot_path, condition=None):
     """
     last = obj_or_class
 
-    for path in str(dot_path).split('.'):
+    for path in str(dot_path).split("."):
         getter = attrgetter(path)
 
         if is_sequence(last):
@@ -873,13 +860,7 @@ def has_changes(obj, attrs=None, exclude=None):
     """
     if attrs:
         if isinstance(attrs, six.string_types):
-            return (
-                sa.inspect(obj)
-                .attrs
-                .get(attrs)
-                .history
-                .has_changes()
-            )
+            return sa.inspect(obj).attrs.get(attrs).history.has_changes()
         else:
             return any(has_changes(obj, attr) for attr in attrs)
     else:
@@ -920,8 +901,7 @@ def is_loaded(obj, prop):
     :param prop: Name of the property or InstrumentedAttribute
     """
     return not isinstance(
-        getattr(sa.inspect(obj).attrs, prop).loaded_value,
-        sa.util.langhelpers._symbol
+        getattr(sa.inspect(obj).attrs, prop).loaded_value, sa.util.langhelpers._symbol
     )
 
 
