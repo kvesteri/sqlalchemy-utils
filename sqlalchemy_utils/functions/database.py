@@ -4,8 +4,9 @@ from collections.abc import Mapping, Sequence
 from copy import copy
 
 import sqlalchemy as sa
-from sqlalchemy.engine.url import make_url
+from sqlalchemy.engine.url import make_url, URL
 from sqlalchemy.exc import OperationalError, ProgrammingError
+from types import SimpleNamespace
 
 from ..utils import starts_with
 from .orm import quote
@@ -30,9 +31,9 @@ def escape_like(string, escape_char='*'):
     """
     return (
         string
-        .replace(escape_char, escape_char * 2)
-        .replace('%', escape_char + '%')
-        .replace('_', escape_char + '_')
+            .replace(escape_char, escape_char * 2)
+            .replace('%', escape_char + '%')
+            .replace('_', escape_char + '_')
     )
 
 
@@ -457,8 +458,14 @@ def database_exists(url):
 
         return header[:16] == b'SQLite format 3\x00'
 
-    url = copy(make_url(url))
+    # Making URL to support SA 1.14
+    url = SimpleNamespace(**make_url(url)._asdict())
+
     database, url.database = url.database, None
+
+    # Support continues
+    url = URL.create(**url.__dict__)
+
     engine = sa.create_engine(url)
 
     if engine.dialect.name == 'postgresql':
@@ -518,8 +525,8 @@ def create_database(url, encoding='utf8', template=None):
     other database engines should be supported.
     """
 
-    url = copy(make_url(url))
-
+    # Making URL to support SA 1.14
+    url = SimpleNamespace(**make_url(url)._asdict())
     database = url.database
 
     if url.drivername.startswith('postgres'):
@@ -528,6 +535,9 @@ def create_database(url, encoding='utf8', template=None):
         url.database = 'master'
     elif not url.drivername.startswith('sqlite'):
         url.database = None
+
+    # Support continues
+    url = URL.create(**url.__dict__)
 
     if url.drivername == 'mssql+pyodbc':
         engine = sa.create_engine(url, connect_args={'autocommit': True})
@@ -594,8 +604,8 @@ def drop_database(url):
 
     """
 
-    url = copy(make_url(url))
-
+    # Making URL to support SA 1.14
+    url = SimpleNamespace(**make_url(url)._asdict())
     database = url.database
 
     if url.drivername.startswith('postgres'):
@@ -604,6 +614,9 @@ def drop_database(url):
         url.database = 'master'
     elif not url.drivername.startswith('sqlite'):
         url.database = None
+
+    # Support continues
+    url = URL.create(**url.__dict__)
 
     if url.drivername == 'mssql+pyodbc':
         engine = sa.create_engine(url, connect_args={'autocommit': True})
@@ -618,8 +631,8 @@ def drop_database(url):
             os.remove(database)
 
     elif (
-                engine.dialect.name == 'postgresql' and
-                engine.driver in {'psycopg2', 'psycopg2cffi'}
+        engine.dialect.name == 'postgresql' and
+        engine.driver in {'psycopg2', 'psycopg2cffi'}
     ):
         if engine.driver == 'psycopg2':
             from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
