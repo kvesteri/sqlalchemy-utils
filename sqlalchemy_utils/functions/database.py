@@ -2,14 +2,14 @@ import itertools
 import os
 from collections.abc import Mapping, Sequence
 from copy import copy
+from types import SimpleNamespace
 
 import sqlalchemy as sa
 from sqlalchemy.engine.url import make_url, URL
 from sqlalchemy.exc import OperationalError, ProgrammingError
-from types import SimpleNamespace
 
-from ..utils import starts_with
 from .orm import quote
+from ..utils import starts_with
 
 
 def escape_like(string, escape_char='*'):
@@ -458,13 +458,15 @@ def database_exists(url):
 
         return header[:16] == b'SQLite format 3\x00'
 
-    # Making URL to support SA 1.14
-    url = SimpleNamespace(**make_url(url)._asdict())
+    url = copy(make_url(url))
+    # Making URL to support SA 1.4 Checking if URL is namedtuples
+    if hasattr(url, '_asdict'):
+        url = SimpleNamespace(**url._asdict())
 
     database, url.database = url.database, None
 
     # Support continues
-    url = URL.create(**url.__dict__)
+    url = URL.create(**vars(url))
 
     engine = sa.create_engine(url)
 
@@ -525,8 +527,11 @@ def create_database(url, encoding='utf8', template=None):
     other database engines should be supported.
     """
 
-    # Making URL to support SA 1.14
-    url = SimpleNamespace(**make_url(url)._asdict())
+    url = copy(make_url(url))
+    # Making URL to support SA 1.4 Checking if URL is namedtuples
+    if hasattr(url, '_asdict'):
+        url = SimpleNamespace(**url._asdict())
+
     database = url.database
 
     if url.drivername.startswith('postgres'):
@@ -537,7 +542,7 @@ def create_database(url, encoding='utf8', template=None):
         url.database = None
 
     # Support continues
-    url = URL.create(**url.__dict__)
+    url = URL.create(**vars(url))
 
     if url.drivername == 'mssql+pyodbc':
         engine = sa.create_engine(url, connect_args={'autocommit': True})
@@ -604,8 +609,11 @@ def drop_database(url):
 
     """
 
-    # Making URL to support SA 1.14
-    url = SimpleNamespace(**make_url(url)._asdict())
+    url = copy(make_url(url))
+    # Making URL to support SA 1.4 Checking if URL is namedtuples
+    if hasattr(url, '_asdict'):
+        url = SimpleNamespace(**url._asdict())
+
     database = url.database
 
     if url.drivername.startswith('postgres'):
@@ -616,7 +624,7 @@ def drop_database(url):
         url.database = None
 
     # Support continues
-    url = URL.create(**url.__dict__)
+    url = URL.create(**vars(url))
 
     if url.drivername == 'mssql+pyodbc':
         engine = sa.create_engine(url, connect_args={'autocommit': True})
