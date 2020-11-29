@@ -466,7 +466,7 @@ def database_exists(url):
     database, url.database = url.database, None
 
     # Support continues
-    url = URL.create(**vars(url))
+    url = URL(**vars(url))
 
     engine = sa.create_engine(url)
 
@@ -542,7 +542,7 @@ def create_database(url, encoding='utf8', template=None):
         url.database = None
 
     # Support continues
-    url = URL.create(**vars(url))
+    url = URL(**vars(url))
 
     if url.drivername == 'mssql+pyodbc':
         engine = sa.create_engine(url, connect_args={'autocommit': True})
@@ -624,7 +624,7 @@ def drop_database(url):
         url.database = None
 
     # Support continues
-    url = URL.create(**vars(url))
+    url = URL(**vars(url))
 
     if url.drivername == 'mssql+pyodbc':
         engine = sa.create_engine(url, connect_args={'autocommit': True})
