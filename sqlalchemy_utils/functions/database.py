@@ -28,7 +28,10 @@ class URLWrapper:
             self.is_sa_14 = False
 
     def get_native_url(self):
-        return URL.create(**vars(self.url))
+        if self.is_sa_14:
+            return URL.create(**vars(self.url))
+        else:
+            return URL(**vars(self.url))
 
 
 def escape_like(string, escape_char='*'):
