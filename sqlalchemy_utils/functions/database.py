@@ -31,15 +31,17 @@ class URLWrapper:
     def get_native_url(self):
         url = URL(self.url.drivername)
 
-        temp_url = SimpleNamespace()
-        for key, value in vars(self.url).items():
-            if hasattr(url, key):
-                setattr(temp_url, key, value)
+        if not self.is_sa_14:
+            for key, value in vars(self.url):
+                if hasattr(url, key):
+                    setattr(url, key, value)
+            return url
 
-        if self.is_sa_14:
-            return URL.create(**vars(temp_url))
         else:
-            return URL(**vars(temp_url))
+            temp_url = SimpleNamespace()
+            for key, value in vars(self.url).items():
+                setattr(temp_url, key, value)
+            return URL.create(**vars(temp_url))
 
 
 def escape_like(string, escape_char='*'):
@@ -316,11 +318,11 @@ def has_index(column_or_constraint):
         columns = [column_or_constraint]
 
     return (
-            (primary_keys and starts_with(primary_keys, columns)) or
-            any(
-                starts_with(index.columns.values(), columns)
-                for index in table.indexes
-            )
+        (primary_keys and starts_with(primary_keys, columns)) or
+        any(
+            starts_with(index.columns.values(), columns)
+            for index in table.indexes
+        )
     )
 
 
@@ -416,17 +418,17 @@ def has_unique_index(column_or_constraint):
         columns = [column_or_constraint]
 
     return (
-            (columns == primary_keys) or
-            any(
-                columns == list(constraint.columns.values())
-                for constraint in table.constraints
-                if isinstance(constraint, sa.sql.schema.UniqueConstraint)
-            ) or
-            any(
-                columns == list(index.columns.values())
-                for index in table.indexes
-                if index.unique
-            )
+        (columns == primary_keys) or
+        any(
+            columns == list(constraint.columns.values())
+            for constraint in table.constraints
+            if isinstance(constraint, sa.sql.schema.UniqueConstraint)
+        ) or
+        any(
+            columns == list(index.columns.values())
+            for index in table.indexes
+            if index.unique
+        )
     )
 
 
@@ -438,16 +440,16 @@ def is_auto_assigned_date_column(column):
     :param column: SQLAlchemy Column object
     """
     return (
-            (
-                    isinstance(column.type, sa.DateTime) or
-                    isinstance(column.type, sa.Date)
-            ) and
-            (
-                    column.default or
-                    column.server_default or
-                    column.onupdate or
-                    column.server_onupdate
-            )
+        (
+            isinstance(column.type, sa.DateTime) or
+            isinstance(column.type, sa.Date)
+        ) and
+        (
+            column.default or
+            column.server_default or
+            column.onupdate or
+            column.server_onupdate
+        )
     )
 
 
@@ -665,8 +667,8 @@ def drop_database(url):
             os.remove(database)
 
     elif (
-            engine.dialect.name == 'postgresql' and
-            engine.driver in {'psycopg2', 'psycopg2cffi'}
+        engine.dialect.name == 'postgresql' and
+        engine.driver in {'psycopg2', 'psycopg2cffi'}
     ):
         if engine.driver == 'psycopg2':
             from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
