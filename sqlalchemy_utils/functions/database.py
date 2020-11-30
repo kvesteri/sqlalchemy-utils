@@ -32,7 +32,7 @@ class URLWrapper:
         url = URL(self.url.drivername)
 
         if not self.is_sa_14:
-            for key, value in vars(self.url):
+            for key, value in vars(self.url).items():
                 if hasattr(url, key):
                     setattr(url, key, value)
             return url
