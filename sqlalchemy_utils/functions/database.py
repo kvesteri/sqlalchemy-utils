@@ -2,14 +2,14 @@ import itertools
 import os
 from collections.abc import Mapping, Sequence
 from copy import copy
+from types import SimpleNamespace
 
 import sqlalchemy as sa
 from sqlalchemy.engine.url import make_url, URL
 from sqlalchemy.exc import OperationalError, ProgrammingError
-from types import SimpleNamespace
 
-from ..utils import starts_with
 from .orm import quote
+from ..utils import starts_with
 
 
 class URLWrapper:
