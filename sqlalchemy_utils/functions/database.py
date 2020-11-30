@@ -2,14 +2,14 @@ import itertools
 import os
 from collections.abc import Mapping, Sequence
 from copy import copy
-from types import SimpleNamespace
 
 import sqlalchemy as sa
 from sqlalchemy.engine.url import make_url, URL
 from sqlalchemy.exc import OperationalError, ProgrammingError
+from types import SimpleNamespace
 
-from .orm import quote
 from ..utils import starts_with
+from .orm import quote
 
 
 class URLWrapper:
@@ -17,7 +17,6 @@ class URLWrapper:
     Special wrapper class for 1.3.* and 1.4.8 SA compatibility
     Just wraps URL object and allows to make attribute assignment
     """
-
     def __init__(self, url):
         if hasattr(url, '_asdict'):
             # it's SA>=1.4
@@ -306,11 +305,11 @@ def has_index(column_or_constraint):
         columns = [column_or_constraint]
 
     return (
-        (primary_keys and starts_with(primary_keys, columns)) or
-        any(
-            starts_with(index.columns.values(), columns)
-            for index in table.indexes
-        )
+            (primary_keys and starts_with(primary_keys, columns)) or
+            any(
+                starts_with(index.columns.values(), columns)
+                for index in table.indexes
+            )
     )
 
 
@@ -406,17 +405,17 @@ def has_unique_index(column_or_constraint):
         columns = [column_or_constraint]
 
     return (
-        (columns == primary_keys) or
-        any(
-            columns == list(constraint.columns.values())
-            for constraint in table.constraints
-            if isinstance(constraint, sa.sql.schema.UniqueConstraint)
-        ) or
-        any(
-            columns == list(index.columns.values())
-            for index in table.indexes
-            if index.unique
-        )
+            (columns == primary_keys) or
+            any(
+                columns == list(constraint.columns.values())
+                for constraint in table.constraints
+                if isinstance(constraint, sa.sql.schema.UniqueConstraint)
+            ) or
+            any(
+                columns == list(index.columns.values())
+                for index in table.indexes
+                if index.unique
+            )
     )
 
 
@@ -428,16 +427,16 @@ def is_auto_assigned_date_column(column):
     :param column: SQLAlchemy Column object
     """
     return (
-        (
-            isinstance(column.type, sa.DateTime) or
-            isinstance(column.type, sa.Date)
-        ) and
-        (
-            column.default or
-            column.server_default or
-            column.onupdate or
-            column.server_onupdate
-        )
+            (
+                    isinstance(column.type, sa.DateTime) or
+                    isinstance(column.type, sa.Date)
+            ) and
+            (
+                    column.default or
+                    column.server_default or
+                    column.onupdate or
+                    column.server_onupdate
+            )
     )
 
 
@@ -486,7 +485,7 @@ def database_exists(url):
     # Support continues
     url = wrapped_url.get_native_url()
 
-    engine = sa.create_engine(url.get_native_url())
+    engine = sa.create_engine(url)
 
     if engine.dialect.name == 'postgresql':
         text = "SELECT 1 FROM pg_database WHERE datname='%s'" % database
@@ -627,7 +626,8 @@ def drop_database(url):
     """
 
     # Making URL to support SA 1.14
-    wrapped_url = URLWrapper(copy(make_url(url)))
+    url = copy(make_url(url))
+    wrapped_url = URLWrapper(url)
 
     database = wrapped_url.url.database
 
@@ -646,7 +646,7 @@ def drop_database(url):
     elif url.drivername == 'postgresql+pg8000':
         engine = sa.create_engine(url, isolation_level='AUTOCOMMIT')
     else:
-        engine = sa.create_engine(url.get_native_url())
+        engine = sa.create_engine(url)
     conn_resource = None
 
     if engine.dialect.name == 'sqlite' and database != ':memory:':
@@ -654,8 +654,8 @@ def drop_database(url):
             os.remove(database)
 
     elif (
-        engine.dialect.name == 'postgresql' and
-        engine.driver in {'psycopg2', 'psycopg2cffi'}
+            engine.dialect.name == 'postgresql' and
+            engine.driver in {'psycopg2', 'psycopg2cffi'}
     ):
         if engine.driver == 'psycopg2':
             from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
