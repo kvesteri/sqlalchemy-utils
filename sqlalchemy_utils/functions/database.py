@@ -17,6 +17,7 @@ class URLWrapper:
     Special wrapper class for 1.3.* and 1.4.8 SA compatibility
     Just wraps URL object and allows to make attribute assignment
     """
+
     def __init__(self, url):
         if hasattr(url, '_asdict'):
             # it's SA>=1.4
@@ -28,10 +29,17 @@ class URLWrapper:
             self.is_sa_14 = False
 
     def get_native_url(self):
+        url = URL(self.url.drivername)
+
+        temp_url = SimpleNamespace()
+        for key, value in vars(self.url).items():
+            if hasattr(url, key):
+                setattr(temp_url, key, value)
+
         if self.is_sa_14:
-            return URL.create(**vars(self.url))
+            return URL.create(**vars(temp_url))
         else:
-            return URL(**vars(self.url))
+            return URL(**vars(temp_url))
 
 
 def escape_like(string, escape_char='*'):
