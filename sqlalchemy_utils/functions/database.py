@@ -12,6 +12,26 @@ from .orm import quote
 from ..utils import starts_with
 
 
+class URLWrapper:
+    """
+    Special wrapper class for 1.3.* and 1.4.8 SA compatibility
+    Just wraps URL object and allows to make attribute assignment
+    """
+
+    def __init__(self, url):
+        if hasattr(url, '_asdict'):
+            # it's SA>=1.4
+            self.url = SimpleNamespace(**url._asdict())
+            self.is_sa_14 = True
+        else:
+            # it's SA=1.3.*
+            self.url = copy(url)
+            self.is_sa_14 = False
+
+    def get_native_url(self):
+        return URL.create(**vars(self.url))
+
+
 def escape_like(string, escape_char='*'):
     """
     Escape the string paremeter used in SQL LIKE expressions.
@@ -458,17 +478,15 @@ def database_exists(url):
 
         return header[:16] == b'SQLite format 3\x00'
 
-    url = copy(make_url(url))
-    # Making URL to support SA 1.4 Checking if URL is namedtuples
-    if hasattr(url, '_asdict'):
-        url = SimpleNamespace(**url._asdict())
+    # Making URL to support SA 1.4
+    wrapped_url = URLWrapper(copy(make_url(url)))
 
-    database, url.database = url.database, None
+    database, wrapped_url.url.database = wrapped_url.url.database, None
 
     # Support continues
-    url = URL(**vars(url))
+    url = wrapped_url.get_native_url()
 
-    engine = sa.create_engine(url)
+    engine = sa.create_engine(url.get_native_url())
 
     if engine.dialect.name == 'postgresql':
         text = "SELECT 1 FROM pg_database WHERE datname='%s'" % database
@@ -527,22 +545,21 @@ def create_database(url, encoding='utf8', template=None):
     other database engines should be supported.
     """
 
+    # Making URL to support SA 1.14
     url = copy(make_url(url))
-    # Making URL to support SA 1.4 Checking if URL is namedtuples
-    if hasattr(url, '_asdict'):
-        url = SimpleNamespace(**url._asdict())
+    wrapped_url = URLWrapper(url)
 
-    database = url.database
+    database = wrapped_url.url.database
 
     if url.drivername.startswith('postgres'):
-        url.database = 'postgres'
+        wrapped_url.url.database = 'postgres'
     elif url.drivername.startswith('mssql'):
-        url.database = 'master'
+        wrapped_url.urldatabase = 'master'
     elif not url.drivername.startswith('sqlite'):
-        url.database = None
+        wrapped_url.urldatabase = None
 
     # Support continues
-    url = URL(**vars(url))
+    url = wrapped_url.get_native_url()
 
     if url.drivername == 'mssql+pyodbc':
         engine = sa.create_engine(url, connect_args={'autocommit': True})
@@ -609,29 +626,27 @@ def drop_database(url):
 
     """
 
-    url = copy(make_url(url))
-    # Making URL to support SA 1.4 Checking if URL is namedtuples
-    if hasattr(url, '_asdict'):
-        url = SimpleNamespace(**url._asdict())
+    # Making URL to support SA 1.14
+    wrapped_url = URLWrapper(copy(make_url(url)))
 
-    database = url.database
+    database = wrapped_url.url.database
 
     if url.drivername.startswith('postgres'):
-        url.database = 'postgres'
+        wrapped_url.url.database = 'postgres'
     elif url.drivername.startswith('mssql'):
-        url.database = 'master'
+        wrapped_url.url.database = 'master'
     elif not url.drivername.startswith('sqlite'):
-        url.database = None
+        wrapped_url.url.database = None
 
     # Support continues
-    url = URL(**vars(url))
+    url = wrapped_url.get_native_url()
 
     if url.drivername == 'mssql+pyodbc':
         engine = sa.create_engine(url, connect_args={'autocommit': True})
     elif url.drivername == 'postgresql+pg8000':
         engine = sa.create_engine(url, isolation_level='AUTOCOMMIT')
     else:
-        engine = sa.create_engine(url)
+        engine = sa.create_engine(url.get_native_url())
     conn_resource = None
 
     if engine.dialect.name == 'sqlite' and database != ':memory:':
