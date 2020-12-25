@@ -458,7 +458,11 @@ def database_exists(url):
         return header[:16] == b'SQLite format 3\x00'
 
     url = copy(make_url(url))
-    database, url.database = url.database, None
+    try:
+        database, url.database = url.database, None
+    except AttributeError:  #SQLalchemy 1.4: url is immutable
+        database = url.database
+        url.set(database=None)
     engine = sa.create_engine(url)
 
     if engine.dialect.name == 'postgresql':
