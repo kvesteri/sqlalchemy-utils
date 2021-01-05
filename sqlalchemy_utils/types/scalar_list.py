@@ -50,6 +50,18 @@ class ScalarListType(types.TypeDecorator):
         session.commit()
 
 
+    ScalarListType is always stored as text. To use an array field on PostgreSQL
+    database use variant construct::
+
+        from sqlalchemy_utils import ScalarListType
+
+
+        class Player(Base):
+            __tablename__ = 'player'
+            id = sa.Column(sa.Integer, autoincrement=True)
+            points = sa.Column(ARRAY(Integer).with_variant(ScalarListType(int), 'sqlite'))
+
+
     """
 
     impl = sa.UnicodeText()
