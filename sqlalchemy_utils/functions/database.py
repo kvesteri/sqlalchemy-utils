@@ -606,7 +606,12 @@ def drop_database(url):
 
     if url.drivername == 'mssql+pyodbc':
         engine = sa.create_engine(url, connect_args={'autocommit': True})
-    elif url.drivername == 'postgresql+pg8000':
+    elif url.drivername in {
+        'postgresql+pg8000',
+        'postgresql+psycopg2',
+        'postgresql',  # Sqlalchemy uses psycopg2 if no driver is specified
+        'postgres'
+    }:
         engine = sa.create_engine(url, isolation_level='AUTOCOMMIT')
     else:
         engine = sa.create_engine(url)
@@ -620,14 +625,8 @@ def drop_database(url):
                 engine.dialect.name == 'postgresql' and
                 engine.driver in {'psycopg2', 'psycopg2cffi'}
     ):
-        if engine.driver == 'psycopg2':
-            from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
-            connection = engine.connect()
-            connection.connection.set_isolation_level(
-                ISOLATION_LEVEL_AUTOCOMMIT
-            )
-        else:
-            connection = engine.connect()
+        connection = engine.connect()
+        if engine.driver == 'psycopg2cffi':
             connection.connection.set_session(autocommit=True)
 
         # Disconnect all users from the database we are dropping.
