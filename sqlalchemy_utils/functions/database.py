@@ -531,7 +531,12 @@ def create_database(url, encoding='utf8', template=None):
 
     if url.drivername == 'mssql+pyodbc':
         engine = sa.create_engine(url, connect_args={'autocommit': True})
-    elif url.drivername == 'postgresql+pg8000':
+    elif url.drivername in {
+        'postgresql+pg8000',
+        'postgresql+psycopg2',
+        'postgresql',  # Sqlalchemy uses psycopg2 if no driver is specified
+        'postgres',
+    }:
         engine = sa.create_engine(url, isolation_level='AUTOCOMMIT')
     else:
         engine = sa.create_engine(url)
@@ -552,12 +557,6 @@ def create_database(url, encoding='utf8', template=None):
             connection.connection.set_session(autocommit=True)
             connection.execute(text)
         else:
-            if engine.driver == 'psycopg2':
-                from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
-                engine.raw_connection().set_isolation_level(
-                    ISOLATION_LEVEL_AUTOCOMMIT
-                )
-
             result_proxy = engine.execute(text)
 
     elif engine.dialect.name == 'mysql':
