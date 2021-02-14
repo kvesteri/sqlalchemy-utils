@@ -78,6 +78,8 @@ EncryptedType
 
 .. autoclass:: EncryptedType
 
+.. autoclass:: StringEncryptedType
+
 JSONType
 --------
 
