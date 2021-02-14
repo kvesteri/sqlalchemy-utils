@@ -29,7 +29,7 @@ def User(Base, encryption_engine, test_key, padding_mechanism):
         username = sa.Column(EncryptedType(
             sa.Unicode,
             test_key,
-            isinstance(encryption_engine, AesEngine),
+            encryption_engine is AesEngine,
             encryption_engine,
             padding_mechanism)
         )
@@ -37,7 +37,7 @@ def User(Base, encryption_engine, test_key, padding_mechanism):
         access_token = sa.Column(EncryptedType(
             sa.String,
             test_key,
-            isinstance(encryption_engine, AesEngine),
+            encryption_engine is AesEngine,
             encryption_engine,
             padding_mechanism)
         )
@@ -45,7 +45,7 @@ def User(Base, encryption_engine, test_key, padding_mechanism):
         is_active = sa.Column(EncryptedType(
             sa.Boolean,
             test_key,
-            isinstance(encryption_engine, AesEngine),
+            encryption_engine is AesEngine,
             encryption_engine,
             padding_mechanism)
         )
@@ -53,7 +53,7 @@ def User(Base, encryption_engine, test_key, padding_mechanism):
         accounts_num = sa.Column(EncryptedType(
             sa.Integer,
             test_key,
-            isinstance(encryption_engine, AesEngine),
+            encryption_engine is AesEngine,
             encryption_engine,
             padding_mechanism)
         )
@@ -61,7 +61,7 @@ def User(Base, encryption_engine, test_key, padding_mechanism):
         phone = sa.Column(EncryptedType(
             PhoneNumberType,
             test_key,
-            isinstance(encryption_engine, AesEngine),
+            encryption_engine is AesEngine,
             encryption_engine,
             padding_mechanism)
         )
@@ -69,7 +69,7 @@ def User(Base, encryption_engine, test_key, padding_mechanism):
         color = sa.Column(EncryptedType(
             ColorType,
             test_key,
-            isinstance(encryption_engine, AesEngine),
+            encryption_engine is AesEngine,
             encryption_engine,
             padding_mechanism)
         )
@@ -77,7 +77,7 @@ def User(Base, encryption_engine, test_key, padding_mechanism):
         date = sa.Column(EncryptedType(
             sa.Date,
             test_key,
-            isinstance(encryption_engine, AesEngine),
+            encryption_engine is AesEngine,
             encryption_engine,
             padding_mechanism)
         )
@@ -85,7 +85,7 @@ def User(Base, encryption_engine, test_key, padding_mechanism):
         time = sa.Column(EncryptedType(
             sa.Time,
             test_key,
-            isinstance(encryption_engine, AesEngine),
+            encryption_engine is AesEngine,
             encryption_engine,
             padding_mechanism)
         )
@@ -93,7 +93,7 @@ def User(Base, encryption_engine, test_key, padding_mechanism):
         datetime = sa.Column(EncryptedType(
             sa.DateTime,
             test_key,
-            isinstance(encryption_engine, AesEngine),
+            encryption_engine is AesEngine,
             encryption_engine,
             padding_mechanism)
         )
@@ -101,7 +101,7 @@ def User(Base, encryption_engine, test_key, padding_mechanism):
         enum = sa.Column(EncryptedType(
             sa.Enum('One', name='user_enum_t'),
             test_key,
-            isinstance(encryption_engine, AesEngine),
+            encryption_engine is AesEngine,
             encryption_engine,
             padding_mechanism)
         )
@@ -109,7 +109,7 @@ def User(Base, encryption_engine, test_key, padding_mechanism):
         json = sa.Column(EncryptedType(
             JSONType,
             test_key,
-            isinstance(encryption_engine, AesEngine),
+            encryption_engine is AesEngine,
             encryption_engine,
             padding_mechanism)
         )
@@ -265,7 +265,7 @@ class EncryptedTypeTestCase(object):
             name = sa.Column(EncryptedType(
                 sa.Unicode,
                 lambda: self._team_key,
-                isinstance(encryption_engine, AesEngine),
+                encryption_engine is AesEngine,
                 encryption_engine,
                 padding_mechanism)
             )
