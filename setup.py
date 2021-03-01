@@ -32,7 +32,7 @@ extras_require = {
         'mock==2.0.0',
         'psycopg2>=2.5.1',
         'psycopg2cffi>=2.8.1',
-        'pg8000>=1.12.4',
+        'pg8000>=1.12.4,<1.16.6',  # Do not upgrade; for context: https://github.com/tlocke/pg8000/commit/3a2e7439ae3613367ec231218d7e0f541466d1e5#commitcomment-43174891
         'pytz>=2014.2',
         'python-dateutil>=2.6',
         'pymysql',
