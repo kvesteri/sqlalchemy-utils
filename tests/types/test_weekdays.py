@@ -6,6 +6,12 @@ from sqlalchemy_utils import i18n
 from sqlalchemy_utils.primitives import WeekDays
 from sqlalchemy_utils.types import WeekDaysType
 
+pymysql = None
+try:
+    import pymysql  # noqa
+except ImportError:
+    pass
+
 
 @pytest.fixture
 def Schedule(Base):
@@ -59,6 +65,7 @@ class TestWeekDaysTypeOnPostgres(WeekDaysTypeTestCase):
     pass
 
 
+@pytest.mark.skipif('pymysql is None')
 @pytest.mark.usefixtures('mysql_dsn')
 class TestWeekDaysTypeOnMySQL(WeekDaysTypeTestCase):
     pass

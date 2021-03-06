@@ -7,6 +7,12 @@ from sqlalchemy_utils import (
     refresh_materialized_view
 )
 
+pymysql = None
+try:
+    import pymysql  # noqa
+except ImportError:
+    pass
+
 
 @pytest.fixture
 def Article(Base, User):
@@ -171,6 +177,7 @@ class TestPostgresTrivialView(SupportsCascade, SupportsNoCascade):
     pass
 
 
+@pytest.mark.skipif('pymysql is None')
 @pytest.mark.usefixtures('mysql_dsn')
 class TestMySqlTrivialView(SupportsCascade, SupportsNoCascade):
     pass
