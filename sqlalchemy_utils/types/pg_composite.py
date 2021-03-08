@@ -58,7 +58,7 @@ When creating CompositeType, you can either pass in a tuple or a dictionary.
     account1.balance = ('USD', 15)
 
     account2 = Account()
-    account2.balance = {'currency': 'USD', 'balance': 15}
+    account2.balance = {'currency': 'USD', 'amount': 15}
 
     session.add(account1)
     session.add(account2)
