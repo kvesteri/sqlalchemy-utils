@@ -460,12 +460,12 @@ def database_exists(url):
     url = copy(make_url(url))
     try:
         database, url.database = url.database, None
-    except AttributeError:  #SQLalchemy 1.4: url is immutable
+    except AttributeError:  # SQLalchemy 1.4: url is immutable
         database = url.database
-        url.set(database=None)
+        url = url.set(database="")
     engine = sa.create_engine(url)
 
-    if engine.dialect.name == 'postgresql':
+    if engine.dialect.name in ('postgresql', 'postgres'):
         text = "SELECT 1 FROM pg_database WHERE datname='%s'" % database
         return bool(get_scalar_result(engine, text))
 
@@ -504,6 +504,7 @@ def create_database(url, encoding='utf8', template=None):
     """Issue the appropriate CREATE DATABASE statement.
 
     :param url: A SQLAlchemy engine URL.
+    :type url: sqlalchemy.engine.url.URL
     :param encoding: The encoding to create the database as.
     :param template:
         The name of the template from which to create the new database. At the
@@ -527,11 +528,23 @@ def create_database(url, encoding='utf8', template=None):
     database = url.database
 
     if url.drivername.startswith('postgres'):
-        url.database = 'postgres'
+        try:
+            url.database = 'postgres'
+        except AttributeError:
+            url = url.set(database='postgres')
+        assert url.database == "postgres", url.database
     elif url.drivername.startswith('mssql'):
-        url.database = 'master'
+        try:
+            url.database = 'master'
+        except AttributeError:
+            url = url.set(database='master')
+        assert url.database == "master"
     elif not url.drivername.startswith('sqlite'):
-        url.database = None
+        try:
+            url.database = None
+            assert url.database is None
+        except AttributeError:
+            url = url.set(database="")
 
     if url.drivername == 'mssql+pyodbc':
         engine = sa.create_engine(url, connect_args={'autocommit': True})
@@ -551,17 +564,12 @@ def create_database(url, encoding='utf8', template=None):
             quote(engine, template)
         )
 
-        if engine.driver == 'psycopg2cffi':
+        if engine.driver == 'psycopg2cffi' or engine.driver == "psycopg2":
             connection = engine.connect()
             connection.connection.set_session(autocommit=True)
             connection.execute(text)
+            connection.close()
         else:
-            if engine.driver == 'psycopg2':
-                from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
-                engine.raw_connection().set_isolation_level(
-                    ISOLATION_LEVEL_AUTOCOMMIT
-                )
-
             result_proxy = engine.execute(text)
 
     elif engine.dialect.name == 'mysql':
@@ -603,11 +611,22 @@ def drop_database(url):
     database = url.database
 
     if url.drivername.startswith('postgres'):
-        url.database = 'postgres'
+        try:
+            url.database = 'postgres'
+        except AttributeError:
+            url = url.set(database="postgres")
+
     elif url.drivername.startswith('mssql'):
-        url.database = 'master'
+        try:
+            url.database = 'master'
+        except AttributeError:
+            url = url.set(database="master")
     elif not url.drivername.startswith('sqlite'):
-        url.database = None
+        try:
+            url.database = None
+        except AttributeError:
+            url.set(database="")
+            assert url.database == ""
 
     if url.drivername == 'mssql+pyodbc':
         engine = sa.create_engine(url, connect_args={'autocommit': True})
