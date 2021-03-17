@@ -2,13 +2,13 @@ import itertools
 import os
 from collections.abc import Mapping, Sequence
 from copy import copy
+
 import sqlalchemy as sa
 from sqlalchemy.engine.url import make_url
 from sqlalchemy.exc import OperationalError, ProgrammingError
-from ..utils import starts_with
+
 from .orm import quote
-from distutils.version import StrictVersion
-_new_sa = StrictVersion(sa.__version__) >= StrictVersion("1.4.0")
+from ..utils import starts_with
 
 
 def escape_like(string, escape_char='*'):
@@ -420,6 +420,24 @@ def is_auto_assigned_date_column(column):
     )
 
 
+def _set_url_database(url: sa.engine.url.URL, database):
+    try:
+        ret = sa.engine.URL.create(
+            drivername=url.drivername,
+            username=url.username,
+            password=url.password,
+            host=url.host,
+            port=url.port,
+            database=database,
+            query=url.query
+        )
+    except AttributeError:  # SQLAlchemy <1.4
+        url.database = database
+        ret = url
+    assert ret.database == database, ret
+    return ret
+
+
 def database_exists(url):
     """Check if a database exists.
 
@@ -459,11 +477,10 @@ def database_exists(url):
 
     url = copy(make_url(url))
     database = url.database
-    url = set_database_from_url(url, with_database=False)
-    assert url.database is None
+    url = _set_url_database(url, database=None)
     engine = sa.create_engine(url)
 
-    if engine.dialect.name in ('postgresql', 'postgres'):
+    if engine.dialect.name == 'postgresql':
         text = "SELECT 1 FROM pg_database WHERE datname='%s'" % database
         return bool(get_scalar_result(engine, text))
 
@@ -485,7 +502,7 @@ def database_exists(url):
         engine = None
         text = 'SELECT 1'
         try:
-            url = set_database_from_url(url, database=database, with_database=True)
+            url = _set_url_database(url, database=database)
             engine = sa.create_engine(url)
             result = engine.execute(text)
             result.close()
@@ -498,34 +515,10 @@ def database_exists(url):
                 engine.dispose()
 
 
-def set_database_from_url(url: sa.engine.url.URL, with_database=False, database=None):
-    if with_database is True:
-        if database is None:
-            database = url.database
-        else:
-            database = database
-    else:
-        database = None
-    if _new_sa is True:
-        return sa.engine.URL.create(
-            drivername=url.drivername,
-            username=url.username,
-            password=url.password,
-            host=url.host,
-            port=url.port,
-            database=database,
-            query=url.query
-        )
-    else:
-        url.database = database
-        return url
-
-
 def create_database(url, encoding='utf8', template=None):
     """Issue the appropriate CREATE DATABASE statement.
 
     :param url: A SQLAlchemy engine URL.
-    :type url: sqlalchemy.engine.url.URL
     :param encoding: The encoding to create the database as.
     :param template:
         The name of the template from which to create the new database. At the
@@ -545,19 +538,14 @@ def create_database(url, encoding='utf8', template=None):
     """
 
     url = copy(make_url(url))
-    assert isinstance(url, sa.engine.URL)
-
     database = url.database
 
     if url.drivername.startswith('postgres'):
-        url = set_database_from_url(url, with_database=True, database="postgres")
-        assert url.database == "postgres", url.database
+        url = _set_url_database(url, database="postgres")
     elif url.drivername.startswith('mssql'):
-        url = set_database_from_url(url, with_database=True, database="master")
-        assert url.database == "master"
+        url = _set_url_database(url, database="master")
     elif not url.drivername.startswith('sqlite'):
-        url = set_database_from_url(url, with_database=False)
-        assert url.database is None
+        url = _set_url_database(url, database=None)
 
     if url.drivername == 'mssql+pyodbc':
         engine = sa.create_engine(url, connect_args={'autocommit': True})
@@ -624,14 +612,11 @@ def drop_database(url):
     database = url.database
 
     if url.drivername.startswith('postgres'):
-        url = set_database_from_url(url, with_database=True, database="postgres")
-        assert url.database == "postgres"
+        url = _set_url_database(url, database="postgres")
     elif url.drivername.startswith('mssql'):
-        url = set_database_from_url(url, with_database=True, database="master")
-        assert url.database == "master"
+        url = _set_url_database(url, database="master")
     elif not url.drivername.startswith('sqlite'):
-        url = set_database_from_url(url, with_database=False)
-        assert url.database is None
+        url = _set_url_database(url, database=None)
 
     if url.drivername == 'mssql+pyodbc':
         engine = sa.create_engine(url, connect_args={'autocommit': True})

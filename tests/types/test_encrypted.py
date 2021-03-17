@@ -1,3 +1,5 @@
+import random
+import string
 from datetime import date, datetime, time
 
 import pytest
@@ -153,11 +155,9 @@ def user_datetime():
 
 @pytest.fixture
 def test_token():
-    import random
-    import string
     token = ''
     characters = string.ascii_letters + string.digits
-    for i in range(60):
+    for _ in range(60):
         token += ''.join(random.choice(characters))
     return token
 
