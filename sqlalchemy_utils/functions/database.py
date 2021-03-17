@@ -2,13 +2,13 @@ import itertools
 import os
 from collections.abc import Mapping, Sequence
 from copy import copy
-
 import sqlalchemy as sa
 from sqlalchemy.engine.url import make_url
 from sqlalchemy.exc import OperationalError, ProgrammingError
-
 from ..utils import starts_with
 from .orm import quote
+from distutils.version import StrictVersion
+_new_sa = StrictVersion(sa.__version__) >= StrictVersion("1.4.0")
 
 
 def escape_like(string, escape_char='*'):
@@ -458,11 +458,9 @@ def database_exists(url):
         return header[:16] == b'SQLite format 3\x00'
 
     url = copy(make_url(url))
-    try:
-        database, url.database = url.database, None
-    except AttributeError:  # SQLalchemy 1.4: url is immutable
-        database = url.database
-        url = url.set(database="")
+    database = url.database
+    url = set_database_from_url(url, with_database=False)
+    assert url.database is None
     engine = sa.create_engine(url)
 
     if engine.dialect.name in ('postgresql', 'postgres'):
@@ -487,7 +485,7 @@ def database_exists(url):
         engine = None
         text = 'SELECT 1'
         try:
-            url.database = database
+            url = set_database_from_url(url, database=database, with_database=True)
             engine = sa.create_engine(url)
             result = engine.execute(text)
             result.close()
@@ -498,6 +496,29 @@ def database_exists(url):
         finally:
             if engine is not None:
                 engine.dispose()
+
+
+def set_database_from_url(url: sa.engine.url.URL, with_database=False, database=None):
+    if with_database is True:
+        if database is None:
+            database = url.database
+        else:
+            database = database
+    else:
+        database = None
+    if _new_sa is True:
+        return sa.engine.URL.create(
+            drivername=url.drivername,
+            username=url.username,
+            password=url.password,
+            host=url.host,
+            port=url.port,
+            database=database,
+            query=url.query
+        )
+    else:
+        url.database = database
+        return url
 
 
 def create_database(url, encoding='utf8', template=None):
@@ -524,27 +545,19 @@ def create_database(url, encoding='utf8', template=None):
     """
 
     url = copy(make_url(url))
+    assert isinstance(url, sa.engine.URL)
 
     database = url.database
 
     if url.drivername.startswith('postgres'):
-        try:
-            url.database = 'postgres'
-        except AttributeError:
-            url = url.set(database='postgres')
+        url = set_database_from_url(url, with_database=True, database="postgres")
         assert url.database == "postgres", url.database
     elif url.drivername.startswith('mssql'):
-        try:
-            url.database = 'master'
-        except AttributeError:
-            url = url.set(database='master')
+        url = set_database_from_url(url, with_database=True, database="master")
         assert url.database == "master"
     elif not url.drivername.startswith('sqlite'):
-        try:
-            url.database = None
-            assert url.database is None
-        except AttributeError:
-            url = url.set(database="")
+        url = set_database_from_url(url, with_database=False)
+        assert url.database is None
 
     if url.drivername == 'mssql+pyodbc':
         engine = sa.create_engine(url, connect_args={'autocommit': True})
@@ -611,22 +624,14 @@ def drop_database(url):
     database = url.database
 
     if url.drivername.startswith('postgres'):
-        try:
-            url.database = 'postgres'
-        except AttributeError:
-            url = url.set(database="postgres")
-
+        url = set_database_from_url(url, with_database=True, database="postgres")
+        assert url.database == "postgres"
     elif url.drivername.startswith('mssql'):
-        try:
-            url.database = 'master'
-        except AttributeError:
-            url = url.set(database="master")
+        url = set_database_from_url(url, with_database=True, database="master")
+        assert url.database == "master"
     elif not url.drivername.startswith('sqlite'):
-        try:
-            url.database = None
-        except AttributeError:
-            url.set(database="")
-            assert url.database == ""
+        url = set_database_from_url(url, with_database=False)
+        assert url.database is None
 
     if url.drivername == 'mssql+pyodbc':
         engine = sa.create_engine(url, connect_args={'autocommit': True})
