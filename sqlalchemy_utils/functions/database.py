@@ -566,10 +566,8 @@ def create_database(url, encoding='utf8', template=None):
         )
 
         if engine.driver == 'psycopg2cffi' or engine.driver == "psycopg2":
-            connection = engine.connect()
-            connection.connection.set_session(autocommit=True)
-            connection.execute(text)
-            connection.close()
+            with engine.connect().execution_options(isolation_level="AUTOCOMMIT") as connection:
+                connection.execute(text)
         else:
             result_proxy = engine.execute(text)
 
@@ -634,15 +632,7 @@ def drop_database(url):
                 engine.dialect.name == 'postgresql' and
                 engine.driver in {'psycopg2', 'psycopg2cffi'}
     ):
-        if engine.driver == 'psycopg2':
-            from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
-            connection = engine.connect()
-            connection.connection.set_isolation_level(
-                ISOLATION_LEVEL_AUTOCOMMIT
-            )
-        else:
-            connection = engine.connect()
-            connection.connection.set_session(autocommit=True)
+        connection = engine.connect().execution_options(isolation_level="AUTOCOMMIT")
 
         # Disconnect all users from the database we are dropping.
         version = connection.dialect.server_version_info
