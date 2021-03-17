@@ -6,6 +6,7 @@ from copy import copy
 import sqlalchemy as sa
 from sqlalchemy.engine.url import make_url
 from sqlalchemy.exc import OperationalError, ProgrammingError
+from sqlalchemy.pool import NullPool
 
 from .orm import quote
 from ..utils import starts_with
@@ -438,6 +439,21 @@ def _set_url_database(url: sa.engine.url.URL, database):
     return ret
 
 
+def _get_scalar_result(engine, sql):
+    with engine.connect() as conn:
+        return conn.scalar(sql)
+
+
+def _sqlite_file_exists(database):
+    if not os.path.isfile(database) or os.path.getsize(database) < 100:
+        return False
+
+    with open(database, 'rb') as f:
+        header = f.read(100)
+
+    return header[:16] == b'SQLite format 3\x00'
+
+
 def database_exists(url):
     """Check if a database exists.
 
@@ -459,60 +475,44 @@ def database_exists(url):
 
     """
 
-    def get_scalar_result(engine, sql):
-        result_proxy = engine.execute(sql)
-        result = result_proxy.scalar()
-        result_proxy.close()
-        engine.dispose()
-        return result
-
-    def sqlite_file_exists(database):
-        if not os.path.isfile(database) or os.path.getsize(database) < 100:
-            return False
-
-        with open(database, 'rb') as f:
-            header = f.read(100)
-
-        return header[:16] == b'SQLite format 3\x00'
-
     url = copy(make_url(url))
     database = url.database
-    url = _set_url_database(url, database=None)
-    engine = sa.create_engine(url)
+    dialect_name = url.get_dialect().name
 
-    if engine.dialect.name == 'postgresql':
+    if dialect_name == 'postgresql':
         text = "SELECT 1 FROM pg_database WHERE datname='%s'" % database
-        return bool(get_scalar_result(engine, text))
+        for db in (database, 'postgres', 'template1', 'template0', None):
+            url = _set_url_database(url, database=db)
+            engine = sa.create_engine(url, poolclass=NullPool)
+            try:
+                return bool(_get_scalar_result(engine, text))
+            except (ProgrammingError, OperationalError):
+                pass
+        return False
 
-    elif engine.dialect.name == 'mysql':
+    elif dialect_name == 'mysql':
+        url = _set_url_database(url, database=None)
+        engine = sa.create_engine(url, poolclass=NullPool)
         text = ("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA "
                 "WHERE SCHEMA_NAME = '%s'" % database)
-        return bool(get_scalar_result(engine, text))
+        return bool(_get_scalar_result(engine, text))
 
-    elif engine.dialect.name == 'sqlite':
+    elif dialect_name == 'sqlite':
+        url = _set_url_database(url, database=None)
+        engine = sa.create_engine(url, poolclass=NullPool)
         if database:
-            return database == ':memory:' or sqlite_file_exists(database)
+            return database == ':memory:' or _sqlite_file_exists(database)
         else:
             # The default SQLAlchemy database is in memory,
             # and :memory is not required, thus we should support that use-case
             return True
-
     else:
-        engine.dispose()
-        engine = None
         text = 'SELECT 1'
         try:
-            url = _set_url_database(url, database=database)
-            engine = sa.create_engine(url)
-            result = engine.execute(text)
-            result.close()
-            return True
-
+            engine = sa.create_engine(url, poolclass=NullPool)
+            return bool(_get_scalar_result(engine, text))
         except (ProgrammingError, OperationalError):
             return False
-        finally:
-            if engine is not None:
-                engine.dispose()
 
 
 def create_database(url, encoding='utf8', template=None):
