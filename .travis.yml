@@ -16,9 +16,6 @@ before_script:
 
 matrix:
   include:
-  - python: 3.5
-    env:
-      - "TOXENV=py35"
   - python: 3.6
     env:
       - "TOXENV=py36"
@@ -28,6 +25,9 @@ matrix:
   - python: 3.8
     env:
       - "TOXENV=py38"
+  - python: 3.9
+    env:
+      - "TOXENV=py39"
 
 install:
   - source $TRAVIS_BUILD_DIR/.travis/install_mssql.sh
