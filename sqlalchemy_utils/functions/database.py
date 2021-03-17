@@ -8,8 +8,8 @@ from sqlalchemy.engine.url import make_url
 from sqlalchemy.exc import OperationalError, ProgrammingError
 from sqlalchemy.pool import NullPool
 
-from .orm import quote
 from ..utils import starts_with
+from .orm import quote
 
 
 def escape_like(string, escape_char='*'):
@@ -566,7 +566,8 @@ def create_database(url, encoding='utf8', template=None):
         )
 
         if engine.driver == 'psycopg2cffi' or engine.driver == "psycopg2":
-            with engine.connect().execution_options(isolation_level="AUTOCOMMIT") as connection:
+            with engine.connect().execution_options(
+                    isolation_level="AUTOCOMMIT") as connection:
                 connection.execute(text)
         else:
             result_proxy = engine.execute(text)
@@ -632,7 +633,9 @@ def drop_database(url):
                 engine.dialect.name == 'postgresql' and
                 engine.driver in {'psycopg2', 'psycopg2cffi'}
     ):
-        connection = engine.connect().execution_options(isolation_level="AUTOCOMMIT")
+        connection = engine.connect().execution_options(
+            isolation_level="AUTOCOMMIT"
+        )
 
         # Disconnect all users from the database we are dropping.
         version = connection.dialect.server_version_info
