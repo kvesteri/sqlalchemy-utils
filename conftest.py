@@ -49,13 +49,22 @@ def postgresql_db_user():
 
 
 @pytest.fixture(scope='session')
+def postgresql_db_password():
+    return os.environ.get('SQLALCHEMY_UTILS_TEST_POSTGRESQL_PASSWORD', '')
+
+
+@pytest.fixture(scope='session')
 def mysql_db_user():
     return os.environ.get('SQLALCHEMY_UTILS_TEST_MYSQL_USER', 'root')
 
 
 @pytest.fixture
-def postgresql_dsn(postgresql_db_user, db_name):
-    return 'postgresql://{0}@localhost/{1}'.format(postgresql_db_user, db_name)
+def postgresql_dsn(postgresql_db_user, postgresql_db_password, db_name):
+    return 'postgresql://{0}:{1}@localhost/{2}'.format(
+        postgresql_db_user,
+        postgresql_db_password,
+        db_name
+    )
 
 
 @pytest.fixture

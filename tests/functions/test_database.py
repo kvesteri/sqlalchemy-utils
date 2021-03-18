@@ -66,7 +66,7 @@ class TestDatabasePostgres(DatabaseTest):
     def db_name(self):
         return 'db_test_sqlalchemy_util'
 
-    def test_template(self, postgresql_db_user):
+    def test_template(self, postgresql_db_user, postgresql_db_password):
         (
             flexmock(sa.engine.Engine)
             .should_receive('execute')
@@ -75,8 +75,9 @@ class TestDatabasePostgres(DatabaseTest):
                 "TEMPLATE my_template"
             )
         )
-        dsn = 'postgresql://{0}@localhost/db_test_sqlalchemy_util'.format(
-            postgresql_db_user
+        dsn = 'postgresql://{0}:{1}@localhost/db_test_sqlalchemy_util'.format(
+            postgresql_db_user,
+            postgresql_db_password
         )
         create_database(dsn, template='my_template')
 
@@ -84,9 +85,10 @@ class TestDatabasePostgres(DatabaseTest):
 class TestDatabasePostgresPg8000(DatabaseTest):
 
     @pytest.fixture
-    def dsn(self, postgresql_db_user):
-        return 'postgresql+pg8000://{0}@localhost/{1}'.format(
+    def dsn(self, postgresql_db_user, postgresql_db_password):
+        return 'postgresql+pg8000://{0}:{1}@localhost/{2}'.format(
             postgresql_db_user,
+            postgresql_db_password,
             'db_to_test_create_and_drop_via_pg8000_driver'
         )
 
@@ -94,9 +96,10 @@ class TestDatabasePostgresPg8000(DatabaseTest):
 class TestDatabasePostgresPsycoPG2CFFI(DatabaseTest):
 
     @pytest.fixture
-    def dsn(self, postgresql_db_user):
-        return 'postgresql+psycopg2cffi://{0}@localhost/{1}'.format(
+    def dsn(self, postgresql_db_user, postgresql_db_password):
+        return 'postgresql+psycopg2cffi://{0}:{1}@localhost/{2}'.format(
             postgresql_db_user,
+            postgresql_db_password,
             'db_to_test_create_and_drop_via_psycopg2cffi_driver'
         )
 
@@ -108,7 +111,7 @@ class TestDatabasePostgresWithQuotedName(DatabaseTest):
     def db_name(self):
         return 'db_test_sqlalchemy-util'
 
-    def test_template(self, postgresql_db_user):
+    def test_template(self, postgresql_db_user, postgresql_db_password):
         (
             flexmock(sa.engine.Engine)
             .should_receive('execute')
@@ -118,20 +121,27 @@ class TestDatabasePostgresWithQuotedName(DatabaseTest):
                 'TEMPLATE "my-template"'
             )
         )
-        dsn = 'postgresql://{0}@localhost/db_test_sqlalchemy-util'.format(
-            postgresql_db_user
+        dsn = 'postgresql://{0}:{1}@localhost/db_test_sqlalchemy-util'.format(
+            postgresql_db_user,
+            postgresql_db_password
         )
         create_database(dsn, template='my-template')
 
 
 class TestDatabasePostgresCreateDatabaseCloseConnection(object):
-    def test_create_database_twice(self, postgresql_db_user):
+    def test_create_database_twice(
+        self,
+        postgresql_db_user,
+        postgresql_db_password
+    ):
         dsn_list = [
-            'postgresql://{0}@localhost/db_test_sqlalchemy-util-a'.format(
-                postgresql_db_user
+            'postgresql://{0}:{1}@localhost/db_test_sqlalchemy-util-a'.format(
+                postgresql_db_user,
+                postgresql_db_password
             ),
-            'postgres://{0}@localhost/db_test_sqlalchemy-util-b'.format(
-                postgresql_db_user
+            'postgres://{0}:{1}@localhost/db_test_sqlalchemy-util-b'.format(
+                postgresql_db_user,
+                postgresql_db_password
             ),
         ]
         for dsn_item in dsn_list:
