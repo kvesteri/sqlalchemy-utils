@@ -4,8 +4,13 @@ jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version: ['3.6', '3.7', '3.8', '3.9']
+        tox_env: ['sqlalchemy14']
+        include:
+          - python-version: '3.6'
+            tox_env: 'sqlalchemy13'
     services:
       postgres:
         image: postgres:latest
@@ -54,4 +59,4 @@ jobs:
       - name: Run tests
         env:
           SQLALCHEMY_UTILS_TEST_POSTGRESQL_PASSWORD: postgres
-        run: tox -e py
+        run: tox -e ${{matrix.tox_env }}
