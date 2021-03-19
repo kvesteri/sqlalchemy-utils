@@ -287,8 +287,14 @@ def get_mapper(mixed):
     if isinstance(mixed, sa.orm.attributes.InstrumentedAttribute):
         mixed = mixed.class_
     if isinstance(mixed, sa.Table):
+        if hasattr(mapperlib, '_all_registries'):
+            all_mappers = set()
+            for mapper_registry in mapperlib._all_registries():
+                all_mappers.update(mapper_registry.mappers)
+        else:  # SQLAlchemy <1.4
+            all_mappers = mapperlib._mapper_registry
         mappers = [
-            mapper for mapper in mapperlib._mapper_registry
+            mapper for mapper in all_mappers
             if mixed in mapper.tables
         ]
         if len(mappers) > 1:
