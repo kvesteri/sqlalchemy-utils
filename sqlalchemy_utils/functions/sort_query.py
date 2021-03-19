@@ -171,16 +171,22 @@ def make_order_by_deterministic(query):
     """
     order_by_func = sa.asc
 
-    if not query._order_by:
+    try:
+        order_by_clauses = query._order_by_clauses
+    except AttributeError:  # SQLAlchemy <1.4
+        order_by_clauses = query._order_by
+    if not order_by_clauses:
         column = None
     else:
-        order_by = query._order_by[0]
+        order_by = order_by_clauses[0]
+        if isinstance(order_by, sa.sql.elements._label_reference):
+            order_by = order_by.element
         if isinstance(order_by, sa.sql.expression.UnaryExpression):
             if order_by.modifier == sa.sql.operators.desc_op:
                 order_by_func = sa.desc
             else:
                 order_by_func = sa.asc
-            column = order_by.get_children()[0]
+            column = list(order_by.get_children())[0]
         else:
             column = order_by
 
