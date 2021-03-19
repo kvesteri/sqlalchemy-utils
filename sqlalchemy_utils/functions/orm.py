@@ -13,9 +13,9 @@ from sqlalchemy.orm.exc import UnmappedInstanceError
 from sqlalchemy.orm.properties import ColumnProperty, RelationshipProperty
 
 try:
-    from sqlalchemy.orm.context import _ColumnEntity
+    from sqlalchemy.orm.context import _ColumnEntity, _MapperEntity
 except ImportError:  # SQLAlchemy <1.4
-    from sqlalchemy.orm.query import _ColumnEntity
+    from sqlalchemy.orm.query import _ColumnEntity, _MapperEntity
 
 from sqlalchemy.orm.session import object_session
 from sqlalchemy.orm.util import AliasedInsp
@@ -269,11 +269,11 @@ def get_mapper(mixed):
 
     .. versionadded: 0.26.1
     """
-    if isinstance(mixed, sa.orm.query._MapperEntity):
+    if isinstance(mixed, _MapperEntity):
         mixed = mixed.expr
     elif isinstance(mixed, sa.Column):
         mixed = mixed.table
-    elif isinstance(mixed, sa.orm.query._ColumnEntity):
+    elif isinstance(mixed, _ColumnEntity):
         mixed = mixed.expr
 
     if isinstance(mixed, sa.orm.Mapper):
@@ -415,7 +415,7 @@ def get_tables(mixed):
         return [mixed.table]
     elif isinstance(mixed, sa.orm.attributes.InstrumentedAttribute):
         return mixed.parent.tables
-    elif isinstance(mixed, sa.orm.query._ColumnEntity):
+    elif isinstance(mixed, _ColumnEntity):
         mixed = mixed.expr
 
     mapper = get_mapper(mixed)
