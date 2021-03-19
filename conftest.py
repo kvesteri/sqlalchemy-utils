@@ -8,6 +8,7 @@ from sqlalchemy.ext.declarative import declarative_base, synonym_for
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import close_all_sessions
+
 from sqlalchemy_utils import (
     aggregates,
     coercion_listener,

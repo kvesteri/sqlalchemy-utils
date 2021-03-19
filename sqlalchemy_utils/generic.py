@@ -110,7 +110,7 @@ class GenericRelationshipProperty(MapperProperty):
                 if key == attr_key:
                     return attr
         else:
-            for key, attr in self.parent.attrs.items():
+            for attr in self.parent.attrs.values():
                 if isinstance(attr, ColumnProperty):
                     if attr.columns[0].name == column.name:
                         return attr
