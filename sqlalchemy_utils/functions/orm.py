@@ -522,6 +522,13 @@ def quote(mixed, ident):
     return dialect.preparer(dialect).quote(ident)
 
 
+def _get_query_compile_state(query):
+    if hasattr(query, '_compile_state'):
+        return query._compile_state()
+    else:  # SQLAlchemy <1.4
+        return query
+
+
 def query_labels(query):
     """
     Return all labels for given SQLAlchemy query object.
@@ -539,7 +546,8 @@ def query_labels(query):
     :param query: SQLAlchemy Query object
     """
     return [
-        entity._label_name for entity in query._entities
+        entity._label_name
+        for entity in _get_query_compile_state(query)._entities
         if isinstance(entity, _ColumnEntity) and entity._label_name
     ]
 
@@ -587,7 +595,8 @@ def get_query_entities(query):
     return [
         get_query_entity(expr) for expr in exprs
     ] + [
-        get_query_entity(entity) for entity in query._join_entities
+        get_query_entity(entity)
+        for entity in _get_query_compile_state(query)._join_entities
     ]
 
 

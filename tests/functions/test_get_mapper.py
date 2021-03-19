@@ -2,6 +2,7 @@ import pytest
 import sqlalchemy as sa
 
 from sqlalchemy_utils import get_mapper
+from sqlalchemy_utils.functions.orm import _get_query_compile_state
 
 
 class TestGetMapper(object):
@@ -79,22 +80,19 @@ class TestGetMapperWithQueryEntities(object):
         pass
 
     def test_mapper_entity_with_mapper(self, session, Building):
-        entity = session.query(Building.__mapper__)._entities[0]
-        assert (
-            get_mapper(entity) ==
-            sa.inspect(Building)
-        )
+        query = session.query(Building.__mapper__)
+        entity = _get_query_compile_state(query)._entities[0]
+        assert get_mapper(entity) == sa.inspect(Building)
 
     def test_mapper_entity_with_class(self, session, Building):
-        entity = session.query(Building)._entities[0]
-        assert (
-            get_mapper(entity) ==
-            sa.inspect(Building)
-        )
+        query = session.query(Building)
+        entity = _get_query_compile_state(query)._entities[0]
+        assert get_mapper(entity) == sa.inspect(Building)
 
     def test_column_entity(self, session, Building):
         query = session.query(Building.id)
-        assert get_mapper(query._entities[0]) == sa.inspect(Building)
+        entity = _get_query_compile_state(query)._entities[0]
+        assert get_mapper(entity) == sa.inspect(Building)
 
 
 class TestGetMapperWithMultipleMappersFound(object):

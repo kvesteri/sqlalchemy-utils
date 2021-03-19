@@ -2,7 +2,7 @@ import sqlalchemy as sa
 from sqlalchemy.sql.expression import asc, desc
 
 from .database import has_unique_index
-from .orm import get_query_descriptor, get_tables
+from .orm import _get_query_compile_state, get_query_descriptor, get_tables
 
 
 class QuerySorterException(Exception):
@@ -192,7 +192,7 @@ def make_order_by_deterministic(query):
         except TypeError:
             pass
 
-    base_table = get_tables(query._entities[0])[0]
+    base_table = get_tables(_get_query_compile_state(query)._entities[0])[0]
     query = query.order_by(
         *(order_by_func(c) for c in base_table.c if c.primary_key)
     )
