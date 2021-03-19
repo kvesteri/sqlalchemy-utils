@@ -10,6 +10,7 @@ from sqlalchemy.util import set_creation_order
 
 from .exceptions import ImproperlyConfigured
 from .functions import identity
+from .functions.orm import _get_class_registry
 
 
 class GenericAttributeImpl(attributes.ScalarAttributeImpl):
@@ -27,7 +28,7 @@ class GenericAttributeImpl(attributes.ScalarAttributeImpl):
         # Find class for discriminator.
         # TODO: Perhaps optimize with some sort of lookup?
         discriminator = self.get_state_discriminator(state)
-        target_class = state.class_._decl_class_registry.get(discriminator)
+        target_class = _get_class_registry(state.class_).get(discriminator)
 
         if target_class is None:
             # Unknown discriminator; return nothing.

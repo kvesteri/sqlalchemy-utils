@@ -75,7 +75,7 @@ def get_class_by_table(base, table, data=None):
     :return: Declarative class or None.
     """
     found_classes = set(
-        c for c in base._decl_class_registry.values()
+        c for c in _get_class_registry(base).values()
         if hasattr(c, '__table__') and c.__table__ is table
     )
     if len(found_classes) > 1:
@@ -1013,3 +1013,10 @@ def naturally_equivalent(obj, obj2):
         if not (getattr(obj, column_key) == getattr(obj2, column_key)):
             return False
     return True
+
+
+def _get_class_registry(class_):
+    try:
+        return class_.registry._class_registry
+    except AttributeError:  # SQLAlchemy <1.4
+        return class_._decl_class_registry

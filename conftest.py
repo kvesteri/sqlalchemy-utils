@@ -14,7 +14,7 @@ from sqlalchemy_utils import (
     i18n,
     InstrumentedList
 )
-
+from sqlalchemy_utils.functions.orm import _get_class_registry
 from sqlalchemy_utils.types.pg_composite import remove_composite_listeners
 
 
@@ -175,7 +175,7 @@ def Category(Base):
 
         @articles_count.expression
         def articles_count(cls):
-            Article = Base._decl_class_registry['Article']
+            Article = _get_class_registry(Base)['Article']
             return (
                 sa.select([sa.func.count(Article.id)])
                 .where(Article.category_id == cls.id)

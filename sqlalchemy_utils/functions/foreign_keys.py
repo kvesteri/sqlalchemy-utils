@@ -8,7 +8,7 @@ from sqlalchemy.schema import ForeignKeyConstraint, MetaData, Table
 
 from ..query_chain import QueryChain
 from .database import has_index
-from .orm import get_column_key, get_mapper, get_tables
+from .orm import _get_class_registry, get_column_key, get_mapper, get_tables
 
 
 def get_foreign_key_values(fk, obj):
@@ -265,7 +265,7 @@ def dependent_objects(obj, foreign_keys=None):
     session = object_session(obj)
 
     chain = QueryChain([])
-    classes = obj.__class__._decl_class_registry
+    classes = _get_class_registry(obj.__class__)
 
     for table, keys in group_foreign_keys(foreign_keys):
         keys = list(keys)
