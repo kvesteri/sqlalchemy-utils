@@ -249,6 +249,7 @@ class TestSortQueryWithPolymorphicInheritance(object):
             type = sa.Column(sa.Unicode(255))
 
             __mapper_args__ = {
+                'polymorphic_identity': u'text_item',
                 'polymorphic_on': type,
                 'with_polymorphic': '*'
             }
@@ -318,6 +319,7 @@ class TestSortQueryWithCustomPolymorphic(object):
             type = sa.Column(sa.Unicode(255))
 
             __mapper_args__ = {
+                'polymorphic_identity': u'text_item',
                 'polymorphic_on': type,
             }
         return TextItem
@@ -348,19 +350,11 @@ class TestSortQueryWithCustomPolymorphic(object):
         return BlogPost
 
     def test_with_unknown_column(self, session, TextItem, BlogPost):
-        query = sort_query(
-            session.query(
-                sa.orm.with_polymorphic(TextItem, [BlogPost])
-            ),
-            'category'
-        )
+        query = session.query(sa.orm.with_polymorphic(TextItem, [BlogPost]))
+        query = sort_query(query, 'category')
         assert 'ORDER BY' not in str(query)
 
     def test_with_existing_column(self, session, TextItem, Article):
-        query = sort_query(
-            session.query(
-                sa.orm.with_polymorphic(TextItem, [Article])
-            ),
-            'category'
-        )
+        query = session.query(sa.orm.with_polymorphic(TextItem, [Article]))
+        query = sort_query(query, 'category')
         assert 'ORDER BY' in str(query)
