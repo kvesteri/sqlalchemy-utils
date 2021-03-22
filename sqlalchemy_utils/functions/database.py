@@ -422,7 +422,7 @@ def is_auto_assigned_date_column(column):
 
 
 def _set_url_database(url: sa.engine.url.URL, database):
-    try:
+    if hasattr(sa.engine, 'URL'):
         ret = sa.engine.URL.create(
             drivername=url.drivername,
             username=url.username,
@@ -432,7 +432,7 @@ def _set_url_database(url: sa.engine.url.URL, database):
             database=database,
             query=url.query
         )
-    except AttributeError:  # SQLAlchemy <1.4
+    else:  # SQLAlchemy <1.4
         url.database = database
         ret = url
     assert ret.database == database, ret
