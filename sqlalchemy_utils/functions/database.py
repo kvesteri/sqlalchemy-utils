@@ -422,6 +422,12 @@ def is_auto_assigned_date_column(column):
 
 
 def _set_url_database(url: sa.engine.url.URL, database):
+    """Set the database of an engine URL.
+
+    :param url: A SQLAlchemy engine URL.
+    :param database: New database to set.
+
+    """
     if hasattr(sa.engine, 'URL'):
         ret = sa.engine.URL.create(
             drivername=url.drivername,
@@ -542,7 +548,7 @@ def create_database(url, encoding='utf8', template=None):
     dialect_name = url.get_dialect().name
     dialect_driver = url.get_dialect().driver
 
-    if dialect_name == 'postgres':
+    if dialect_name == 'postgresql':
         url = _set_url_database(url, database="postgres")
     elif dialect_name == 'mssql':
         url = _set_url_database(url, database="master")
@@ -610,7 +616,7 @@ def drop_database(url):
     dialect_name = url.get_dialect().name
     dialect_driver = url.get_dialect().driver
 
-    if dialect_name == 'postgres':
+    if dialect_name == 'postgresql':
         url = _set_url_database(url, database="postgres")
     elif dialect_name == 'mssql':
         url = _set_url_database(url, database="master")
