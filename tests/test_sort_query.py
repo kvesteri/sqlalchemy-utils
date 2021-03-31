@@ -249,7 +249,7 @@ class TestSortQueryWithPolymorphicInheritance(object):
             type = sa.Column(sa.Unicode(255))
 
             __mapper_args__ = {
-                'polymorphic_identity': u'text_item',
+                'polymorphic_identity': 'text_item',
                 'polymorphic_on': type,
                 'with_polymorphic': '*'
             }
@@ -264,7 +264,7 @@ class TestSortQueryWithPolymorphicInheritance(object):
             )
             category = sa.Column(sa.Unicode(255))
             __mapper_args__ = {
-                'polymorphic_identity': u'article'
+                'polymorphic_identity': 'article'
             }
         return Article
 
@@ -319,7 +319,7 @@ class TestSortQueryWithCustomPolymorphic(object):
             type = sa.Column(sa.Unicode(255))
 
             __mapper_args__ = {
-                'polymorphic_identity': u'text_item',
+                'polymorphic_identity': 'text_item',
                 'polymorphic_on': type,
             }
         return TextItem
@@ -333,7 +333,7 @@ class TestSortQueryWithCustomPolymorphic(object):
             )
             category = sa.Column(sa.Unicode(255))
             __mapper_args__ = {
-                'polymorphic_identity': u'article'
+                'polymorphic_identity': 'article'
             }
         return Article
 
@@ -345,7 +345,7 @@ class TestSortQueryWithCustomPolymorphic(object):
                 sa.Integer, sa.ForeignKey(TextItem.id), primary_key=True
             )
             __mapper_args__ = {
-                'polymorphic_identity': u'blog_post'
+                'polymorphic_identity': 'blog_post'
             }
         return BlogPost
 
