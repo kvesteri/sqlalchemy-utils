@@ -51,8 +51,12 @@ def create_table_from_selectable(
 
     # whoa doggie, the deprecation notice in
     # https://docs.sqlalchemy.org/en/14/core/selectable.html#sqlalchemy.sql.expression.SelectBase.c
-    # is waaaaay ambiguous (ie, "this attribute").
-    cols = selectable.subquery().c
+    # is waaaaay ambiguous (ie, "this attribute"). anyway looks like
+    # 1.3 Select doesn't have subquery() so...
+    if hasattr(selectable, 'subquery'):
+        cols = selectable.subquery().c
+    else:
+        cols = selectable.c
 
     args = [
         sa.Column(
