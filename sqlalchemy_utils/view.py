@@ -48,7 +48,12 @@ def create_table_from_selectable(
         metadata = sa.MetaData()
     if aliases is None:
         aliases = {}
-    cols = selectable.selected_columns
+
+    # whoa doggie, the deprecation notice in
+    # https://docs.sqlalchemy.org/en/14/core/selectable.html#sqlalchemy.sql.expression.SelectBase.c
+    # is waaaaay ambiguous (ie, "this attribute").
+    cols = selectable.subquery().c
+
     args = [
         sa.Column(
             c.name,
