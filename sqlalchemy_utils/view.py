@@ -48,6 +48,7 @@ def create_table_from_selectable(
         metadata = sa.MetaData()
     if aliases is None:
         aliases = {}
+    cols = selectable.selected_columns
     args = [
         sa.Column(
             c.name,
@@ -55,13 +56,13 @@ def create_table_from_selectable(
             key=aliases.get(c.name, c.name),
             primary_key=c.primary_key
         )
-        for c in selectable.c
+        for c in cols
     ] + indexes
     table = sa.Table(name, metadata, *args)
 
-    if not any([c.primary_key for c in selectable.c]):
+    if not any([c.primary_key for c in cols]):
         table.append_constraint(
-            PrimaryKeyConstraint(*[c.name for c in selectable.c])
+            PrimaryKeyConstraint(*[c.name for c in cols])
         )
     return table
 
