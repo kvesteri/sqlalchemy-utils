@@ -535,22 +535,6 @@ def _get_query_compile_state(query):
         return query
 
 
-def get_query_entity_by_alias(query, alias):
-    entities = get_query_entities(query)
-
-    if not alias:
-        return entities[0]
-
-    for entity in entities:
-        if isinstance(entity, sa.orm.util.AliasedClass):
-            name = sa.inspect(entity).name
-        else:
-            name = get_mapper(entity).tables[0].name
-
-        if name == alias:
-            return entity
-
-
 def get_polymorphic_mappers(mixed):
     if isinstance(mixed, AliasedInsp):
         return mixed.with_polymorphic_mappers
