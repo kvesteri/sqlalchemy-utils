@@ -393,7 +393,7 @@ class TestSelectCorrelatedExpression(object):
             'groups',
             alias,
             order_by=[group_user_tbl.c.user_id]
-        ).alias('test')
+        )
         # Just check that the query execution doesn't fail because of wrongly
         # constructed aliases
         assert session.execute(aggregate)
