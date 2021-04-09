@@ -369,6 +369,7 @@ import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.sql.functions import _FunctionGenerator
 
+from .compat import get_scalar_subquery
 from .functions.orm import get_column_key
 from .relationships import (
     chained_join,
@@ -452,7 +453,7 @@ class AggregatedValue(object):
             self.relationships[0].mapper.class_
         )
 
-        return query.as_scalar()
+        return get_scalar_subquery(query)
 
     def update_query(self, objects):
         table = self.class_.__table__
