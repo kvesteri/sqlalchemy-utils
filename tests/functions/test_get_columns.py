@@ -45,10 +45,14 @@ class TestGetColumns(object):
         assert [c.name for c in get_columns(Building()).values()] == columns
 
     def test_mapper(self, Building, columns):
-        assert [c.name for c in get_columns(Building.__mapper__).values()] == columns
+        assert [
+            c.name for c in get_columns(Building.__mapper__).values()
+        ] == columns
 
     def test_class_alias(self, Building, columns):
-        assert [c.name for c in get_columns(sa.orm.aliased(Building)).values()] == columns
+        assert [
+            c.name for c in get_columns(sa.orm.aliased(Building)).values()
+        ] == columns
 
     def test_table_alias(self, Building, columns):
         alias = sa.orm.aliased(Building.__table__)

@@ -1,5 +1,4 @@
 import sqlalchemy as sa
-from sqlalchemy.sql.expression import asc, desc
 
 from .database import has_unique_index
 from .orm import _get_query_compile_state, get_tables
