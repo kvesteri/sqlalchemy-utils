@@ -2,6 +2,8 @@ import sqlalchemy as sa
 from sqlalchemy.ext import compiler
 from sqlalchemy.schema import DDLElement, PrimaryKeyConstraint
 
+from sqlalchemy_utils.functions import get_columns
+
 
 class CreateView(DDLElement):
     def __init__(self, name, selectable, materialized=False):
@@ -55,13 +57,13 @@ def create_table_from_selectable(
             key=aliases.get(c.name, c.name),
             primary_key=c.primary_key
         )
-        for c in selectable.c
+        for c in get_columns(selectable)
     ] + indexes
     table = sa.Table(name, metadata, *args)
 
-    if not any([c.primary_key for c in selectable.c]):
+    if not any([c.primary_key for c in get_columns(selectable)]):
         table.append_constraint(
-            PrimaryKeyConstraint(*[c.name for c in selectable.c])
+            PrimaryKeyConstraint(*[c.name for c in get_columns(selectable)])
         )
     return table
 

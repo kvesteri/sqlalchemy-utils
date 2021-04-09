@@ -462,7 +462,10 @@ def get_columns(mixed):
         instance or an alias of any of these objects
     """
     if isinstance(mixed, sa.sql.selectable.Selectable):
-        return mixed.c
+        try:
+            return mixed.selected_columns
+        except AttributeError:  # SQLAlchemy <1.4
+            return mixed.c
     if isinstance(mixed, sa.orm.util.AliasedClass):
         return sa.inspect(mixed).mapper.columns
     if isinstance(mixed, sa.orm.Mapper):
