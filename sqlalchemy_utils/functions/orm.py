@@ -535,97 +535,6 @@ def _get_query_compile_state(query):
         return query
 
 
-def query_labels(query):
-    """
-    Return all labels for given SQLAlchemy query object.
-
-    Example::
-
-
-        query = session.query(
-            Category,
-            db.func.count(Article.id).label('articles')
-        )
-
-        query_labels(query)  # ['articles']
-
-    :param query: SQLAlchemy Query object
-    """
-    return [
-        entity._label_name
-        for entity in _get_query_compile_state(query)._entities
-        if isinstance(entity, _ColumnEntity) and entity._label_name
-    ]
-
-
-def get_query_entities(query):
-    """
-    Return a list of all entities present in given SQLAlchemy query object.
-
-    Examples::
-
-
-        from sqlalchemy_utils import get_query_entities
-
-
-        query = session.query(Category)
-
-        get_query_entities(query)  # [<Category>]
-
-
-        query = session.query(Category.id)
-
-        get_query_entities(query)  # [<Category>]
-
-
-    This function also supports queries with joins.
-
-    ::
-
-
-        query = session.query(Category).join(Article)
-
-        get_query_entities(query)  # [<Category>, <Article>]
-
-    .. versionchanged: 0.26.7
-        This function now returns a list instead of generator
-
-    :param query: SQLAlchemy Query object
-    """
-    exprs = [
-        d['expr']
-        if is_labeled_query(d['expr']) or isinstance(d['expr'], sa.Column)
-        else d['entity']
-        for d in query.column_descriptions
-    ]
-    return [
-        get_query_entity(expr) for expr in exprs
-    ] + [
-        get_query_entity(entity)
-        for entity in _get_query_compile_state(query)._join_entities
-    ]
-
-
-def is_labeled_query(expr):
-    return (
-        isinstance(expr, sa.sql.elements.Label) and
-        isinstance(
-            list(expr.base_columns)[0],
-            (sa.sql.selectable.Select, sa.sql.selectable.ScalarSelect)
-        )
-    )
-
-
-def get_query_entity(expr):
-    if isinstance(expr, sa.orm.attributes.InstrumentedAttribute):
-        return expr.parent.class_
-    elif isinstance(expr, sa.Column):
-        return expr.table
-    elif isinstance(expr, AliasedInsp):
-        return expr.entity
-    return expr
-
-
 def get_query_entity_by_alias(query, alias):
     entities = get_query_entities(query)
 
@@ -647,21 +556,6 @@ def get_polymorphic_mappers(mixed):
         return mixed.with_polymorphic_mappers
     else:
         return mixed.polymorphic_map.values()
-
-
-def get_query_descriptor(query, entity, attr):
-    if attr in query_labels(query):
-        return attr
-    else:
-        entity = get_query_entity_by_alias(query, entity)
-        if entity:
-            descriptor = get_descriptor(entity, attr)
-            if (
-                hasattr(descriptor, 'property') and
-                isinstance(descriptor.property, sa.orm.RelationshipProperty)
-            ):
-                return
-            return descriptor
 
 
 def get_descriptor(entity, attr):
