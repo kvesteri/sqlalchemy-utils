@@ -18,7 +18,7 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: sqlalchemy_utils_test
-        # Set health checks to wait until postgres has started
+        # Set health checks to wait until PostgreSQL has started
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -37,7 +37,13 @@ jobs:
         image: mcr.microsoft.com/mssql/server:2017-latest
         env:
           ACCEPT_EULA: Y
-          SA_PASSWORD: Strong!Passw0rd
+          SA_PASSWORD: Strong_Passw0rd
+        # Set health checks to wait until SQL Server has started
+        options: >-
+          --health-cmd "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${SA_PASSWORD} -Q 'SELECT 1;' -b"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
         ports:
           - 1433:1433
     steps:

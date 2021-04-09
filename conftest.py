@@ -96,7 +96,7 @@ def mssql_db_user():
 @pytest.fixture
 def mssql_db_password():
     return os.environ.get('SQLALCHEMY_UTILS_TEST_MSSQL_PASSWORD',
-                          'Strong!Passw0rd')
+                          'Strong_Passw0rd')
 
 
 @pytest.fixture
