@@ -555,10 +555,9 @@ def create_database(url, encoding='utf8', template=None):
     elif not dialect_name == 'sqlite':
         url = _set_url_database(url, database=None)
 
-    if dialect_name == 'mssql' and dialect_driver in {'pymssql', 'pyodbc'}:
-        engine = sa.create_engine(url, connect_args={'autocommit': True})
-    elif dialect_name == 'postgresql' and dialect_driver in {
-            'asyncpg', 'pg8000', 'psycopg2', 'psycopg2cffi'}:
+    if (dialect_name == 'mssql' and dialect_driver in {'pymssql', 'pyodbc'}) \
+            or (dialect_name == 'postgresql' and dialect_driver in {
+            'asyncpg', 'pg8000', 'psycopg2', 'psycopg2cffi'}):
         engine = sa.create_engine(url, isolation_level='AUTOCOMMIT')
     else:
         engine = sa.create_engine(url)
