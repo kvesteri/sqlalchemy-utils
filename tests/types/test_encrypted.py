@@ -5,7 +5,7 @@ from datetime import date, datetime, time
 import pytest
 import sqlalchemy as sa
 
-from sqlalchemy_utils import ColorType, EncryptedType, PhoneNumberType
+from sqlalchemy_utils import ColorType, StringEncryptedType, PhoneNumberType
 from sqlalchemy_utils.types import JSONType
 from sqlalchemy_utils.types.encrypted.encrypted_type import (
     AesEngine,
@@ -28,77 +28,77 @@ def User(Base, encryption_engine, test_key, padding_mechanism):
         __tablename__ = 'user'
         id = sa.Column(sa.Integer, primary_key=True)
 
-        username = sa.Column(EncryptedType(
+        username = sa.Column(StringEncryptedType(
             sa.Unicode,
             test_key,
             encryption_engine,
             padding_mechanism)
         )
 
-        access_token = sa.Column(EncryptedType(
+        access_token = sa.Column(StringEncryptedType(
             sa.String,
             test_key,
             encryption_engine,
             padding_mechanism)
         )
 
-        is_active = sa.Column(EncryptedType(
+        is_active = sa.Column(StringEncryptedType(
             sa.Boolean,
             test_key,
             encryption_engine,
             padding_mechanism)
         )
 
-        accounts_num = sa.Column(EncryptedType(
+        accounts_num = sa.Column(StringEncryptedType(
             sa.Integer,
             test_key,
             encryption_engine,
             padding_mechanism)
         )
 
-        phone = sa.Column(EncryptedType(
+        phone = sa.Column(StringEncryptedType(
             PhoneNumberType,
             test_key,
             encryption_engine,
             padding_mechanism)
         )
 
-        color = sa.Column(EncryptedType(
+        color = sa.Column(StringEncryptedType(
             ColorType,
             test_key,
             encryption_engine,
             padding_mechanism)
         )
 
-        date = sa.Column(EncryptedType(
+        date = sa.Column(StringEncryptedType(
             sa.Date,
             test_key,
             encryption_engine,
             padding_mechanism)
         )
 
-        time = sa.Column(EncryptedType(
+        time = sa.Column(StringEncryptedType(
             sa.Time,
             test_key,
             encryption_engine,
             padding_mechanism)
         )
 
-        datetime = sa.Column(EncryptedType(
+        datetime = sa.Column(StringEncryptedType(
             sa.DateTime,
             test_key,
             encryption_engine,
             padding_mechanism)
         )
 
-        enum = sa.Column(EncryptedType(
+        enum = sa.Column(StringEncryptedType(
             sa.Enum('One', name='user_enum_t'),
             test_key,
             encryption_engine,
             padding_mechanism)
         )
 
-        json = sa.Column(EncryptedType(
+        json = sa.Column(StringEncryptedType(
             JSONType,
             test_key,
             encryption_engine,
@@ -251,7 +251,7 @@ class EncryptedTypeTestCase(object):
             __tablename__ = 'team'
             id = sa.Column(sa.Integer, primary_key=True)
             key = sa.Column(sa.String(50))
-            name = sa.Column(EncryptedType(
+            name = sa.Column(StringEncryptedType(
                 sa.Unicode,
                 lambda: self._team_key,
                 encryption_engine,

@@ -89,6 +89,7 @@ from .types import (  # noqa
     remove_composite_listeners,
     ScalarListException,
     ScalarListType,
+    StringEncryptedType,
     TimezoneType,
     TSVectorType,
     URLType,
