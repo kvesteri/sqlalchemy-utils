@@ -5,7 +5,7 @@ from datetime import date, datetime, time
 import pytest
 import sqlalchemy as sa
 
-from sqlalchemy_utils import ColorType, StringEncryptedType, PhoneNumberType
+from sqlalchemy_utils import ColorType, PhoneNumberType, StringEncryptedType
 from sqlalchemy_utils.types import JSONType
 from sqlalchemy_utils.types.encrypted.encrypted_type import (
     AesEngine,
