@@ -349,6 +349,7 @@ class StringEncryptedType(TypeDecorator, ScalarCoercible):
     """
 
     impl = String
+    default_engine = AesEngine
 
     def __init__(self, type_in=None, key=None,
                  engine=None, padding=None, **kwargs):
@@ -366,7 +367,7 @@ class StringEncryptedType(TypeDecorator, ScalarCoercible):
         self.underlying_type = type_in
         self._key = key
         if not engine:
-            engine = AesEngine
+            engine = self.default_engine
         self.engine = engine()
         if isinstance(self.engine, AesEngine):
             self.engine._set_padding_mechanism(padding)
