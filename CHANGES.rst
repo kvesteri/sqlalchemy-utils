@@ -4,6 +4,15 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.37.0 (2021-04-12)
+^^^^^^^^^^^^^^^^^^^
+
+- Added SQLAlchemy 1.4 support
+- Fixed database_exists() on PostgreSQL (#462)
+- Added create_database support pymssql (#486)
+- Removed `sort_query`, `get_query_entities` and `get_query_entity_by_alias` functions
+
+
 0.36.8 (2020-07-08)
 ^^^^^^^^^^^^^^^^^^^
 
