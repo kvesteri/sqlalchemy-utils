@@ -28,7 +28,6 @@ from .orm import (  # noqa
     get_hybrid_properties,
     get_mapper,
     get_primary_keys,
-    get_query_entities,
     get_tables,
     get_type,
     getdotattr,
@@ -40,8 +39,4 @@ from .orm import (  # noqa
     table_name
 )
 from .render import render_expression, render_statement  # noqa
-from .sort_query import (  # noqa
-    make_order_by_deterministic,
-    QuerySorterException,
-    sort_query
-)
+from .sort_query import make_order_by_deterministic  # noqa

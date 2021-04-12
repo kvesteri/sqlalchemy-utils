@@ -8,7 +8,10 @@ from .color import ColorType  # noqa
 from .country import CountryType  # noqa
 from .currency import CurrencyType  # noqa
 from .email import EmailType  # noqa
-from .encrypted.encrypted_type import EncryptedType  # noqa
+from .encrypted.encrypted_type import (  # noqa
+    EncryptedType,
+    StringEncryptedType
+)
 from .enriched_datetime.enriched_date_type import EnrichedDateType  # noqa
 from .ip_address import IPAddressType  # noqa
 from .json import JSONType  # noqa

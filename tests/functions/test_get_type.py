@@ -2,6 +2,7 @@ import pytest
 import sqlalchemy as sa
 
 from sqlalchemy_utils import get_type
+from sqlalchemy_utils.compat import get_scalar_subquery
 
 
 @pytest.fixture
@@ -45,5 +46,5 @@ class TestGetType(object):
         assert get_type(Article.author) == User
 
     def test_scalar_select(self, Article):
-        query = sa.select([Article.id]).as_scalar()
+        query = get_scalar_subquery(sa.select([Article.id]))
         assert isinstance(get_type(query), sa.Integer)

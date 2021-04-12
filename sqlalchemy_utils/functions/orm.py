@@ -11,7 +11,12 @@ from sqlalchemy.orm import mapperlib
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.orm.exc import UnmappedInstanceError
 from sqlalchemy.orm.properties import ColumnProperty, RelationshipProperty
-from sqlalchemy.orm.query import _ColumnEntity
+
+try:
+    from sqlalchemy.orm.context import _ColumnEntity, _MapperEntity
+except ImportError:  # SQLAlchemy <1.4
+    from sqlalchemy.orm.query import _ColumnEntity, _MapperEntity
+
 from sqlalchemy.orm.session import object_session
 from sqlalchemy.orm.util import AliasedInsp
 
@@ -70,7 +75,7 @@ def get_class_by_table(base, table, data=None):
     :return: Declarative class or None.
     """
     found_classes = set(
-        c for c in base._decl_class_registry.values()
+        c for c in _get_class_registry(base).values()
         if hasattr(c, '__table__') and c.__table__ is table
     )
     if len(found_classes) > 1:
@@ -264,11 +269,11 @@ def get_mapper(mixed):
 
     .. versionadded: 0.26.1
     """
-    if isinstance(mixed, sa.orm.query._MapperEntity):
+    if isinstance(mixed, _MapperEntity):
         mixed = mixed.expr
     elif isinstance(mixed, sa.Column):
         mixed = mixed.table
-    elif isinstance(mixed, sa.orm.query._ColumnEntity):
+    elif isinstance(mixed, _ColumnEntity):
         mixed = mixed.expr
 
     if isinstance(mixed, sa.orm.Mapper):
@@ -282,8 +287,14 @@ def get_mapper(mixed):
     if isinstance(mixed, sa.orm.attributes.InstrumentedAttribute):
         mixed = mixed.class_
     if isinstance(mixed, sa.Table):
+        if hasattr(mapperlib, '_all_registries'):
+            all_mappers = set()
+            for mapper_registry in mapperlib._all_registries():
+                all_mappers.update(mapper_registry.mappers)
+        else:  # SQLAlchemy <1.4
+            all_mappers = mapperlib._mapper_registry
         mappers = [
-            mapper for mapper in mapperlib._mapper_registry
+            mapper for mapper in all_mappers
             if mixed in mapper.tables
         ]
         if len(mappers) > 1:
@@ -410,7 +421,7 @@ def get_tables(mixed):
         return [mixed.table]
     elif isinstance(mixed, sa.orm.attributes.InstrumentedAttribute):
         return mixed.parent.tables
-    elif isinstance(mixed, sa.orm.query._ColumnEntity):
+    elif isinstance(mixed, _ColumnEntity):
         mixed = mixed.expr
 
     mapper = get_mapper(mixed)
@@ -451,7 +462,10 @@ def get_columns(mixed):
         instance or an alias of any of these objects
     """
     if isinstance(mixed, sa.sql.selectable.Selectable):
-        return mixed.c
+        try:
+            return mixed.selected_columns
+        except AttributeError:  # SQLAlchemy <1.4
+            return mixed.c
     if isinstance(mixed, sa.orm.util.AliasedClass):
         return sa.inspect(mixed).mapper.columns
     if isinstance(mixed, sa.orm.Mapper):
@@ -517,109 +531,11 @@ def quote(mixed, ident):
     return dialect.preparer(dialect).quote(ident)
 
 
-def query_labels(query):
-    """
-    Return all labels for given SQLAlchemy query object.
-
-    Example::
-
-
-        query = session.query(
-            Category,
-            db.func.count(Article.id).label('articles')
-        )
-
-        query_labels(query)  # ['articles']
-
-    :param query: SQLAlchemy Query object
-    """
-    return [
-        entity._label_name for entity in query._entities
-        if isinstance(entity, _ColumnEntity) and entity._label_name
-    ]
-
-
-def get_query_entities(query):
-    """
-    Return a list of all entities present in given SQLAlchemy query object.
-
-    Examples::
-
-
-        from sqlalchemy_utils import get_query_entities
-
-
-        query = session.query(Category)
-
-        get_query_entities(query)  # [<Category>]
-
-
-        query = session.query(Category.id)
-
-        get_query_entities(query)  # [<Category>]
-
-
-    This function also supports queries with joins.
-
-    ::
-
-
-        query = session.query(Category).join(Article)
-
-        get_query_entities(query)  # [<Category>, <Article>]
-
-    .. versionchanged: 0.26.7
-        This function now returns a list instead of generator
-
-    :param query: SQLAlchemy Query object
-    """
-    exprs = [
-        d['expr']
-        if is_labeled_query(d['expr']) or isinstance(d['expr'], sa.Column)
-        else d['entity']
-        for d in query.column_descriptions
-    ]
-    return [
-        get_query_entity(expr) for expr in exprs
-    ] + [
-        get_query_entity(entity) for entity in query._join_entities
-    ]
-
-
-def is_labeled_query(expr):
-    return (
-        isinstance(expr, sa.sql.elements.Label) and
-        isinstance(
-            list(expr.base_columns)[0],
-            (sa.sql.selectable.Select, sa.sql.selectable.ScalarSelect)
-        )
-    )
-
-
-def get_query_entity(expr):
-    if isinstance(expr, sa.orm.attributes.InstrumentedAttribute):
-        return expr.parent.class_
-    elif isinstance(expr, sa.Column):
-        return expr.table
-    elif isinstance(expr, AliasedInsp):
-        return expr.entity
-    return expr
-
-
-def get_query_entity_by_alias(query, alias):
-    entities = get_query_entities(query)
-
-    if not alias:
-        return entities[0]
-
-    for entity in entities:
-        if isinstance(entity, sa.orm.util.AliasedClass):
-            name = sa.inspect(entity).name
-        else:
-            name = get_mapper(entity).tables[0].name
-
-        if name == alias:
-            return entity
+def _get_query_compile_state(query):
+    if hasattr(query, '_compile_state'):
+        return query._compile_state()
+    else:  # SQLAlchemy <1.4
+        return query
 
 
 def get_polymorphic_mappers(mixed):
@@ -627,21 +543,6 @@ def get_polymorphic_mappers(mixed):
         return mixed.with_polymorphic_mappers
     else:
         return mixed.polymorphic_map.values()
-
-
-def get_query_descriptor(query, entity, attr):
-    if attr in query_labels(query):
-        return attr
-    else:
-        entity = get_query_entity_by_alias(query, entity)
-        if entity:
-            descriptor = get_descriptor(entity, attr)
-            if (
-                hasattr(descriptor, 'property') and
-                isinstance(descriptor.property, sa.orm.RelationshipProperty)
-            ):
-                return
-            return descriptor
 
 
 def get_descriptor(entity, attr):
@@ -999,3 +900,10 @@ def naturally_equivalent(obj, obj2):
         if not (getattr(obj, column_key) == getattr(obj2, column_key)):
             return False
     return True
+
+
+def _get_class_registry(class_):
+    try:
+        return class_.registry._class_registry
+    except AttributeError:  # SQLAlchemy <1.4
+        return class_._decl_class_registry

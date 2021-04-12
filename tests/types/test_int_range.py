@@ -2,6 +2,7 @@ import pytest
 import sqlalchemy as sa
 
 from sqlalchemy_utils import IntRangeType
+from sqlalchemy_utils.compat import get_scalar_subquery
 
 intervals = None
 inf = -1
@@ -283,7 +284,7 @@ class TestIntRangeTypeOnPostgres(NumberRangeTestCase):
             session.query(Building)
             .filter(
                 Building.persons_at_night ==
-                session.query(Building.persons_at_night)
+                get_scalar_subquery(session.query(Building.persons_at_night))
             ).order_by(Building.persons_at_night).limit(1)
         )
         assert query.count()

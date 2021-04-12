@@ -25,7 +25,6 @@ from .functions import (  # noqa
     get_hybrid_properties,
     get_mapper,
     get_primary_keys,
-    get_query_entities,
     get_referencing_foreign_keys,
     get_tables,
     get_type,
@@ -42,7 +41,6 @@ from .functions import (  # noqa
     naturally_equivalent,
     render_expression,
     render_statement,
-    sort_query,
     table_name
 )
 from .generic import generic_relationship  # noqa
@@ -91,6 +89,7 @@ from .types import (  # noqa
     remove_composite_listeners,
     ScalarListException,
     ScalarListType,
+    StringEncryptedType,
     TimezoneType,
     TSVectorType,
     URLType,

@@ -1,6 +1,5 @@
 import pytest
 import sqlalchemy as sa
-from flexmock import flexmock
 
 from sqlalchemy_utils import create_database, database_exists, drop_database
 
@@ -66,27 +65,24 @@ class TestDatabasePostgres(DatabaseTest):
     def db_name(self):
         return 'db_test_sqlalchemy_util'
 
-    def test_template(self, postgresql_db_user):
-        (
-            flexmock(sa.engine.Engine)
-            .should_receive('execute')
-            .with_args(
-                "CREATE DATABASE db_test_sqlalchemy_util ENCODING 'utf8' "
-                "TEMPLATE my_template"
-            )
+    def test_template(self, postgresql_db_user, postgresql_db_password):
+        dsn = 'postgresql://{0}:{1}@localhost/db_test_sqlalchemy_util'.format(
+            postgresql_db_user,
+            postgresql_db_password
         )
-        dsn = 'postgresql://{0}@localhost/db_test_sqlalchemy_util'.format(
-            postgresql_db_user
-        )
-        create_database(dsn, template='my_template')
+        with pytest.raises(sa.exc.ProgrammingError) as excinfo:
+            create_database(dsn, template='my_template')
+        assert ("CREATE DATABASE db_test_sqlalchemy_util ENCODING 'utf8' "
+                "TEMPLATE my_template") in str(excinfo.value)
 
 
 class TestDatabasePostgresPg8000(DatabaseTest):
 
     @pytest.fixture
-    def dsn(self, postgresql_db_user):
-        return 'postgresql+pg8000://{0}@localhost/{1}'.format(
+    def dsn(self, postgresql_db_user, postgresql_db_password):
+        return 'postgresql+pg8000://{0}:{1}@localhost/{2}'.format(
             postgresql_db_user,
+            postgresql_db_password,
             'db_to_test_create_and_drop_via_pg8000_driver'
         )
 
@@ -94,9 +90,10 @@ class TestDatabasePostgresPg8000(DatabaseTest):
 class TestDatabasePostgresPsycoPG2CFFI(DatabaseTest):
 
     @pytest.fixture
-    def dsn(self, postgresql_db_user):
-        return 'postgresql+psycopg2cffi://{0}@localhost/{1}'.format(
+    def dsn(self, postgresql_db_user, postgresql_db_password):
+        return 'postgresql+psycopg2cffi://{0}:{1}@localhost/{2}'.format(
             postgresql_db_user,
+            postgresql_db_password,
             'db_to_test_create_and_drop_via_psycopg2cffi_driver'
         )
 
@@ -108,30 +105,31 @@ class TestDatabasePostgresWithQuotedName(DatabaseTest):
     def db_name(self):
         return 'db_test_sqlalchemy-util'
 
-    def test_template(self, postgresql_db_user):
-        (
-            flexmock(sa.engine.Engine)
-            .should_receive('execute')
-            .with_args(
-                '''CREATE DATABASE "db_test_sqlalchemy-util"'''
-                " ENCODING 'utf8' "
-                'TEMPLATE "my-template"'
-            )
+    def test_template(self, postgresql_db_user, postgresql_db_password):
+        dsn = 'postgresql://{0}:{1}@localhost/db_test_sqlalchemy-util'.format(
+            postgresql_db_user,
+            postgresql_db_password
         )
-        dsn = 'postgresql://{0}@localhost/db_test_sqlalchemy-util'.format(
-            postgresql_db_user
-        )
-        create_database(dsn, template='my-template')
+        with pytest.raises(sa.exc.ProgrammingError) as excinfo:
+            create_database(dsn, template='my-template')
+        assert ('CREATE DATABASE "db_test_sqlalchemy-util" ENCODING \'utf8\' '
+                'TEMPLATE "my-template"') in str(excinfo.value)
 
 
 class TestDatabasePostgresCreateDatabaseCloseConnection(object):
-    def test_create_database_twice(self, postgresql_db_user):
+    def test_create_database_twice(
+        self,
+        postgresql_db_user,
+        postgresql_db_password
+    ):
         dsn_list = [
-            'postgresql://{0}@localhost/db_test_sqlalchemy-util-a'.format(
-                postgresql_db_user
+            'postgresql://{0}:{1}@localhost/db_test_sqlalchemy-util-a'.format(
+                postgresql_db_user,
+                postgresql_db_password
             ),
-            'postgres://{0}@localhost/db_test_sqlalchemy-util-b'.format(
-                postgresql_db_user
+            'postgresql://{0}:{1}@localhost/db_test_sqlalchemy-util-b'.format(
+                postgresql_db_user,
+                postgresql_db_password
             ),
         ]
         for dsn_item in dsn_list:

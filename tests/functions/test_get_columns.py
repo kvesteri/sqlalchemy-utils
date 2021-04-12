@@ -13,8 +13,12 @@ def Building(Base):
     return Building
 
 
-class TestGetColumns(object):
+@pytest.fixture
+def columns():
+    return ['_id', '_name']
 
+
+class TestGetColumns(object):
     def test_table(self, Building):
         assert isinstance(
             get_columns(Building.__table__),
@@ -34,33 +38,22 @@ class TestGetColumns(object):
             Building.__table__.c._id
         ]
 
-    def test_declarative_class(self, Building):
-        assert isinstance(
-            get_columns(Building),
-            sa.util._collections.OrderedProperties
-        )
+    def test_declarative_class(self, Building, columns):
+        assert [c.name for c in get_columns(Building).values()] == columns
 
-    def test_declarative_object(self, Building):
-        assert isinstance(
-            get_columns(Building()),
-            sa.util._collections.OrderedProperties
-        )
+    def test_declarative_object(self, Building, columns):
+        assert [c.name for c in get_columns(Building()).values()] == columns
 
-    def test_mapper(self, Building):
-        assert isinstance(
-            get_columns(Building.__mapper__),
-            sa.util._collections.OrderedProperties
-        )
+    def test_mapper(self, Building, columns):
+        assert [
+            c.name for c in get_columns(Building.__mapper__).values()
+        ] == columns
 
-    def test_class_alias(self, Building):
-        assert isinstance(
-            get_columns(sa.orm.aliased(Building)),
-            sa.util._collections.OrderedProperties
-        )
+    def test_class_alias(self, Building, columns):
+        assert [
+            c.name for c in get_columns(sa.orm.aliased(Building)).values()
+        ] == columns
 
-    def test_table_alias(self, Building):
+    def test_table_alias(self, Building, columns):
         alias = sa.orm.aliased(Building.__table__)
-        assert isinstance(
-            get_columns(alias),
-            sa.sql.base.ImmutableColumnCollection
-        )
+        assert [c.name for c in get_columns(alias).values()] == columns

@@ -23,11 +23,15 @@ def coercion_listener(mapper, class_):
 
 def instant_defaults_listener(target, args, kwargs):
     for key, column in sa.inspect(target.__class__).columns.items():
-        if hasattr(column, 'default') and column.default is not None:
+        if (
+            hasattr(column, 'default') and
+            column.default is not None and
+            key not in kwargs
+        ):
             if callable(column.default.arg):
-                setattr(target, key, column.default.arg(target))
+                kwargs[key] = column.default.arg(target)
             else:
-                setattr(target, key, column.default.arg)
+                kwargs[key] = column.default.arg
 
 
 def force_auto_coercion(mapper=None):

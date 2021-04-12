@@ -4,6 +4,7 @@ import six
 import sqlalchemy as sa
 
 from .mock import create_mock_engine
+from .orm import _get_query_compile_state
 
 
 def render_expression(expression, bind, stream=None):
@@ -58,7 +59,9 @@ def render_statement(statement, bind=None):
 
     if isinstance(statement, sa.orm.query.Query):
         if bind is None:
-            bind = statement.session.get_bind(statement._mapper_zero())
+            bind = statement.session.get_bind(
+                _get_query_compile_state(statement)._mapper_zero()
+            )
 
         statement = statement.statement
 

@@ -8,13 +8,14 @@ from sqlalchemy.ext.declarative import declarative_base, synonym_for
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import close_all_sessions
+
 from sqlalchemy_utils import (
     aggregates,
     coercion_listener,
     i18n,
     InstrumentedList
 )
-
+from sqlalchemy_utils.functions.orm import _get_class_registry
 from sqlalchemy_utils.types.pg_composite import remove_composite_listeners
 
 
@@ -49,13 +50,22 @@ def postgresql_db_user():
 
 
 @pytest.fixture(scope='session')
+def postgresql_db_password():
+    return os.environ.get('SQLALCHEMY_UTILS_TEST_POSTGRESQL_PASSWORD', '')
+
+
+@pytest.fixture(scope='session')
 def mysql_db_user():
     return os.environ.get('SQLALCHEMY_UTILS_TEST_MYSQL_USER', 'root')
 
 
 @pytest.fixture
-def postgresql_dsn(postgresql_db_user, db_name):
-    return 'postgresql://{0}@localhost/{1}'.format(postgresql_db_user, db_name)
+def postgresql_dsn(postgresql_db_user, postgresql_db_password, db_name):
+    return 'postgresql://{0}:{1}@localhost/{2}'.format(
+        postgresql_db_user,
+        postgresql_db_password,
+        db_name
+    )
 
 
 @pytest.fixture
@@ -86,7 +96,7 @@ def mssql_db_user():
 @pytest.fixture
 def mssql_db_password():
     return os.environ.get('SQLALCHEMY_UTILS_TEST_MSSQL_PASSWORD',
-                          'Strong!Passw0rd')
+                          'Strong_Passw0rd')
 
 
 @pytest.fixture
@@ -166,7 +176,7 @@ def Category(Base):
 
         @articles_count.expression
         def articles_count(cls):
-            Article = Base._decl_class_registry['Article']
+            Article = _get_class_registry(Base)['Article']
             return (
                 sa.select([sa.func.count(Article.id)])
                 .where(Article.category_id == cls.id)

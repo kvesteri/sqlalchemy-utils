@@ -1,0 +1,68 @@
+name: Tests
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.6', '3.7', '3.8', '3.9']
+        tox_env: ['sqlalchemy14']
+        include:
+          - python-version: '3.6'
+            tox_env: 'sqlalchemy13'
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: sqlalchemy_utils_test
+        # Set health checks to wait until PostgreSQL has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      mysql:
+        image: mysql:latest
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: sqlalchemy_utils_test
+        ports:
+          - 3306:3306
+      mssql:
+        image: mcr.microsoft.com/mssql/server:2017-latest
+        env:
+          ACCEPT_EULA: Y
+          SA_PASSWORD: Strong_Passw0rd
+        # Set health checks to wait until SQL Server has started
+        options: >-
+          --health-cmd "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${SA_PASSWORD} -Q 'SELECT 1;' -b"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 1433:1433
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install MS SQL stuff
+        run: bash .ci/install_mssql.sh
+      - name: Add hstore extension to the sqlalchemy_utils_test database
+        env:
+          PGHOST: localhost
+          PGPASSWORD: postgres
+          PGPORT: 5432
+        run: psql -U postgres -d sqlalchemy_utils_test -c 'CREATE EXTENSION hstore;'
+      - name: Install tox
+        run: pip install tox
+      - name: Run tests
+        env:
+          SQLALCHEMY_UTILS_TEST_POSTGRESQL_PASSWORD: postgres
+        run: tox -e ${{matrix.tox_env }}

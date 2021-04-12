@@ -13,16 +13,15 @@ def Article(Base):
     class Article(Base):
         __tablename__ = 'article'
         id = sa.Column(sa.Integer, primary_key=True)
-        name = sa.Column(sa.Unicode(255), default=u'Some article')
+        name = sa.Column(sa.Unicode(255), default='Some article')
         created_at = sa.Column(sa.DateTime, default=datetime.now)
     return Article
 
 
-class TestInstantDefaultListener(object):
-
+class TestInstantDefaultListener:
     def test_assigns_defaults_on_object_construction(self, Article):
         article = Article()
-        assert article.name == u'Some article'
+        assert article.name == 'Some article'
 
     def test_callables_as_defaults(self, Article):
         article = Article()

@@ -47,7 +47,7 @@ class TestCaseInsensitiveComparator(object):
             .filter(User.email.notin_([u'email@example.com', u'a']))
         )
         assert (
-            'user.email NOT IN (lower(?), lower(?))'
+            'user.email NOT IN ('
             in str(query)
         )
 

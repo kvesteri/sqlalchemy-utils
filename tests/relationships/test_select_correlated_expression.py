@@ -2,6 +2,7 @@ import pytest
 import sqlalchemy as sa
 from sqlalchemy.ext.hybrid import hybrid_property
 
+from sqlalchemy_utils.compat import get_scalar_subquery
 from sqlalchemy_utils.relationships import select_correlated_expression
 
 
@@ -155,9 +156,11 @@ def Comment(Base, Article, User):
         author = sa.orm.relationship(User, backref='comments')
 
     Article.comment_count = sa.orm.column_property(
-        sa.select([sa.func.count(Comment.id)])
-        .where(Comment.article_id == Article.id)
-        .correlate_except(Article)
+        get_scalar_subquery(
+            sa.select([sa.func.count(Comment.id)])
+            .where(Comment.article_id == Article.id)
+            .correlate_except(Article)
+        )
     )
 
     return Comment
@@ -393,7 +396,7 @@ class TestSelectCorrelatedExpression(object):
             'groups',
             alias,
             order_by=[group_user_tbl.c.user_id]
-        ).alias('test')
+        )
         # Just check that the query execution doesn't fail because of wrongly
         # constructed aliases
         assert session.execute(aggregate)

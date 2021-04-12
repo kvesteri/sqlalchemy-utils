@@ -2,6 +2,7 @@ import pytest
 import sqlalchemy as sa
 
 from sqlalchemy_utils import get_tables
+from sqlalchemy_utils.functions.orm import _get_query_compile_state
 
 
 @pytest.fixture
@@ -69,18 +70,15 @@ class TestGetTables(object):
 
     def test_mapper_entity_with_class(self, session, TextItem, Article):
         query = session.query(Article)
-        assert get_tables(query._entities[0]) == [
-            TextItem.__table__, Article.__table__
-        ]
+        entity = _get_query_compile_state(query)._entities[0]
+        assert get_tables(entity) == [TextItem.__table__, Article.__table__]
 
     def test_mapper_entity_with_mapper(self, session, TextItem, Article):
         query = session.query(sa.inspect(Article))
-        assert get_tables(query._entities[0]) == [
-            TextItem.__table__, Article.__table__
-        ]
+        entity = _get_query_compile_state(query)._entities[0]
+        assert get_tables(entity) == [TextItem.__table__, Article.__table__]
 
     def test_column_entity(self, session, TextItem, Article):
         query = session.query(Article.id)
-        assert get_tables(query._entities[0]) == [
-            TextItem.__table__, Article.__table__
-        ]
+        entity = _get_query_compile_state(query)._entities[0]
+        assert get_tables(entity) == [TextItem.__table__, Article.__table__]

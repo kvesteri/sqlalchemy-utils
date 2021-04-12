@@ -4,11 +4,11 @@ SQLAlchemy-Utils
 
 Various utility functions and custom data types for SQLAlchemy.
 """
-from setuptools import setup, find_packages
 import os
 import re
 import sys
 
+from setuptools import find_packages, setup
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 PY3 = sys.version_info[0] == 3
@@ -58,9 +58,9 @@ extras_require = {
 
 # Add all optional dependencies to testing requirements.
 test_all = []
-for name, requirements in sorted(extras_require.items()):
+for requirements in extras_require.values():
     test_all += requirements
-extras_require['test_all'] = test_all
+extras_require['test_all'] = sorted(test_all)
 
 
 setup(
