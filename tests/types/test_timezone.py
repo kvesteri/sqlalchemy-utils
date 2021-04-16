@@ -3,6 +3,11 @@ import pytz
 import sqlalchemy as sa
 from dateutil.zoneinfo import getzoneinfofile_stream, tzfile, ZoneInfoFile
 
+try:
+    import zoneinfo
+except ImportError:
+    from backports import zoneinfo
+
 from sqlalchemy_utils.types import timezone, TimezoneType
 
 
@@ -16,6 +21,9 @@ def Visitor(Base):
         )
         timezone_pytz = sa.Column(
             timezone.TimezoneType(backend='pytz')
+        )
+        timezone_zoneinfo = sa.Column(
+            timezone.TimezoneType(backend='zoneinfo')
         )
 
         def __repr__(self):
@@ -33,7 +41,8 @@ class TestTimezoneType(object):
     def test_parameter_processing(self, session, Visitor):
         visitor = Visitor(
             timezone_dateutil=u'America/Los_Angeles',
-            timezone_pytz=u'America/Los_Angeles'
+            timezone_pytz=u'America/Los_Angeles',
+            timezone_zoneinfo=u'America/Los_Angeles'
         )
 
         session.add(visitor)
@@ -45,12 +54,16 @@ class TestTimezoneType(object):
         visitor_pytz = session.query(Visitor).filter_by(
             timezone_pytz=u'America/Los_Angeles'
         ).first()
+        visitor_zoneinfo = session.query(Visitor).filter_by(
+            timezone_zoneinfo=u'America/Los_Angeles'
+        ).first()
 
         assert visitor_dateutil is not None
         assert visitor_pytz is not None
+        assert visitor_zoneinfo is not None
 
 
-TIMEZONE_BACKENDS = ['dateutil', 'pytz']
+TIMEZONE_BACKENDS = ['dateutil', 'pytz', 'zoneinfo']
 
 
 def test_can_coerce_pytz_DstTzInfo():
@@ -79,12 +92,23 @@ def test_can_coerce_string_for_dateutil_zone(zone):
     assert isinstance(tzcol._coerce(zone), tzfile)
 
 
+@pytest.mark.parametrize('zone', zoneinfo.available_timezones())
+def test_can_coerce_string_for_zoneinfo_zone(zone):
+    tzcol = TimezoneType(backend='zoneinfo')
+    assert str(tzcol._coerce(zone)) == zone
+
+
 @pytest.mark.parametrize('backend', TIMEZONE_BACKENDS)
 def test_can_coerce_and_raise_UnknownTimeZoneError_or_ValueError(backend):
     tzcol = TimezoneType(backend=backend)
-    with pytest.raises((ValueError, pytz.exceptions.UnknownTimeZoneError)):
+    exceptions = (
+        ValueError,
+        pytz.exceptions.UnknownTimeZoneError,
+        zoneinfo.ZoneInfoNotFoundError
+    )
+    with pytest.raises(exceptions):
         tzcol._coerce('SolarSystem/Mars')
-    with pytest.raises((ValueError, pytz.exceptions.UnknownTimeZoneError)):
+    with pytest.raises(exceptions):
         tzcol._coerce('')
 
 
