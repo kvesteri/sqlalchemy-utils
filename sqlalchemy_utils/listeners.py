@@ -22,6 +22,11 @@ def coercion_listener(mapper, class_):
 
 
 def instant_defaults_listener(target, args, kwargs):
+    # insertion order of kwargs matters
+    # copy and clear so that we can add back later at the end of the dict
+    original = kwargs.copy()
+    kwargs.clear()
+
     for key, column in sa.inspect(target.__class__).columns.items():
         if (
             hasattr(column, 'default') and
@@ -32,6 +37,9 @@ def instant_defaults_listener(target, args, kwargs):
                 kwargs[key] = column.default.arg(target)
             else:
                 kwargs[key] = column.default.arg
+
+    # supersede w/initial in case target uses setters overriding defaults
+    kwargs.update(original)
 
 
 def force_auto_coercion(mapper=None):
