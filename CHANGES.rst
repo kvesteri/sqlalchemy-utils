@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.37.1 (2021-05-03)
+^^^^^^^^^^^^^^^^^^^
+
+- Removed py27 from pypi wheel
+
+
 0.37.0 (2021-04-12)
 ^^^^^^^^^^^^^^^^^^^
 
