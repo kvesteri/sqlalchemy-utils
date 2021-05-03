@@ -30,8 +30,7 @@ def instant_defaults_listener(target, args, kwargs):
     for key, column in sa.inspect(target.__class__).columns.items():
         if (
             hasattr(column, 'default') and
-            column.default is not None and
-            key not in kwargs
+            column.default is not None
         ):
             if callable(column.default.arg):
                 kwargs[key] = column.default.arg(target)
