@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.37.2 (2021-05-05)
+^^^^^^^^^^^^^^^^^^^
+
+- Added python_requires to setup.py
+
+
 0.37.1 (2021-05-03)
 ^^^^^^^^^^^^^^^^^^^
 
