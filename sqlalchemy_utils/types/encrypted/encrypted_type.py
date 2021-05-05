@@ -73,7 +73,7 @@ class AesEngine(EncryptionDecryptionBaseEngine):
     for a row based on the value of an encrypted column. Use AesEngine
     instead, since that allows you to perform such searches.
 
-    If you don't need to search by the value of an encypted column, the
+    If you don't need to search by the value of an encrypted column, the
     AesGcmEngine provides better security.
     """
 
@@ -141,7 +141,7 @@ class AesGcmEngine(EncryptionDecryptionBaseEngine):
     for a row based on the value of an encrypted column. Use AesEngine
     instead, since that allows you to perform such searches.
 
-    If you don't need to search by the value of an encypted column, the
+    If you don't need to search by the value of an encrypted column, the
     AesGcmEngine provides better security.
     """
 
@@ -199,7 +199,16 @@ class AesGcmEngine(EncryptionDecryptionBaseEngine):
 
 
 class FernetEngine(EncryptionDecryptionBaseEngine):
-    """Provide Fernet encryption and decryption methods."""
+    """
+    Provide Fernet encryption and decryption methods.
+
+    You should NOT use this FernetEngine if you want to be able to search
+    for a row based on the value of an encrypted column. Use AesEngine
+    instead, since that allows you to perform such searches.
+
+    If you don't need to search by the value of an encrypted column, the
+    AesGcmEngine or FernetEngine provides better security.
+    """
 
     def _initialize_engine(self, parent_class_key):
         self.secret_key = base64.urlsafe_b64encode(parent_class_key)
@@ -225,15 +234,40 @@ class FernetEngine(EncryptionDecryptionBaseEngine):
 
 class StringEncryptedType(TypeDecorator, ScalarCoercible):
     """
-    EncryptedType provides a way to encrypt and decrypt values,
+    StringEncryptedType provides a way to encrypt and decrypt values,
     to and from databases, that their type is a basic SQLAlchemy type.
     For example Unicode, String or even Boolean.
     On the way in, the value is encrypted and on the way out the stored value
     is decrypted.
 
-    EncryptedType needs Cryptography_ library in order to work.
+    StringEncryptedType needs Cryptography_ library in order to work.
 
-    When declaring a column which will be of type EncryptedType
+    The `queryable` parameter sets whether it will be possible to search for
+    a row based on the value of an encrypted column. This is convenient, but
+    the encryption used can leak information (see below warning).
+
+    By default, when `queryable` is `True` the `AesEngine` will be used for
+    encryption, and when `queryable` is `False` the `FernetEngine` will be
+    used. Other engines can be specified by passing the encryption engine
+    class via the `engine` parameter, however the engine chosen must be
+    compatible with the value of `queryable`.
+
+    .. warning::
+        Information can be leaked when using an encryption engine that
+        supports searching for a row based on the value of an encrypted
+        column. These engines use a static IV per key - see
+        https://security.stackexchange.com/a/1097 for why this can be
+        problematic.
+
+        If a row does not need to be searchable in this way, then it is
+        strongly recommended to set the `queryable` parameter to `False`
+        so that a more robust encryption method is used.
+
+    The `padding` parameter is passed to the `AesEngine` if it is used, so if
+    another engine is used (`queryable` is set to `False`) then `padding` is
+    ignored.
+
+    When declaring a column which will be of type StringEncryptedType
     it is better to be as precise as possible and follow the pattern
     below.
 
@@ -242,14 +276,14 @@ class StringEncryptedType(TypeDecorator, ScalarCoercible):
     ::
 
 
-        a_column = sa.Column(EncryptedType(sa.Unicode,
-                                           secret_key,
-                                           FernetEngine))
+        a_column = sa.Column(StringEncryptedType(sa.Unicode,
+                                                 secret_key,
+                                                 False))
 
-        another_column = sa.Column(EncryptedType(sa.Unicode,
-                                           secret_key,
-                                           AesEngine,
-                                           'pkcs5'))
+        another_column = sa.Column(StringEncryptedType(sa.Unicode,
+                                                       secret_key,
+                                                       True,
+                                                       padding='pkcs5'))
 
 
     A more complete example is given below.
@@ -262,8 +296,7 @@ class StringEncryptedType(TypeDecorator, ScalarCoercible):
         from sqlalchemy.ext.declarative import declarative_base
         from sqlalchemy.orm import sessionmaker
 
-        from sqlalchemy_utils import EncryptedType
-        from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
+        from sqlalchemy_utils import StringEncryptedType
 
         secret_key = 'secretkey1234'
         # setup
@@ -275,22 +308,22 @@ class StringEncryptedType(TypeDecorator, ScalarCoercible):
         class User(Base):
             __tablename__ = "user"
             id = sa.Column(sa.Integer, primary_key=True)
-            username = sa.Column(EncryptedType(sa.Unicode,
-                                               secret_key,
-                                               AesEngine,
-                                               'pkcs5'))
-            access_token = sa.Column(EncryptedType(sa.String,
-                                                   secret_key,
-                                                   AesEngine,
-                                                   'pkcs5'))
-            is_active = sa.Column(EncryptedType(sa.Boolean,
-                                                secret_key,
-                                                AesEngine,
-                                                'zeroes'))
-            number_of_accounts = sa.Column(EncryptedType(sa.Integer,
+            username = sa.Column(StringEncryptedType(sa.Unicode,
+                                                     secret_key,
+                                                     True,
+                                                     padding='pkcs5'))
+            access_token = sa.Column(StringEncryptedType(sa.String,
                                                          secret_key,
-                                                         AesEngine,
-                                                         'oneandzeroes'))
+                                                         False,
+                                                         AesGcmEngine))
+            is_active = sa.Column(StringEncryptedType(sa.Boolean,
+                                                      secret_key,
+                                                      True,
+                                                      padding='zeroes'))
+            number_of_accounts = sa.Column(StringEncryptedType(sa.Integer,
+                                                               secret_key,
+                                                               True,
+                                                               padding='oneandzeroes'))
 
 
         sa.orm.configure_mappers()
@@ -343,7 +376,7 @@ class StringEncryptedType(TypeDecorator, ScalarCoercible):
         class User(Base):
             __tablename__ = 'user'
             id = sa.Column(sa.Integer, primary_key=True)
-            username = sa.Column(EncryptedType(
+            username = sa.Column(StringEncryptedType(
                 sa.Unicode, get_key))
 
     """
@@ -351,11 +384,11 @@ class StringEncryptedType(TypeDecorator, ScalarCoercible):
     impl = String
 
     def __init__(self, type_in=None, key=None,
-                 engine=None, padding=None, **kwargs):
+                 queryable=False, engine=None, padding=None, **kwargs):
         """Initialization."""
         if not cryptography:
             raise ImproperlyConfigured(
-                "'cryptography' is required to use EncryptedType"
+                "'cryptography' is required to use StringEncryptedType"
             )
         super(StringEncryptedType, self).__init__(**kwargs)
         # set the underlying type
@@ -365,11 +398,34 @@ class StringEncryptedType(TypeDecorator, ScalarCoercible):
             type_in = type_in()
         self.underlying_type = type_in
         self._key = key
-        if not engine:
-            engine = AesEngine
-        self.engine = engine()
-        if isinstance(self.engine, AesEngine):
+
+        # If queryable, only the AesEngine is supported.
+        if queryable:
+            if engine not in (None, AesEngine):
+                raise ValueError(
+                    "When `queryable` is `True` the encryption engine must be "
+                    "`AesEngine` (the default). See the documentation for "
+                    "security warnings."
+                )
+            self.engine = AesEngine()
             self.engine._set_padding_mechanism(padding)
+
+        # The AesEngine cannot be used when queryable is True.
+        elif engine is AesEngine:
+            raise ValueError(
+                "When `queryable` is `False` the encryption engine should not "
+                "be `AesEngine` (the default), since it is less secure than "
+                "alternatives. See the documentation for security warnings."
+            )
+
+        # By now, queryable is True, so default engine to FernetEngine.
+        elif engine is None:
+            self.engine = FernetEngine()
+
+        # By now, queryable is True and we know it's not AesEngine, so we can
+        # instantiate whichever engine was chosen by the caller.
+        else:
+            self.engine = engine()
 
     @property
     def key(self):
@@ -449,6 +505,16 @@ class StringEncryptedType(TypeDecorator, ScalarCoercible):
 
 
 class EncryptedType(StringEncryptedType):
+    """
+    See the `StringEncryptedType` baseclass for details.
+
+    The base class includes important security notes that should
+    be read before using encryption.
+
+    The `EncryptedType` class will change implementation from
+    'LargeBinary' to 'String' in a future version. Use
+    `StringEncryptedType` to use the 'String' implementation.
+    """
     impl = LargeBinary
 
     def __init__(self, *args, **kwargs):

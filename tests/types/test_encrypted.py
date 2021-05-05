@@ -31,6 +31,7 @@ def User(Base, encryption_engine, test_key, padding_mechanism):
         username = sa.Column(StringEncryptedType(
             sa.Unicode,
             test_key,
+            encryption_engine is AesEngine,
             encryption_engine,
             padding_mechanism)
         )
@@ -38,6 +39,7 @@ def User(Base, encryption_engine, test_key, padding_mechanism):
         access_token = sa.Column(StringEncryptedType(
             sa.String,
             test_key,
+            encryption_engine is AesEngine,
             encryption_engine,
             padding_mechanism)
         )
@@ -45,6 +47,7 @@ def User(Base, encryption_engine, test_key, padding_mechanism):
         is_active = sa.Column(StringEncryptedType(
             sa.Boolean,
             test_key,
+            encryption_engine is AesEngine,
             encryption_engine,
             padding_mechanism)
         )
@@ -52,6 +55,7 @@ def User(Base, encryption_engine, test_key, padding_mechanism):
         accounts_num = sa.Column(StringEncryptedType(
             sa.Integer,
             test_key,
+            encryption_engine is AesEngine,
             encryption_engine,
             padding_mechanism)
         )
@@ -59,6 +63,7 @@ def User(Base, encryption_engine, test_key, padding_mechanism):
         phone = sa.Column(StringEncryptedType(
             PhoneNumberType,
             test_key,
+            encryption_engine is AesEngine,
             encryption_engine,
             padding_mechanism)
         )
@@ -66,6 +71,7 @@ def User(Base, encryption_engine, test_key, padding_mechanism):
         color = sa.Column(StringEncryptedType(
             ColorType,
             test_key,
+            encryption_engine is AesEngine,
             encryption_engine,
             padding_mechanism)
         )
@@ -73,6 +79,7 @@ def User(Base, encryption_engine, test_key, padding_mechanism):
         date = sa.Column(StringEncryptedType(
             sa.Date,
             test_key,
+            encryption_engine is AesEngine,
             encryption_engine,
             padding_mechanism)
         )
@@ -80,6 +87,7 @@ def User(Base, encryption_engine, test_key, padding_mechanism):
         time = sa.Column(StringEncryptedType(
             sa.Time,
             test_key,
+            encryption_engine is AesEngine,
             encryption_engine,
             padding_mechanism)
         )
@@ -87,6 +95,7 @@ def User(Base, encryption_engine, test_key, padding_mechanism):
         datetime = sa.Column(StringEncryptedType(
             sa.DateTime,
             test_key,
+            encryption_engine is AesEngine,
             encryption_engine,
             padding_mechanism)
         )
@@ -94,6 +103,7 @@ def User(Base, encryption_engine, test_key, padding_mechanism):
         enum = sa.Column(StringEncryptedType(
             sa.Enum('One', name='user_enum_t'),
             test_key,
+            encryption_engine is AesEngine,
             encryption_engine,
             padding_mechanism)
         )
@@ -101,6 +111,7 @@ def User(Base, encryption_engine, test_key, padding_mechanism):
         json = sa.Column(StringEncryptedType(
             JSONType,
             test_key,
+            encryption_engine is AesEngine,
             encryption_engine,
             padding_mechanism)
         )
@@ -254,6 +265,7 @@ class EncryptedTypeTestCase(object):
             name = sa.Column(StringEncryptedType(
                 sa.Unicode,
                 lambda: self._team_key,
+                encryption_engine is AesEngine,
                 encryption_engine,
                 padding_mechanism)
             )
