@@ -54,7 +54,9 @@ class ScalarListType(types.TypeDecorator):
 
     impl = sa.UnicodeText()
 
-    def __init__(self, coerce_func=six.text_type, separator=u','):
+    def __init__(self, length=None, coerce_func=six.text_type, separator=u','):
+        if length is not None:
+            self.impl = sa.String(length)
         self.separator = six.text_type(separator)
         self.coerce_func = coerce_func
 
