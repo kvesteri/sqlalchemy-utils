@@ -6,12 +6,10 @@ Various utility functions and custom data types for SQLAlchemy.
 """
 import os
 import re
-import sys
 
 from setuptools import find_packages, setup
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-PY3 = sys.version_info[0] == 3
 
 
 def get_version():
@@ -48,8 +46,6 @@ extras_require = {
     'phone': ['phonenumbers>=5.9.2'],
     'password': ['passlib >= 1.6, < 2.0'],
     'color': ['colour>=0.0.4'],
-    'ipaddress': ['ipaddr'] if not PY3 else [],
-    'enum': ['enum34'] if sys.version_info < (3, 4) else [],
     'timezone': ['python-dateutil'],
     'url': ['furl >= 0.4.1'],
     'encrypted': ['cryptography>=0.6']
@@ -83,6 +79,7 @@ setup(
         'SQLAlchemy>=1.0'
     ],
     extras_require=extras_require,
+    python_requires='~=3.4',
     classifiers=[
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
