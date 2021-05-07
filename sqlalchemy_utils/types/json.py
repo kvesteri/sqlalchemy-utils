@@ -55,9 +55,10 @@ class JSONType(sa.types.TypeDecorator):
         session.commit()
     """
     impl = sa.UnicodeText
+    json = json
 
     def __init__(self, *args, **kwargs):
-        if json is None:
+        if self.json is None:
             raise ImproperlyConfigured(
                 'JSONType needs anyjson package installed.'
             )
@@ -77,12 +78,12 @@ class JSONType(sa.types.TypeDecorator):
         if dialect.name == 'postgresql' and has_postgres_json:
             return value
         if value is not None:
-            value = six.text_type(json.dumps(value))
+            value = six.text_type(self.json.dumps(value))
         return value
 
     def process_result_value(self, value, dialect):
         if dialect.name == 'postgresql':
             return value
         if value is not None:
-            value = json.loads(value)
+            value = self.json.loads(value)
         return value
