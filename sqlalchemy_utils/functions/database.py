@@ -1,6 +1,11 @@
 import itertools
 import os
-from collections.abc import Mapping, Sequence
+
+try:
+    from collections.abc import Mapping, Sequence
+except ImportError:
+    from collections import Mapping, Sequence
+
 from copy import copy
 
 import sqlalchemy as sa
@@ -420,7 +425,7 @@ def is_auto_assigned_date_column(column):
     )
 
 
-def _set_url_database(url: sa.engine.url.URL, database):
+def _set_url_database(url, database):
     """Set the database of an engine URL.
 
     :param url: A SQLAlchemy engine URL.

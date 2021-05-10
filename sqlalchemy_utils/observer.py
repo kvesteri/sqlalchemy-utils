@@ -174,7 +174,11 @@ in the decorator.
 """
 import itertools
 from collections import defaultdict, namedtuple
-from collections.abc import Iterable
+
+try:
+    from collections.abc import Iterable
+except ImportError:
+    from collections import Iterable
 
 import sqlalchemy as sa
 
