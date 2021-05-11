@@ -26,9 +26,11 @@ class UUIDType(types.TypeDecorator, ScalarCoercible):
     """
     impl = types.BINARY(16)
 
+    cache_ok = True
+
     python_type = uuid.UUID
 
-    def __init__(self, binary=True, native=True, **kwargs):
+    def __init__(self, binary=True, native=True):
         """
         :param binary: Whether to use a BINARY(16) or CHAR(32) fallback.
         """
