@@ -8,6 +8,8 @@ class BitType(sa.types.TypeDecorator):
     """
     impl = sa.types.BINARY
 
+    cache_ok = True
+
     def __init__(self, length=1, **kwargs):
         self.length = length
         sa.types.TypeDecorator.__init__(self, **kwargs)

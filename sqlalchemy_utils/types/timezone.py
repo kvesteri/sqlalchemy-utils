@@ -5,7 +5,7 @@ from ..exceptions import ImproperlyConfigured
 from .scalar_coercible import ScalarCoercible
 
 
-class TimezoneType(types.TypeDecorator, ScalarCoercible):
+class TimezoneType(ScalarCoercible, types.TypeDecorator):
     """
     TimezoneType provides a way for saving timezones (from either the pytz or
     the dateutil package) objects into database. TimezoneType saves timezone

@@ -55,7 +55,6 @@ def onload_callback(schemes, deprecated):
 
 @pytest.mark.skipif('types.password.passlib is None')
 class TestPasswordType(object):
-
     @pytest.mark.parametrize('dialect_module,impl', [
         (sqlalchemy.dialects.sqlite, sa.dialects.sqlite.BLOB),
         (sqlalchemy.dialects.postgresql, sa.dialects.postgresql.BYTEA),
@@ -255,3 +254,8 @@ class TestPasswordType(object):
         onload = mock.Mock(return_value={})
         PasswordType(onload=onload)
         assert not onload.called
+
+    def test_compilation(self, User, session):
+        query = sa.select([User.password])
+        # the type should be cacheable and not throw exception
+        session.execute(query)

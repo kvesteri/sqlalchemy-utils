@@ -34,3 +34,8 @@ class TestEmailType(object):
 
     def test_custom_length(self, session, User):
         assert User.short_email.type.impl.length == 70
+
+    def test_compilation(self, User, session):
+        query = sa.select([User.email])
+        # the type should be cacheable and not throw exception
+        session.execute(query)

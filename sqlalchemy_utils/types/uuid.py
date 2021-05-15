@@ -8,7 +8,7 @@ from sqlalchemy.dialects import mssql, postgresql
 from .scalar_coercible import ScalarCoercible
 
 
-class UUIDType(types.TypeDecorator, ScalarCoercible):
+class UUIDType(ScalarCoercible, types.TypeDecorator):
     """
     Stores a UUID in the database natively when it can and falls back to
     a BINARY(16) or a CHAR(32) when it can't.
@@ -28,7 +28,7 @@ class UUIDType(types.TypeDecorator, ScalarCoercible):
 
     python_type = uuid.UUID
 
-    def __init__(self, binary=True, native=True, **kwargs):
+    def __init__(self, binary=True, native=True):
         """
         :param binary: Whether to use a BINARY(16) or CHAR(32) fallback.
         """

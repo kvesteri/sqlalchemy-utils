@@ -28,6 +28,7 @@ class EnrichedDateTimeType(types.TypeDecorator, ScalarCoercible):
         session.commit()
     """
     impl = types.DateTime
+    cache_ok = True
 
     def __init__(self, datetime_processor=PendulumDateTime, *args, **kwargs):
         super(EnrichedDateTimeType, self).__init__(*args, **kwargs)

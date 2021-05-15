@@ -36,7 +36,7 @@ class Choice(object):
         )
 
 
-class ChoiceType(types.TypeDecorator, ScalarCoercible):
+class ChoiceType(ScalarCoercible, types.TypeDecorator):
     """
     ChoiceType offers way of having fixed set of choices for given column. It
     could work with a list of tuple (a collection of key-value pairs), or
@@ -144,7 +144,7 @@ class ChoiceType(types.TypeDecorator, ScalarCoercible):
     impl = types.Unicode(255)
 
     def __init__(self, choices, impl=None):
-        self.choices = choices
+        self.choices = tuple(choices)
 
         if (
             Enum is not None and

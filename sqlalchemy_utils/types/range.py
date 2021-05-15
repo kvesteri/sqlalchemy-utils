@@ -262,7 +262,7 @@ for func in funcs:
     )
 
 
-class RangeType(types.TypeDecorator, ScalarCoercible):
+class RangeType(ScalarCoercible, types.TypeDecorator):
     comparator_factory = RangeComparator
 
     def __init__(self, *args, **kwargs):

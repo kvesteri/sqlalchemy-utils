@@ -55,6 +55,7 @@ class JSONType(sa.types.TypeDecorator):
         session.commit()
     """
     impl = sa.UnicodeText
+    cache_ok = True
 
     def __init__(self, *args, **kwargs):
         if json is None:

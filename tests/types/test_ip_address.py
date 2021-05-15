@@ -24,7 +24,6 @@ def init_models(Visitor):
 
 @pytest.mark.skipif('ip_address.ip_address is None')
 class TestIPAddressType(object):
-
     def test_parameter_processing(self, session, Visitor):
         visitor = Visitor(
             ip_address=u'111.111.111.111'
@@ -35,3 +34,8 @@ class TestIPAddressType(object):
 
         visitor = session.query(Visitor).first()
         assert six.text_type(visitor.ip_address) == u'111.111.111.111'
+
+    def test_compilation(self, Visitor, session):
+        query = sa.select([Visitor.ip_address])
+        # the type should be cacheable and not throw exception
+        session.execute(query)

@@ -11,7 +11,7 @@ except ImportError:
     pass
 
 
-class LocaleType(types.TypeDecorator, ScalarCoercible):
+class LocaleType(ScalarCoercible, types.TypeDecorator):
     """
     LocaleType saves Babel_ Locale objects into database. The Locale objects
     are converted to string on the way in and back to object on the way out.

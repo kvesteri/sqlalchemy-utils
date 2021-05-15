@@ -51,6 +51,8 @@ class WeekDaysType(types.TypeDecorator, ScalarCoercible):
 
     impl = BitType(WeekDay.NUM_WEEK_DAYS)
 
+    cache_ok = True
+
     def __init__(self, *args, **kwargs):
         if i18n.babel is None:
             raise ImproperlyConfigured(

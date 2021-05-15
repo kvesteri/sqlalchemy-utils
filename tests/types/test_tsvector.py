@@ -26,8 +26,7 @@ def init_models(User):
 
 
 @pytest.mark.usefixtures('postgresql_dsn')
-class TestTSVector(object):
-
+class TestTSVector:
     def test_generates_table(self, User):
         assert 'search_index' in User.__table__.c
 

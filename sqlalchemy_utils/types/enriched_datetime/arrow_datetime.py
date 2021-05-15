@@ -1,13 +1,9 @@
+from collections.abc import Iterable
 from datetime import datetime
 
 import six
 
 from ...exceptions import ImproperlyConfigured
-
-try:
-    from collections.abc import Iterable
-except ImportError:  # For python 2.7 support
-    from collections import Iterable
 
 arrow = None
 try:

@@ -19,7 +19,8 @@ def User(Base):
         birthday = sa.Column(
             enriched_date_type.EnrichedDateType(
                 date_processor=pendulum_date.PendulumDate
-            ))
+            )
+        )
     return User
 
 
@@ -30,7 +31,6 @@ def init_models(User):
 
 @pytest.mark.skipif('pendulum_date.pendulum is None')
 class TestPendulumDateType(object):
-
     def test_parameter_processing(self, session, User):
         user = User(
             birthday=pendulum_date.pendulum.date(1995, 7, 11)
@@ -66,3 +66,8 @@ class TestPendulumDateType(object):
         clause = User.birthday > '2015-01-01'
         compiled = str(clause.compile(compile_kwargs={"literal_binds": True}))
         assert compiled == "users.birthday > '2015-01-01'"
+
+    def test_compilation(self, User, session):
+        query = sa.select([User.birthday])
+        # the type should be cacheable and not throw exception
+        session.execute(query)

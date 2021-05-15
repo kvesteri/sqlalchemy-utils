@@ -23,7 +23,6 @@ def init_models(User):
 
 @pytest.mark.skipif('url.furl is None')
 class TestURLType(object):
-
     def test_color_parameter_processing(self, session, User):
         user = User(
             website=url.furl(u'www.example.com')
@@ -39,3 +38,8 @@ class TestURLType(object):
         user = User(website=u'www.example.com')
 
         assert isinstance(user.website, url.furl)
+
+    def test_compilation(self, User, session):
+        query = sa.select([User.website])
+        # the type should be cacheable and not throw exception
+        session.execute(query)

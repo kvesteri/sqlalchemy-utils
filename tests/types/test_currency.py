@@ -29,7 +29,6 @@ def init_models(User):
 
 @pytest.mark.skipif('i18n.babel is None')
 class TestCurrencyType(object):
-
     def test_parameter_processing(self, session, User, set_get_locale):
         user = User(
             currency=Currency('USD')
@@ -53,3 +52,8 @@ class TestCurrencyType(object):
         clause = User.currency == 'USD'
         compiled = str(clause.compile(compile_kwargs={'literal_binds': True}))
         assert compiled == '"user".currency = \'USD\''
+
+    def test_compilation(self, User, session):
+        query = sa.select([User.currency])
+        # the type should be cacheable and not throw exception
+        session.execute(query)

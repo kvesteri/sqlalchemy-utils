@@ -6,7 +6,7 @@ from ..primitives import Currency
 from .scalar_coercible import ScalarCoercible
 
 
-class CurrencyType(types.TypeDecorator, ScalarCoercible):
+class CurrencyType(ScalarCoercible, types.TypeDecorator):
     """
     Changes :class:`.Currency` objects to a string representation on the way in
     and changes them back to :class:`.Currency` objects on the way out.

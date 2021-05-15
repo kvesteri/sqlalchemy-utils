@@ -33,6 +33,7 @@ class EmailType(sa.types.TypeDecorator):
     """
     impl = sa.Unicode
     comparator_factory = CaseInsensitiveComparator
+    cache_ok = True
 
     def __init__(self, length=255, *args, **kwargs):
         super(EmailType, self).__init__(length=length, *args, **kwargs)

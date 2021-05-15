@@ -10,7 +10,7 @@ except ImportError:
     pass
 
 
-class URLType(types.TypeDecorator, ScalarCoercible):
+class URLType(ScalarCoercible, types.TypeDecorator):
     """
     URLType stores furl_ objects into database.
 

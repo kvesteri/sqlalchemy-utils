@@ -21,10 +21,8 @@ class TestChoice(object):
 
 
 class TestChoiceType(object):
-
     @pytest.fixture
     def User(self, Base):
-
         class User(Base):
             TYPES = [
                 ('admin', 'Admin'),
@@ -81,6 +79,11 @@ class TestChoiceType(object):
     def test_throws_exception_if_no_choices_given(self):
         with pytest.raises(ImproperlyConfigured):
             ChoiceType([])
+
+    def test_compilation(self, User, session):
+        query = sa.select([User.type])
+        # the type should be cacheable and not throw exception
+        session.execute(query)
 
 
 class TestChoiceTypeWithCustomUnderlyingType(object):

@@ -5,7 +5,7 @@ from ..primitives import Country
 from .scalar_coercible import ScalarCoercible
 
 
-class CountryType(types.TypeDecorator, ScalarCoercible):
+class CountryType(ScalarCoercible, types.TypeDecorator):
     """
     Changes :class:`.Country` objects to a string representation on the way in
     and changes them back to :class:`.Country objects on the way out.

@@ -7,7 +7,7 @@ from ..exceptions import ImproperlyConfigured
 from .scalar_coercible import ScalarCoercible
 
 
-class IPAddressType(types.TypeDecorator, ScalarCoercible):
+class IPAddressType(ScalarCoercible, types.TypeDecorator):
     """
     Changes IPAddress objects to a string representation on the way in and
     changes them back to IPAddress objects on the way out.
