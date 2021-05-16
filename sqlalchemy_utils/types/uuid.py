@@ -39,7 +39,7 @@ class UUIDType(ScalarCoercible, types.TypeDecorator):
         return util.generic_repr(self)
 
     def load_dialect_impl(self, dialect):
-        if dialect.name == 'postgresql' and self.native:
+        if self.native and dialect.name in ('postgresql', 'cockroachdb'):
             # Use the native UUID type.
             return dialect.type_descriptor(postgresql.UUID())
 
@@ -70,7 +70,7 @@ class UUIDType(ScalarCoercible, types.TypeDecorator):
         if not isinstance(value, uuid.UUID):
             value = self._coerce(value)
 
-        if self.native and dialect.name in ('postgresql', 'mssql'):
+        if self.native and dialect.name in ('postgresql', 'mssql', 'cockroachdb'):
             return str(value)
 
         return value.bytes if self.binary else value.hex
@@ -79,7 +79,7 @@ class UUIDType(ScalarCoercible, types.TypeDecorator):
         if value is None:
             return value
 
-        if self.native and dialect.name in ('postgresql', 'mssql'):
+        if self.native and dialect.name in ('postgresql', 'mssql', 'cockroachdb'):
             if isinstance(value, uuid.UUID):
                 # Some drivers convert PostgreSQL's uuid values to
                 # Python's uuid.UUID objects by themselves
