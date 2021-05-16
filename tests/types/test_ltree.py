@@ -39,3 +39,8 @@ class TestLTREE(object):
         clause = Section.path == 'path'
         compiled = str(clause.compile(compile_kwargs={'literal_binds': True}))
         assert compiled == 'section.path = \'path\''
+
+    def test_compilation(self, Section, session):
+        query = sa.select([Section.path])
+        # the type should be cacheable and not throw exception
+        session.execute(query)

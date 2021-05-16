@@ -92,3 +92,8 @@ class TestScalarUnicodeList(object):
 
         user = session.query(User).first()
         assert user.some_list == []
+
+    def test_compilation(self, User, session):
+        query = sa.select([User.some_list])
+        # the type should be cacheable and not throw exception
+        session.execute(query)

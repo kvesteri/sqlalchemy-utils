@@ -28,8 +28,7 @@ def init_models(Visitor):
     pass
 
 
-class TestTimezoneType(object):
-
+class TestTimezoneType:
     def test_parameter_processing(self, session, Visitor):
         visitor = Visitor(
             timezone_dateutil=u'America/Los_Angeles',
@@ -48,6 +47,11 @@ class TestTimezoneType(object):
 
         assert visitor_dateutil is not None
         assert visitor_pytz is not None
+
+    def test_compilation(self, Visitor, session):
+        query = sa.select([Visitor.timezone_pytz])
+        # the type should be cacheable and not throw exception
+        session.execute(query)
 
 
 TIMEZONE_BACKENDS = ['dateutil', 'pytz']

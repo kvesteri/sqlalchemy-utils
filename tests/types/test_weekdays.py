@@ -32,7 +32,6 @@ def set_get_locale():
 @pytest.mark.usefixtures('set_get_locale')
 @pytest.mark.skipif('i18n.babel is None')
 class WeekDaysTypeTestCase(object):
-
     def test_color_parameter_processing(self, session, Schedule):
         schedule = Schedule(
             working_days=b'0001111'
@@ -47,6 +46,11 @@ class WeekDaysTypeTestCase(object):
         schedule = Schedule(working_days=b'1010101')
 
         assert isinstance(schedule.working_days, WeekDays)
+
+    def test_compilation(self, Schedule, session):
+        query = sa.select([Schedule.working_days])
+        # the type should be cacheable and not throw exception
+        session.execute(query)
 
 
 @pytest.mark.usefixtures('sqlite_memory_dsn')

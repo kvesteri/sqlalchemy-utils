@@ -43,3 +43,8 @@ class TestCountryType(object):
         clause = User.country == 'FI'
         compiled = str(clause.compile(compile_kwargs={'literal_binds': True}))
         assert compiled == '"user".country = \'FI\''
+
+    def test_compilation(self, User, session):
+        query = sa.select([User.country])
+        # the type should be cacheable and not throw exception
+        session.execute(query)

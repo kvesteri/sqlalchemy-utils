@@ -76,7 +76,7 @@ class Password(Mutable, object):
         return not (self == value)
 
 
-class PasswordType(types.TypeDecorator, ScalarCoercible):
+class PasswordType(ScalarCoercible, types.TypeDecorator):
     """
     PasswordType hashes passwords as they come into the database and allows
     verifying them using a Pythonic interface. This Pythonic interface

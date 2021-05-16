@@ -27,17 +27,22 @@ class PendulumDateTime(object):
             elif isinstance(value, six.string_types) and value.isdigit():
                 value = pendulum.from_timestamp(int(value))
             elif isinstance(value, datetime):
-                value = pendulum.datetime(value.year,
-                                          value.month, value.day,
-                                          value.hour, value.minute,
-                                          value.second, value.microsecond)
+                value = pendulum.datetime(
+                    value.year,
+                    value.month,
+                    value.day,
+                    value.hour,
+                    value.minute,
+                    value.second,
+                    value.microsecond
+                )
             else:
                 value = pendulum.parse(value)
         return value
 
     def process_bind_param(self, impl, value, dialect):
         if value:
-            return self._coerce(impl, value).in_tz("UTC")
+            return self._coerce(impl, value).in_tz('UTC')
         return value
 
     def process_result_value(self, impl, value, dialect):

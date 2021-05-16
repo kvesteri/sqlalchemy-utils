@@ -40,7 +40,7 @@ class InvalidCiphertextError(Exception):
     pass
 
 
-class EncryptionDecryptionBaseEngine(object):
+class EncryptionDecryptionBaseEngine:
     """A base encryption and decryption engine.
 
     This class must be sub-classed in order to create
@@ -347,11 +347,17 @@ class StringEncryptedType(TypeDecorator, ScalarCoercible):
                 sa.Unicode, get_key))
 
     """
-
     impl = String
+    cache_ok = True
 
-    def __init__(self, type_in=None, key=None,
-                 engine=None, padding=None, **kwargs):
+    def __init__(
+        self,
+        type_in=None,
+        key=None,
+        engine=None,
+        padding=None,
+        **kwargs
+    ):
         """Initialization."""
         if not cryptography:
             raise ImproperlyConfigured(

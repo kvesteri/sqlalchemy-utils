@@ -60,3 +60,8 @@ class TestColorType(object):
         clause = Document.bg_color == 'white'
         compiled = str(clause.compile(compile_kwargs={'literal_binds': True}))
         assert compiled == "document.bg_color = 'white'"
+
+    def test_compilation(self, Document, session):
+        query = sa.select([Document.bg_color])
+        # the type should be cacheable and not throw exception
+        session.execute(query)

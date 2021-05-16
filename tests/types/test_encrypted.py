@@ -338,7 +338,6 @@ class EncryptedTypeTestCase(object):
 
 
 class AesEncryptedTypeTestCase(EncryptedTypeTestCase):
-
     @pytest.fixture
     def encryption_engine(self):
         return AesEngine
@@ -352,28 +351,24 @@ class AesEncryptedTypeTestCase(EncryptedTypeTestCase):
 
 
 class TestAesEncryptedTypeWithPKCS5Padding(AesEncryptedTypeTestCase):
-
     @pytest.fixture
     def padding_mechanism(self):
         return 'pkcs5'
 
 
 class TestAesEncryptedTypeWithOneAndZeroesPadding(AesEncryptedTypeTestCase):
-
     @pytest.fixture
     def padding_mechanism(self):
         return 'oneandzeroes'
 
 
 class TestAesEncryptedTypeWithZeroesPadding(AesEncryptedTypeTestCase):
-
     @pytest.fixture
     def padding_mechanism(self):
         return 'zeroes'
 
 
 class TestAesEncryptedTypeTestcaseWithNaivePadding(AesEncryptedTypeTestCase):
-
     @pytest.fixture
     def padding_mechanism(self):
         return 'naive'
@@ -390,7 +385,6 @@ class TestAesEncryptedTypeTestcaseWithNaivePadding(AesEncryptedTypeTestCase):
 
 
 class TestFernetEncryptedTypeTestCase(EncryptedTypeTestCase):
-
     @pytest.fixture
     def encryption_engine(self):
         return FernetEngine
@@ -400,8 +394,7 @@ class TestFernetEncryptedTypeTestCase(EncryptedTypeTestCase):
         return None
 
 
-class TestDatetimeHandler(object):
-
+class TestDatetimeHandler:
     def test_datetime_with_micro_and_timezone(
         self, datetime_with_micro_and_timezone
     ):
@@ -533,7 +526,6 @@ class TestAesGcmEngine(object):
 
 
 class TestAesGcmEncryptedType(EncryptedTypeTestCase):
-
     @pytest.fixture
     def encryption_engine(self):
         return AesGcmEngine

@@ -23,7 +23,6 @@ def init_models(User):
 
 
 class TestUUIDType(object):
-
     def test_repr(self):
         plain = UUIDType()
         assert repr(plain) == 'UUIDType()'
@@ -56,3 +55,8 @@ class TestUUIDType(object):
 
         assert isinstance(obj.id, uuid.UUID)
         assert obj.id.bytes == identifier
+
+    def test_compilation(self, User, session):
+        query = sa.select([User.id])
+        # the type should be cacheable and not throw exception
+        session.execute(query)

@@ -140,7 +140,7 @@ class PhoneNumber(BasePhoneNumber):
         return hash(self.e164)
 
 
-class PhoneNumberType(types.TypeDecorator, ScalarCoercible):
+class PhoneNumberType(ScalarCoercible, types.TypeDecorator):
     """
     Changes PhoneNumber objects to a string representation on the way in and
     changes them back to PhoneNumber objects on the way out. If E164 is used

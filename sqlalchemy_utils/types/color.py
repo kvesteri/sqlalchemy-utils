@@ -12,7 +12,7 @@ except ImportError:
     python_colour_type = None
 
 
-class ColorType(types.TypeDecorator, ScalarCoercible):
+class ColorType(ScalarCoercible, types.TypeDecorator):
     """
     ColorType provides a way for saving Color (from colour_ package) objects
     into database. ColorType saves Color objects as strings on the way in and
@@ -49,7 +49,7 @@ class ColorType(types.TypeDecorator, ScalarCoercible):
 
     .. _colour: https://github.com/vaab/colour
     """
-    STORE_FORMAT = u'hex'
+    STORE_FORMAT = 'hex'
     impl = types.Unicode(20)
     python_type = python_colour_type
 

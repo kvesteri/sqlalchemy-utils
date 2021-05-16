@@ -1,20 +1,13 @@
+from ipaddress import ip_address
+
 import six
 from sqlalchemy import types
 
 from ..exceptions import ImproperlyConfigured
 from .scalar_coercible import ScalarCoercible
 
-ip_address = None
-try:
-    from ipaddress import ip_address
-except ImportError:
-    try:
-        from ipaddr import IPAddress as ip_address
-    except ImportError:
-        pass
 
-
-class IPAddressType(types.TypeDecorator, ScalarCoercible):
+class IPAddressType(ScalarCoercible, types.TypeDecorator):
     """
     Changes IPAddress objects to a string representation on the way in and
     changes them back to IPAddress objects on the way out.

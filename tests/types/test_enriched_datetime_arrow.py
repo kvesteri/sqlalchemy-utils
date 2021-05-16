@@ -35,7 +35,6 @@ def init_models(Article):
 
 @pytest.mark.skipif('arrow_datetime.arrow is None')
 class TestArrowDateTimeType(object):
-
     def test_parameter_processing(self, session, Article):
         article = Article(
             created_at=arrow_datetime.arrow.get(datetime(2000, 11, 1))
@@ -89,3 +88,8 @@ class TestArrowDateTimeType(object):
         item = session.query(Article).one()
         assert item.published_at.datetime == item.published_at_dt
         assert item.published_at.to(timezone) == dt
+
+    def test_compilation(self, Article, session):
+        query = sa.select([Article.published_at])
+        # the type should be cacheable and not throw exception
+        session.execute(query)

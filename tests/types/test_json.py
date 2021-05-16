@@ -20,7 +20,6 @@ def init_models(Document):
 
 
 class JSONTestCase(object):
-
     def test_list(self, session, Document):
         document = Document(
             json=[1, 2, 3]
@@ -53,6 +52,11 @@ class JSONTestCase(object):
 
         document = session.query(Document).first()
         assert document.json == {'something': u'äääööö'}
+
+    def test_compilation(self, Document, session):
+        query = sa.select([Document.json])
+        # the type should be cacheable and not throw exception
+        session.execute(query)
 
 
 @pytest.mark.skipif('json.json is None')

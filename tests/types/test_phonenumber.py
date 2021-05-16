@@ -54,8 +54,7 @@ def user(session, User, phone_number):
 
 
 @pytest.mark.skipif('types.phone_number.phonenumbers is None')
-class TestPhoneNumber(object):
-
+class TestPhoneNumber:
     @pytest.mark.parametrize('raw_number', VALID_PHONE_NUMBERS)
     def test_valid_phone_numbers(self, raw_number):
         number = PhoneNumber(raw_number, 'FI')
@@ -119,8 +118,7 @@ class TestPhoneNumber(object):
 
 
 @pytest.mark.skipif('types.phone_number.phonenumbers is None')
-class TestPhoneNumberType(object):
-
+class TestPhoneNumberType:
     def test_query_returns_phone_number_object(
         self,
         session,
@@ -178,9 +176,14 @@ class TestPhoneNumberType(object):
 
         assert isinstance(user.phone_number, PhoneNumber)
 
+    def test_compilation(self, User, session):
+        query = sa.select([User.phone_number])
+        # the type should be cacheable and not throw exception
+        session.execute(query)
+
 
 @pytest.mark.skipif('types.phone_number.phonenumbers is None')
-class TestPhoneNumberComposite(object):
+class TestPhoneNumberComposite:
     @pytest.fixture
     def User(self, Base):
         class User(Base):
