@@ -173,7 +173,7 @@ class Ltree(object):
         parts = self.path.split('.')
         for index, element in enumerate(parts):
             if any((
-                other[index] != element or len(other) <= index + 1
+                other[index] != element or len(other) <= index + 1 or len(parts) == index + 1
                 for other in other_parts
             )):
                 if index == 0:
