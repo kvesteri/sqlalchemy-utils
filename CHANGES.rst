@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.37.4 (2021-05-21)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed incorrect Ltree.lca behaviour (#468, pull request courtesy of slymit)
+
+
 0.37.3 (2021-05-16)
 ^^^^^^^^^^^^^^^^^^^
 
