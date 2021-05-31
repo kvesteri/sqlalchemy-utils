@@ -15,6 +15,16 @@ def Article(Base):
         id = sa.Column(sa.Integer, primary_key=True)
         name = sa.Column(sa.Unicode(255), default='Some article')
         created_at = sa.Column(sa.DateTime, default=datetime.now)
+        _byline = sa.Column(sa.Unicode(255), default='Default byline')
+
+        @property
+        def byline(self):
+            return self._byline
+
+        @byline.setter
+        def byline(self, value):
+            self._byline = value
+
     return Article
 
 
@@ -26,3 +36,7 @@ class TestInstantDefaultListener:
     def test_callables_as_defaults(self, Article):
         article = Article()
         assert isinstance(article.created_at, datetime)
+
+    def test_override_default_with_setter_function(self, Article):
+        article = Article(byline='provided byline')
+        assert article.byline == 'provided byline'
