@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.37.5 (2021-05-31)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed instant_defaults_listener to respect constructor supplied kwargs (#516, pull request courtesy of soundstripe)
+
+
 0.37.4 (2021-05-21)
 ^^^^^^^^^^^^^^^^^^^
 
