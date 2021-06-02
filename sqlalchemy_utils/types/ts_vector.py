@@ -82,6 +82,7 @@ class TSVectorType(sa.types.TypeDecorator):
 
     """
     impl = TSVECTOR
+    cache_ok = True
 
     class comparator_factory(TSVECTOR.Comparator):
         def match(self, other, **kwargs):

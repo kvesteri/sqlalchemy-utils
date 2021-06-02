@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.37.6 (2021-06-02)
+^^^^^^^^^^^^^^^^^^^
+
+- Added `cache_ok=True` for TSVectorType
+
+
 0.37.5 (2021-05-31)
 ^^^^^^^^^^^^^^^^^^^
 
