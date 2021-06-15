@@ -2,6 +2,7 @@ import uuid
 
 import pytest
 import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
 
 from sqlalchemy_utils import UUIDType
 
@@ -60,3 +61,12 @@ class TestUUIDType(object):
         query = sa.select([User.id])
         # the type should be cacheable and not throw exception
         session.execute(query)
+
+    def test_literal_bind(self, User):
+        expr = (User.id == 'b4e794d6-5750-4844-958c-fa382649719d').compile(
+            dialect=postgresql.dialect(),
+            compile_kwargs={'literal_binds': True}
+        )
+        assert str(expr) == (
+            '''"user".id = \'b4e794d6-5750-4844-958c-fa382649719d\''''
+        )

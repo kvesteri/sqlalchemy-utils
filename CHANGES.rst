@@ -8,6 +8,7 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 ^^^^^^^^^^^^^^^^^^^
 
 - Added identifier quoting for view functions and constructs
+- Added literal processor for UUIDType
 
 
 0.37.6 (2021-06-02)

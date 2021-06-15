@@ -63,6 +63,9 @@ class UUIDType(ScalarCoercible, types.TypeDecorator):
 
         return value
 
+    def process_literal_param(self, value, dialect):
+        return "'{}'".format(value) if value else value
+
     def process_bind_param(self, value, dialect):
         if value is None:
             return value
