@@ -32,7 +32,7 @@ def User(Base):
 def ArticleMV(Base, Article, User):
     class ArticleMV(Base):
         __table__ = create_materialized_view(
-            name='article_mv',
+            name='article-mv',
             selectable=sa.select(
                 [
                     Article.id,
@@ -47,7 +47,7 @@ def ArticleMV(Base, Article, User):
             ),
             aliases={'name': 'article_name'},
             metadata=Base.metadata,
-            indexes=[sa.Index('article_mv_id_idx', 'id')]
+            indexes=[sa.Index('article-mv_id_idx', 'id')]
         )
     return ArticleMV
 
@@ -56,7 +56,7 @@ def ArticleMV(Base, Article, User):
 def ArticleView(Base, Article, User):
     class ArticleView(Base):
         __table__ = create_view(
-            name='article_view',
+            name='article-view',
             selectable=sa.select(
                 [
                     Article.id,
@@ -94,7 +94,7 @@ class TestMaterializedViews:
         )
         session.add(article)
         session.commit()
-        refresh_materialized_view(session, 'article_mv')
+        refresh_materialized_view(session, 'article-mv')
         materialized = session.query(ArticleMV).first()
         assert materialized.article_name == 'Some article'
         assert materialized.author_name == 'Some user'

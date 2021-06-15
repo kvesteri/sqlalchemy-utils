@@ -16,7 +16,7 @@ class CreateView(DDLElement):
 def compile_create_materialized_view(element, compiler, **kw):
     return 'CREATE {}VIEW {} AS {}'.format(
         'MATERIALIZED ' if element.materialized else '',
-        element.name,
+        compiler.dialect.identifier_preparer.quote(element.name),
         compiler.sql_compiler.process(element.selectable, literal_binds=True),
     )
 
@@ -32,7 +32,7 @@ class DropView(DDLElement):
 def compile_drop_materialized_view(element, compiler, **kw):
     return 'DROP {}VIEW IF EXISTS {} {}'.format(
         'MATERIALIZED ' if element.materialized else '',
-        element.name,
+        compiler.dialect.identifier_preparer.quote(element.name),
         'CASCADE' if element.cascade else ''
     )
 
@@ -190,6 +190,6 @@ def refresh_materialized_view(session, name, concurrently=False):
     session.execute(
         'REFRESH MATERIALIZED VIEW {}{}'.format(
             'CONCURRENTLY ' if concurrently else '',
-            name
+            session.bind.engine.dialect.identifier_preparer.quote(name)
         )
     )

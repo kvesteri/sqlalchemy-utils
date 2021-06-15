@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.37.7 (2021-06-15)
+^^^^^^^^^^^^^^^^^^^
+
+- Added identifier quoting for view functions and constructs
+
+
 0.37.6 (2021-06-02)
 ^^^^^^^^^^^^^^^^^^^
 
