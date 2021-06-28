@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.37.8 (2021-06-28)
+^^^^^^^^^^^^^^^^^^^
+
+- Added 'zoneinfo' backend to TimezoneType (#510, pull request courtesy of huonw)
+
+
 0.37.7 (2021-06-15)
 ^^^^^^^^^^^^^^^^^^^
 
