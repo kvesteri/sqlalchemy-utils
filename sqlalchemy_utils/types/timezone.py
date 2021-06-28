@@ -7,11 +7,9 @@ from .scalar_coercible import ScalarCoercible
 
 class TimezoneType(ScalarCoercible, types.TypeDecorator):
     """
-    TimezoneType provides a way for saving timezones (from either the pytz or
-    the dateutil package) objects into database. TimezoneType saves timezone
-    objects as strings on the way in and converts them back to objects when
-    querying the database.
-
+    TimezoneType provides a way for saving timezones objects into database.
+    TimezoneType saves timezone objects as strings on the way in and converts
+    them back to objects when querying the database.
 
     ::
 
@@ -20,9 +18,15 @@ class TimezoneType(ScalarCoercible, types.TypeDecorator):
         class User(Base):
             __tablename__ = 'user'
 
-            # Pass backend='pytz' to change it to use pytz (dateutil by
-            # default)
+            # Pass backend='pytz' to change it to use pytz. Other values:
+            # 'dateutil' (default), and 'zoneinfo'.
             timezone = sa.Column(TimezoneType(backend='pytz'))
+
+    :param backend: Whether to use 'dateutil', 'pytz' or 'zoneinfo' for
+        timezones. 'zoneinfo' uses the standard library module in Python 3.9+,
+        but requires the external 'backports.zoneinfo' package for older
+        Python versions.
+
     """
 
     impl = types.Unicode(50)
@@ -30,10 +34,6 @@ class TimezoneType(ScalarCoercible, types.TypeDecorator):
     python_type = None
 
     def __init__(self, backend='dateutil'):
-        """
-        :param backend: Whether to use 'dateutil' or 'pytz' for timezones.
-        """
-
         self.backend = backend
         if backend == 'dateutil':
             try:
@@ -65,10 +65,27 @@ class TimezoneType(ScalarCoercible, types.TypeDecorator):
                     "for 'TimezoneType'"
                 )
 
+        elif backend == "zoneinfo":
+            try:
+                import zoneinfo
+            except ImportError:
+                try:
+                    from backports import zoneinfo
+                except ImportError:
+                    raise ImproperlyConfigured(
+                        "'backports.zoneinfo' is required to use "
+                        "the 'zoneinfo' backend for 'TimezoneType'"
+                        "on Python version < 3.9"
+                    )
+
+            self.python_type = zoneinfo.ZoneInfo
+            self._to = zoneinfo.ZoneInfo
+            self._from = six.text_type
+
         else:
             raise ImproperlyConfigured(
-                "'pytz' or 'dateutil' are the backends supported for "
-                "'TimezoneType'"
+                "'pytz', 'dateutil' or 'zoneinfo' are the backends "
+                "supported for 'TimezoneType'"
             )
 
     def _coerce(self, value):

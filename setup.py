@@ -33,6 +33,7 @@ extras_require = {
         'pg8000>=1.12.4',
         'pytz>=2014.2',
         'python-dateutil>=2.6',
+        'backports.zoneinfo;python_version<"3.9"',
         'pymysql',
         'flake8>=2.4.0',
         'isort>=4.2.2',
