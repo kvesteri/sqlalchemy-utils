@@ -75,7 +75,7 @@ class LtreeType(types.Concatenable, types.UserDefinedType, ScalarCoercible):
 
     def literal_processor(self, dialect):
         def process(value):
-            value = value.replace("'", "''")
+            value = value.path.replace("'", "''")
             return "'%s'" % value
         return process
 
