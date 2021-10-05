@@ -11,10 +11,10 @@ class Padding(object):
     def __init__(self, block_size):
         self.block_size = block_size
 
-    def pad(value):
+    def pad(self, value):
         raise NotImplementedError('Subclasses must implement this!')
 
-    def unpad(value):
+    def unpad(self, value):
         raise NotImplementedError('Subclasses must implement this!')
 
 
