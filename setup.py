@@ -39,7 +39,6 @@ extras_require = {
         'isort>=4.2.2',
         'pyodbc',
     ],
-    'anyjson': ['anyjson>=0.3.3'],
     'babel': ['Babel>=1.3'],
     'arrow': ['arrow>=0.3.4'],
     'pendulum': ['pendulum>=2.0.5'],
