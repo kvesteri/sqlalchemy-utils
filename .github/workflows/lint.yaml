@@ -2,7 +2,7 @@ name: Python linting
 on: [push, pull_request]
 jobs:
   test:
-    name: Test
+    name: Lint
     runs-on: ubuntu-latest
     strategy:
       matrix:

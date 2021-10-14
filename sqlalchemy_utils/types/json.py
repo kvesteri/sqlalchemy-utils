@@ -1,16 +1,10 @@
 from __future__ import absolute_import
 
+import json
+
 import six
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql.base import ischema_names
-
-from ..exceptions import ImproperlyConfigured
-
-json = None
-try:
-    import anyjson as json
-except ImportError:
-    import json as json
 
 try:
     from sqlalchemy.dialects.postgresql import JSON
@@ -58,10 +52,6 @@ class JSONType(sa.types.TypeDecorator):
     cache_ok = True
 
     def __init__(self, *args, **kwargs):
-        if json is None:
-            raise ImproperlyConfigured(
-                'JSONType needs anyjson package installed.'
-            )
         super(JSONType, self).__init__(*args, **kwargs)
 
     def load_dialect_impl(self, dialect):
