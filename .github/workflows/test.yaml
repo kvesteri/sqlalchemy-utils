@@ -66,3 +66,5 @@ jobs:
         env:
           SQLALCHEMY_UTILS_TEST_POSTGRESQL_PASSWORD: postgres
         run: tox -e ${{matrix.tox_env }}
+      - name: Upload code coverage reports
+        uses: codecov/codecov-action@v2
