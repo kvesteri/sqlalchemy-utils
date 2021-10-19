@@ -42,7 +42,8 @@ def create_table_from_selectable(
     selectable,
     indexes=None,
     metadata=None,
-    aliases=None
+    aliases=None,
+    **kwargs
 ):
     if indexes is None:
         indexes = []
@@ -59,7 +60,7 @@ def create_table_from_selectable(
         )
         for c in get_columns(selectable)
     ] + indexes
-    table = sa.Table(name, metadata, *args)
+    table = sa.Table(name, metadata, *args, **kwargs)
 
     if not any([c.primary_key for c in get_columns(selectable)]):
         table.append_constraint(
