@@ -1,5 +1,3 @@
-import inspect
-
 import six
 import sqlalchemy as sa
 from sqlalchemy.ext.compiler import compiles
@@ -27,21 +25,6 @@ def get_locale():
         )
 
 
-if six.PY2:
-    def get_args_count(func):
-        if (
-            callable(func) and
-            not inspect.isfunction(func) and
-            not inspect.ismethod(func)
-        ):
-            func = func.__call__
-        args = inspect.getargspec(func).args
-        return len(args) - 1 if inspect.ismethod(func) else len(args)
-else:
-    def get_args_count(func):
-        return len(inspect.signature(func).parameters)
-
-
 def cast_locale(obj, locale, attr):
     """
     Cast given locale to string. Supports also callbacks that return locales.
@@ -52,13 +35,13 @@ def cast_locale(obj, locale, attr):
         Locale object or string or callable that returns a locale.
     """
     if callable(locale):
-        args_count = get_args_count(locale)
-        if args_count == 0:
-            locale = locale()
-        elif args_count == 1:
-            locale = locale(obj)
-        elif args_count == 2:
+        try:
             locale = locale(obj, attr.key)
+        except TypeError:
+            try:
+                locale = locale(obj)
+            except TypeError:
+                locale = locale()
     if isinstance(locale, babel.Locale):
         return str(locale)
     return locale
