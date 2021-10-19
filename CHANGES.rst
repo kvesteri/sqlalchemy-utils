@@ -4,6 +4,14 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.37.9 (2021-10-19)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed base padding class abstract methods (#547, pull request courtesy of dpgaspar)
+- Optimized cast_locale function (#552, pull request courtesy of tvuotila)
+- Allow for arbitrary Table keyword arguments in create_table_from_selectable (#551, pull request courtesy of quoimec)
+
+
 0.37.8 (2021-06-28)
 ^^^^^^^^^^^^^^^^^^^
 
