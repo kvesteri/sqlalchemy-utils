@@ -42,7 +42,7 @@ def init_models(Booking):
 
 
 @pytest.mark.skipif('intervals is None')
-class DateRangeTestCase:
+class TestDateRange:
     def test_nullify_range(self, create_booking):
         booking = create_booking(None)
         assert booking.during is None
