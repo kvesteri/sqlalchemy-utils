@@ -1,6 +1,5 @@
 from enum import Enum
 
-import six
 from sqlalchemy import types
 
 from ..exceptions import ImproperlyConfigured
@@ -23,11 +22,8 @@ class Choice(object):
     def __ne__(self, other):
         return not (self == other)
 
-    def __unicode__(self):
-        return six.text_type(self.value)
-
     def __str__(self):
-        return six.ensure_str(self.__unicode__())
+        return str(self.value)
 
     def __repr__(self):
         return 'Choice(code={code}, value={value})'.format(
