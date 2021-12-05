@@ -140,7 +140,7 @@ class ChoiceType(ScalarCoercible, types.TypeDecorator):
     impl = types.Unicode(255)
 
     def __init__(self, choices, impl=None):
-        self.choices = tuple(choices)
+        self.choices = tuple(choices) if isinstance(choices, list) else choices
 
         if (
             Enum is not None and
