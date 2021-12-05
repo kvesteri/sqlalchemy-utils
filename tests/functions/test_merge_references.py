@@ -192,3 +192,61 @@ class TestMergeReferencesWithManyToManyAssociationObjects(object):
         users = [member.user for member in team.members]
         assert john not in users
         assert jack in users
+
+
+class TestMergeReferencesWithMappedProperties(object):
+
+    @pytest.fixture
+    def User(self, Base):
+        class User(Base):
+            __tablename__ = 'user'
+            id_ = sa.Column("id", sa.Integer, primary_key=True)
+            name = sa.Column(sa.Unicode(255))
+
+            def __repr__(self):
+                return 'User(%r)' % self.name
+        return User
+
+    @pytest.fixture
+    def Team(self, Base):
+        team_member = sa.Table(
+            'team_member', Base.metadata,
+            sa.Column(
+                'user_id', sa.Integer,
+                sa.ForeignKey('user.id', ondelete='CASCADE'),
+                primary_key=True
+            ),
+            sa.Column(
+                'team_id', sa.Integer,
+                sa.ForeignKey('team.id', ondelete='CASCADE'),
+                primary_key=True
+            )
+        )
+
+        class Team(Base):
+            __tablename__ = 'team'
+            id = sa.Column(sa.Integer, primary_key=True)
+            name = sa.Column(sa.Unicode(255))
+
+            members = sa.orm.relationship(
+                'User',
+                secondary=team_member,
+                backref='teams'
+            )
+        return Team
+
+    @pytest.fixture
+    def init_models(self, User, Team):
+        pass
+
+    def test_supports_associations(self, session, User, Team):
+        john = User(name=u'John')
+        jack = User(name=u'Jack')
+        team = Team(name=u'Team')
+        team.members.append(john)
+        session.add(john)
+        session.add(jack)
+        session.commit()
+        merge_references(john, jack)
+        assert john not in team.members
+        assert jack in team.members
