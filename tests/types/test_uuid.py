@@ -59,6 +59,7 @@ class TestUUIDType(object):
 
     def test_compilation(self, User, session):
         query = sa.select([User.id])
+
         # the type should be cacheable and not throw exception
         session.execute(query)
 

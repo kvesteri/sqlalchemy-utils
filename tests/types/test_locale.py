@@ -59,3 +59,9 @@ class TestLocaleType(object):
         clause = User.locale == 'en_US'
         compiled = str(clause.compile(compile_kwargs={'literal_binds': True}))
         assert compiled == '"user".locale = \'en_US\''
+
+    def test_compilation(self, User, session):
+        query = sa.select([User.locale])
+
+        # the type should be cacheable and not throw exception
+        session.execute(query)
