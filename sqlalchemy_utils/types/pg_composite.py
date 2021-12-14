@@ -193,12 +193,12 @@ class CompositeType(UserDefinedType, SchemaType):
 
             return CompositeElement(self.expr, key, type_)
 
-    def __init__(self, name, columns):
+    def __init__(self, name, columns, schema=None):
         if psycopg2 is None:
             raise ImproperlyConfigured(
                 "'psycopg2' package is required in order to use CompositeType."
             )
-        SchemaType.__init__(self)
+        SchemaType.__init__(self, schema=schema)
         self.name = name
         self.columns = columns
         if name in registered_composites:
@@ -217,7 +217,7 @@ class CompositeType(UserDefinedType, SchemaType):
         attach_composite_listeners()
 
     def get_col_spec(self):
-        return self.name
+        return f'{self.schema}.{self.name}' if self.schema else self.name
 
     def bind_processor(self, dialect):
         def process(value):
@@ -238,6 +238,11 @@ class CompositeType(UserDefinedType, SchemaType):
                             current_value, dialect
                         )
                     )
+                elif isinstance(column.type, CompositeType) or isinstance(column.type, CompositeArray):
+                    type_proc = column.type.dialect_impl(dialect).bind_processor(
+                        dialect
+                    )
+                    processed_value.append(type_proc(current_value))
                 else:
                     processed_value.append(current_value)
             return self.type_cls(*processed_value)
@@ -276,7 +281,7 @@ class CompositeType(UserDefinedType, SchemaType):
 
 def register_psycopg2_composite(dbapi_connection, composite):
     psycopg2.extras.register_composite(
-        composite.name,
+        composite.get_col_spec(),
         dbapi_connection,
         globally=True,
         factory=composite.caster
@@ -304,7 +309,7 @@ def register_psycopg2_composite(dbapi_connection, composite):
             else value.getquoted()
             for value in adapted
         ]
-        return AsIs("(%s)::%s" % (', '.join(values), composite.name))
+        return AsIs("(%s)::%s" % (', '.join(values), composite.get_col_spec()))
 
     register_adapter(composite.type_cls, adapt_composite)
 
