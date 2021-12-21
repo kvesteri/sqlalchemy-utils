@@ -165,6 +165,7 @@ class PhoneNumberType(ScalarCoercible, types.TypeDecorator):
     STORE_FORMAT = 'e164'
     impl = types.Unicode(20)
     python_type = PhoneNumber
+    cache_ok = True
 
     def __init__(self, region='US', max_length=20, *args, **kwargs):
         # Bail if phonenumbers is not found.

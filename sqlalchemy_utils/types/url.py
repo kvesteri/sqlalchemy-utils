@@ -40,6 +40,7 @@ class URLType(ScalarCoercible, types.TypeDecorator):
     """
 
     impl = types.UnicodeText
+    cache_ok = True
 
     def process_bind_param(self, value, dialect):
         if furl is not None and isinstance(value, furl):

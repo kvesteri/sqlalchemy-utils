@@ -139,6 +139,8 @@ class ChoiceType(ScalarCoercible, types.TypeDecorator):
 
     impl = types.Unicode(255)
 
+    cache_ok = True
+
     def __init__(self, choices, impl=None):
         self.choices = tuple(choices) if isinstance(choices, list) else choices
 

@@ -39,6 +39,7 @@ class LtreeType(types.Concatenable, types.UserDefinedType, ScalarCoercible):
         may require installation of Postgresql ltree extension on the server
         side. Please visit http://www.postgres.org for details.
     """
+    cache_ok = True
 
     class comparator_factory(types.Concatenable.Comparator):
         def ancestor_of(self, other):

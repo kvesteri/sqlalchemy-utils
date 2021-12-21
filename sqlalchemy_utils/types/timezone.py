@@ -30,8 +30,8 @@ class TimezoneType(ScalarCoercible, types.TypeDecorator):
     """
 
     impl = types.Unicode(50)
-
     python_type = None
+    cache_ok = True
 
     def __init__(self, backend='dateutil'):
         self.backend = backend

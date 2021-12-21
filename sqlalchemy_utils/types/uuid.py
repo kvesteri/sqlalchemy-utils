@@ -32,6 +32,8 @@ class UUIDType(ScalarCoercible, types.TypeDecorator):
 
     python_type = uuid.UUID
 
+    cache_ok = True
+
     def __init__(self, binary=True, native=True):
         """
         :param binary: Whether to use a BINARY(16) or CHAR(32) fallback.

@@ -46,6 +46,7 @@ class CountryType(ScalarCoercible, types.TypeDecorator):
     """
     impl = types.String(2)
     python_type = Country
+    cache_ok = True
 
     def process_bind_param(self, value, dialect):
         if isinstance(value, Country):

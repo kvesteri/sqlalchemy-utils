@@ -52,6 +52,8 @@ class LocaleType(ScalarCoercible, types.TypeDecorator):
 
     impl = types.Unicode(10)
 
+    cache_ok = True
+
     def __init__(self):
         if babel is None:
             raise ImproperlyConfigured(

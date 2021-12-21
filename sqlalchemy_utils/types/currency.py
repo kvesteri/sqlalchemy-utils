@@ -49,6 +49,7 @@ class CurrencyType(ScalarCoercible, types.TypeDecorator):
     """
     impl = types.String(3)
     python_type = Currency
+    cache_ok = True
 
     def __init__(self, *args, **kwargs):
         if i18n.babel is None:

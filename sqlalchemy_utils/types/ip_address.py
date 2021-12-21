@@ -40,6 +40,7 @@ class IPAddressType(ScalarCoercible, types.TypeDecorator):
     """
 
     impl = types.Unicode(50)
+    cache_ok = True
 
     def __init__(self, max_length=50, *args, **kwargs):
         if not ip_address:

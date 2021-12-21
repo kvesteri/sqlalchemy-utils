@@ -355,6 +355,7 @@ class IntRangeType(RangeType):
     """
     impl = INT4RANGE
     comparator_factory = IntRangeComparator
+    cache_ok = True
 
     def __init__(self, *args, **kwargs):
         super(IntRangeType, self).__init__(*args, **kwargs)
@@ -407,6 +408,7 @@ class Int8RangeType(RangeType):
     """
     impl = INT8RANGE
     comparator_factory = IntRangeComparator
+    cache_ok = True
 
     def __init__(self, *args, **kwargs):
         super(Int8RangeType, self).__init__(*args, **kwargs)
@@ -433,6 +435,7 @@ class DateRangeType(RangeType):
     """
     impl = DATERANGE
     comparator_factory = DateRangeComparator
+    cache_ok = True
 
     def __init__(self, *args, **kwargs):
         super(DateRangeType, self).__init__(*args, **kwargs)
@@ -460,6 +463,7 @@ class NumericRangeType(RangeType):
 
     impl = NUMRANGE
     comparator_factory = ContinuousRangeComparator
+    cache_ok = True
 
     def __init__(self, *args, **kwargs):
         super(NumericRangeType, self).__init__(*args, **kwargs)
@@ -469,6 +473,7 @@ class NumericRangeType(RangeType):
 class DateTimeRangeType(RangeType):
     impl = TSRANGE
     comparator_factory = ContinuousRangeComparator
+    cache_ok = True
 
     def __init__(self, *args, **kwargs):
         super(DateTimeRangeType, self).__init__(*args, **kwargs)
