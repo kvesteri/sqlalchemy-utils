@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.38.1 (2021-12-21)
+^^^^^^^^^^^^^^^^^^^
+
+- Added cache_ok=True for various different types
+
+
 0.38.0 (2021-12-21)
 ^^^^^^^^^^^^^^^^^^^
 
