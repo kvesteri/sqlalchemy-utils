@@ -19,7 +19,6 @@ from .locale import LocaleType  # noqa
 from .ltree import LtreeType  # noqa
 from .password import Password, PasswordType  # noqa
 from .pg_composite import (  # noqa
-    CompositeArray,
     CompositeType,
     register_composites,
     remove_composite_listeners

@@ -61,7 +61,6 @@ from .types import (  # noqa
     Choice,
     ChoiceType,
     ColorType,
-    CompositeArray,
     CompositeType,
     CountryType,
     CurrencyType,
@@ -102,4 +101,4 @@ from .view import (  # noqa
     refresh_materialized_view
 )
 
-__version__ = '0.37.10'
+__version__ = '0.38.0'

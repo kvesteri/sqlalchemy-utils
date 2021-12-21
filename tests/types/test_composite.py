@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 import pytest
 import sqlalchemy as sa
+from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import close_all_sessions
 
 from sqlalchemy_utils import (
-    CompositeArray,
     CompositeType,
     Currency,
     CurrencyType,
@@ -182,7 +182,7 @@ class TestCompositeTypeInsideArray(object):
             __tablename__ = 'account'
             id = sa.Column(sa.Integer, primary_key=True)
             balances = sa.Column(
-                CompositeArray(type_)
+                ARRAY(type_, dimensions=1)
             )
 
         return Account
@@ -246,7 +246,7 @@ class TestCompositeTypeWithRangeTypeInsideArray(object):
             __tablename__ = 'account'
             id = sa.Column(sa.Integer, primary_key=True)
             categories = sa.Column(
-                CompositeArray(type_)
+                ARRAY(type_, dimensions=1)
             )
 
         return Account

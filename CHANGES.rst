@@ -4,10 +4,11 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
-0.37.10 (2021-12-05)
-^^^^^^^^^^^^^^^^^^^^
+0.38.0 (2021-12-21)
+^^^^^^^^^^^^^^^^^^^
 
-- Make ChoicesType only convert lists to tuples internally.
+- Removed CompositeArray. Instead of CompositeArray one should use ARRAY(dimensions=1)
+- Made ChoicesType only convert lists to tuples internally.
 
 
 0.37.9 (2021-10-19)
