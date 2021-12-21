@@ -82,21 +82,22 @@ Arrays of composites
 
 ::
 
-    from sqlalchemy_utils import CompositeArray
+    from sqlalchemy.dialects.postgresql import ARRAY
 
 
     class Account(Base):
         __tablename__ = 'account'
         id = sa.Column(sa.Integer, primary_key=True)
         balances = sa.Column(
-            CompositeArray(
+            ARRAY(
                 CompositeType(
                     'money_type',
                     [
                         sa.Column('currency', CurrencyType),
                         sa.Column('amount', sa.Integer)
                     ]
-                )
+                ),
+                dimensions=1
             )
         )
 
@@ -113,7 +114,6 @@ from collections import namedtuple
 
 import six
 import sqlalchemy as sa
-from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.dialects.postgresql.psycopg2 import PGDialect_psycopg2
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.schema import _CreateDropBase
@@ -154,15 +154,6 @@ class CompositeElement(FunctionElement):
 @compiles(CompositeElement)
 def _compile_pgelem(expr, compiler, **kw):
     return '(%s).%s' % (compiler.process(expr.clauses, **kw), expr.name)
-
-
-class CompositeArray(ARRAY):
-    def _proc_array(self, arr, itemproc, dim, collection):
-        if dim is None:
-            if isinstance(self.item_type, CompositeType):
-                arr = [itemproc(a) for a in arr]
-                return arr
-        return ARRAY._proc_array(self, arr, itemproc, dim, collection)
 
 
 # TODO: Make the registration work on connection level instead of global level
