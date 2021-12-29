@@ -48,6 +48,8 @@ def cast_locale(obj, locale, attr):
 
 
 class cast_locale_expr(ColumnElement):
+    inherit_cache = False
+
     def __init__(self, cls, locale, attr):
         self.cls = cls
         self.locale = locale

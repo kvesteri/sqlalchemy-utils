@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.38.2 (2021-12-29)
+^^^^^^^^^^^^^^^^^^^
+
+- Added inherit_cache=False in order to avoid SQLAlchemy warnings in `cast_locale_expr` (#571)
+
+
 0.38.1 (2021-12-21)
 ^^^^^^^^^^^^^^^^^^^
 
