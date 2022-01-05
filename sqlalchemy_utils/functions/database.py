@@ -438,6 +438,7 @@ def _set_url_database(url: sa.engine.url.URL, database):
             query=url.query
         )
     else:  # SQLAlchemy <1.4
+        url = copy(url)
         url.database = database
         ret = url
     assert ret.database == database, ret
@@ -480,7 +481,7 @@ def database_exists(url):
 
     """
 
-    url = copy(make_url(url))
+    url = make_url(url)
     database = url.database
     dialect_name = url.get_dialect().name
     engine = None
@@ -546,7 +547,7 @@ def create_database(url, encoding='utf8', template=None):
     other database engines should be supported.
     """
 
-    url = copy(make_url(url))
+    url = make_url(url)
     database = url.database
     dialect_name = url.get_dialect().name
     dialect_driver = url.get_dialect().driver
@@ -613,7 +614,7 @@ def drop_database(url):
 
     """
 
-    url = copy(make_url(url))
+    url = make_url(url)
     database = url.database
     dialect_name = url.get_dialect().name
     dialect_driver = url.get_dialect().driver
