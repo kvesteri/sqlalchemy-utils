@@ -427,16 +427,9 @@ def _set_url_database(url: sa.engine.url.URL, database):
     :param database: New database to set.
 
     """
-    if hasattr(sa.engine, 'URL'):
-        ret = sa.engine.URL.create(
-            drivername=url.drivername,
-            username=url.username,
-            password=url.password,
-            host=url.host,
-            port=url.port,
-            database=database,
-            query=url.query
-        )
+    if hasattr(url, '_replace'):
+        # Cannot use URL.set() as database may need to be set to None.
+        ret = url._replace(database=database)
     else:  # SQLAlchemy <1.4
         url = copy(url)
         url.database = database
