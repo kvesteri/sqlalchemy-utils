@@ -1,4 +1,5 @@
-from collections import OrderedDict, Sequence
+from collections import OrderedDict
+from collections.abc import Sequence
 from functools import partial
 from inspect import isclass
 from operator import attrgetter
