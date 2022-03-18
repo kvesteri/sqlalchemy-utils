@@ -408,3 +408,67 @@ class TestCompositeTypeWhenTypeAlreadyExistsInDatabase(object):
         account = session.query(Account).first()
         assert account.balance.currency == 'USD'
         assert account.balance.amount == 15
+
+
+@pytest.mark.usefixtures('postgresql_dsn')
+class TestCompositeTypeWithMixedCase(object):
+
+    @pytest.fixture
+    def Account(self, Base):
+        pg_composite.registered_composites = {}
+
+        type_ = CompositeType(
+            'MoneyType',
+            [
+                sa.Column('currency', sa.String),
+                sa.Column('amount', sa.Integer)
+            ]
+        )
+
+        class Account(Base):
+            __tablename__ = 'account'
+            id = sa.Column(sa.Integer, primary_key=True)
+            balance = sa.Column(type_)
+
+        return Account
+
+    @pytest.fixture
+    def session(self, request, engine, connection, Base, Account):
+        sa.orm.configure_mappers()
+
+        Session = sessionmaker(bind=connection)
+        session = Session()
+        session.execute(
+            'CREATE TYPE "MoneyType" AS (currency VARCHAR, amount INTEGER)'
+        )
+        session.execute(
+            """CREATE TABLE account (
+                id SERIAL, balance "MoneyType", PRIMARY KEY(id)
+            )"""
+        )
+
+        def teardown():
+            session.execute('DROP TABLE account')
+            session.execute('DROP TYPE "MoneyType"')
+            session.commit()
+            close_all_sessions()
+            connection.close()
+            remove_composite_listeners()
+            engine.dispose()
+
+        register_composites(connection)
+        request.addfinalizer(teardown)
+
+        return session
+
+    def test_parameter_processing(self, session, Account):
+        account = Account(
+            balance=('USD', 15),
+        )
+
+        session.add(account)
+        session.commit()
+
+        account = session.query(Account).first()
+        assert account.balance.currency == 'USD'
+        assert account.balance.amount == 15
