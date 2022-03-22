@@ -555,6 +555,8 @@ def create_database(url, encoding='utf8', template=None):
         url = _set_url_database(url, database="postgres")
     elif dialect_name == 'mssql':
         url = _set_url_database(url, database="master")
+    elif dialect_name == 'cockroachdb':
+        url = _set_url_database(url, database="defaultdb")
     elif not dialect_name == 'sqlite':
         url = _set_url_database(url, database=None)
 
@@ -622,6 +624,8 @@ def drop_database(url):
         url = _set_url_database(url, database="postgres")
     elif dialect_name == 'mssql':
         url = _set_url_database(url, database="master")
+    elif dialect_name == 'cockroachdb':
+        url = _set_url_database(url, database="defaultdb")
     elif not dialect_name == 'sqlite':
         url = _set_url_database(url, database=None)
 
