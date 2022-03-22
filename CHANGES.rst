@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.38.3 (2022-xx-xx)
+^^^^^^^^^^^^^^^^^^^
+
+- Fixed double-quoted UUID's in sqlalchemy >= 1.4.30 (#581, pull request courtesy of kurtmckee)
+
+
 0.38.2 (2021-12-29)
 ^^^^^^^^^^^^^^^^^^^
 
