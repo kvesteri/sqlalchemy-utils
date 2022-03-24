@@ -1,7 +1,7 @@
 import pytest
 import pytz
 import sqlalchemy as sa
-from dateutil.zoneinfo import getzoneinfofile_stream, tzfile, ZoneInfoFile
+from dateutil.zoneinfo import get_zonefile_instance, tzfile
 
 try:
     import zoneinfo
@@ -89,8 +89,7 @@ def test_can_coerce_string_for_pytz_zone(zone):
     assert tzcol._coerce(zone).zone == zone
 
 
-@pytest.mark.parametrize(
-    'zone', ZoneInfoFile(getzoneinfofile_stream()).zones.keys())
+@pytest.mark.parametrize('zone', get_zonefile_instance().zones.keys())
 def test_can_coerce_string_for_dateutil_zone(zone):
     tzcol = TimezoneType(backend='dateutil')
     assert isinstance(tzcol._coerce(zone), tzfile)
