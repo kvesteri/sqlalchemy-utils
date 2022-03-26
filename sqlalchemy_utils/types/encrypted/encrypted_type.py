@@ -462,7 +462,7 @@ class EncryptedType(StringEncryptedType):
             "The 'EncryptedType' class will change implementation from "
             "'LargeBinary' to 'String' in a future version. Use "
             "'StringEncryptedType' to use the 'String' implementation.",
-            DeprecationWarning)
+            DeprecationWarning, stacklevel=2)
         super().__init__(*args, **kwargs)
 
     def process_bind_param(self, value, dialect):
