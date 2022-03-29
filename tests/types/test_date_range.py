@@ -84,7 +84,7 @@ class TestDateRange:
 
 
 @pytest.mark.usefixtures('postgresql_dsn')
-class TestDateRangeOnPostgres(DateRangeTestCase):
+class TestDateRangeOnPostgres(TestDateRange):
     @pytest.mark.parametrize(
         ('date_range', 'length'),
         (
