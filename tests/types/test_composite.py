@@ -99,6 +99,18 @@ class TestCompositeTypeWithRegularTypes(object):
         assert account.balance.currency is None
         assert account.balance.amount == 15
 
+    def test_composite_attribute_query(self, session, Account):
+        account_query = session \
+            .query(Account) \
+            .filter(Account.balance.amount == 15)
+
+        raw_query = str(
+            account_query.statement
+                .compile(compile_kwargs={"literal_binds": True})
+        )
+        assert '(account.balance).amount = 15' in raw_query
+
+
 
 @pytest.mark.skipif('i18n.babel is None')
 @pytest.mark.usefixtures('postgresql_dsn')
