@@ -112,6 +112,7 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 0.36.6 (2020-05-24)
 ^^^^^^^^^^^^^^^^^^^
 
+- Droppd support for Python 2.7 (thanks for the help graingert)
 - Reverted #426 and added support for Legacy Encrypted Type (#450, pull request courtesy of rushilsrivastava)
 - Added psycopg2cffi support for create_database and drop_database (#447, pull request courtesy of DominicBurkart)
 
