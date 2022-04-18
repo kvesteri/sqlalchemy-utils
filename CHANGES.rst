@@ -9,6 +9,7 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 - Fixed double-quoted UUID's in sqlalchemy >= 1.4.30 (#581, pull request courtesy of kurtmckee)
 - Fixed create_database() and drop_database() crashing with CockroachDB (#586, pull request courtesy of kurtmckee)
+- Added mixed case support for pg composite (#584, pull request courtesy of bamartin125)
 
 
 0.38.2 (2021-12-29)
