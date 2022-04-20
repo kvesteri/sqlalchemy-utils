@@ -6,11 +6,11 @@ from sqlalchemy_utils.functions import get_columns
 
 
 class CreateView(DDLElement):
-    def __init__(self, name, selectable, schema, materialized=False):
-        self.name = name
+    def __init__(self, table, selectable, materialized=False):
+        self.table = table
         self.selectable = selectable
         self.materialized = materialized
-        self.materialized = schema
+        # self.schema = schema
 
 
 
@@ -20,14 +20,14 @@ def compile_create_materialized_view(element, compiler, **kw):
         'MATERIALIZED ' if element.materialized else '',
         # compiler.dialect.identifier_preparer.quote(element.name),
         compiler.dialect.identifier_preparer.format_table(
-            element.name, element.schema, use_schema=True),
+            element.table, use_schema=True), #if element.schema else compiler.dialect.identifier_preparer.quote(element.name),
         compiler.sql_compiler.process(element.selectable, literal_binds=True),
     )
 
 
 class DropView(DDLElement):
-    def __init__(self, name, materialized=False, cascade=True):
-        self.name = name
+    def __init__(self, table, materialized=False, cascade=True):
+        self.table = table
         self.materialized = materialized
         self.cascade = cascade
 
@@ -36,7 +36,9 @@ class DropView(DDLElement):
 def compile_drop_materialized_view(element, compiler, **kw):
     return 'DROP {}VIEW IF EXISTS {} {}'.format(
         'MATERIALIZED ' if element.materialized else '',
-        compiler.dialect.identifier_preparer.quote(element.name),
+        # compiler.dialect.identifier_preparer.quote(element.name),
+        compiler.dialect.identifier_preparer.format_table(
+            element.table, use_schema=True),
         'CASCADE' if element.cascade else ''
     )
 
@@ -65,7 +67,7 @@ def create_table_from_selectable(
         )
         for c in get_columns(selectable)
     ] + indexes
-    table = sa.Table(name, metadata, schema=schema, *args, **kwargs)
+    table = sa.Table(name, metadata, *args, **kwargs, schema=schema)
 
     if not any([c.primary_key for c in get_columns(selectable)]):
         table.append_constraint(
@@ -112,7 +114,7 @@ def create_materialized_view(
     sa.event.listen(
         metadata,
         'after_create',
-        CreateView(name, selectable, schema, materialized=True)
+        CreateView(table, selectable, materialized=True)
     )
 
     @sa.event.listens_for(metadata, 'after_create')
@@ -123,7 +125,7 @@ def create_materialized_view(
     sa.event.listen(
         metadata,
         'before_drop',
-        DropView(name, materialized=True)
+        DropView(table, materialized=True)
     )
     return table
 
@@ -177,7 +179,7 @@ def create_view(
         metadata=None
     )
 
-    sa.event.listen(metadata, 'after_create', CreateView(name, selectable, schema))
+    sa.event.listen(metadata, 'after_create', CreateView(table, selectable))
 
     @sa.event.listens_for(metadata, 'after_create')
     def create_indexes(target, connection, **kw): ##  Does non-materialized views allow index creation??
@@ -187,12 +189,12 @@ def create_view(
     sa.event.listen(
         metadata,
         'before_drop',
-        DropView(name, cascade=cascade_on_drop)
+        DropView(table, cascade=cascade_on_drop)
     )
     return table
 
 
-def refresh_materialized_view(session, table, concurrently=False):
+def refresh_materialized_view(session, view, concurrently=False):
     """ Refreshes an already existing materialized view
 
     :param session: An SQLAlchemy Session instance.
@@ -226,7 +228,8 @@ def refresh_materialized_view(session, table, concurrently=False):
         'REFRESH MATERIALIZED VIEW {}{}'.format(
             'CONCURRENTLY ' if concurrently else '',
             # session.bind.engine.dialect.identifier_preparer.quote(name)
-            session.bind.engine.dialect.identifier_preparer.format_table(table, use_schema=True)
+            session.bind.engine.dialect.identifier_preparer.format_table(
+                view.__table__, use_schema=True)  # if schema else session.bind.engine.dialect.identifier_preparer.quote(name)
         )
     )
     session.commit() #  needed to persist changes in the materialized view
