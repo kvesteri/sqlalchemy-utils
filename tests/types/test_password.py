@@ -1,4 +1,5 @@
-import mock
+import unittest.mock as mock
+
 import pytest
 import sqlalchemy as sa
 import sqlalchemy.dialects.mysql
