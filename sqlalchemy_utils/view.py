@@ -20,7 +20,7 @@ def compile_create_materialized_view(element, compiler, **kw):
         'MATERIALIZED ' if element.materialized else '',
         # compiler.dialect.identifier_preparer.quote(element.name),
         compiler.dialect.identifier_preparer.format_table(
-            element.table, use_schema=True), #if element.schema else compiler.dialect.identifier_preparer.quote(element.name),
+            element.table, use_schema=True),
         compiler.sql_compiler.process(element.selectable, literal_binds=True),
     )
 
@@ -108,7 +108,6 @@ def create_materialized_view(
         metadata=None,
         aliases=aliases,
         schema=schema
-
     )
 
     sa.event.listen(
@@ -198,25 +197,25 @@ def refresh_materialized_view(session, view, concurrently=False):
     """ Refreshes an already existing materialized view
 
     :param session: An SQLAlchemy Session instance.
-    :param table: The view to refresh (table object).
+    :param view: The view to refresh.
     :param concurrently:
         Optional flag that causes the ``CONCURRENTLY`` parameter
         to be specified when the materialized view is refreshed.
 
 
     example (flask_sqlalchemy) ORM:
-    User(db.Model):
+    ArticleMV(db.Model):
     __table__ = create_materialized_view(
-        name = 'user',
+        name = 'article-mv',
         selectable = db.select(...),
-        schema = 'name'
+        schema = 'main'
         )
     @classmethod
     def refresh_view(cls, concurrently=False):
-        refresh_materialized_view(db.session,cls.__table__, concurrently)
+        refresh_materialized_view(db.session, cls, concurrently)
 
     User.refresh_view()
-    >SQL: REFRESH MATERIALIZED VIEW name.user
+    >SQL: REFRESH MATERIALIZED VIEW main.article-mv
     """
     # Since session.execute() bypasses autoflush, we must manually flush in
     # order to include newly-created/modified objects in the refresh.

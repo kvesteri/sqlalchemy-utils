@@ -94,7 +94,7 @@ class TestMaterializedViews:
         )
         session.add(article)
         session.commit()
-        refresh_materialized_view(session, 'article-mv')
+        refresh_materialized_view(session, ArticleMV)
         materialized = session.query(ArticleMV).first()
         assert materialized.article_name == 'Some article'
         assert materialized.author_name == 'Some user'
