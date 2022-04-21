@@ -12,15 +12,17 @@ from .orm import _get_class_registry, get_column_key, get_mapper, get_tables
 
 
 def get_foreign_key_values(fk, obj):
+    mapper = get_mapper(obj)
     return dict(
         (
-            fk.constraint.columns.values()[index].key,
+            fk.constraint.columns.values()[index],
             getattr(obj, element.column.key)
+            if hasattr(obj, element.column.key)
+            else getattr(
+                obj, mapper.get_property_by_column(element.column).key
+            ),
         )
-        for
-        index, element
-        in
-        enumerate(fk.constraint.elements)
+        for index, element in enumerate(fk.constraint.elements)
     )
 
 
@@ -165,27 +167,25 @@ def merge_references(from_, to, foreign_keys=None):
         old_values = get_foreign_key_values(fk, from_)
         new_values = get_foreign_key_values(fk, to)
         criteria = (
-            getattr(fk.constraint.table.c, key) == value
+            getattr(fk.constraint.table.c, key.key) == value
             for key, value in old_values.items()
         )
         try:
             mapper = get_mapper(fk.constraint.table)
         except ValueError:
             query = (
-                fk.constraint.table
-                .update()
+                fk.constraint.table.update()
                 .where(sa.and_(*criteria))
-                .values(new_values)
+                .values(
+                    dict((key.key, value) for key, value in new_values.items())
+                )
             )
             session.execute(query)
         else:
             (
                 session.query(mapper.class_)
-                .filter_by(**old_values)
-                .update(
-                    new_values,
-                    'evaluate'
-                )
+                .filter(*[k == old_values[k] for k in old_values])
+                .update(new_values, synchronize_session='fetch')
             )
 
 
