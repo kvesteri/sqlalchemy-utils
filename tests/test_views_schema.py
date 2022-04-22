@@ -8,12 +8,6 @@ from sqlalchemy_utils import (
 )
 
 
-# @pytest.fixture
-# def create_schema(engine):
-#     if not engine.dialect.has_schema(engine, 'main'):
-#         engine.execute(sa.schema.CreateSchema('main'))
-
-
 @pytest.fixture
 def Article(Base, User):
     class Article(Base):
