@@ -57,7 +57,7 @@ def ArticleMV(Base, Article, User, engine):
             ),
             aliases={'name': 'article_name'},
             metadata=Base.metadata,
-            schema = 'main',
+            schema='main',
             indexes=[sa.Index('article-mv_id_idx', 'id')]
         )
         # __table_args__ = {"schema": "main"}
@@ -81,7 +81,7 @@ def ArticleView(Base, Article, User):
                     .join(User, Article.author_id == User.id)
                 )
             ),
-            schema = 'main',
+            schema='main',
             metadata=Base.metadata
         )
         # __table_args__ = {"schema": "main"}
@@ -119,7 +119,6 @@ class TestMaterializedViews:
         assert materialized.article_name == 'Some article'
         assert materialized.author_name == 'Some user'
 
-
     def test_querying_view(
         self,
         session,
@@ -138,9 +137,7 @@ class TestMaterializedViews:
         assert row.name == 'Some article'
         assert row.author_name == 'Some user'
 
-
     def drop_view(self, engine, ArticleMV, ArticleView):
-
         ArticleView.__table__.drop(engine)
         ArticleMV.__table__.drop(engine)
         if engine.dialect.has_schema(engine, 'main'):

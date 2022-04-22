@@ -13,7 +13,6 @@ class CreateView(DDLElement):
         # self.schema = schema
 
 
-
 @compiler.compiles(CreateView)
 def compile_create_materialized_view(element, compiler, **kw):
     return 'CREATE {}VIEW {} AS {}'.format(
@@ -49,7 +48,7 @@ def create_table_from_selectable(
     indexes=None,
     metadata=None,
     aliases=None,
-    schema = None,
+    schema=None,
     **kwargs
 ):
     if indexes is None:
@@ -181,7 +180,8 @@ def create_view(
     sa.event.listen(metadata, 'after_create', CreateView(table, selectable))
 
     @sa.event.listens_for(metadata, 'after_create')
-    def create_indexes(target, connection, **kw): ##  Does non-materialized views allow index creation??
+    def create_indexes(target, connection, **kw):
+        # Does non-materialized views allow index creation??
         for idx in table.indexes:
             idx.create(connection)
 
@@ -219,8 +219,8 @@ def refresh_materialized_view(session, view, concurrently=False):
     """
     # Since session.execute() bypasses autoflush, we must manually flush in
     # order to include newly-created/modified objects in the refresh.
-
-    #  session.bind.engine.dialect.identifier_preparer do no accept str as a param, it schould be the table
+    # session.bind.engine.dialect.identifier_preparer
+    # do no accept str as a param, it schould be the table
 
     session.flush()
     session.execute(
@@ -228,7 +228,7 @@ def refresh_materialized_view(session, view, concurrently=False):
             'CONCURRENTLY ' if concurrently else '',
             # session.bind.engine.dialect.identifier_preparer.quote(name)
             session.bind.engine.dialect.identifier_preparer.format_table(
-                view.__table__, use_schema=True)  # if schema else session.bind.engine.dialect.identifier_preparer.quote(name)
+                view.__table__, use_schema=True)
         )
     )
-    session.commit() #  needed to persist changes in the materialized view
+    session.commit()  # needed to persist changes in the materialized view
