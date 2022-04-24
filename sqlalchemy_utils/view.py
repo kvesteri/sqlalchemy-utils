@@ -6,16 +6,17 @@ from sqlalchemy_utils.functions import get_columns
 
 
 class CreateView(DDLElement):
-    def __init__(self, name, selectable, materialized=False):
+    def __init__(self, name, selectable, materialized=False, create_if_not_exists=False):
         self.name = name
         self.selectable = selectable
         self.materialized = materialized
-
+        self.not_exists = create_if_not_exists
 
 @compiler.compiles(CreateView)
 def compile_create_materialized_view(element, compiler, **kw):
-    return 'CREATE {}VIEW {} AS {}'.format(
+    return 'CREATE {}VIEW {}{} AS {}'.format(
         'MATERIALIZED ' if element.materialized else '',
+        'IF NOT EXISTS ' if element.not_exists else '',
         compiler.dialect.identifier_preparer.quote(element.name),
         compiler.sql_compiler.process(element.selectable, literal_binds=True),
     )
@@ -74,7 +75,8 @@ def create_materialized_view(
     selectable,
     metadata,
     indexes=None,
-    aliases=None
+    aliases=None,
+    create_if_not_exists=False,
 ):
     """ Create a view on a given metadata
 
@@ -87,6 +89,9 @@ def create_materialized_view(
     :param aliases:
         An optional dictionary containing with keys as column names and values
         as column aliases.
+    :param create_if_not_exists:
+        An optional flag to indicate whether to use the 
+        ``CREATE MATERIALIZED VIEW IF NOT EXISTS`` statement.
 
     Same as for ``create_view`` except that a ``CREATE MATERIALIZED VIEW``
     statement is emitted instead of a ``CREATE VIEW``.
@@ -103,7 +108,12 @@ def create_materialized_view(
     sa.event.listen(
         metadata,
         'after_create',
-        CreateView(name, selectable, materialized=True)
+        CreateView(
+            name, 
+            selectable, 
+            materialized=True, 
+            create_if_not_exists=create_if_not_exists
+        )
     )
 
     @sa.event.listens_for(metadata, 'after_create')
@@ -123,7 +133,8 @@ def create_view(
     name,
     selectable,
     metadata,
-    cascade_on_drop=True
+    cascade_on_drop=True,
+    create_if_not_exists=False,
 ):
     """ Create a view on a given metadata
 
@@ -132,6 +143,9 @@ def create_view(
     :param metadata:
         An SQLAlchemy Metadata instance that stores the features of the
         database being described.
+    :param create_if_not_exists:
+        An optional flag to indicate whether to use the 
+        ``CREATE VIEW IF NOT EXISTS`` statement.
 
     The process for creating a view is similar to the standard way that a
     table is constructed, except that a selectable is provided instead of
@@ -161,7 +175,11 @@ def create_view(
         metadata=None
     )
 
-    sa.event.listen(metadata, 'after_create', CreateView(name, selectable))
+    sa.event.listen(
+        metadata, 
+        'after_create', 
+        CreateView(name, selectable, create_if_not_exists=create_if_not_exists)
+    )
 
     @sa.event.listens_for(metadata, 'after_create')
     def create_indexes(target, connection, **kw):
