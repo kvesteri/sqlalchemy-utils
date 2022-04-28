@@ -23,16 +23,16 @@ class CreateView(DDLElement):
 
 @compiler.compiles(CreateView)
 def compile_create_materialized_view(element, compiler, **kw):
-    return "CREATE {}{}VIEW {}{} AS {}".format(
-        "OR REPLACE " if element.or_replace else "",
-        "MATERIALIZED " if element.materialized else "",
-        "IF NOT EXISTS " if element.if_not_exists else "",
+    return 'CREATE {}{}VIEW {}{} AS {}'.format(
+        'OR REPLACE ' if element.or_replace else '',
+        'MATERIALIZED ' if element.materialized else '',
+        'IF NOT EXISTS ' if element.if_not_exists else '',
         compiler.dialect.identifier_preparer.quote(element.name),
         compiler.sql_compiler.process(element.selectable, literal_binds=True),
     )
 
 
-@compiler.compiles(CreateView, "postgresql")
+@compiler.compiles(CreateView, 'postgresql')
 def compile_create_materialized_view_(element, compiler, **kw):
     """
     CREATE [ OR REPLACE ] [ TEMP | TEMPORARY ] [ RECURSIVE ] VIEW name [ ( column_name [, ...] ) ]
@@ -51,16 +51,16 @@ def compile_create_materialized_view_(element, compiler, **kw):
     see https://www.postgresql.org/docs/current/sql-createview.html
     see https://www.postgresql.org/docs/current/sql-creatematerializedview.html
     """
-    return "CREATE {}{}VIEW {}{} AS {}".format(
-        "OR REPLACE " if not element.materialized and element.or_replace else "",
-        "MATERIALIZED " if element.materialized else "",
-        "IF NOT EXISTS " if element.materialized and element.if_not_exists else "",
+    return 'CREATE {}{}VIEW {}{} AS {}'.format(
+        'OR REPLACE ' if not element.materialized and element.or_replace else '',
+        'MATERIALIZED ' if element.materialized else '',
+        'IF NOT EXISTS ' if element.materialized and element.if_not_exists else '',
         compiler.dialect.identifier_preparer.quote(element.name),
         compiler.sql_compiler.process(element.selectable, literal_binds=True),
     )
 
 
-@compiler.compiles(CreateView, "mysql")
+@compiler.compiles(CreateView, 'mysql')
 def compile_create_materialized_view_(element, compiler, **kw):
     """
     CREATE
@@ -76,15 +76,15 @@ def compile_create_materialized_view_(element, compiler, **kw):
     NOTE mysql does not support materialized view
     """
     if element.materialized:
-        raise ValueError("mysql does not support materialized view!")
-    return "CREATE {}VIEW {} AS {}".format(
-        "OR REPLACE " if element.or_replace else "",
+        raise ValueError('mysql does not support materialized view!')
+    return 'CREATE {}VIEW {} AS {}'.format(
+        'OR REPLACE ' if element.or_replace else '',
         compiler.dialect.identifier_preparer.quote(element.name),
         compiler.sql_compiler.process(element.selectable, literal_binds=True),
     )
 
 
-@compiler.compiles(CreateView, "mssql")
+@compiler.compiles(CreateView, 'mssql')
 def compile_create_materialized_view_(element, compiler, **kw):
     """
     CREATE [ OR ALTER ] VIEW [ schema_name . ] view_name [ (column [ ,...n ] ) ]
@@ -103,15 +103,15 @@ def compile_create_materialized_view_(element, compiler, **kw):
     see https://docs.microsoft.com/en-us/sql/t-sql/statements/create-view-transact-sql?view=sql-server-ver15
     see https://docs.microsoft.com/en-us/sql/t-sql/statements/create-materialized-view-as-select-transact-sql?view=azure-sqldw-latest&viewFallbackFrom=sql-server-ver15
     """
-    return "CREATE {}{}VIEW {} AS {}".format(
-        "OR ALTER " if not element.materialized and element.or_replace else "",
-        "MATERIALIZED " if element.materialized else "",
+    return 'CREATE {}{}VIEW {} AS {}'.format(
+        'OR ALTER ' if not element.materialized and element.or_replace else '',
+        'MATERIALIZED ' if element.materialized else '',
         compiler.dialect.identifier_preparer.quote(element.name),
         compiler.sql_compiler.process(element.selectable, literal_binds=True),
     )
 
 
-@compiler.compiles(CreateView, "snowflake")
+@compiler.compiles(CreateView, 'snowflake')
 def compile_create_materialized_view(element, compiler, **kw):
     """
     CREATE [ OR REPLACE ] [ SECURE ] [ RECURSIVE ] VIEW [ IF NOT EXISTS ] <name>
@@ -140,10 +140,10 @@ def compile_create_materialized_view(element, compiler, **kw):
     see https://docs.snowflake.com/en/sql-reference/sql/create-view.html
     see https://docs.snowflake.com/en/sql-reference/sql/create-materialized-view.html
     """
-    return "CREATE {}{}VIEW {}{} AS {}".format(
-        "OR REPLACE " if element.or_replace else "",
-        "MATERIALIZED " if element.materialized else "",
-        "IF NOT EXISTS " if element.if_not_exists else "",
+    return 'CREATE {}{}VIEW {}{} AS {}'.format(
+        'OR REPLACE ' if element.or_replace else '',
+        'MATERIALIZED ' if element.materialized else '',
+        'IF NOT EXISTS ' if element.if_not_exists else '',
         compiler.dialect.identifier_preparer.quote(element.name),
         compiler.sql_compiler.process(element.selectable, literal_binds=True),
     )
@@ -158,10 +158,10 @@ class DropView(DDLElement):
 
 @compiler.compiles(DropView)
 def compile_drop_materialized_view(element, compiler, **kw):
-    return "DROP {}VIEW IF EXISTS {} {}".format(
-        "MATERIALIZED " if element.materialized else "",
+    return 'DROP {}VIEW IF EXISTS {} {}'.format(
+        'MATERIALIZED ' if element.materialized else '',
         compiler.dialect.identifier_preparer.quote(element.name),
-        "CASCADE" if element.cascade else "",
+        'CASCADE' if element.cascade else '',
     )
 
 
@@ -230,7 +230,7 @@ def create_materialized_view(
 
     sa.event.listen(
         metadata,
-        "after_create",
+        'after_create',
         CreateView(
             name,
             selectable,
@@ -240,12 +240,12 @@ def create_materialized_view(
         ),
     )
 
-    @sa.event.listens_for(metadata, "after_create")
+    @sa.event.listens_for(metadata, 'after_create')
     def create_indexes(target, connection, **kw):
         for idx in table.indexes:
             idx.create(connection)
 
-    sa.event.listen(metadata, "before_drop", DropView(name, materialized=True))
+    sa.event.listen(metadata, 'before_drop', DropView(name, materialized=True))
     return table
 
 
@@ -299,18 +299,18 @@ def create_view(
 
     sa.event.listen(
         metadata,
-        "after_create",
+        'after_create',
         CreateView(
             name, selectable, if_not_exists=if_not_exists, or_replace=or_replace
         ),
     )
 
-    @sa.event.listens_for(metadata, "after_create")
+    @sa.event.listens_for(metadata, 'after_create')
     def create_indexes(target, connection, **kw):
         for idx in table.indexes:
             idx.create(connection)
 
-    sa.event.listen(metadata, "before_drop", DropView(name, cascade=cascade_on_drop))
+    sa.event.listen(metadata, 'before_drop', DropView(name, cascade=cascade_on_drop))
     return table
 
 
@@ -327,8 +327,8 @@ def refresh_materialized_view(session, name, concurrently=False):
     # order to include newly-created/modified objects in the refresh.
     session.flush()
     session.execute(
-        "REFRESH MATERIALIZED VIEW {}{}".format(
-            "CONCURRENTLY " if concurrently else "",
+        'REFRESH MATERIALIZED VIEW {}{}'.format(
+            'CONCURRENTLY ' if concurrently else '',
             session.bind.engine.dialect.identifier_preparer.quote(name),
         )
     )
