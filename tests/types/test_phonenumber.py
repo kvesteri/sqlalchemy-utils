@@ -1,5 +1,4 @@
 import pytest
-import six
 import sqlalchemy as sa
 
 from sqlalchemy_utils import (  # noqa
@@ -94,11 +93,7 @@ class TestPhoneNumber:
 
     def test_phone_number_str_repr(self):
         number = PhoneNumber("+358401234567")
-        if six.PY2:
-            assert unicode(number) == number.national  # noqa
-            assert str(number) == number.national.encode("utf-8")
-        else:
-            assert str(number) == number.national
+        assert str(number) == number.national
 
     def test_phone_number_hash(self):
         number1 = PhoneNumber("+821023456789")

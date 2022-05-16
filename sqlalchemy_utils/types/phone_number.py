@@ -1,4 +1,3 @@
-import six
 from sqlalchemy import exc, types
 
 from ..exceptions import ImproperlyConfigured
@@ -97,9 +96,7 @@ class PhoneNumber(BasePhoneNumber):
             # Worth noting that if -1 shows up as the error_type
             # it's likely because the API has changed upstream and these
             # bindings need to be updated.
-            raise PhoneNumberParseException(
-                getattr(e, "error_type", -1), six.text_type(e)
-            )
+            raise PhoneNumberParseException(getattr(e, "error_type", -1), str(e))
 
         super(PhoneNumber, self).__init__(
             country_code=self._phone_number.country_code,
