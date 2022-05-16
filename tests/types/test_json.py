@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import pytest
 import sqlalchemy as sa
+import sqlalchemy.orm as sa_orm
 
 from sqlalchemy_utils.types import json
 
@@ -12,6 +13,27 @@ def Document(Base):
         id = sa.Column(sa.Integer, primary_key=True)
         json = sa.Column(json.JSONType)
     return Document
+
+
+@pytest.fixture
+def AAA(Base):
+    class AAA(Base):
+        __tablename__ = 'aaa'
+        id = sa.Column(sa.Integer, primary_key=True)
+        json_column = sa.Column(json.JSONType, nullable=False)
+
+    return AAA
+
+
+@pytest.fixture
+def BBB(Base, AAA):
+    class BBB(Base):
+        __tablename__ = 'bbb'
+        id = sa.Column(sa.Integer, primary_key=True)
+        aaa_id = sa.Column(sa.Integer, sa.ForeignKey('aaa.id'), nullable=True)
+        parent = sa_orm.relationship('AAA', backref='children')
+
+    return BBB
 
 
 @pytest.fixture
@@ -57,6 +79,28 @@ class JSONTestCase(object):
         query = sa.select([Document.json])
         # the type should be cacheable and not throw exception
         session.execute(query)
+
+    def test_unhashable_type(self, AAA, BBB, session):
+        """Verify there are no TypeErrors with certain JSON queries.
+
+        This test will fail under these conditions:
+
+        1.  sqlalchemy versions 1.4.19 through 1.4.23 are installed.
+        2.  `JSONType.hashable` is not set to False.
+
+        For more info, see:
+
+        *   kvesteri/sqlalchemy-utils#543
+        *   sqlalchemy/sqlalchemy#6924
+        """
+
+        session.add(AAA(id=13, json_column=[1, 2, 3]))
+        session.add(BBB(id=333, aaa_id=13))
+
+        query = session.query(AAA).join(BBB).with_entities(
+            AAA.id, AAA.json_column,
+        )
+        assert len(list(query)) == 1
 
 
 @pytest.mark.skipif('json.json is None')

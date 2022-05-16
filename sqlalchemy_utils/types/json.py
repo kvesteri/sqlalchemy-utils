@@ -49,6 +49,7 @@ class JSONType(sa.types.TypeDecorator):
         session.commit()
     """
     impl = sa.UnicodeText
+    hashable = False
     cache_ok = True
 
     def __init__(self, *args, **kwargs):
