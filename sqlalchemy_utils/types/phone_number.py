@@ -1,4 +1,11 @@
-import six
+"""
+..  note::
+
+    The `phonenumbers`_ package must be installed to use PhoneNumber types.
+
+..  _phonenumbers: https://github.com/daviddrysdale/python-phonenumbers
+"""
+
 from sqlalchemy import exc, types
 
 from ..exceptions import ImproperlyConfigured
@@ -16,14 +23,15 @@ except ImportError:
 
 
 class PhoneNumberParseException(NumberParseException, exc.DontWrapMixin):
-    '''
+    """
     Wraps exceptions from phonenumbers with SQLAlchemy's DontWrapMixin
     so we get more meaningful exceptions on validation failure instead of the
     StatementException
 
     Clients can catch this as either a PhoneNumberParseException or
     NumberParseException from the phonenumbers library.
-    '''
+    """
+
     pass
 
 
@@ -62,9 +70,9 @@ class PhoneNumber(BasePhoneNumber):
 
         user = User(phone_number=PhoneNumber('0401234567', 'FI'))
 
-        user.phone_number.e164  # u'+358401234567'
-        user.phone_number.international  # u'+358 40 1234567'
-        user.phone_number.national  # u'040 1234567'
+        user.phone_number.e164  # '+358401234567'
+        user.phone_number.international  # '+358 40 1234567'
+        user.phone_number.national  # '040 1234567'
         user.country_code  # 'FI'
 
 
@@ -77,18 +85,17 @@ class PhoneNumber(BasePhoneNumber):
         should always be True for external callers.
         Can be useful for short codes or toll free
     """
+
     def __init__(self, raw_number, region=None, check_region=True):
         # Bail if phonenumbers is not found.
         if phonenumbers is None:
             raise ImproperlyConfigured(
-                "'phonenumbers' is required to use 'PhoneNumber'"
+                "The 'phonenumbers' package is required to use 'PhoneNumber'"
             )
 
         try:
             self._phone_number = phonenumbers.parse(
-                raw_number,
-                region,
-                _check_region=check_region
+                raw_number, region, _check_region=check_region
             )
         except NumberParseException as e:
             # Wrap exception so SQLAlchemy doesn't swallow it as a
@@ -97,10 +104,7 @@ class PhoneNumber(BasePhoneNumber):
             # Worth noting that if -1 shows up as the error_type
             # it's likely because the API has changed upstream and these
             # bindings need to be updated.
-            raise PhoneNumberParseException(
-                getattr(e, 'error_type', -1),
-                six.text_type(e)
-            )
+            raise PhoneNumberParseException(getattr(e, "error_type", -1), str(e))
 
         super(PhoneNumber, self).__init__(
             country_code=self._phone_number.country_code,
@@ -111,20 +115,17 @@ class PhoneNumber(BasePhoneNumber):
             country_code_source=self._phone_number.country_code_source,
             preferred_domestic_carrier_code=(
                 self._phone_number.preferred_domestic_carrier_code
-            )
+            ),
         )
         self.region = region
         self.national = phonenumbers.format_number(
-            self._phone_number,
-            phonenumbers.PhoneNumberFormat.NATIONAL
+            self._phone_number, phonenumbers.PhoneNumberFormat.NATIONAL
         )
         self.international = phonenumbers.format_number(
-            self._phone_number,
-            phonenumbers.PhoneNumberFormat.INTERNATIONAL
+            self._phone_number, phonenumbers.PhoneNumberFormat.INTERNATIONAL
         )
         self.e164 = phonenumbers.format_number(
-            self._phone_number,
-            phonenumbers.PhoneNumberFormat.E164
+            self._phone_number, phonenumbers.PhoneNumberFormat.E164
         )
 
     def __composite_values__(self):
@@ -158,20 +159,21 @@ class PhoneNumberType(ScalarCoercible, types.TypeDecorator):
 
         user = User(phone_number='+358401234567')
 
-        user.phone_number.e164  # u'+358401234567'
-        user.phone_number.international  # u'+358 40 1234567'
-        user.phone_number.national  # u'040 1234567'
+        user.phone_number.e164  # '+358401234567'
+        user.phone_number.international  # '+358 40 1234567'
+        user.phone_number.national  # '040 1234567'
     """
-    STORE_FORMAT = 'e164'
+
+    STORE_FORMAT = "e164"
     impl = types.Unicode(20)
     python_type = PhoneNumber
     cache_ok = True
 
-    def __init__(self, region='US', max_length=20, *args, **kwargs):
+    def __init__(self, region="US", max_length=20, *args, **kwargs):
         # Bail if phonenumbers is not found.
         if phonenumbers is None:
             raise ImproperlyConfigured(
-                "'phonenumbers' is required to use 'PhoneNumberType'"
+                "The 'phonenumbers' package is required to use 'PhoneNumberType'"
             )
 
         super(PhoneNumberType, self).__init__(*args, **kwargs)
@@ -183,8 +185,8 @@ class PhoneNumberType(ScalarCoercible, types.TypeDecorator):
             if not isinstance(value, PhoneNumber):
                 value = PhoneNumber(value, region=self.region)
 
-            if self.STORE_FORMAT == 'e164' and value.extension:
-                return '%s;ext=%s' % (value.e164, value.extension)
+            if self.STORE_FORMAT == "e164" and value.extension:
+                return "%s;ext=%s" % (value.e164, value.extension)
 
             return getattr(value, self.STORE_FORMAT)
 
