@@ -70,9 +70,9 @@ class PhoneNumber(BasePhoneNumber):
 
         user = User(phone_number=PhoneNumber('0401234567', 'FI'))
 
-        user.phone_number.e164  # u'+358401234567'
-        user.phone_number.international  # u'+358 40 1234567'
-        user.phone_number.national  # u'040 1234567'
+        user.phone_number.e164  # '+358401234567'
+        user.phone_number.international  # '+358 40 1234567'
+        user.phone_number.national  # '040 1234567'
         user.country_code  # 'FI'
 
 
@@ -159,9 +159,9 @@ class PhoneNumberType(ScalarCoercible, types.TypeDecorator):
 
         user = User(phone_number='+358401234567')
 
-        user.phone_number.e164  # u'+358401234567'
-        user.phone_number.international  # u'+358 40 1234567'
-        user.phone_number.national  # u'040 1234567'
+        user.phone_number.e164  # '+358401234567'
+        user.phone_number.international  # '+358 40 1234567'
+        user.phone_number.national  # '040 1234567'
     """
 
     STORE_FORMAT = "e164"
