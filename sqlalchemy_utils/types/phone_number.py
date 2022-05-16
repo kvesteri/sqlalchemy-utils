@@ -1,3 +1,11 @@
+"""
+..  note::
+
+    The `phonenumbers`_ package must be installed to use PhoneNumber types.
+
+..  _phonenumbers: https://github.com/daviddrysdale/python-phonenumbers
+"""
+
 from sqlalchemy import exc, types
 
 from ..exceptions import ImproperlyConfigured
@@ -82,7 +90,7 @@ class PhoneNumber(BasePhoneNumber):
         # Bail if phonenumbers is not found.
         if phonenumbers is None:
             raise ImproperlyConfigured(
-                "'phonenumbers' is required to use 'PhoneNumber'"
+                "The 'phonenumbers' package is required to use 'PhoneNumber'"
             )
 
         try:
@@ -165,7 +173,7 @@ class PhoneNumberType(ScalarCoercible, types.TypeDecorator):
         # Bail if phonenumbers is not found.
         if phonenumbers is None:
             raise ImproperlyConfigured(
-                "'phonenumbers' is required to use 'PhoneNumberType'"
+                "The 'phonenumbers' package is required to use 'PhoneNumberType'"
             )
 
         super(PhoneNumberType, self).__init__(*args, **kwargs)
