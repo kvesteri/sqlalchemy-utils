@@ -33,7 +33,7 @@ def compile_create_materialized_view(element, compiler, **kw):
 
 
 @compiler.compiles(CreateView, 'postgresql')
-def compile_create_materialized_view_(element, compiler, **kw):
+def compile_create_materialized_view_postgresql(element, compiler, **kw):
     """
     CREATE [ OR REPLACE ] [ TEMP | TEMPORARY ] [ RECURSIVE ] VIEW name [ ( column_name [, ...] ) ]
         [ WITH ( view_option_name [= view_option_value] [, ... ] ) ]
@@ -61,7 +61,7 @@ def compile_create_materialized_view_(element, compiler, **kw):
 
 
 @compiler.compiles(CreateView, 'mysql')
-def compile_create_materialized_view_(element, compiler, **kw):
+def compile_create_materialized_view_mysql(element, compiler, **kw):
     """
     CREATE
         [OR REPLACE]
@@ -85,7 +85,7 @@ def compile_create_materialized_view_(element, compiler, **kw):
 
 
 @compiler.compiles(CreateView, 'mssql')
-def compile_create_materialized_view_(element, compiler, **kw):
+def compile_create_materialized_view_mssql(element, compiler, **kw):
     """
     CREATE [ OR ALTER ] VIEW [ schema_name . ] view_name [ (column [ ,...n ] ) ]
         [ WITH <view_attribute> [ ,...n ] ]
@@ -112,7 +112,7 @@ def compile_create_materialized_view_(element, compiler, **kw):
 
 
 @compiler.compiles(CreateView, 'snowflake')
-def compile_create_materialized_view(element, compiler, **kw):
+def compile_create_materialized_view_snowflake(element, compiler, **kw):
     """
     CREATE [ OR REPLACE ] [ SECURE ] [ RECURSIVE ] VIEW [ IF NOT EXISTS ] <name>
         [ ( <column_list> ) ]
