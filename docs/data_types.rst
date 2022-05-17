@@ -127,7 +127,7 @@ PasswordType
 PhoneNumberType
 ---------------
 
-.. module:: sqlalchemy_utils.types.phone_number
+.. automodule:: sqlalchemy_utils.types.phone_number
 
 .. autoclass:: PhoneNumber
 
