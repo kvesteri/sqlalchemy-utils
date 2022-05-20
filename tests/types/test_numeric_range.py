@@ -89,6 +89,12 @@ class NumericRangeTestCase(object):
         assert car.price_range.lower == 15
         assert car.price_range.upper == 15
 
+    def test_compilation(self, session, Car):
+        query = sa.select([Car.price_range])
+
+        # the type should be cacheable and not throw exception
+        session.execute(query)
+
 
 @pytest.mark.usefixtures('postgresql_dsn')
 class TestNumericRangeOnPostgres(NumericRangeTestCase):

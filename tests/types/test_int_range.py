@@ -100,6 +100,12 @@ class NumberRangeTestCase(object):
         assert building.persons_at_night.lower == 15
         assert building.persons_at_night.upper == 15
 
+    def test_compilation(self, session, Building):
+        query = sa.select([Building.persons_at_night])
+
+        # the type should be cacheable and not throw exception
+        session.execute(query)
+
 
 @pytest.mark.usefixtures('postgresql_dsn')
 class TestIntRangeTypeOnPostgres(NumberRangeTestCase):

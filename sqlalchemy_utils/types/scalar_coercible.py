@@ -1,6 +1,4 @@
 class ScalarCoercible:
-    cache_ok = True
-
     def _coerce(self, value):
         raise NotImplementedError
 

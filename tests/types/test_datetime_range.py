@@ -82,6 +82,12 @@ class DateTimeRangeTestCase:
         assert booking.during.lower == datetime(2015, 1, 1)
         assert booking.during.upper == datetime(2015, 1, 1)
 
+    def test_compilation(self, session, Booking):
+        query = sa.select([Booking.during])
+
+        # the type should be cacheable and not throw exception
+        session.execute(query)
+
 
 @pytest.mark.usefixtures('postgresql_dsn')
 class TestDateTimeRangeOnPostgres(DateTimeRangeTestCase):
