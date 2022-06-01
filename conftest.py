@@ -45,6 +45,11 @@ def db_name():
 
 
 @pytest.fixture(scope='session')
+def postgresql_db_host():
+    return os.environ.get('SQLALCHEMY_UTILS_TEST_POSTGRESQL_HOST', 'localhost')
+
+
+@pytest.fixture(scope='session')
 def postgresql_db_user():
     return os.environ.get('SQLALCHEMY_UTILS_TEST_POSTGRESQL_USER', 'postgres')
 
@@ -60,10 +65,12 @@ def mysql_db_user():
 
 
 @pytest.fixture
-def postgresql_dsn(postgresql_db_user, postgresql_db_password, db_name):
-    return 'postgresql://{0}:{1}@localhost/{2}'.format(
+def postgresql_dsn(postgresql_db_user, postgresql_db_password, postgresql_db_host,
+                   db_name):
+    return 'postgresql://{0}:{1}@{2}/{3}'.format(
         postgresql_db_user,
         postgresql_db_password,
+        postgresql_db_host,
         db_name
     )
 
