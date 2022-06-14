@@ -52,6 +52,9 @@ Session.vim
 # JetBrains
 .idea/
 
+# vscode
+.vscode/
+
 # Environments
 .env
 .venv

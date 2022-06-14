@@ -6,16 +6,144 @@ from sqlalchemy_utils.functions import get_columns
 
 
 class CreateView(DDLElement):
-    def __init__(self, name, selectable, materialized=False):
+    def __init__(
+        self,
+        name,
+        selectable,
+        materialized=False,
+        if_not_exists=False,
+        or_replace=False,
+    ):
         self.name = name
         self.selectable = selectable
         self.materialized = materialized
+        self.if_not_exists = if_not_exists
+        self.or_replace = or_replace
 
 
 @compiler.compiles(CreateView)
 def compile_create_materialized_view(element, compiler, **kw):
-    return 'CREATE {}VIEW {} AS {}'.format(
+    return 'CREATE {}{}VIEW {}{} AS {}'.format(
+        'OR REPLACE ' if element.or_replace else '',
         'MATERIALIZED ' if element.materialized else '',
+        'IF NOT EXISTS ' if element.if_not_exists else '',
+        compiler.dialect.identifier_preparer.quote(element.name),
+        compiler.sql_compiler.process(element.selectable, literal_binds=True),
+    )
+
+
+@compiler.compiles(CreateView, 'postgresql')
+def compile_create_materialized_view_postgresql(element, compiler, **kw):
+    """
+    CREATE [ OR REPLACE ] [ TEMP | TEMPORARY ] [ RECURSIVE ] VIEW name [ ( column_name [, ...] ) ]
+        [ WITH ( view_option_name [= view_option_value] [, ... ] ) ]
+        AS query
+        [ WITH [ CASCADED | LOCAL ] CHECK OPTION ]
+
+    CREATE MATERIALIZED VIEW [ IF NOT EXISTS ] table_name
+        [ (column_name [, ...] ) ]
+        [ USING method ]
+        [ WITH ( storage_parameter [= value] [, ... ] ) ]
+        [ TABLESPACE tablespace_name ]
+        AS query
+        [ WITH [ NO ] DATA ]
+
+    see https://www.postgresql.org/docs/current/sql-createview.html
+    see https://www.postgresql.org/docs/current/sql-creatematerializedview.html
+    """
+    return 'CREATE {}{}VIEW {}{} AS {}'.format(
+        'OR REPLACE ' if not element.materialized and element.or_replace else '',
+        'MATERIALIZED ' if element.materialized else '',
+        'IF NOT EXISTS ' if element.materialized and element.if_not_exists else '',
+        compiler.dialect.identifier_preparer.quote(element.name),
+        compiler.sql_compiler.process(element.selectable, literal_binds=True),
+    )
+
+
+@compiler.compiles(CreateView, 'mysql')
+def compile_create_materialized_view_mysql(element, compiler, **kw):
+    """
+    CREATE
+        [OR REPLACE]
+        [ALGORITHM = {UNDEFINED | MERGE | TEMPTABLE}]
+        [DEFINER = user]
+        [SQL SECURITY { DEFINER | INVOKER }]
+        VIEW view_name [(column_list)]
+        AS select_statement
+        [WITH [CASCADED | LOCAL] CHECK OPTION]
+
+    See https://dev.mysql.com/doc/refman/8.0/en/create-view.html
+    NOTE mysql does not support materialized view
+    """
+    if element.materialized:
+        raise ValueError('mysql does not support materialized view!')
+    return 'CREATE {}VIEW {} AS {}'.format(
+        'OR REPLACE ' if element.or_replace else '',
+        compiler.dialect.identifier_preparer.quote(element.name),
+        compiler.sql_compiler.process(element.selectable, literal_binds=True),
+    )
+
+
+@compiler.compiles(CreateView, 'mssql')
+def compile_create_materialized_view_mssql(element, compiler, **kw):
+    """
+    CREATE [ OR ALTER ] VIEW [ schema_name . ] view_name [ (column [ ,...n ] ) ]
+        [ WITH <view_attribute> [ ,...n ] ]
+        AS select_statement
+        [ WITH CHECK OPTION ]
+        [ ; ]
+
+    CREATE MATERIALIZED VIEW [ schema_name. ] materialized_view_name
+        WITH (
+        <distribution_option>
+        )
+        AS <select_statement>
+    [;]
+
+    see https://docs.microsoft.com/en-us/sql/t-sql/statements/create-view-transact-sql?view=sql-server-ver15
+    see https://docs.microsoft.com/en-us/sql/t-sql/statements/create-materialized-view-as-select-transact-sql?view=azure-sqldw-latest&viewFallbackFrom=sql-server-ver15
+    """
+    return 'CREATE {}{}VIEW {} AS {}'.format(
+        'OR ALTER ' if not element.materialized and element.or_replace else '',
+        'MATERIALIZED ' if element.materialized else '',
+        compiler.dialect.identifier_preparer.quote(element.name),
+        compiler.sql_compiler.process(element.selectable, literal_binds=True),
+    )
+
+
+@compiler.compiles(CreateView, 'snowflake')
+def compile_create_materialized_view_snowflake(element, compiler, **kw):
+    """
+    CREATE [ OR REPLACE ] [ SECURE ] [ RECURSIVE ] VIEW [ IF NOT EXISTS ] <name>
+        [ ( <column_list> ) ]
+        [ <col1> [ WITH ] MASKING POLICY <policy_name> [ USING ( <col1> , <cond_col1> , ... ) ]
+                [ WITH ] TAG ( <tag_name> = '<tag_value>' [ , <tag_name> = '<tag_value>' , ... ] ) ]
+        [ , <col2> [ ... ] ]
+        [ [ WITH ] ROW ACCESS POLICY <policy_name> ON ( <col_name> [ , <col_name> ... ] ) ]
+        [ WITH ] TAG ( <tag_name> = '<tag_value>' [ , <tag_name> = '<tag_value>' , ... ] ) ]
+        [ COPY GRANTS ]
+        [ COMMENT = '<string_literal>' ]
+        AS <select_statement>
+
+    CREATE [ OR REPLACE ] [ SECURE ] MATERIALIZED VIEW [ IF NOT EXISTS ] <name>
+        [ COPY GRANTS ]
+        ( <column_list> )
+        [ <col1> [ WITH ] MASKING POLICY <policy_name> [ USING ( <col1> , <cond_col1> , ... ) ]
+                [ WITH ] TAG ( <tag_name> = '<tag_value>' [ , <tag_name> = '<tag_value>' , ... ] ) ]
+        [ , <col2> [ ... ] ]
+        [ [ WITH ] ROW ACCESS POLICY <policy_name> ON ( <col_name> [ , <col_name> ... ] ) ]
+        [ WITH ] TAG ( <tag_name> = '<tag_value>' [ , <tag_name> = '<tag_value>' , ... ] ) ]
+        [ COMMENT = '<string_literal>' ]
+        [ CLUSTER BY ( <expr1> [, <expr2> ... ] ) ]
+        AS <select_statement>
+
+    see https://docs.snowflake.com/en/sql-reference/sql/create-view.html
+    see https://docs.snowflake.com/en/sql-reference/sql/create-materialized-view.html
+    """
+    return 'CREATE {}{}VIEW {}{} AS {}'.format(
+        'OR REPLACE ' if element.or_replace else '',
+        'MATERIALIZED ' if element.materialized else '',
+        'IF NOT EXISTS ' if element.if_not_exists else '',
         compiler.dialect.identifier_preparer.quote(element.name),
         compiler.sql_compiler.process(element.selectable, literal_binds=True),
     )
@@ -33,17 +161,12 @@ def compile_drop_materialized_view(element, compiler, **kw):
     return 'DROP {}VIEW IF EXISTS {} {}'.format(
         'MATERIALIZED ' if element.materialized else '',
         compiler.dialect.identifier_preparer.quote(element.name),
-        'CASCADE' if element.cascade else ''
+        'CASCADE' if element.cascade else '',
     )
 
 
 def create_table_from_selectable(
-    name,
-    selectable,
-    indexes=None,
-    metadata=None,
-    aliases=None,
-    **kwargs
+    name, selectable, indexes=None, metadata=None, aliases=None, **kwargs
 ):
     if indexes is None:
         indexes = []
@@ -53,10 +176,7 @@ def create_table_from_selectable(
         aliases = {}
     args = [
         sa.Column(
-            c.name,
-            c.type,
-            key=aliases.get(c.name, c.name),
-            primary_key=c.primary_key
+            c.name, c.type, key=aliases.get(c.name, c.name), primary_key=c.primary_key
         )
         for c in get_columns(selectable)
     ] + indexes
@@ -74,9 +194,11 @@ def create_materialized_view(
     selectable,
     metadata,
     indexes=None,
-    aliases=None
+    aliases=None,
+    if_not_exists=False,
+    or_replace=False,
 ):
-    """ Create a view on a given metadata
+    """Create a view on a given metadata
 
     :param name: The name of the view to create.
     :param selectable: An SQLAlchemy selectable e.g. a select() statement.
@@ -87,6 +209,12 @@ def create_materialized_view(
     :param aliases:
         An optional dictionary containing with keys as column names and values
         as column aliases.
+    :param if_not_exists:
+        An optional flag to indicate whether to use the
+        ``CREATE MATERIALIZED VIEW IF NOT EXISTS`` statement.
+    :param or_replace:
+        An optional flag to indicate whether to use the
+        ``CREATE OR REPLACE MATERIALIZED VIEW`` statement.
 
     Same as for ``create_view`` except that a ``CREATE MATERIALIZED VIEW``
     statement is emitted instead of a ``CREATE VIEW``.
@@ -97,13 +225,19 @@ def create_materialized_view(
         selectable=selectable,
         indexes=indexes,
         metadata=None,
-        aliases=aliases
+        aliases=aliases,
     )
 
     sa.event.listen(
         metadata,
         'after_create',
-        CreateView(name, selectable, materialized=True)
+        CreateView(
+            name,
+            selectable,
+            materialized=True,
+            if_not_exists=if_not_exists,
+            or_replace=or_replace,
+        ),
     )
 
     @sa.event.listens_for(metadata, 'after_create')
@@ -111,11 +245,7 @@ def create_materialized_view(
         for idx in table.indexes:
             idx.create(connection)
 
-    sa.event.listen(
-        metadata,
-        'before_drop',
-        DropView(name, materialized=True)
-    )
+    sa.event.listen(metadata, 'before_drop', DropView(name, materialized=True))
     return table
 
 
@@ -123,15 +253,23 @@ def create_view(
     name,
     selectable,
     metadata,
-    cascade_on_drop=True
+    cascade_on_drop=True,
+    if_not_exists=False,
+    or_replace=False,
 ):
-    """ Create a view on a given metadata
+    """Create a view on a given metadata
 
     :param name: The name of the view to create.
     :param selectable: An SQLAlchemy selectable e.g. a select() statement.
     :param metadata:
         An SQLAlchemy Metadata instance that stores the features of the
         database being described.
+    :param if_not_exists:
+        An optional flag to indicate whether to use the
+        ``CREATE VIEW IF NOT EXISTS`` statement.
+    :param or_replace:
+        An optional flag to indicate whether to use the
+        ``CREATE OR REPLACE VIEW`` statement. (``OR ALTER`` will be used for mysql)
 
     The process for creating a view is similar to the standard way that a
     table is constructed, except that a selectable is provided instead of
@@ -156,28 +294,28 @@ def create_view(
 
     """
     table = create_table_from_selectable(
-        name=name,
-        selectable=selectable,
-        metadata=None
+        name=name, selectable=selectable, metadata=None
     )
 
-    sa.event.listen(metadata, 'after_create', CreateView(name, selectable))
+    sa.event.listen(
+        metadata,
+        'after_create',
+        CreateView(
+            name, selectable, if_not_exists=if_not_exists, or_replace=or_replace
+        ),
+    )
 
     @sa.event.listens_for(metadata, 'after_create')
     def create_indexes(target, connection, **kw):
         for idx in table.indexes:
             idx.create(connection)
 
-    sa.event.listen(
-        metadata,
-        'before_drop',
-        DropView(name, cascade=cascade_on_drop)
-    )
+    sa.event.listen(metadata, 'before_drop', DropView(name, cascade=cascade_on_drop))
     return table
 
 
 def refresh_materialized_view(session, name, concurrently=False):
-    """ Refreshes an already existing materialized view
+    """Refreshes an already existing materialized view
 
     :param session: An SQLAlchemy Session instance.
     :param name: The name of the materialized view to refresh.
@@ -191,6 +329,6 @@ def refresh_materialized_view(session, name, concurrently=False):
     session.execute(
         'REFRESH MATERIALIZED VIEW {}{}'.format(
             'CONCURRENTLY ' if concurrently else '',
-            session.bind.engine.dialect.identifier_preparer.quote(name)
+            session.bind.engine.dialect.identifier_preparer.quote(name),
         )
     )
