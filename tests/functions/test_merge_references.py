@@ -34,10 +34,10 @@ class TestMergeReferences(object):
         pass
 
     def test_updates_foreign_keys(self, session, User, BlogPost):
-        john = User(name=u'John')
-        jack = User(name=u'Jack')
-        post = BlogPost(title=u'Some title', author=john)
-        post2 = BlogPost(title=u'Other title', author=jack)
+        john = User(name='John')
+        jack = User(name='Jack')
+        post = BlogPost(title='Some title', author=john)
+        post2 = BlogPost(title='Other title', author=jack)
         session.add(john)
         session.add(jack)
         session.add(post)
@@ -49,10 +49,10 @@ class TestMergeReferences(object):
         assert post2.author == jack
 
     def test_object_merging_whenever_possible(self, session, User, BlogPost):
-        john = User(name=u'John')
-        jack = User(name=u'Jack')
-        post = BlogPost(title=u'Some title', author=john)
-        post2 = BlogPost(title=u'Other title', author=jack)
+        john = User(name='John')
+        jack = User(name='Jack')
+        post = BlogPost(title='Some title', author=john)
+        post2 = BlogPost(title='Other title', author=jack)
         session.add(john)
         session.add(jack)
         session.add(post)
@@ -111,9 +111,9 @@ class TestMergeReferencesWithManyToManyAssociations(object):
         pass
 
     def test_supports_associations(self, session, User, Team):
-        john = User(name=u'John')
-        jack = User(name=u'Jack')
-        team = Team(name=u'Team')
+        john = User(name='John')
+        jack = User(name='Jack')
+        team = Team(name='Team')
         team.members.append(john)
         session.add(john)
         session.add(jack)
@@ -179,9 +179,9 @@ class TestMergeReferencesWithManyToManyAssociationObjects(object):
         pass
 
     def test_supports_associations(self, session, User, Team, TeamMember):
-        john = User(name=u'John')
-        jack = User(name=u'Jack')
-        team = Team(name=u'Team')
+        john = User(name='John')
+        jack = User(name='Jack')
+        team = Team(name='Team')
         team.members.append(TeamMember(user=john))
         session.add(john)
         session.add(jack)
@@ -240,9 +240,9 @@ class TestMergeReferencesWithMappedProperties(object):
         pass
 
     def test_supports_associations(self, session, User, Team):
-        john = User(name=u'John')
-        jack = User(name=u'Jack')
-        team = Team(name=u'Team')
+        john = User(name='John')
+        jack = User(name='Jack')
+        team = Team(name='Team')
         team.members.append(john)
         session.add(john)
         session.add(jack)

@@ -40,8 +40,8 @@ class TestCurrency(object):
     @pytest.mark.parametrize(
         ('code', 'symbol'),
         (
-            ('USD', u'$'),
-            ('EUR', u'€')
+            ('USD', '$'),
+            ('EUR', '€')
         )
     )
     def test_symbol_property(self, code, symbol):
@@ -58,7 +58,7 @@ class TestCurrency(object):
 
     def test_unicode(self):
         currency = Currency('USD')
-        assert str(currency) == u'USD'
+        assert str(currency) == 'USD'
 
     def test_str(self):
         currency = Currency('USD')

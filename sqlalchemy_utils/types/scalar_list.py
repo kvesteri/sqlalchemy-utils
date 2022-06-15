@@ -26,7 +26,7 @@ class ScalarListType(types.TypeDecorator):
 
 
         user = User()
-        user.hobbies = [u'football', u'ice_hockey']
+        user.hobbies = ['football', 'ice_hockey']
         session.commit()
 
 
@@ -68,13 +68,13 @@ class ScalarListType(types.TypeDecorator):
 
     cache_ok = True
 
-    def __init__(self, coerce_func=str, separator=u','):
+    def __init__(self, coerce_func=str, separator=','):
         self.separator = str(separator)
         self.coerce_func = coerce_func
 
     def process_bind_param(self, value, dialect):
         # Convert list of values to unicode separator-separated list
-        # Example: [1, 2, 3, 4] -> u'1, 2, 3, 4'
+        # Example: [1, 2, 3, 4] -> '1, 2, 3, 4'
         if value is not None:
             if any(self.separator in str(item) for item in value):
                 raise ScalarListException(
@@ -89,7 +89,7 @@ class ScalarListType(types.TypeDecorator):
 
     def process_result_value(self, value, dialect):
         if value is not None:
-            if value == u'':
+            if value == '':
                 return []
             # coerce each value
             return list(map(

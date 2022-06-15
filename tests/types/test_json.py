@@ -66,14 +66,14 @@ class JSONTestCase(object):
 
     def test_non_ascii_chars(self, session, Document):
         document = Document(
-            json={'something': u'äääööö'}
+            json={'something': 'äääööö'}
         )
 
         session.add(document)
         session.commit()
 
         document = session.query(Document).first()
-        assert document.json == {'something': u'äääööö'}
+        assert document.json == {'something': 'äääööö'}
 
     def test_compilation(self, Document, session):
         query = sa.select([Document.json])

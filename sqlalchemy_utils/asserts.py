@@ -73,13 +73,13 @@ def _repeated_value(type_):
         if isinstance(type_.item_type, sa.Integer):
             return [0]
         elif isinstance(type_.item_type, sa.String):
-            return [u'a']
+            return ['a']
         elif isinstance(type_.item_type, sa.Numeric):
             return [Decimal('0')]
         else:
             raise TypeError('Unknown array item type')
     else:
-        return u'a'
+        return 'a'
 
 
 def _expected_exception(type_):

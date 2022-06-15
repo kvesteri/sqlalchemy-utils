@@ -28,7 +28,7 @@ class TestColorType(object):
         from colour import Color
 
         flexmock(ColorType).should_receive('_coerce').and_return(
-            u'white'
+            'white'
         )
         document = Document(
             bg_color='white'
@@ -38,17 +38,17 @@ class TestColorType(object):
         session.commit()
 
         document = session.query(Document).first()
-        assert document.bg_color.hex == Color(u'white').hex
+        assert document.bg_color.hex == Color('white').hex
 
     def test_color_parameter_processing(self, session, Document):
         from colour import Color
 
-        document = Document(bg_color=Color(u'white'))
+        document = Document(bg_color=Color('white'))
         session.add(document)
         session.commit()
 
         document = session.query(Document).first()
-        assert document.bg_color.hex == Color(u'white').hex
+        assert document.bg_color.hex == Color('white').hex
 
     def test_scalar_attributes_get_coerced_to_objects(self, Document):
         from colour import Color

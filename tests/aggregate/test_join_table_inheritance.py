@@ -111,12 +111,12 @@ class TestLazyEvaluatedSelectExpressionsForAggregates(object):
 
     def test_assigns_aggregates_on_insert(self, session, AnyProduct, Catalog):
         catalog = Catalog(
-            name=u'Some catalog'
+            name='Some catalog'
         )
         session.add(catalog)
         session.commit()
         product = AnyProduct(
-            name=u'Some product',
+            name='Some product',
             price=Decimal('1000'),
             catalog=catalog
         )
@@ -127,12 +127,12 @@ class TestLazyEvaluatedSelectExpressionsForAggregates(object):
 
     def test_assigns_aggregates_on_update(self, session, Catalog, AnyProduct):
         catalog = Catalog(
-            name=u'Some catalog'
+            name='Some catalog'
         )
         session.add(catalog)
         session.commit()
         product = AnyProduct(
-            name=u'Some product',
+            name='Some product',
             price=Decimal('1000'),
             catalog=catalog
         )

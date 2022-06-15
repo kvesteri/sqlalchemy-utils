@@ -49,7 +49,7 @@ class WeekDays(object):
         )
 
     def __unicode__(self):
-        return u', '.join(str(day) for day in self)
+        return ', '.join(str(day) for day in self)
 
     def as_bit_string(self):
         return ''.join(

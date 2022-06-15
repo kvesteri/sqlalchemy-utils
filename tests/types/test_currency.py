@@ -38,7 +38,7 @@ class TestCurrencyType(object):
         session.commit()
 
         user = session.query(User).first()
-        assert user.currency.name == u'US Dollar'
+        assert user.currency.name == 'US Dollar'
 
     def test_scalar_attributes_get_coerced_to_objects(
         self,

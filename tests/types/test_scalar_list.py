@@ -58,7 +58,7 @@ class TestScalarUnicodeList(object):
         User
     ):
         user = User(
-            some_list=[u',']
+            some_list=[',']
         )
 
         session.add(user)
@@ -72,14 +72,14 @@ class TestScalarUnicodeList(object):
 
     def test_save_unicode_list(self, session, User):
         user = User(
-            some_list=[u'1', u'2', u'3', u'4']
+            some_list=['1', '2', '3', '4']
         )
 
         session.add(user)
         session.commit()
 
         user = session.query(User).first()
-        assert user.some_list == [u'1', u'2', u'3', u'4']
+        assert user.some_list == ['1', '2', '3', '4']
 
     def test_save_and_retrieve_empty_list(self, session, User):
         user = User(

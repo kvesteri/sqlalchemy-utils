@@ -1,4 +1,3 @@
-import sys
 from datetime import datetime
 
 import pytest
@@ -13,7 +12,7 @@ class TestTimestamp(object):
         class Article(Base, Timestamp):
             __tablename__ = 'article'
             id = sa.Column(sa.Integer, primary_key=True)
-            name = sa.Column(sa.Unicode(255), default=u'Some article')
+            name = sa.Column(sa.Unicode(255), default='Some article')
         return Article
 
     def test_created(self, session, Article):
@@ -32,7 +31,7 @@ class TestTimestamp(object):
         session.commit()
 
         then = datetime.utcnow()
-        article.name = u"Something"
+        article.name = "Something"
 
         session.commit()
 
@@ -45,19 +44,14 @@ class TestGenericRepr:
         class Article(Base):
             __tablename__ = 'article'
             id = sa.Column(sa.Integer, primary_key=True)
-            name = sa.Column(sa.Unicode(255), default=u'Some article')
+            name = sa.Column(sa.Unicode(255), default='Some article')
         return Article
 
     def test_repr(self, Article):
         """Representation of a basic model."""
         Article = generic_repr(Article)
-        article = Article(id=1, name=u'Foo')
-        if sys.version_info[0] == 2:
-            expected_repr = u'Article(id=1, name=u\'Foo\')'
-        elif sys.version_info[0] == 3:
-            expected_repr = u'Article(id=1, name=\'Foo\')'
-        else:
-            raise AssertionError
+        article = Article(id=1, name='Foo')
+        expected_repr = "Article(id=1, name='Foo')"
         actual_repr = repr(article)
 
         assert actual_repr == expected_repr
@@ -65,8 +59,8 @@ class TestGenericRepr:
     def test_repr_partial(self, Article):
         """Representation of a basic model with selected fields."""
         Article = generic_repr('id')(Article)
-        article = Article(id=1, name=u'Foo')
-        expected_repr = u'Article(id=1)'
+        article = Article(id=1, name='Foo')
+        expected_repr = 'Article(id=1)'
         actual_repr = repr(article)
 
         assert actual_repr == expected_repr
@@ -77,12 +71,12 @@ class TestGenericRepr:
         instead represents them as "<not loaded>".
         """
         Article = generic_repr(Article)
-        article = Article(name=u'Foo')
+        article = Article(name='Foo')
         session.add(article)
         session.commit()
 
         article = session.query(Article).options(sa.orm.defer('name')).one()
         actual_repr = repr(article)
 
-        expected_repr = u'Article(id={}, name=<not loaded>)'.format(article.id)
+        expected_repr = 'Article(id={}, name=<not loaded>)'.format(article.id)
         assert actual_repr == expected_repr

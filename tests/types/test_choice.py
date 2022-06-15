@@ -48,31 +48,31 @@ class TestChoiceType(object):
 
     def test_string_processing(self, session, User):
         flexmock(ChoiceType).should_receive('_coerce').and_return(
-            u'admin'
+            'admin'
         )
         user = User(
-            type=u'admin'
+            type='admin'
         )
 
         session.add(user)
         session.commit()
 
         user = session.query(User).first()
-        assert user.type.value == u'Admin'
+        assert user.type.value == 'Admin'
 
     def test_parameter_processing(self, session, User):
         user = User(
-            type=u'admin'
+            type='admin'
         )
 
         session.add(user)
         session.commit()
 
         user = session.query(User).first()
-        assert user.type.value == u'Admin'
+        assert user.type.value == 'Admin'
 
     def test_scalar_attributes_get_coerced_to_objects(self, User):
-        user = User(type=u'admin')
+        user = User(type='admin')
 
         assert isinstance(user.type, Choice)
 
@@ -88,7 +88,7 @@ class TestChoiceType(object):
 
 class TestChoiceTypeWithCustomUnderlyingType(object):
     def test_init_type(self):
-        type_ = ChoiceType([(1, u'something')], impl=sa.Integer)
+        type_ = ChoiceType([(1, 'something')], impl=sa.Integer)
         assert type_.impl == sa.Integer
 
 

@@ -56,14 +56,14 @@ class TestCompositeTypeWithRegularTypes(object):
 
     def test_non_ascii_chars(self, session, Account):
         account = Account(
-            balance=(u'ääöö', 15)
+            balance=('ääöö', 15)
         )
 
         session.add(account)
         session.commit()
 
         account = session.query(Account).first()
-        assert account.balance.currency == u'ääöö'
+        assert account.balance.currency == 'ääöö'
         assert account.balance.amount == 15
 
     def test_dict_input(self, session, Account):

@@ -19,13 +19,13 @@ def User(Base):
 
 class TestEmailType(object):
     def test_saves_email_as_lowercased(self, session, User):
-        user = User(email=u'Someone@example.com')
+        user = User(email='Someone@example.com')
 
         session.add(user)
         session.commit()
 
         user = session.query(User).first()
-        assert user.email == u'someone@example.com'
+        assert user.email == 'someone@example.com'
 
     def test_literal_param(self, session, User):
         clause = User.email == 'Someone@example.com'

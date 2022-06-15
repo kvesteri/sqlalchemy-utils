@@ -86,7 +86,7 @@ class TestProxyDict(object):
         article.translations['en']
         article.translations['en'] = ArticleTranslation(
             locale='en',
-            name=u'something'
+            name='something'
         )
         article.translations['en']
 

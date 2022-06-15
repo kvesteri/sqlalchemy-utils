@@ -328,7 +328,7 @@ class IntRangeType(RangeType):
             estimated_number_of_persons = sa.Column(IntRangeType)
 
 
-        party = Event(name=u'party')
+        party = Event(name='party')
 
         # we estimate the party to contain minium of 10 persons and at max
         # 100 persons
@@ -342,7 +342,7 @@ class IntRangeType(RangeType):
     support many arithmetic operators::
 
 
-        meeting = Event(name=u'meeting')
+        meeting = Event(name='meeting')
 
         meeting.estimated_number_of_persons = [20, 40]
 
@@ -381,7 +381,7 @@ class Int8RangeType(RangeType):
             estimated_number_of_persons = sa.Column(Int8RangeType)
 
 
-        party = Event(name=u'party')
+        party = Event(name='party')
 
         # we estimate the party to contain minium of 10 persons and at max
         # 100 persons
@@ -395,7 +395,7 @@ class Int8RangeType(RangeType):
     support many arithmetic operators::
 
 
-        meeting = Event(name=u'meeting')
+        meeting = Event(name='meeting')
 
         meeting.estimated_number_of_persons = [20, 40]
 

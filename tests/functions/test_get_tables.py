@@ -28,7 +28,7 @@ def Article(TextItem):
             sa.Integer, sa.ForeignKey(TextItem.id), primary_key=True
         )
         __mapper_args__ = {
-            'polymorphic_identity': u'article'
+            'polymorphic_identity': 'article'
         }
     return Article
 

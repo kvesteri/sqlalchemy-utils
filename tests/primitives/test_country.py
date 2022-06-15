@@ -15,7 +15,7 @@ def set_get_locale():
 class TestCountry(object):
 
     def test_init(self):
-        assert Country(u'FI') == Country(Country(u'FI'))
+        assert Country('FI') == Country(Country('FI'))
 
     def test_constructor_with_wrong_type(self):
         with pytest.raises(TypeError) as e:
@@ -49,32 +49,32 @@ class TestCountry(object):
         )
 
     def test_equality_operator(self):
-        assert Country(u'FI') == u'FI'
-        assert u'FI' == Country(u'FI')
-        assert Country(u'FI') == Country(u'FI')
+        assert Country('FI') == 'FI'
+        assert 'FI' == Country('FI')
+        assert Country('FI') == Country('FI')
 
     def test_non_equality_operator(self):
-        assert Country(u'FI') != u'sv'
-        assert not (Country(u'FI') != u'FI')
+        assert Country('FI') != 'sv'
+        assert not (Country('FI') != 'FI')
 
     @pytest.mark.parametrize(
         'op, code_left, code_right, is_',
         [
-            (operator.lt, u'ES', u'FI', True),
-            (operator.lt, u'FI', u'ES', False),
-            (operator.lt, u'ES', u'ES', False),
+            (operator.lt, 'ES', 'FI', True),
+            (operator.lt, 'FI', 'ES', False),
+            (operator.lt, 'ES', 'ES', False),
 
-            (operator.le, u'ES', u'FI', True),
-            (operator.le, u'FI', u'ES', False),
-            (operator.le, u'ES', u'ES', True),
+            (operator.le, 'ES', 'FI', True),
+            (operator.le, 'FI', 'ES', False),
+            (operator.le, 'ES', 'ES', True),
 
-            (operator.ge, u'ES', u'FI', False),
-            (operator.ge, u'FI', u'ES', True),
-            (operator.ge, u'ES', u'ES', True),
+            (operator.ge, 'ES', 'FI', False),
+            (operator.ge, 'FI', 'ES', True),
+            (operator.ge, 'ES', 'ES', True),
 
-            (operator.gt, u'ES', u'FI', False),
-            (operator.gt, u'FI', u'ES', True),
-            (operator.gt, u'ES', u'ES', False),
+            (operator.gt, 'ES', 'FI', False),
+            (operator.gt, 'FI', 'ES', True),
+            (operator.gt, 'ES', 'ES', False),
         ]
     )
     def test_ordering(self, op, code_left, code_right, is_):
@@ -92,7 +92,7 @@ class TestCountry(object):
 
     def test_unicode(self):
         country = Country('FI')
-        assert str(country) == u'Finland'
+        assert str(country) == 'Finland'
 
     def test_str(self):
         country = Country('FI')

@@ -25,7 +25,7 @@ def init_models(User):
 class TestLocaleType(object):
     def test_parameter_processing(self, session, User):
         user = User(
-            locale=locale.babel.Locale(u'fi')
+            locale=locale.babel.Locale('fi')
         )
 
         session.add(user)
@@ -34,7 +34,7 @@ class TestLocaleType(object):
         user = session.query(User).first()
 
     def test_territory_parsing(self, session, User):
-        ko_kr = locale.babel.Locale(u'ko', territory=u'KR')
+        ko_kr = locale.babel.Locale('ko', territory='KR')
         user = User(locale=ko_kr)
         session.add(user)
         session.commit()
@@ -44,7 +44,7 @@ class TestLocaleType(object):
     def test_coerce_territory_parsing(self, User):
         user = User()
         user.locale = 'ko_KR'
-        assert user.locale == locale.babel.Locale(u'ko', territory=u'KR')
+        assert user.locale == locale.babel.Locale('ko', territory='KR')
 
     def test_scalar_attributes_get_coerced_to_objects(self, User):
         user = User(locale='en_US')
@@ -53,7 +53,7 @@ class TestLocaleType(object):
 
     def test_unknown_locale_throws_exception(self, User):
         with pytest.raises(locale.babel.UnknownLocaleError):
-            User(locale=u'unknown')
+            User(locale='unknown')
 
     def test_literal_param(self, session, User):
         clause = User.locale == 'en_US'

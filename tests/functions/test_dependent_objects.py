@@ -46,7 +46,7 @@ class TestDependentObjects(object):
         pass
 
     def test_returns_all_dependent_objects(self, session, User, Article):
-        user = User(first_name=u'John')
+        user = User(first_name='John')
         articles = [
             Article(author=user),
             Article(),
@@ -69,7 +69,7 @@ class TestDependentObjects(object):
         Article,
         BlogPost
     ):
-        user = User(first_name=u'John')
+        user = User(first_name='John')
         objects = [
             Article(author=user),
             Article(),
@@ -140,7 +140,7 @@ class TestDependentObjectsWithColumnAliases(object):
         pass
 
     def test_returns_all_dependent_objects(self, session, User, Article):
-        user = User(first_name=u'John')
+        user = User(first_name='John')
         articles = [
             Article(author=user),
             Article(),
@@ -163,7 +163,7 @@ class TestDependentObjectsWithColumnAliases(object):
         Article,
         BlogPost
     ):
-        user = User(first_name=u'John')
+        user = User(first_name='John')
         objects = [
             Article(author=user),
             Article(),
@@ -222,7 +222,7 @@ class TestDependentObjectsWithManyReferences(object):
         pass
 
     def test_with_many_dependencies(self, session, User, Article, BlogPost):
-        user = User(first_name=u'John')
+        user = User(first_name='John')
         objects = [
             Article(author=user),
             BlogPost(author=user)
@@ -265,7 +265,7 @@ class TestDependentObjectsWithCompositeKeys(object):
         pass
 
     def test_returns_all_dependent_objects(self, session, User, Article):
-        user = User(first_name=u'John', last_name=u'Smith')
+        user = User(first_name='John', last_name='Smith')
         articles = [
             Article(author=user),
             Article(),
@@ -318,7 +318,7 @@ class TestDependentObjectsWithSingleTableInheritance(object):
     def Article(self, TextItem):
         class Article(TextItem):
             __mapper_args__ = {
-                'polymorphic_identity': u'article'
+                'polymorphic_identity': 'article'
             }
         return Article
 
@@ -326,7 +326,7 @@ class TestDependentObjectsWithSingleTableInheritance(object):
     def BlogPost(self, TextItem):
         class BlogPost(TextItem):
             __mapper_args__ = {
-                'polymorphic_identity': u'blog_post'
+                'polymorphic_identity': 'blog_post'
             }
         return BlogPost
 
@@ -335,8 +335,8 @@ class TestDependentObjectsWithSingleTableInheritance(object):
         pass
 
     def test_returns_all_dependent_objects(self, session, Category, Article):
-        category1 = Category(name=u'Category #1')
-        category2 = Category(name=u'Category #2')
+        category1 = Category(name='Category #1')
+        category2 = Category(name='Category #2')
         articles = [
             Article(category=category1),
             Article(category=category1),

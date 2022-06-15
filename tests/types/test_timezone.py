@@ -39,22 +39,22 @@ def init_models(Visitor):
 class TestTimezoneType:
     def test_parameter_processing(self, session, Visitor):
         visitor = Visitor(
-            timezone_dateutil=u'America/Los_Angeles',
-            timezone_pytz=u'America/Los_Angeles',
-            timezone_zoneinfo=u'America/Los_Angeles'
+            timezone_dateutil='America/Los_Angeles',
+            timezone_pytz='America/Los_Angeles',
+            timezone_zoneinfo='America/Los_Angeles'
         )
 
         session.add(visitor)
         session.commit()
 
         visitor_dateutil = session.query(Visitor).filter_by(
-            timezone_dateutil=u'America/Los_Angeles'
+            timezone_dateutil='America/Los_Angeles'
         ).first()
         visitor_pytz = session.query(Visitor).filter_by(
-            timezone_pytz=u'America/Los_Angeles'
+            timezone_pytz='America/Los_Angeles'
         ).first()
         visitor_zoneinfo = session.query(Visitor).filter_by(
-            timezone_zoneinfo=u'America/Los_Angeles'
+            timezone_zoneinfo='America/Los_Angeles'
         ).first()
 
         assert visitor_dateutil is not None

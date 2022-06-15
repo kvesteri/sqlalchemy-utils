@@ -6,7 +6,7 @@ class TestInstrumentedList(object):
     ):
         category = Category()
         category.articles.append(Article())
-        category.articles.append(Article(name=u'some name'))
+        category.articles.append(Article(name='some name'))
         assert category.articles.any('name')
 
     def test_any_returns_false_if_no_member_has_attr_defined(

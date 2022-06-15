@@ -25,14 +25,14 @@ def init_models(Visitor):
 class TestIPAddressType(object):
     def test_parameter_processing(self, session, Visitor):
         visitor = Visitor(
-            ip_address=u'111.111.111.111'
+            ip_address='111.111.111.111'
         )
 
         session.add(visitor)
         session.commit()
 
         visitor = session.query(Visitor).first()
-        assert str(visitor.ip_address) == u'111.111.111.111'
+        assert str(visitor.ip_address) == '111.111.111.111'
 
     def test_compilation(self, Visitor, session):
         query = sa.select([Visitor.ip_address])

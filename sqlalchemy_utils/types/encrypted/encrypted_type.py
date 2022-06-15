@@ -302,7 +302,7 @@ class StringEncryptedType(TypeDecorator, ScalarCoercible):
         session = Session()
 
         # example
-        user_name = u'secret_user'
+        user_name = 'secret_user'
         test_token = 'atesttoken'
         active = True
         num_of_accounts = 2

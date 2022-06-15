@@ -28,7 +28,7 @@ class URLType(ScalarCoercible, types.TypeDecorator):
             website = sa.Column(URLType)
 
 
-        user = User(website=u'www.example.com')
+        user = User(website='www.example.com')
 
         # website is coerced to furl object, hence all nice furl operations
         # come available

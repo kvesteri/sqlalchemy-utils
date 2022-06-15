@@ -26,7 +26,7 @@ class TestCaseInsensitiveComparator(object):
     def test_supports_equals(self, session, User):
         query = (
             session.query(User)
-            .filter(User.email == u'email@example.com')
+            .filter(User.email == 'email@example.com')
         )
 
         assert 'user.email = lower(?)' in str(query)
@@ -34,7 +34,7 @@ class TestCaseInsensitiveComparator(object):
     def test_supports_in_(self, session, User):
         query = (
             session.query(User)
-            .filter(User.email.in_([u'email@example.com', u'a']))
+            .filter(User.email.in_(['email@example.com', 'a']))
         )
         assert (
             'user.email IN (lower(?), lower(?))'
@@ -44,7 +44,7 @@ class TestCaseInsensitiveComparator(object):
     def test_supports_notin_(self, session, User):
         query = (
             session.query(User)
-            .filter(User.email.notin_([u'email@example.com', u'a']))
+            .filter(User.email.notin_(['email@example.com', 'a']))
         )
         assert (
             'user.email NOT IN ('
