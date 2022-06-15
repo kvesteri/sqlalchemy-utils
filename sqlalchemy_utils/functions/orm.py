@@ -3,7 +3,6 @@ from functools import partial
 from inspect import isclass
 from operator import attrgetter
 
-import six
 import sqlalchemy as sa
 from sqlalchemy.engine.interfaces import Dialect
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -772,7 +771,7 @@ def has_changes(obj, attrs=None, exclude=None):
     :param exclude: Names of the attributes to exclude
     """
     if attrs:
-        if isinstance(attrs, six.string_types):
+        if isinstance(attrs, str):
             return (
                 sa.inspect(obj)
                 .attrs

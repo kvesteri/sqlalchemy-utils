@@ -1,5 +1,4 @@
 import pytest
-import six
 import sqlalchemy as sa
 
 from sqlalchemy_utils.types import ip_address
@@ -33,7 +32,7 @@ class TestIPAddressType(object):
         session.commit()
 
         visitor = session.query(Visitor).first()
-        assert six.text_type(visitor.ip_address) == u'111.111.111.111'
+        assert str(visitor.ip_address) == u'111.111.111.111'
 
     def test_compilation(self, Visitor, session):
         query = sa.select([Visitor.ip_address])

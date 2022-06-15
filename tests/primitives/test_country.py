@@ -1,7 +1,6 @@
 import operator
 
 import pytest
-import six
 
 from sqlalchemy_utils import Country, i18n
 
@@ -93,7 +92,7 @@ class TestCountry(object):
 
     def test_unicode(self):
         country = Country('FI')
-        assert six.text_type(country) == u'Finland'
+        assert str(country) == u'Finland'
 
     def test_str(self):
         country = Country('FI')

@@ -1,5 +1,4 @@
 import pytest
-import six
 import sqlalchemy as sa
 from sqlalchemy.util.langhelpers import symbol
 
@@ -166,7 +165,7 @@ class TestPath(object):
         assert Path('s.s2.s3').index('s2') == 1
 
     def test_unicode(self):
-        assert six.text_type(Path('s.s2')) == u's.s2'
+        assert str(Path('s.s2')) == u's.s2'
 
     def test_getitem_with_slice(self):
         path = Path('s.s2.s3')

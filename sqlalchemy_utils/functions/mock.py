@@ -1,9 +1,9 @@
 import contextlib
 import datetime
 import inspect
+import io
 import re
 
-import six
 import sqlalchemy as sa
 
 
@@ -14,7 +14,7 @@ def create_mock_engine(bind, stream=None):
     :param stream: Render all DDL operations to the stream.
     """
 
-    if not isinstance(bind, six.string_types):
+    if not isinstance(bind, str):
         bind_url = str(bind.url)
 
     else:
@@ -31,7 +31,7 @@ def create_mock_engine(bind, stream=None):
                         bindparam.value, bindparam.type)
 
                 def render_literal_value(self, value, type_):
-                    if isinstance(value, six.integer_types):
+                    if isinstance(value, int):
                         return str(value)
 
                     elif isinstance(value, (datetime.date, datetime.datetime)):
@@ -71,17 +71,17 @@ def mock_engine(engine, stream=None):
     # Create a stream if not present.
 
     if stream is None:
-        stream = six.moves.cStringIO()
+        stream = io.StringIO()
 
     # Navigate the stack and find the calling frame that allows the
-    # expression to execuate.
+    # expression to execute.
 
     for frame in inspect.stack()[1:]:
 
         try:
             frame = frame[0]
             expression = '__target = %s' % engine
-            six.exec_(expression, frame.f_globals, frame.f_locals)
+            exec(expression, frame.f_globals, frame.f_locals)
             target = frame.f_locals['__target']
             break
 
@@ -98,7 +98,7 @@ def mock_engine(engine, stream=None):
 
     # Replace the target with our mock.
 
-    six.exec_('%s = __mock' % engine, frame.f_globals, frame.f_locals)
+    exec('%s = __mock' % engine, frame.f_globals, frame.f_locals)
 
     # Give control back.
 
@@ -107,6 +107,6 @@ def mock_engine(engine, stream=None):
     # Put the target engine back.
 
     frame.f_locals['__target'] = target
-    six.exec_('%s = __target' % engine, frame.f_globals, frame.f_locals)
-    six.exec_('del __target', frame.f_globals, frame.f_locals)
-    six.exec_('del __mock', frame.f_globals, frame.f_locals)
+    exec('%s = __target' % engine, frame.f_globals, frame.f_locals)
+    exec('del __target', frame.f_globals, frame.f_locals)
+    exec('del __mock', frame.f_globals, frame.f_locals)

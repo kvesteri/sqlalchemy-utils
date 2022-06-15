@@ -1,5 +1,4 @@
 import pytest
-import six
 from flexmock import flexmock
 
 from sqlalchemy_utils import i18n
@@ -78,7 +77,7 @@ class TestWeekDay(object):
     def test_unicode(self):
         day = WeekDay(0)
         flexmock(day).should_receive('name').and_return(u'maanantaina')
-        assert six.text_type(day) == u'maanantaina'
+        assert str(day) == u'maanantaina'
 
     def test_str(self):
         day = WeekDay(0)
@@ -161,7 +160,7 @@ class TestWeekDays(object):
     def test_unicode(self):
         i18n.get_locale = lambda: i18n.babel.Locale('fi')
         days = WeekDays('1000100')
-        assert six.text_type(days) == u'maanantaina, perjantaina'
+        assert str(days) == u'maanantaina, perjantaina'
 
     def test_str(self):
         i18n.get_locale = lambda: i18n.babel.Locale('fi')

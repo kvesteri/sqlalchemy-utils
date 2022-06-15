@@ -1,5 +1,3 @@
-import six
-
 from ..utils import str_coercible
 from .weekday import WeekDay
 
@@ -7,7 +5,7 @@ from .weekday import WeekDay
 @str_coercible
 class WeekDays(object):
     def __init__(self, bit_string_or_week_days):
-        if isinstance(bit_string_or_week_days, six.string_types):
+        if isinstance(bit_string_or_week_days, str):
             self._days = set()
 
             if len(bit_string_or_week_days) != WeekDay.NUM_WEEK_DAYS:
@@ -32,7 +30,7 @@ class WeekDays(object):
     def __eq__(self, other):
         if isinstance(other, WeekDays):
             return self._days == other._days
-        elif isinstance(other, six.string_types):
+        elif isinstance(other, str):
             return self.as_bit_string() == other
         else:
             return NotImplemented
@@ -51,10 +49,10 @@ class WeekDays(object):
         )
 
     def __unicode__(self):
-        return u', '.join(six.text_type(day) for day in self)
+        return u', '.join(str(day) for day in self)
 
     def as_bit_string(self):
         return ''.join(
             '1' if WeekDay(index) in self._days else '0'
-            for index in six.moves.xrange(WeekDay.NUM_WEEK_DAYS)
+            for index in range(WeekDay.NUM_WEEK_DAYS)
         )

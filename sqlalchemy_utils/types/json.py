@@ -2,7 +2,6 @@ from __future__ import absolute_import
 
 import json
 
-import six
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql.base import ischema_names
 
@@ -69,7 +68,7 @@ class JSONType(sa.types.TypeDecorator):
         if dialect.name == 'postgresql' and has_postgres_json:
             return value
         if value is not None:
-            value = six.text_type(json.dumps(value))
+            value = json.dumps(value)
         return value
 
     def process_result_value(self, value, dialect):

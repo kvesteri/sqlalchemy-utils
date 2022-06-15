@@ -1,8 +1,6 @@
 from collections.abc import Iterable
 from datetime import datetime
 
-import six
-
 from ...exceptions import ImproperlyConfigured
 
 arrow = None
@@ -20,7 +18,7 @@ class ArrowDateTime(object):
             )
 
     def _coerce(self, impl, value):
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             value = arrow.get(value)
         elif isinstance(value, Iterable):
             value = arrow.get(*value)

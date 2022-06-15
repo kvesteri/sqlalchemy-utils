@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import pytest
-import six
 
 from sqlalchemy_utils import Currency, i18n
 
@@ -59,7 +58,7 @@ class TestCurrency(object):
 
     def test_unicode(self):
         currency = Currency('USD')
-        assert six.text_type(currency) == u'USD'
+        assert str(currency) == u'USD'
 
     def test_str(self):
         currency = Currency('USD')

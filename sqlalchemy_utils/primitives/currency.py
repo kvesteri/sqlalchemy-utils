@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-import six
-
 from .. import i18n, ImproperlyConfigured
 from ..utils import str_coercible
 
@@ -60,7 +58,7 @@ class Currency(object):
             )
         if isinstance(code, Currency):
             self.code = code
-        elif isinstance(code, six.string_types):
+        elif isinstance(code, str):
             self.validate(code)
             self.code = code
         else:
@@ -94,7 +92,7 @@ class Currency(object):
     def __eq__(self, other):
         if isinstance(other, Currency):
             return self.code == other.code
-        elif isinstance(other, six.string_types):
+        elif isinstance(other, str):
             return self.code == other
         else:
             return NotImplemented

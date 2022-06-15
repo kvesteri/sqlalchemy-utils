@@ -1,4 +1,3 @@
-import six
 import sqlalchemy as sa
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -59,7 +58,7 @@ class cast_locale_expr(ColumnElement):
 @compiles(cast_locale_expr)
 def compile_cast_locale_expr(element, compiler, **kw):
     locale = cast_locale(element.cls, element.locale, element.attr)
-    if isinstance(locale, six.string_types):
+    if isinstance(locale, str):
         return "'{0}'".format(locale)
     return compiler.process(locale)
 

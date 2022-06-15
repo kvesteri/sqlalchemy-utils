@@ -11,6 +11,7 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 - Fixed create_database() and drop_database() crashing with CockroachDB (#586, pull request courtesy of kurtmckee)
 - Added mixed case support for pg composite (#584, pull request courtesy of bamartin125)
 - Support Python 3.10.
+- Remove the dependency on the six package. (#605)
 
 
 0.38.2 (2021-12-29)

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import pytest
-import six
 
 from sqlalchemy_utils import Ltree
 
@@ -198,7 +197,7 @@ class TestLtree(object):
 
     def test_unicode(self):
         ltree = Ltree('path.path')
-        assert six.text_type(ltree) == 'path.path'
+        assert str(ltree) == 'path.path'
 
     def test_str(self):
         ltree = Ltree('path')

@@ -1,4 +1,3 @@
-import six
 from sqlalchemy import types
 
 from .. import i18n
@@ -70,8 +69,7 @@ class WeekDaysType(types.TypeDecorator, ScalarCoercible):
             value = value.as_bit_string()
 
         if dialect.name == 'mysql':
-            func = bytes if six.PY3 else bytearray
-            return func(value, 'utf8')
+            return bytes(value, 'utf8')
         return value
 
     def process_result_value(self, value, dialect):

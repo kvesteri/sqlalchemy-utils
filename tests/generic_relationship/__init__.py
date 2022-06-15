@@ -1,6 +1,3 @@
-import six
-
-
 class GenericRelationshipTestCase(object):
     def test_set_as_none(self, Event):
         event = Event()
@@ -15,7 +12,7 @@ class GenericRelationshipTestCase(object):
 
         event = Event()
         event.object_id = user.id
-        event.object_type = six.text_type(type(user).__name__)
+        event.object_type = str(type(user).__name__)
 
         assert event.object is None
 

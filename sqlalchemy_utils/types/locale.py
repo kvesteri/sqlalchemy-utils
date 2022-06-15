@@ -1,4 +1,3 @@
-import six
 from sqlalchemy import types
 
 from ..exceptions import ImproperlyConfigured
@@ -62,9 +61,9 @@ class LocaleType(ScalarCoercible, types.TypeDecorator):
 
     def process_bind_param(self, value, dialect):
         if isinstance(value, babel.Locale):
-            return six.text_type(value)
+            return str(value)
 
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             return value
 
     def process_result_value(self, value, dialect):

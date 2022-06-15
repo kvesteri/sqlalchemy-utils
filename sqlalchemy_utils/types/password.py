@@ -1,6 +1,5 @@
 import weakref
 
-import six
 from sqlalchemy import types
 from sqlalchemy.dialects import oracle, postgresql, sqlite
 from sqlalchemy.ext.mutable import Mutable
@@ -23,7 +22,7 @@ class Password(Mutable, object):
         if isinstance(value, Password):
             return value
 
-        if isinstance(value, (six.string_types, six.binary_type)):
+        if isinstance(value, (str, bytes)):
             return cls(value, secret=True)
 
         super(Password, cls).coerce(key, value)
@@ -36,7 +35,7 @@ class Password(Mutable, object):
         self.secret = value if secret else None
 
         # The hash should be bytes.
-        if isinstance(self.hash, six.text_type):
+        if isinstance(self.hash, str):
             self.hash = self.hash.encode('utf8')
 
         # Save weakref of the password context (if we have one)
@@ -56,7 +55,7 @@ class Password(Mutable, object):
             # Compare 2 hashes again as we don't know how to validate.
             return value == self
 
-        if isinstance(value, (six.string_types, six.binary_type)):
+        if isinstance(value, (str, bytes)):
             valid, new = self.context.verify_and_update(value, self.hash)
             if valid and new:
                 # New hash was calculated due to various reasons; stored one
@@ -64,7 +63,7 @@ class Password(Mutable, object):
                 self.hash = new
 
                 # The hash should be bytes.
-                if isinstance(self.hash, six.string_types):
+                if isinstance(self.hash, str):
                     self.hash = self.hash.encode('utf8')
                     self.changed()
 
@@ -220,7 +219,7 @@ class PasswordType(ScalarCoercible, types.TypeDecorator):
             # Value has already been hashed.
             return value.hash
 
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             # Assume value has not been hashed.
             return self._hash(value).encode('utf8')
 

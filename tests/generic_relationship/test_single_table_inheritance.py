@@ -1,5 +1,4 @@
 import pytest
-import six
 import sqlalchemy as sa
 
 from sqlalchemy_utils import generic_relationship
@@ -71,7 +70,7 @@ class TestGenericRelationship(object):
 
         event = Event()
         event.object_id = manager.id
-        event.object_type = six.text_type(type(manager).__name__)
+        event.object_type = type(manager).__name__
 
         assert event.object is None
 

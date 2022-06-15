@@ -2,8 +2,6 @@ from __future__ import absolute_import
 
 import re
 
-import six
-
 from ..utils import str_coercible
 
 path_matcher = re.compile(r'^[A-Za-z0-9_]+(\.[A-Za-z0-9_]+)*$')
@@ -99,7 +97,7 @@ class Ltree(object):
     def __init__(self, path_or_ltree):
         if isinstance(path_or_ltree, Ltree):
             self.path = path_or_ltree.path
-        elif isinstance(path_or_ltree, six.string_types):
+        elif isinstance(path_or_ltree, str):
             self.validate(path_or_ltree)
             self.path = path_or_ltree
         else:
@@ -191,7 +189,7 @@ class Ltree(object):
     def __eq__(self, other):
         if isinstance(other, Ltree):
             return self.path == other.path
-        elif isinstance(other, six.string_types):
+        elif isinstance(other, str):
             return self.path == other
         else:
             return NotImplemented

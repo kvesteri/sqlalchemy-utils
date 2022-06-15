@@ -1,7 +1,5 @@
 from functools import total_ordering
 
-import six
-
 from .. import i18n
 from ..utils import str_coercible
 
@@ -57,7 +55,7 @@ class Country(object):
     def __init__(self, code_or_country):
         if isinstance(code_or_country, Country):
             self.code = code_or_country.code
-        elif isinstance(code_or_country, six.string_types):
+        elif isinstance(code_or_country, str):
             self.validate(code_or_country)
             self.code = code_or_country
         else:
@@ -87,7 +85,7 @@ class Country(object):
     def __eq__(self, other):
         if isinstance(other, Country):
             return self.code == other.code
-        elif isinstance(other, six.string_types):
+        elif isinstance(other, str):
             return self.code == other
         else:
             return NotImplemented
@@ -101,7 +99,7 @@ class Country(object):
     def __lt__(self, other):
         if isinstance(other, Country):
             return self.code < other.code
-        elif isinstance(other, six.string_types):
+        elif isinstance(other, str):
             return self.code < other
         return NotImplemented
 
