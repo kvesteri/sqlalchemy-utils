@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # SQLAlchemy-Utils documentation build configuration file, created by
 # sphinx-quickstart on Tue Feb 19 11:16:09 2013.
 #

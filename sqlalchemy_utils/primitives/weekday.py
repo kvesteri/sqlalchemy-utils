@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from functools import total_ordering
 
 from .. import i18n

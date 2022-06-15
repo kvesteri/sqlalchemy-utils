@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from .. import i18n, ImproperlyConfigured
 from ..utils import str_coercible
 
