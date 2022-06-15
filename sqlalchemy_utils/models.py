@@ -4,7 +4,7 @@ import sqlalchemy as sa
 from sqlalchemy.util.langhelpers import symbol
 
 
-class Timestamp(object):
+class Timestamp:
     """Adds `created` and `updated` columns to a derived declarative model.
 
     The `created` column is handled through a default and the `updated`

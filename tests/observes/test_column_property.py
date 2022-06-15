@@ -5,7 +5,7 @@ from sqlalchemy_utils.observer import observes
 
 
 @pytest.mark.usefixtures('postgresql_dsn')
-class TestObservesForColumn(object):
+class TestObservesForColumn:
 
     @pytest.fixture
     def Product(self, Base):
@@ -31,7 +31,7 @@ class TestObservesForColumn(object):
 
 
 @pytest.mark.usefixtures('postgresql_dsn')
-class TestObservesForColumnWithoutActualChanges(object):
+class TestObservesForColumnWithoutActualChanges:
 
     @pytest.fixture
     def Product(self, Base):
@@ -61,7 +61,7 @@ class TestObservesForColumnWithoutActualChanges(object):
 
 
 @pytest.mark.usefixtures('postgresql_dsn')
-class TestObservesForMultipleColumns(object):
+class TestObservesForMultipleColumns:
 
     @pytest.fixture
     def Order(self, Base):
@@ -98,7 +98,7 @@ class TestObservesForMultipleColumns(object):
 
 
 @pytest.mark.usefixtures('postgresql_dsn')
-class TestObservesForMultipleColumnsFiresOnlyOnce(object):
+class TestObservesForMultipleColumnsFiresOnlyOnce:
 
     @pytest.fixture
     def Order(self, Base):

@@ -81,7 +81,7 @@ def catalog(session, Catalog, Category, SubCategory, Product):
 
 
 @pytest.mark.usefixtures('postgresql_dsn')
-class TestObservesForOneToOneToOneToOne(object):
+class TestObservesForOneToOneToOneToOne:
 
     def test_simple_insert(self, catalog):
         assert catalog.product_price == 123

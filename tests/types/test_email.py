@@ -17,7 +17,7 @@ def User(Base):
     return User
 
 
-class TestEmailType(object):
+class TestEmailType:
     def test_saves_email_as_lowercased(self, session, User):
         user = User(email='Someone@example.com')
 

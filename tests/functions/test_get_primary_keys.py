@@ -18,7 +18,7 @@ def Building(Base):
     return Building
 
 
-class TestGetPrimaryKeys(object):
+class TestGetPrimaryKeys:
 
     def test_table(self, Building):
         assert get_primary_keys(Building.__table__) == OrderedDict({

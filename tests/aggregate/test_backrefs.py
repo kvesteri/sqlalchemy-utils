@@ -34,7 +34,7 @@ def init_models(Thread, Comment):
     pass
 
 
-class TestAggregateValueGenerationWithBackrefs(object):
+class TestAggregateValueGenerationWithBackrefs:
 
     def test_assigns_aggregates_on_insert(self, session, Thread, Comment):
         thread = Thread()

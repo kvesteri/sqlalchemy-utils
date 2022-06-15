@@ -4,7 +4,7 @@ import pytest
 from sqlalchemy_utils import Ltree
 
 
-class TestLtree(object):
+class TestLtree:
     def test_init(self):
         assert Ltree('path.path') == Ltree(Ltree('path.path'))
 

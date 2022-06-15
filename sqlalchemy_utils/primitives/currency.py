@@ -4,7 +4,7 @@ from ..utils import str_coercible
 
 
 @str_coercible
-class Currency(object):
+class Currency:
     """
     Currency class wraps a 3-letter currency code. It provides various
     convenience properties and methods.

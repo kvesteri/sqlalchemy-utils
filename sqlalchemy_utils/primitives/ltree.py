@@ -8,7 +8,7 @@ path_matcher = re.compile(r'^[A-Za-z0-9_]+(\.[A-Za-z0-9_]+)*$')
 
 
 @str_coercible
-class Ltree(object):
+class Ltree:
     """
     Ltree class wraps a valid string label path. It provides various
     convenience properties and methods.

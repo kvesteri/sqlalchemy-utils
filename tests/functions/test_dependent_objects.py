@@ -4,7 +4,7 @@ import sqlalchemy as sa
 from sqlalchemy_utils import dependent_objects, get_referencing_foreign_keys
 
 
-class TestDependentObjects(object):
+class TestDependentObjects:
 
     @pytest.fixture
     def User(self, Base):
@@ -94,7 +94,7 @@ class TestDependentObjects(object):
         assert objects[3] in deps
 
 
-class TestDependentObjectsWithColumnAliases(object):
+class TestDependentObjectsWithColumnAliases:
 
     @pytest.fixture
     def User(self, Base):
@@ -188,7 +188,7 @@ class TestDependentObjectsWithColumnAliases(object):
         assert objects[3] in deps
 
 
-class TestDependentObjectsWithManyReferences(object):
+class TestDependentObjectsWithManyReferences:
 
     @pytest.fixture
     def User(self, Base):
@@ -233,7 +233,7 @@ class TestDependentObjectsWithManyReferences(object):
         assert len(deps) == 2
 
 
-class TestDependentObjectsWithCompositeKeys(object):
+class TestDependentObjectsWithCompositeKeys:
 
     @pytest.fixture
     def User(self, Base):
@@ -281,7 +281,7 @@ class TestDependentObjectsWithCompositeKeys(object):
         assert articles[3] in deps
 
 
-class TestDependentObjectsWithSingleTableInheritance(object):
+class TestDependentObjectsWithSingleTableInheritance:
 
     @pytest.fixture
     def Category(self, Base):

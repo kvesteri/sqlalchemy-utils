@@ -28,7 +28,7 @@ def init_models(User):
 
 
 @pytest.mark.skipif('i18n.babel is None')
-class TestCurrencyType(object):
+class TestCurrencyType:
     def test_parameter_processing(self, session, User, set_get_locale):
         user = User(
             currency=Currency('USD')

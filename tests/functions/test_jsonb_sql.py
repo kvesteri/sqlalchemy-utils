@@ -5,7 +5,7 @@ from sqlalchemy_utils import jsonb_sql
 
 
 @pytest.mark.usefixtures('postgresql_dsn')
-class TestJSONBSQL(object):
+class TestJSONBSQL:
 
     @pytest.mark.parametrize(
         ('value', 'result'),

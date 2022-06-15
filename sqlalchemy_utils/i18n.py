@@ -63,7 +63,7 @@ def compile_cast_locale_expr(element, compiler, **kw):
     return compiler.process(locale)
 
 
-class TranslationHybrid(object):
+class TranslationHybrid:
     def __init__(self, current_locale, default_locale, default_value=None):
         if babel is None:
             raise ImproperlyConfigured(

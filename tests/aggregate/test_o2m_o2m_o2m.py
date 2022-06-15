@@ -77,7 +77,7 @@ def catalog_factory(Product, SubCategory, Category, Catalog, session):
 
 
 @pytest.mark.usefixtures('postgresql_dsn')
-class Test3LevelDeepOneToMany(object):
+class Test3LevelDeepOneToMany:
 
     def test_assigns_aggregates(self, session, catalog_factory):
         catalog = catalog_factory()

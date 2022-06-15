@@ -23,7 +23,7 @@ def init_models(Document):
 
 
 @pytest.mark.skipif('types.color.python_colour_type is None')
-class TestColorType(object):
+class TestColorType:
     def test_string_parameter_processing(self, session, Document):
         from colour import Color
 

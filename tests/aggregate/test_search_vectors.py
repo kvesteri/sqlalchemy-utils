@@ -48,7 +48,7 @@ def init_models(Product, Catalog):
 
 
 @pytest.mark.usefixtures('postgresql_dsn')
-class TestSearchVectorAggregates(object):
+class TestSearchVectorAggregates:
 
     def test_assigns_aggregates_on_insert(self, session, Product, Catalog):
         catalog = Catalog(

@@ -6,7 +6,7 @@ from sqlalchemy_utils import Choice, ChoiceType, ImproperlyConfigured
 from sqlalchemy_utils.types.choice import Enum
 
 
-class TestChoice(object):
+class TestChoice:
     def test_equality_operator(self):
         assert Choice(1, 1) == 1
         assert 1 == Choice(1, 1)
@@ -20,7 +20,7 @@ class TestChoice(object):
         assert hash(Choice(1, 1)) == hash(1)
 
 
-class TestChoiceType(object):
+class TestChoiceType:
     @pytest.fixture
     def User(self, Base):
         class User(Base):
@@ -86,14 +86,14 @@ class TestChoiceType(object):
         session.execute(query)
 
 
-class TestChoiceTypeWithCustomUnderlyingType(object):
+class TestChoiceTypeWithCustomUnderlyingType:
     def test_init_type(self):
         type_ = ChoiceType([(1, 'something')], impl=sa.Integer)
         assert type_.impl == sa.Integer
 
 
 @pytest.mark.skipif('Enum is None')
-class TestEnumType(object):
+class TestEnumType:
 
     @pytest.fixture
     def OrderStatus(self):

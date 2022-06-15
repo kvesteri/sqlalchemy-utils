@@ -4,7 +4,7 @@ import sqlalchemy as sa
 from sqlalchemy_utils.functions import identity
 
 
-class IdentityTestCase(object):
+class IdentityTestCase:
 
     @pytest.fixture
     def init_models(self, Building):

@@ -6,7 +6,7 @@ import sqlalchemy as sa
 from sqlalchemy_utils import generic_repr, Timestamp
 
 
-class TestTimestamp(object):
+class TestTimestamp:
     @pytest.fixture
     def Article(self, Base):
         class Article(Base, Timestamp):

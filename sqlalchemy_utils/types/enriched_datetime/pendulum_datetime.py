@@ -9,7 +9,7 @@ except ImportError:
     pass
 
 
-class PendulumDateTime(object):
+class PendulumDateTime:
     def __init__(self):
         if not pendulum:
             raise ImproperlyConfigured(

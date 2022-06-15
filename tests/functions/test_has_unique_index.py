@@ -4,7 +4,7 @@ import sqlalchemy as sa
 from sqlalchemy_utils import get_fk_constraint_for_columns, has_unique_index
 
 
-class TestHasUniqueIndex(object):
+class TestHasUniqueIndex:
 
     @pytest.fixture
     def articles(self, Base):
@@ -53,7 +53,7 @@ class TestHasUniqueIndex(object):
         assert not has_unique_index(article_translations.c.is_archived)
 
 
-class TestHasUniqueIndexWithFKConstraint(object):
+class TestHasUniqueIndexWithFKConstraint:
     def test_composite_fk_without_index(self, Base):
 
         class User(Base):

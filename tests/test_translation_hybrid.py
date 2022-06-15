@@ -30,7 +30,7 @@ def init_models(City):
 
 @pytest.mark.usefixtures('postgresql_dsn')
 @pytest.mark.skipif('i18n.babel is None')
-class TestTranslationHybrid(object):
+class TestTranslationHybrid:
 
     def test_using_hybrid_as_constructor(self, City):
         city = City(name='Helsinki')
@@ -111,7 +111,7 @@ class TestTranslationHybrid(object):
         )
 
     def test_locales_casted_only_in_compilation_phase(self, Base):
-        class LocaleGetter(object):
+        class LocaleGetter:
             def current_locale(self):
                 return lambda obj: obj.locale
 

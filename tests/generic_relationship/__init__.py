@@ -1,4 +1,4 @@
-class GenericRelationshipTestCase(object):
+class GenericRelationshipTestCase:
     def test_set_as_none(self, Event):
         event = Event()
         event.object = None

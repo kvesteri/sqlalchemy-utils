@@ -28,7 +28,7 @@ def create_car(session, Car):
 
 
 @pytest.mark.skipif('intervals is None')
-class NumericRangeTestCase(object):
+class NumericRangeTestCase:
 
     @pytest.fixture
     def Car(self, Base):
@@ -125,7 +125,7 @@ class TestNumericRangeOnPostgres(NumericRangeTestCase):
 
 
 @pytest.mark.skipif('intervals is None')
-class TestNumericRangeWithStep(object):
+class TestNumericRangeWithStep:
     @pytest.fixture
     def Car(self, Base):
         class Car(Base):

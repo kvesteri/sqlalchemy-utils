@@ -41,7 +41,7 @@ def init_models(Article, User):
     pass
 
 
-class TestMakeOrderByDeterministic(object):
+class TestMakeOrderByDeterministic:
 
     def test_column_property(self, session, User):
         query = session.query(User).order_by(User.email_lower)

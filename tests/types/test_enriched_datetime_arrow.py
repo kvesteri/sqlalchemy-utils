@@ -34,7 +34,7 @@ def init_models(Article):
 
 
 @pytest.mark.skipif('arrow_datetime.arrow is None')
-class TestArrowDateTimeType(object):
+class TestArrowDateTimeType:
     def test_parameter_processing(self, session, Article):
         article = Article(
             created_at=arrow_datetime.arrow.get(datetime(2000, 11, 1))

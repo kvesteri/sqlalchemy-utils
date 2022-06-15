@@ -22,7 +22,7 @@ def init_models(User):
 
 
 @pytest.mark.skipif('locale.babel is None')
-class TestLocaleType(object):
+class TestLocaleType:
     def test_parameter_processing(self, session, User):
         user = User(
             locale=locale.babel.Locale('fi')

@@ -22,7 +22,7 @@ def init_models(User):
 
 
 @pytest.mark.skipif('i18n.babel is None')
-class TestCountryType(object):
+class TestCountryType:
 
     def test_parameter_processing(self, session, User):
         user = User(

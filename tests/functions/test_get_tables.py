@@ -38,7 +38,7 @@ def init_models(TextItem, Article):
     pass
 
 
-class TestGetTables(object):
+class TestGetTables:
 
     def test_child_class_using_join_table_inheritance(self, TextItem, Article):
         assert get_tables(Article) == [

@@ -31,7 +31,7 @@ def set_get_locale():
 
 @pytest.mark.usefixtures('set_get_locale')
 @pytest.mark.skipif('i18n.babel is None')
-class WeekDaysTypeTestCase(object):
+class WeekDaysTypeTestCase:
     def test_color_parameter_processing(self, session, Schedule):
         schedule = Schedule(
             working_days=b'0001111'

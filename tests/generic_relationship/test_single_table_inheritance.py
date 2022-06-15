@@ -55,7 +55,7 @@ def init_models(Employee, Manager, Engineer, Event):
     pass
 
 
-class TestGenericRelationship(object):
+class TestGenericRelationship:
 
     def test_set_as_none(self, Event):
         event = Event()

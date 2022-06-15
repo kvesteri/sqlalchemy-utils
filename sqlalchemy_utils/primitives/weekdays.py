@@ -3,7 +3,7 @@ from .weekday import WeekDay
 
 
 @str_coercible
-class WeekDays(object):
+class WeekDays:
     def __init__(self, bit_string_or_week_days):
         if isinstance(bit_string_or_week_days, str):
             self._days = set()

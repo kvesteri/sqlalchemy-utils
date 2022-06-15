@@ -22,7 +22,7 @@ def Category(Base):
     return Category
 
 
-class TestGetHybridProperties(object):
+class TestGetHybridProperties:
 
     def test_declarative_model(self, Category):
         assert (

@@ -95,7 +95,7 @@ def init_models(AnyProduct, Catalog, CostumeCatalog, CarCatalog):
 
 
 @pytest.mark.usefixtures('postgresql_dsn')
-class TestLazyEvaluatedSelectExpressionsForAggregates(object):
+class TestLazyEvaluatedSelectExpressionsForAggregates:
 
     def test_columns_inherited_from_parent(
         self,

@@ -13,7 +13,7 @@ def Article(Base):
     return Article
 
 
-class TestIsLoaded(object):
+class TestIsLoaded:
 
     def test_loaded_property(self, Article):
         article = Article(id=1)

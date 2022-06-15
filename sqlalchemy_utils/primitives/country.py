@@ -6,7 +6,7 @@ from ..utils import str_coercible
 
 @total_ordering
 @str_coercible
-class Country(object):
+class Country:
     """
     Country class wraps a 2 to 3 letter country code. It provides various
     convenience properties and methods.

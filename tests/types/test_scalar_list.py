@@ -4,7 +4,7 @@ import sqlalchemy as sa
 from sqlalchemy_utils import ScalarListType
 
 
-class TestScalarIntegerList(object):
+class TestScalarIntegerList:
 
     @pytest.fixture
     def User(self, Base):
@@ -34,7 +34,7 @@ class TestScalarIntegerList(object):
         assert user.some_list == [1, 2, 3, 4]
 
 
-class TestScalarUnicodeList(object):
+class TestScalarUnicodeList:
 
     @pytest.fixture
     def User(self, Base):

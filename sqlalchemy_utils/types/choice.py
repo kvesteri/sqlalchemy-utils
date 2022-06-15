@@ -6,7 +6,7 @@ from ..exceptions import ImproperlyConfigured
 from .scalar_coercible import ScalarCoercible
 
 
-class Choice(object):
+class Choice:
     def __init__(self, code, value):
         self.code = code
         self.value = value
@@ -170,7 +170,7 @@ class ChoiceType(ScalarCoercible, types.TypeDecorator):
         return self.type_impl.process_result_value(value, dialect)
 
 
-class ChoiceTypeImpl(object):
+class ChoiceTypeImpl:
     """The implementation for the ``Choice`` usage."""
 
     def __init__(self, choices):
@@ -198,7 +198,7 @@ class ChoiceTypeImpl(object):
         return value
 
 
-class EnumTypeImpl(object):
+class EnumTypeImpl:
     """The implementation for the ``Enum`` usage."""
 
     def __init__(self, enum_class):

@@ -12,7 +12,7 @@ def set_get_locale():
 
 @pytest.mark.skipif('i18n.babel is None')
 @pytest.mark.usefixtures('set_get_locale')
-class TestWeekDay(object):
+class TestWeekDay:
 
     def test_constructor_with_valid_index(self):
         day = WeekDay(1)
@@ -86,7 +86,7 @@ class TestWeekDay(object):
 
 
 @pytest.mark.skipif('i18n.babel is None')
-class TestWeekDays(object):
+class TestWeekDays:
     def test_constructor_with_valid_bit_string(self):
         days = WeekDays('1000100')
         assert days._days == set([WeekDay(0), WeekDay(4)])

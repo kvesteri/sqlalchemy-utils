@@ -22,7 +22,7 @@ def init_models(Visitor):
 
 
 @pytest.mark.skipif('ip_address.ip_address is None')
-class TestIPAddressType(object):
+class TestIPAddressType:
     def test_parameter_processing(self, session, Visitor):
         visitor = Visitor(
             ip_address='111.111.111.111'

@@ -57,7 +57,7 @@ def init_models(User, UserHistory, Event):
     pass
 
 
-class TestGenericRelationship(object):
+class TestGenericRelationship:
 
     def test_set_manual_and_get(self, session, User, UserHistory, Event):
         user = User(id=1)

@@ -8,7 +8,7 @@ from sqlalchemy_utils.functions import (
 )
 
 
-class TestRender(object):
+class TestRender:
 
     @pytest.fixture
     def User(self, Base):

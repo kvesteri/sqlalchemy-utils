@@ -13,7 +13,7 @@ def Article(Base):
     return Article
 
 
-class TestHasChangesWithStringAttr(object):
+class TestHasChangesWithStringAttr:
     def test_without_changed_attr(self, Article):
         article = Article()
         assert not has_changes(article, 'title')
@@ -23,7 +23,7 @@ class TestHasChangesWithStringAttr(object):
         assert has_changes(article, 'title')
 
 
-class TestHasChangesWithMultipleAttrs(object):
+class TestHasChangesWithMultipleAttrs:
     def test_without_changed_attr(self, Article):
         article = Article()
         assert not has_changes(article, ['title'])
@@ -33,7 +33,7 @@ class TestHasChangesWithMultipleAttrs(object):
         assert has_changes(article, ['title', 'id'])
 
 
-class TestHasChangesWithExclude(object):
+class TestHasChangesWithExclude:
     def test_without_changed_attr(self, Article):
         article = Article()
         assert not has_changes(article, exclude=['id'])

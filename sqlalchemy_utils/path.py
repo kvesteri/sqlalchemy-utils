@@ -6,7 +6,7 @@ from .utils import str_coercible
 
 
 @str_coercible
-class Path(object):
+class Path:
     def __init__(self, path, separator='.'):
         if isinstance(path, Path):
             self.path = path.path
@@ -61,7 +61,7 @@ def get_attr(mixed, attr):
 
 
 @str_coercible
-class AttrPath(object):
+class AttrPath:
     def __init__(self, class_, path):
         self.class_ = class_
         self.path = Path(path)

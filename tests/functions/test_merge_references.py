@@ -4,7 +4,7 @@ import sqlalchemy as sa
 from sqlalchemy_utils import merge_references
 
 
-class TestMergeReferences(object):
+class TestMergeReferences:
 
     @pytest.fixture
     def User(self, Base):
@@ -65,7 +65,7 @@ class TestMergeReferences(object):
         assert post2.author_id == jack.id
 
 
-class TestMergeReferencesWithManyToManyAssociations(object):
+class TestMergeReferencesWithManyToManyAssociations:
 
     @pytest.fixture
     def User(self, Base):
@@ -123,7 +123,7 @@ class TestMergeReferencesWithManyToManyAssociations(object):
         assert jack in team.members
 
 
-class TestMergeReferencesWithManyToManyAssociationObjects(object):
+class TestMergeReferencesWithManyToManyAssociationObjects:
 
     @pytest.fixture
     def Team(self, Base):
@@ -194,7 +194,7 @@ class TestMergeReferencesWithManyToManyAssociationObjects(object):
         assert jack in users
 
 
-class TestMergeReferencesWithMappedProperties(object):
+class TestMergeReferencesWithMappedProperties:
 
     @pytest.fixture
     def User(self, Base):

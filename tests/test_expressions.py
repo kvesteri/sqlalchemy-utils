@@ -26,7 +26,7 @@ def Article(Base):
     return Article
 
 
-class TestAsterisk(object):
+class TestAsterisk:
     def test_with_table_object(self):
         Base = sa.ext.declarative.declarative_base()
 
@@ -48,7 +48,7 @@ class TestAsterisk(object):
         )) == '"user".*'
 
 
-class TestRowToJson(object):
+class TestRowToJson:
     def test_compiler_with_default_dialect(self):
         assert str(row_to_json(sa.text('article.*'))) == (
             'row_to_json(article.*)'

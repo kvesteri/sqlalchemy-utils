@@ -434,7 +434,7 @@ def aggregate_expression(expr, class_):
         return expr(class_)
 
 
-class AggregatedValue(object):
+class AggregatedValue:
     def __init__(self, class_, attr, path, expr):
         self.class_ = class_
         self.attr = attr
@@ -499,7 +499,7 @@ class AggregatedValue(object):
                 )
 
 
-class AggregationManager(object):
+class AggregationManager:
     def __init__(self):
         self.reset()
 

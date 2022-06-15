@@ -1,7 +1,7 @@
 from sqlalchemy_utils.functions import naturally_equivalent
 
 
-class TestNaturallyEquivalent(object):
+class TestNaturallyEquivalent:
     def test_returns_true_when_properties_match(self, User):
         assert naturally_equivalent(
             User(name='someone'), User(name='someone')

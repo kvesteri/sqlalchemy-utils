@@ -42,7 +42,7 @@ def init_models(Thread, Comment):
 
 
 @pytest.mark.usefixtures('postgresql_dsn')
-class TestAggregateValueGenerationWithCascadeDelete(object):
+class TestAggregateValueGenerationWithCascadeDelete:
 
     def test_something(self, session, Thread, Comment):
         thread = Thread()

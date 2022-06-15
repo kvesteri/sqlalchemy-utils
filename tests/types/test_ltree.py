@@ -21,7 +21,7 @@ def init_models(Section, connection):
 
 
 @pytest.mark.usefixtures('postgresql_dsn')
-class TestLTREE(object):
+class TestLTREE:
     def test_saves_path(self, session, Section):
         section = Section(path='1.1.2')
 

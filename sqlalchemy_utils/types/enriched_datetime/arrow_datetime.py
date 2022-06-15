@@ -10,7 +10,7 @@ except ImportError:
     pass
 
 
-class ArrowDateTime(object):
+class ArrowDateTime:
     def __init__(self):
         if not arrow:
             raise ImproperlyConfigured(

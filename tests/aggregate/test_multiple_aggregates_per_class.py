@@ -51,7 +51,7 @@ def init_models(Comment, Thread):
     pass
 
 
-class TestAggregateValueGenerationForSimpleModelPaths(object):
+class TestAggregateValueGenerationForSimpleModelPaths:
 
     def test_assigns_aggregates_on_insert(self, session, Thread, Comment):
         thread = Thread()

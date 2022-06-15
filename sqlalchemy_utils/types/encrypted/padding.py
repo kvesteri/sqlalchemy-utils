@@ -2,7 +2,7 @@ class InvalidPaddingError(Exception):
     pass
 
 
-class Padding(object):
+class Padding:
     """Base class for padding and unpadding."""
 
     def __init__(self, block_size):

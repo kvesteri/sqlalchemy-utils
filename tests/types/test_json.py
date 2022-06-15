@@ -41,7 +41,7 @@ def init_models(Document):
     pass
 
 
-class JSONTestCase(object):
+class JSONTestCase:
     def test_list(self, session, Document):
         document = Document(
             json=[1, 2, 3]

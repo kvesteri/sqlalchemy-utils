@@ -241,7 +241,7 @@ def date_simple():
 
 
 @pytest.mark.skipif('cryptography is None')
-class EncryptedTypeTestCase(object):
+class EncryptedTypeTestCase:
 
     @pytest.fixture
     def Team(self, Base, encryption_engine, padding_mechanism):
@@ -459,7 +459,7 @@ class TestDatetimeHandler:
 
 
 @pytest.mark.skipif('cryptography is None')
-class TestAesGcmEngine(object):
+class TestAesGcmEngine:
     KEY = b'0123456789ABCDEF'
 
     def setup_method(self):

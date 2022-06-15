@@ -21,7 +21,7 @@ def init_models(User):
     pass
 
 
-class TestCaseInsensitiveComparator(object):
+class TestCaseInsensitiveComparator:
 
     def test_supports_equals(self, session, User):
         query = (

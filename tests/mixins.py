@@ -2,7 +2,7 @@ import pytest
 import sqlalchemy as sa
 
 
-class ThreeLevelDeepOneToOne(object):
+class ThreeLevelDeepOneToOne:
 
     @pytest.fixture
     def Catalog(self, Base, Category):
@@ -70,7 +70,7 @@ class ThreeLevelDeepOneToOne(object):
         pass
 
 
-class ThreeLevelDeepOneToMany(object):
+class ThreeLevelDeepOneToMany:
 
     @pytest.fixture
     def Catalog(self, Base, Category):
@@ -135,7 +135,7 @@ class ThreeLevelDeepOneToMany(object):
         pass
 
 
-class ThreeLevelDeepManyToMany(object):
+class ThreeLevelDeepManyToMany:
 
     @pytest.fixture
     def Catalog(self, Base, Category):

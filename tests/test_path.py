@@ -47,7 +47,7 @@ def SubSection(Base, Section):
     return SubSection
 
 
-class TestAttrPath(object):
+class TestAttrPath:
 
     @pytest.fixture
     def init_models(self, Document, Section, SubSection):
@@ -124,7 +124,7 @@ class TestAttrPath(object):
         )
 
 
-class TestPath(object):
+class TestPath:
     def test_init(self):
         path = Path('attr.attr2')
         assert path.path == 'attr.attr2'

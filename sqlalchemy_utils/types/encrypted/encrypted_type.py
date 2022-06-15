@@ -477,7 +477,7 @@ class EncryptedType(StringEncryptedType):
         return value
 
 
-class DatetimeHandler(object):
+class DatetimeHandler:
     """
     DatetimeHandler is responsible for parsing strings and
     returning the appropriate date, datetime or time objects.

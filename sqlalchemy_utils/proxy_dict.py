@@ -1,7 +1,7 @@
 import sqlalchemy as sa
 
 
-class ProxyDict(object):
+class ProxyDict:
     def __init__(self, parent, collection_name, mapping_attr):
         self.parent = parent
         self.collection_name = collection_name

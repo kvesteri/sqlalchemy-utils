@@ -1,4 +1,4 @@
-class TestInstrumentedList(object):
+class TestInstrumentedList:
     def test_any_returns_true_if_member_has_attr_defined(
         self,
         Category,

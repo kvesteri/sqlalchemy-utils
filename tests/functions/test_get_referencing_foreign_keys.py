@@ -4,7 +4,7 @@ import sqlalchemy as sa
 from sqlalchemy_utils import get_referencing_foreign_keys
 
 
-class TestGetReferencingFksWithCompositeKeys(object):
+class TestGetReferencingFksWithCompositeKeys:
 
     @pytest.fixture
     def User(self, Base):
@@ -42,7 +42,7 @@ class TestGetReferencingFksWithCompositeKeys(object):
         assert Article.__table__.foreign_keys == fks
 
 
-class TestGetReferencingFksWithInheritance(object):
+class TestGetReferencingFksWithInheritance:
 
     @pytest.fixture
     def User(self, Base):

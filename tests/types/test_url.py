@@ -22,7 +22,7 @@ def init_models(User):
 
 
 @pytest.mark.skipif('url.furl is None')
-class TestURLType(object):
+class TestURLType:
     def test_color_parameter_processing(self, session, User):
         user = User(
             website=url.furl('www.example.com')

@@ -10,7 +10,7 @@ except ImportError:
     pass
 
 
-class DatabaseTest(object):
+class DatabaseTest:
     def test_create_and_drop(self, dsn):
         assert not database_exists(dsn)
         create_database(dsn)
@@ -20,14 +20,14 @@ class DatabaseTest(object):
 
 
 @pytest.mark.usefixtures('sqlite_memory_dsn')
-class TestDatabaseSQLiteMemory(object):
+class TestDatabaseSQLiteMemory:
 
     def test_exists_memory(self, dsn):
         assert database_exists(dsn)
 
 
 @pytest.mark.usefixtures('sqlite_none_database_dsn')
-class TestDatabaseSQLiteMemoryNoDatabaseString(object):
+class TestDatabaseSQLiteMemoryNoDatabaseString:
     def test_exists_memory_none_database(self, sqlite_none_database_dsn):
         assert database_exists(sqlite_none_database_dsn)
 
@@ -116,7 +116,7 @@ class TestDatabasePostgresWithQuotedName(DatabaseTest):
                 'TEMPLATE "my-template"') in str(excinfo.value)
 
 
-class TestDatabasePostgresCreateDatabaseCloseConnection(object):
+class TestDatabasePostgresCreateDatabaseCloseConnection:
     def test_create_database_twice(
         self,
         postgresql_db_user,

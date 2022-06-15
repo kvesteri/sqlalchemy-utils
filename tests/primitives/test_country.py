@@ -12,7 +12,7 @@ def set_get_locale():
 
 @pytest.mark.skipif('i18n.babel is None')
 @pytest.mark.usefixtures('set_get_locale')
-class TestCountry(object):
+class TestCountry:
 
     def test_init(self):
         assert Country('FI') == Country(Country('FI'))

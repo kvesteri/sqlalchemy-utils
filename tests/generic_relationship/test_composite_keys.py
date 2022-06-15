@@ -8,7 +8,7 @@ from ..generic_relationship import GenericRelationshipTestCase
 
 @pytest.fixture
 def incrementor():
-    class Incrementor(object):
+    class Incrementor:
         value = 1
     return Incrementor()
 

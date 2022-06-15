@@ -6,7 +6,7 @@ from sqlalchemy_utils.types.encrypted.padding import (
 )
 
 
-class TestPkcs5Padding(object):
+class TestPkcs5Padding:
     def setup_method(self):
         self.BLOCK_SIZE = 8
         self.padder = PKCS5Padding(self.BLOCK_SIZE)

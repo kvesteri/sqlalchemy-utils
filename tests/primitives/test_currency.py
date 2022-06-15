@@ -11,7 +11,7 @@ def set_get_locale():
 
 @pytest.mark.skipif('i18n.babel is None')
 @pytest.mark.usefixtures('set_get_locale')
-class TestCurrency(object):
+class TestCurrency:
 
     def test_init(self):
         assert Currency('USD') == Currency(Currency('USD'))

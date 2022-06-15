@@ -66,7 +66,7 @@ def init_models(Document, Section, SubSection, SubSubSection):
     pass
 
 
-class TestGetDotAttr(object):
+class TestGetDotAttr:
 
     def test_simple_objects(self, Document, Section, SubSection):
         document = Document(name='some document')
