@@ -15,7 +15,7 @@ example psycopg2 range objects do not support.
 
 Some good reading for practical interval implementations:
 
-http://wiki.postgresql.org/images/f/f0/Range-types.pdf
+https://wiki.postgresql.org/images/f/f0/Range-types.pdf
 
 
 Range type initialization

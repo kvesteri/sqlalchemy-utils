@@ -18,7 +18,7 @@ class TSVectorType(sa.types.TypeDecorator):
     * Provides extensible base for extensions such as SQLAlchemy-Searchable_
 
     .. _TSVECTOR:
-        http://docs.sqlalchemy.org/en/latest/dialects/postgresql.html#full-text-search
+        https://docs.sqlalchemy.org/en/latest/dialects/postgresql.html#full-text-search
 
     .. _SQLAlchemy-Searchable:
         https://www.github.com/kvesteri/sqlalchemy-searchable

@@ -103,12 +103,12 @@ Arrays of composites
 
 
 .. _PostgreSQL composite types:
-    http://www.postgresql.org/docs/current/static/rowtypes.html
+    https://www.postgresql.org/docs/current/rowtypes.html
 
 
 Related links:
 
-http://schinckel.net/2014/09/24/using-postgres-composite-types-in-django/
+https://schinckel.net/2014/09/24/using-postgres-composite-types-in-django/
 """
 from collections import namedtuple
 

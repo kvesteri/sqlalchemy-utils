@@ -16,7 +16,7 @@ class WeekDaysType(types.TypeDecorator, ScalarCoercible):
 
     In order to use WeekDaysType you need to install Babel_ first.
 
-    .. _Babel: http://babel.pocoo.org/
+    .. _Babel: https://babel.pocoo.org/
 
     ::
 

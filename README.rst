@@ -11,8 +11,8 @@ Resources
 ---------
 
 - `Documentation <https://sqlalchemy-utils.readthedocs.io/>`_
-- `Issue Tracker <http://github.com/kvesteri/sqlalchemy-utils/issues>`_
-- `Code <http://github.com/kvesteri/sqlalchemy-utils/>`_
+- `Issue Tracker <https://github.com/kvesteri/sqlalchemy-utils/issues>`_
+- `Code <https://github.com/kvesteri/sqlalchemy-utils/>`_
 
 .. |Build Status| image:: https://travis-ci.org/kvesteri/sqlalchemy-utils.svg?branch=master
    :target: https://travis-ci.org/kvesteri/sqlalchemy-utils
