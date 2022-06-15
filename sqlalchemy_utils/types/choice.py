@@ -36,10 +36,7 @@ class ChoiceType(ScalarCoercible, types.TypeDecorator):
     """
     ChoiceType offers way of having fixed set of choices for given column. It
     could work with a list of tuple (a collection of key-value pairs), or
-    integrate with :mod:`enum` in the standard library of Python 3.4+ (the
-    enum34_ backported package on PyPI is compatible too for ``< 3.4``).
-
-    .. _enum34: https://pypi.python.org/pypi/enum34
+    integrate with :mod:`enum` in the standard library of Python 3.
 
     Columns with ChoiceTypes are automatically coerced to Choice objects while
     a list of tuple been passed to the constructor. If a subclass of
