@@ -6,24 +6,27 @@ from sqlalchemy_utils.functions import get_columns
 
 
 class CreateView(DDLElement):
-    def __init__(self, name, selectable, materialized=False):
-        self.name = name
+    def __init__(self, table, selectable, materialized=False):
+        self.table = table
         self.selectable = selectable
         self.materialized = materialized
+        # self.schema = schema
 
 
 @compiler.compiles(CreateView)
 def compile_create_materialized_view(element, compiler, **kw):
     return 'CREATE {}VIEW {} AS {}'.format(
         'MATERIALIZED ' if element.materialized else '',
-        compiler.dialect.identifier_preparer.quote(element.name),
+        # compiler.dialect.identifier_preparer.quote(element.name),
+        compiler.dialect.identifier_preparer.format_table(
+            element.table, use_schema=True),
         compiler.sql_compiler.process(element.selectable, literal_binds=True),
     )
 
 
 class DropView(DDLElement):
-    def __init__(self, name, materialized=False, cascade=True):
-        self.name = name
+    def __init__(self, table, materialized=False, cascade=True):
+        self.table = table
         self.materialized = materialized
         self.cascade = cascade
 
@@ -32,7 +35,9 @@ class DropView(DDLElement):
 def compile_drop_materialized_view(element, compiler, **kw):
     return 'DROP {}VIEW IF EXISTS {} {}'.format(
         'MATERIALIZED ' if element.materialized else '',
-        compiler.dialect.identifier_preparer.quote(element.name),
+        # compiler.dialect.identifier_preparer.quote(element.name),
+        compiler.dialect.identifier_preparer.format_table(
+            element.table, use_schema=True),
         'CASCADE' if element.cascade else ''
     )
 
@@ -43,6 +48,7 @@ def create_table_from_selectable(
     indexes=None,
     metadata=None,
     aliases=None,
+    schema=None,
     **kwargs
 ):
     if indexes is None:
@@ -60,7 +66,7 @@ def create_table_from_selectable(
         )
         for c in get_columns(selectable)
     ] + indexes
-    table = sa.Table(name, metadata, *args, **kwargs)
+    table = sa.Table(name, metadata, *args, **kwargs, schema=schema)
 
     if not any([c.primary_key for c in get_columns(selectable)]):
         table.append_constraint(
@@ -74,7 +80,8 @@ def create_materialized_view(
     selectable,
     metadata,
     indexes=None,
-    aliases=None
+    aliases=None,
+    schema=None,
 ):
     """ Create a view on a given metadata
 
@@ -87,6 +94,7 @@ def create_materialized_view(
     :param aliases:
         An optional dictionary containing with keys as column names and values
         as column aliases.
+    :param schema: optinal the schema name for the view
 
     Same as for ``create_view`` except that a ``CREATE MATERIALIZED VIEW``
     statement is emitted instead of a ``CREATE VIEW``.
@@ -97,13 +105,14 @@ def create_materialized_view(
         selectable=selectable,
         indexes=indexes,
         metadata=None,
-        aliases=aliases
+        aliases=aliases,
+        schema=schema
     )
 
     sa.event.listen(
         metadata,
         'after_create',
-        CreateView(name, selectable, materialized=True)
+        CreateView(table, selectable, materialized=True)
     )
 
     @sa.event.listens_for(metadata, 'after_create')
@@ -114,7 +123,7 @@ def create_materialized_view(
     sa.event.listen(
         metadata,
         'before_drop',
-        DropView(name, materialized=True)
+        DropView(table, materialized=True)
     )
     return table
 
@@ -123,6 +132,8 @@ def create_view(
     name,
     selectable,
     metadata,
+    schema=None,
+    # indexes=None, Does non-materialized views allow index creation??
     cascade_on_drop=True
 ):
     """ Create a view on a given metadata
@@ -132,6 +143,8 @@ def create_view(
     :param metadata:
         An SQLAlchemy Metadata instance that stores the features of the
         database being described.
+    :param schema: optinal the schema name for the view
+
 
     The process for creating a view is similar to the standard way that a
     table is constructed, except that a selectable is provided instead of
@@ -147,10 +160,11 @@ def create_view(
                 Column('name', String),
                 Column('fullname', String),
                 Column('premium_user', Boolean, default=False),
+                schema=None
             )
 
         premium_members = select([users]).where(users.c.premium_user == True)
-        create_view('premium_users', premium_members, metadata)
+        create_view('premium_users', premium_members, metadata,)
 
         metadata.create_all(engine) # View is created at this point
 
@@ -158,39 +172,63 @@ def create_view(
     table = create_table_from_selectable(
         name=name,
         selectable=selectable,
+        schema=schema,
+        # indexes=indexes,???
         metadata=None
     )
 
-    sa.event.listen(metadata, 'after_create', CreateView(name, selectable))
+    sa.event.listen(metadata, 'after_create', CreateView(table, selectable))
 
     @sa.event.listens_for(metadata, 'after_create')
     def create_indexes(target, connection, **kw):
+        # Does non-materialized views allow index creation??
         for idx in table.indexes:
             idx.create(connection)
 
     sa.event.listen(
         metadata,
         'before_drop',
-        DropView(name, cascade=cascade_on_drop)
+        DropView(table, cascade=cascade_on_drop)
     )
     return table
 
 
-def refresh_materialized_view(session, name, concurrently=False):
+def refresh_materialized_view(session, view, concurrently=False):
     """ Refreshes an already existing materialized view
 
     :param session: An SQLAlchemy Session instance.
-    :param name: The name of the materialized view to refresh.
+    :param view: The view to refresh.
     :param concurrently:
         Optional flag that causes the ``CONCURRENTLY`` parameter
         to be specified when the materialized view is refreshed.
+
+
+    example (flask_sqlalchemy) ORM:
+    ArticleMV(db.Model):
+    __table__ = create_materialized_view(
+        name = 'article-mv',
+        selectable = db.select(...),
+        schema = 'main'
+        )
+    @classmethod
+    def refresh_view(cls, concurrently=False):
+        refresh_materialized_view(db.session, cls, concurrently)
+
+    User.refresh_view()
+    >SQL: REFRESH MATERIALIZED VIEW main.article-mv
     """
     # Since session.execute() bypasses autoflush, we must manually flush in
     # order to include newly-created/modified objects in the refresh.
+    # session.bind.engine.dialect.identifier_preparer
+    # do no accept str as a param, it schould be the table
+
     session.flush()
     session.execute(
         'REFRESH MATERIALIZED VIEW {}{}'.format(
             'CONCURRENTLY ' if concurrently else '',
-            session.bind.engine.dialect.identifier_preparer.quote(name)
+            # session.bind.engine.dialect.identifier_preparer.quote(name)
+            session.bind.engine.dialect.identifier_preparer.format_table(
+                view.__table__, use_schema=True)
         )
     )
+    session.commit()  # needed to persist changes in the materialized view
