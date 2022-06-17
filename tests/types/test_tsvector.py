@@ -36,8 +36,7 @@ class TestTSVector:
         table = sa.schema.Table(
             'user',
             reflected_metadata,
-            autoload=True,
-            autoload_with=engine
+            autoload_with=engine,
         )
         assert isinstance(table.c['search_index'].type, TSVECTOR)
 

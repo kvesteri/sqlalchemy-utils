@@ -2,6 +2,7 @@ import pytest
 import sqlalchemy as sa
 
 from sqlalchemy_utils import Ltree, LtreeType
+from sqlalchemy_utils.compat import _select_args
 
 
 @pytest.fixture
@@ -16,7 +17,8 @@ def Section(Base):
 
 @pytest.fixture
 def init_models(Section, connection):
-    connection.execute('CREATE EXTENSION IF NOT EXISTS ltree')
+    with connection.begin():
+        connection.execute(sa.text('CREATE EXTENSION IF NOT EXISTS ltree'))
     pass
 
 
@@ -41,6 +43,6 @@ class TestLTREE:
         assert compiled == 'section.path = \'path\''
 
     def test_compilation(self, Section, session):
-        query = sa.select([Section.path])
+        query = sa.select(*_select_args(Section.path))
         # the type should be cacheable and not throw exception
         session.execute(query)

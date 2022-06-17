@@ -3,6 +3,7 @@ from datetime import date
 import pytest
 import sqlalchemy as sa
 
+from sqlalchemy_utils.compat import _select_args
 from sqlalchemy_utils.types.enriched_datetime import (
     enriched_date_type,
     pendulum_date
@@ -66,6 +67,6 @@ class TestPendulumDateType:
         assert compiled == "users.birthday > '2015-01-01'"
 
     def test_compilation(self, User, session):
-        query = sa.select([User.birthday])
+        query = sa.select(*_select_args(User.birthday))
         # the type should be cacheable and not throw exception
         session.execute(query)

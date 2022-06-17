@@ -3,6 +3,7 @@ import sqlalchemy as sa
 from flexmock import flexmock
 
 from sqlalchemy_utils import ColorType, types  # noqa
+from sqlalchemy_utils.compat import _select_args
 
 
 @pytest.fixture
@@ -62,6 +63,6 @@ class TestColorType:
         assert compiled == "document.bg_color = 'white'"
 
     def test_compilation(self, Document, session):
-        query = sa.select([Document.bg_color])
+        query = sa.select(*_select_args(Document.bg_color))
         # the type should be cacheable and not throw exception
         session.execute(query)

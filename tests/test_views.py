@@ -1,11 +1,13 @@
 import pytest
 import sqlalchemy as sa
+import sqlalchemy.orm
 
 from sqlalchemy_utils import (
     create_materialized_view,
     create_view,
     refresh_materialized_view
 )
+from sqlalchemy_utils.compat import _select_args
 
 
 @pytest.fixture
@@ -34,16 +36,14 @@ def ArticleMV(Base, Article, User):
         __table__ = create_materialized_view(
             name='article-mv',
             selectable=sa.select(
-                [
+                *_select_args(
                     Article.id,
                     Article.name,
                     User.id.label('author_id'),
-                    User.name.label('author_name')
-                ],
-                from_obj=(
-                    Article.__table__
-                    .join(User, Article.author_id == User.id)
+                    User.name.label('author_name'),
                 )
+            ).select_from(
+                Article.__table__.join(User, Article.author_id == User.id)
             ),
             aliases={'name': 'article_name'},
             metadata=Base.metadata,
@@ -58,16 +58,14 @@ def ArticleView(Base, Article, User):
         __table__ = create_view(
             name='article-view',
             selectable=sa.select(
-                [
+                *_select_args(
                     Article.id,
                     Article.name,
                     User.id.label('author_id'),
-                    User.name.label('author_name')
-                ],
-                from_obj=(
-                    Article.__table__
-                    .join(User, Article.author_id == User.id)
+                    User.name.label('author_name'),
                 )
+            ).select_from(
+                Article.__table__.join(User, Article.author_id == User.id)
             ),
             metadata=Base.metadata
         )
@@ -127,7 +125,7 @@ class TrivialViewTestCases:
     ):
         __table__ = create_view(
             name='trivial_view',
-            selectable=sa.select([column]),
+            selectable=sa.select(*_select_args(column)),
             metadata=metadata,
             cascade_on_drop=cascade_on_drop
         )

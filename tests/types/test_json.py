@@ -2,6 +2,7 @@ import pytest
 import sqlalchemy as sa
 import sqlalchemy.orm as sa_orm
 
+from sqlalchemy_utils.compat import _select_args
 from sqlalchemy_utils.types import json
 
 
@@ -75,7 +76,7 @@ class JSONTestCase:
         assert document.json == {'something': 'äääööö'}
 
     def test_compilation(self, Document, session):
-        query = sa.select([Document.json])
+        query = sa.select(*_select_args(Document.json))
         # the type should be cacheable and not throw exception
         session.execute(query)
 

@@ -1,5 +1,6 @@
 import pytest
 import sqlalchemy as sa
+import sqlalchemy.orm
 
 from sqlalchemy_utils import (  # noqa
     PhoneNumber,
@@ -7,6 +8,7 @@ from sqlalchemy_utils import (  # noqa
     PhoneNumberType,
     types
 )
+from sqlalchemy_utils.compat import _select_args
 
 VALID_PHONE_NUMBERS = (
     "040 1234567",
@@ -111,7 +113,8 @@ class TestPhoneNumberType:
 
     def test_phone_number_is_stored_as_string(self, session, user):
         result = session.execute(
-            'SELECT phone_number FROM "user" WHERE id=:param', {"param": user.id}
+            sa.text('SELECT phone_number FROM "user" WHERE id=:param'),
+            {"param": user.id},
         )
         assert result.first()[0] == "+358401234567"
 
@@ -145,7 +148,8 @@ class TestPhoneNumberType:
         queried_user = session.query(User)[1]
         assert queried_user.phone_number is None
         result = session.execute(
-            'SELECT phone_number FROM "user" WHERE id=:param', {"param": user.id}
+            sa.text('SELECT phone_number FROM "user" WHERE id=:param'),
+            {"param": user.id},
         )
         assert result.first()[0] is None
 
@@ -155,7 +159,7 @@ class TestPhoneNumberType:
         assert isinstance(user.phone_number, PhoneNumber)
 
     def test_compilation(self, User, session):
-        query = sa.select([User.phone_number])
+        query = sa.select(*_select_args(User.phone_number))
         # the type should be cacheable and not throw exception
         session.execute(query)
 
