@@ -336,7 +336,6 @@ def non_indexed_foreign_keys(metadata, engine=None):
         table = Table(
             table_name,
             reflected_metadata,
-            autoload=True,
             autoload_with=metadata.bind or engine
         )
 

@@ -27,7 +27,8 @@ if _sqlalchemy_version >= (1, 4):
     from sqlalchemy.orm import declarative_base as _declarative_base
     from sqlalchemy.orm import synonym_for as _synonym_for
 else:
-    from sqlalchemy.ext.declarative import declarative_base as _declarative_base
+    from sqlalchemy.ext.declarative import \
+        declarative_base as _declarative_base
     from sqlalchemy.ext.declarative import synonym_for as _synonym_for
 
 

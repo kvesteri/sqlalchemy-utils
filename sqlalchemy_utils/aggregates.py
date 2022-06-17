@@ -366,10 +366,12 @@ from collections import defaultdict
 from weakref import WeakKeyDictionary
 
 import sqlalchemy as sa
+import sqlalchemy.event
+import sqlalchemy.orm
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.sql.functions import _FunctionGenerator
 
-from .compat import get_scalar_subquery
+from .compat import _select_args, get_scalar_subquery
 from .functions.orm import get_column_key
 from .relationships import (
     chained_join,
@@ -488,10 +490,9 @@ class AggregatedValue:
                 return query.where(
                     local.in_(
                         sa.select(
-                            [remote],
-                            from_obj=[
-                                chained_join(*reversed(self.relationships))
-                            ]
+                            *_select_args(remote)
+                        ).select_from(
+                            chained_join(*reversed(self.relationships))
                         ).where(
                             condition
                         )
