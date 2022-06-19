@@ -9,6 +9,7 @@ import sqlalchemy.dialects.sqlite
 from sqlalchemy import inspect
 
 from sqlalchemy_utils import Password, PasswordType, types  # noqa
+from sqlalchemy_utils.compat import _select_args
 
 
 @pytest.fixture
@@ -95,7 +96,11 @@ class TestPasswordType:
         session.add(obj)
         session.commit()
 
-        obj = session.query(User).get(obj.id)
+        try:
+            obj = session.get(User, obj.id)
+        except AttributeError:
+            # sqlalchemy 1.3
+            obj = session.query(User).get(obj.id)
 
         assert obj.password == b'b'
         assert obj.password != 'a'
@@ -157,7 +162,11 @@ class TestPasswordType:
         session.add(obj)
         session.commit()
 
-        obj = session.query(User).get(obj.id)
+        try:
+            obj = session.get(User, obj.id)
+        except AttributeError:
+            # sqlalchemy 1.3
+            obj = session.query(User).get(obj.id)
 
         assert obj.password is None
 
@@ -173,7 +182,11 @@ class TestPasswordType:
         session.add(obj)
         session.commit()
 
-        obj = session.query(User).get(obj.id)
+        try:
+            obj = session.get(User, obj.id)
+        except AttributeError:
+            # sqlalchemy 1.3
+            obj = session.query(User).get(obj.id)
         obj.password = 'b'
 
         session.commit()
@@ -213,7 +226,11 @@ class TestPasswordType:
 
         session.commit()
 
-        obj = session.query(User).get(obj.id)
+        try:
+            obj = session.get(User, obj.id)
+        except AttributeError:
+            # sqlalchemy 1.3
+            obj = session.query(User).get(obj.id)
 
         assert obj.password.hash.decode('utf8').startswith('$pbkdf2-sha512$')
         assert obj.password == 'b'
@@ -257,6 +274,6 @@ class TestPasswordType:
         assert not onload.called
 
     def test_compilation(self, User, session):
-        query = sa.select([User.password])
+        query = sa.select(*_select_args(User.password))
         # the type should be cacheable and not throw exception
         session.execute(query)

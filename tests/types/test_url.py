@@ -1,6 +1,7 @@
 import pytest
 import sqlalchemy as sa
 
+from sqlalchemy_utils.compat import _select_args
 from sqlalchemy_utils.types import url
 
 
@@ -40,6 +41,6 @@ class TestURLType:
         assert isinstance(user.website, url.furl)
 
     def test_compilation(self, User, session):
-        query = sa.select([User.website])
+        query = sa.select(*_select_args(User.website))
         # the type should be cacheable and not throw exception
         session.execute(query)

@@ -3,8 +3,9 @@ import warnings
 
 import pytest
 import sqlalchemy as sa
+import sqlalchemy.event
+import sqlalchemy.exc
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base, synonym_for
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import close_all_sessions
@@ -14,6 +15,11 @@ from sqlalchemy_utils import (
     coercion_listener,
     i18n,
     InstrumentedList
+)
+from sqlalchemy_utils.compat import (
+    _declarative_base,
+    _select_args,
+    _synonym_for
 )
 from sqlalchemy_utils.functions.orm import _get_class_registry
 from sqlalchemy_utils.types.pg_composite import remove_composite_listeners
@@ -148,7 +154,7 @@ def connection(engine):
 
 @pytest.fixture
 def Base():
-    return declarative_base()
+    return _declarative_base()
 
 
 @pytest.fixture
@@ -185,7 +191,7 @@ def Category(Base):
         def articles_count(cls):
             Article = _get_class_registry(Base)['Article']
             return (
-                sa.select([sa.func.count(Article.id)])
+                sa.select(*_select_args(sa.func.count(Article.id)))
                 .where(Article.category_id == cls.id)
                 .correlate(Article.__table__)
                 .label('article_count')
@@ -195,7 +201,7 @@ def Category(Base):
         def name_alias(self):
             return self.name
 
-        @synonym_for('name')
+        @_synonym_for('name')
         @property
         def name_synonym(self):
             return self.name
@@ -229,15 +235,22 @@ def init_models(User, Category, Article):
 @pytest.fixture
 def session(request, engine, connection, Base, init_models):
     sa.orm.configure_mappers()
-    Base.metadata.create_all(connection)
+    with connection.begin():
+        Base.metadata.create_all(connection)
     Session = sessionmaker(bind=connection)
-    session = Session()
+    try:
+        # Enable sqlalchemy 2.0 behavior.
+        session = Session(future=True)
+    except TypeError:
+        # sqlalchemy 1.3
+        session = Session()
     i18n.get_locale = get_locale
 
     def teardown():
         aggregates.manager.reset()
         close_all_sessions()
-        Base.metadata.drop_all(connection)
+        with connection.begin():
+            Base.metadata.drop_all(connection)
         remove_composite_listeners()
         connection.close()
         engine.dispose()

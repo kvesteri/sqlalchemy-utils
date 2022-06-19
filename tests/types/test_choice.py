@@ -3,6 +3,7 @@ import sqlalchemy as sa
 from flexmock import flexmock
 
 from sqlalchemy_utils import Choice, ChoiceType, ImproperlyConfigured
+from sqlalchemy_utils.compat import _select_args
 from sqlalchemy_utils.types.choice import Enum
 
 
@@ -81,7 +82,7 @@ class TestChoiceType:
             ChoiceType([])
 
     def test_compilation(self, User, session):
-        query = sa.select([User.type])
+        query = sa.select(*_select_args(User.type))
         # the type should be cacheable and not throw exception
         session.execute(query)
 

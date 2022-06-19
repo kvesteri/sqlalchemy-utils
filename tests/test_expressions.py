@@ -3,6 +3,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 from sqlalchemy_utils import Asterisk, row_to_json
+from sqlalchemy_utils.compat import _declarative_base
 
 
 @pytest.fixture
@@ -28,7 +29,7 @@ def Article(Base):
 
 class TestAsterisk:
     def test_with_table_object(self):
-        Base = sa.ext.declarative.declarative_base()
+        Base = _declarative_base()
 
         class Article(Base):
             __tablename__ = 'article'
@@ -37,7 +38,7 @@ class TestAsterisk:
         assert str(Asterisk(Article.__table__)) == 'article.*'
 
     def test_with_quoted_identifier(self):
-        Base = sa.ext.declarative.declarative_base()
+        Base = _declarative_base()
 
         class User(Base):
             __tablename__ = 'user'

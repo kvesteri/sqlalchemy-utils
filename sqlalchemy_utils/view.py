@@ -149,7 +149,9 @@ def create_view(
                 Column('premium_user', Boolean, default=False),
             )
 
-        premium_members = select([users]).where(users.c.premium_user == True)
+        premium_members = select(users).where(users.c.premium_user == True)
+        # sqlalchemy 1.3:
+        # premium_members = select([users]).where(users.c.premium_user == True)
         create_view('premium_users', premium_members, metadata)
 
         metadata.create_all(engine) # View is created at this point
@@ -189,8 +191,8 @@ def refresh_materialized_view(session, name, concurrently=False):
     # order to include newly-created/modified objects in the refresh.
     session.flush()
     session.execute(
-        'REFRESH MATERIALIZED VIEW {}{}'.format(
+        sa.text('REFRESH MATERIALIZED VIEW {}{}'.format(
             'CONCURRENTLY ' if concurrently else '',
             session.bind.engine.dialect.identifier_preparer.quote(name)
-        )
+        ))
     )

@@ -1,5 +1,6 @@
 import pytest
 import sqlalchemy as sa
+import sqlalchemy.orm
 
 from sqlalchemy_utils import aggregated
 
@@ -66,10 +67,11 @@ def init_models(Catalog, Category, SubCategory, Product):
 def catalog_factory(Product, SubCategory, Category, Catalog, session):
     def catalog_factory():
         product = Product()
-        sub_category = SubCategory(
-            products=[product]
-        )
+        session.add(product)
+        sub_category = SubCategory(products=[product])
+        session.add(sub_category)
         category = Category(sub_categories=[sub_category])
+        session.add(category)
         catalog = Catalog(categories=[category])
         session.add(catalog)
         return catalog
@@ -94,10 +96,13 @@ class Test3LevelDeepOneToMany:
         Catalog
     ):
         product = Product()
+        session.add(product)
         sub_category = SubCategory(
             products=[product]
         )
+        session.add(sub_category)
         category = Category(sub_categories=[sub_category])
+        session.add(category)
         catalog = Catalog(categories=[category])
         session.add(catalog)
         return catalog
@@ -115,8 +120,9 @@ class Test3LevelDeepOneToMany:
         # force set catalog2 product_count to zero in order to check if it gets
         # updated when the other catalog's product count gets updated
         session.execute(
-            'UPDATE catalog SET product_count = 0 WHERE id = %d'
-            % catalog2.id
+            sa.text(
+                'UPDATE catalog SET product_count = 0 WHERE id = %d' % catalog2.id
+            )
         )
 
         catalog.categories[0].sub_categories[0].products.append(

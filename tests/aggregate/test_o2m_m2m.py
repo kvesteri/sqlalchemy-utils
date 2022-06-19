@@ -1,5 +1,6 @@
 import pytest
 import sqlalchemy as sa
+import sqlalchemy.orm
 
 from sqlalchemy_utils import aggregated
 
@@ -71,18 +72,21 @@ class TestAggregateOneToManyAndManyToMany:
 
     def test_insert(self, session, Category, Catalog, Product):
         category = Category()
+        session.add(category)
         products = [
             Product(categories=[category]),
             Product(categories=[category])
         ]
+        [session.add(product) for product in products]
         catalog = Catalog(products=products)
         session.add(catalog)
         products2 = [
             Product(categories=[category]),
             Product(categories=[category])
         ]
+        [session.add(product) for product in products2]
         catalog2 = Catalog(products=products2)
-        session.add(catalog)
+        session.add(catalog2)
         session.commit()
         assert catalog.category_count == 1
         assert catalog2.category_count == 1

@@ -2,6 +2,7 @@ import pytest
 import sqlalchemy as sa
 
 from sqlalchemy_utils import i18n
+from sqlalchemy_utils.compat import _select_args
 from sqlalchemy_utils.primitives import WeekDays
 from sqlalchemy_utils.types import WeekDaysType
 
@@ -47,7 +48,7 @@ class WeekDaysTypeTestCase:
         assert isinstance(schedule.working_days, WeekDays)
 
     def test_compilation(self, Schedule, session):
-        query = sa.select([Schedule.working_days])
+        query = sa.select(*_select_args(Schedule.working_days))
         # the type should be cacheable and not throw exception
         session.execute(query)
 

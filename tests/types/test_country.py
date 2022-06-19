@@ -2,6 +2,7 @@ import pytest
 import sqlalchemy as sa
 
 from sqlalchemy_utils import Country, CountryType, i18n  # noqa
+from sqlalchemy_utils.compat import _select_args
 
 
 @pytest.fixture
@@ -45,6 +46,6 @@ class TestCountryType:
         assert compiled == '"user".country = \'FI\''
 
     def test_compilation(self, User, session):
-        query = sa.select([User.country])
+        query = sa.select(*_select_args(User.country))
         # the type should be cacheable and not throw exception
         session.execute(query)

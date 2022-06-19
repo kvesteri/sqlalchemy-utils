@@ -374,17 +374,17 @@ class TestCompositeTypeWhenTypeAlreadyExistsInDatabase:
         Session = sessionmaker(bind=connection)
         session = Session()
         session.execute(
-            "CREATE TYPE money_type AS (currency VARCHAR, amount INTEGER)"
+            sa.text("CREATE TYPE money_type AS (currency VARCHAR, amount INTEGER)")
         )
         session.execute(
-            """CREATE TABLE account (
+            sa.text("""CREATE TABLE account (
                 id SERIAL, balance MONEY_TYPE, PRIMARY KEY(id)
-            )"""
+            )""")
         )
 
         def teardown():
-            session.execute('DROP TABLE account')
-            session.execute('DROP TYPE money_type')
+            session.execute(sa.text('DROP TABLE account'))
+            session.execute(sa.text('DROP TYPE money_type'))
             session.commit()
             close_all_sessions()
             connection.close()
@@ -436,19 +436,24 @@ class TestCompositeTypeWithMixedCase:
         sa.orm.configure_mappers()
 
         Session = sessionmaker(bind=connection)
-        session = Session()
+        try:
+            # Enable sqlalchemy 2.0 behavior
+            session = Session(future=True)
+        except TypeError:
+            # sqlalchemy 1.3
+            session = Session()
         session.execute(
-            'CREATE TYPE "MoneyType" AS (currency VARCHAR, amount INTEGER)'
+            sa.text('CREATE TYPE "MoneyType" AS (currency VARCHAR, amount INTEGER)')
         )
-        session.execute(
+        session.execute(sa.text(
             """CREATE TABLE account (
                 id SERIAL, balance "MoneyType", PRIMARY KEY(id)
             )"""
-        )
+        ))
 
         def teardown():
-            session.execute('DROP TABLE account')
-            session.execute('DROP TYPE "MoneyType"')
+            session.execute(sa.text('DROP TABLE account'))
+            session.execute(sa.text('DROP TYPE "MoneyType"'))
             session.commit()
             close_all_sessions()
             connection.close()

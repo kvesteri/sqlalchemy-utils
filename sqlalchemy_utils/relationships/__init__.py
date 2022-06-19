@@ -1,6 +1,8 @@
 import sqlalchemy as sa
+import sqlalchemy.orm
 from sqlalchemy.sql.util import ClauseAdapter
 
+from ..compat import _select_args
 from .chained_join import chained_join  # noqa
 
 
@@ -94,7 +96,7 @@ def select_correlated_expression(
 ):
     relationships = list(reversed(path_to_relationships(path, root_model)))
 
-    query = sa.select([expr])
+    query = sa.select(*_select_args(expr))
 
     join_expr, aliases = chained_inverse_join(relationships, leaf_model)
 

@@ -439,7 +439,7 @@ def _set_url_database(url: sa.engine.url.URL, database):
 
 
 def _get_scalar_result(engine, sql):
-    with engine.connect() as conn:
+    with engine.begin() as conn:
         return conn.scalar(sql)
 
 
@@ -485,7 +485,7 @@ def database_exists(url):
                 url = _set_url_database(url, database=db)
                 engine = sa.create_engine(url)
                 try:
-                    return bool(_get_scalar_result(engine, text))
+                    return bool(_get_scalar_result(engine, sa.text(text)))
                 except (ProgrammingError, OperationalError):
                     pass
             return False
@@ -495,7 +495,7 @@ def database_exists(url):
             engine = sa.create_engine(url)
             text = ("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA "
                     "WHERE SCHEMA_NAME = '%s'" % database)
-            return bool(_get_scalar_result(engine, text))
+            return bool(_get_scalar_result(engine, sa.text(text)))
 
         elif dialect_name == 'sqlite':
             url = _set_url_database(url, database=None)
@@ -503,14 +503,14 @@ def database_exists(url):
             if database:
                 return database == ':memory:' or _sqlite_file_exists(database)
             else:
-                # The default SQLAlchemy database is in memory, and :memory is
+                # The default SQLAlchemy database is in memory, and :memory: is
                 # not required, thus we should support that use case.
                 return True
         else:
             text = 'SELECT 1'
             try:
                 engine = sa.create_engine(url)
-                return bool(_get_scalar_result(engine, text))
+                return bool(_get_scalar_result(engine, sa.text(text)))
             except (ProgrammingError, OperationalError):
                 return False
     finally:
@@ -571,27 +571,27 @@ def create_database(url, encoding='utf8', template=None):
             quote(engine, template)
         )
 
-        with engine.connect() as connection:
-            connection.execute(text)
+        with engine.begin() as connection:
+            connection.execute(sa.text(text))
 
     elif dialect_name == 'mysql':
         text = "CREATE DATABASE {0} CHARACTER SET = '{1}'".format(
             quote(engine, database),
             encoding
         )
-        with engine.connect() as connection:
-            connection.execute(text)
+        with engine.begin() as connection:
+            connection.execute(sa.text(text))
 
     elif dialect_name == 'sqlite' and database != ':memory:':
         if database:
-            with engine.connect() as connection:
-                connection.execute("CREATE TABLE DB(id int);")
-                connection.execute("DROP TABLE DB;")
+            with engine.begin() as connection:
+                connection.execute(sa.text("CREATE TABLE DB(id int);"))
+                connection.execute(sa.text("DROP TABLE DB;"))
 
     else:
         text = 'CREATE DATABASE {0}'.format(quote(engine, database))
-        with engine.connect() as connection:
-            connection.execute(text)
+        with engine.begin() as connection:
+            connection.execute(sa.text(text))
 
     engine.dispose()
 
@@ -635,7 +635,7 @@ def drop_database(url):
         if database:
             os.remove(database)
     elif dialect_name == 'postgresql':
-        with engine.connect() as connection:
+        with engine.begin() as connection:
             # Disconnect all users from the database we are dropping.
             version = connection.dialect.server_version_info
             pid_column = (
@@ -647,14 +647,14 @@ def drop_database(url):
             WHERE pg_stat_activity.datname = '%(database)s'
             AND %(pid_column)s <> pg_backend_pid();
             ''' % {'pid_column': pid_column, 'database': database}
-            connection.execute(text)
+            connection.execute(sa.text(text))
 
             # Drop the database.
             text = 'DROP DATABASE {0}'.format(quote(connection, database))
-            connection.execute(text)
+            connection.execute(sa.text(text))
     else:
         text = 'DROP DATABASE {0}'.format(quote(engine, database))
-        with engine.connect() as connection:
-            connection.execute(text)
+        with engine.begin() as connection:
+            connection.execute(sa.text(text))
 
     engine.dispose()

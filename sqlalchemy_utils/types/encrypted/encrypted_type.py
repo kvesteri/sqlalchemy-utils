@@ -257,7 +257,11 @@ class StringEncryptedType(TypeDecorator, ScalarCoercible):
 
         import sqlalchemy as sa
         from sqlalchemy import create_engine
-        from sqlalchemy.ext.declarative import declarative_base
+        try:
+            from sqlalchemy.orm import declarative_base
+        except ImportError:
+            # sqlalchemy 1.3
+            from sqlalchemy.ext.declarative import declarative_base
         from sqlalchemy.orm import sessionmaker
 
         from sqlalchemy_utils import EncryptedType

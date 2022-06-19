@@ -1,7 +1,9 @@
 import pytest
 import sqlalchemy as sa
+import sqlalchemy.exc
 
 from sqlalchemy_utils import ScalarListType
+from sqlalchemy_utils.compat import _select_args
 
 
 class TestScalarIntegerList:
@@ -93,6 +95,6 @@ class TestScalarUnicodeList:
         assert user.some_list == []
 
     def test_compilation(self, User, session):
-        query = sa.select([User.some_list])
+        query = sa.select(*_select_args(User.some_list))
         # the type should be cacheable and not throw exception
         session.execute(query)
