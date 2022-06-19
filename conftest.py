@@ -171,7 +171,7 @@ def Category(Base):
 
         @hybrid_property
         def full_name(self):
-            return u'%s %s' % (self.title, self.name)
+            return '%s %s' % (self.title, self.name)
 
         @full_name.expression
         def full_name(self):

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import pytest
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import ARRAY
@@ -19,7 +18,7 @@ from sqlalchemy_utils.types.range import intervals
 
 
 @pytest.mark.usefixtures('postgresql_dsn')
-class TestCompositeTypeWithRegularTypes(object):
+class TestCompositeTypeWithRegularTypes:
 
     @pytest.fixture
     def Account(self, Base):
@@ -56,14 +55,14 @@ class TestCompositeTypeWithRegularTypes(object):
 
     def test_non_ascii_chars(self, session, Account):
         account = Account(
-            balance=(u'ääöö', 15)
+            balance=('ääöö', 15)
         )
 
         session.add(account)
         session.commit()
 
         account = session.query(Account).first()
-        assert account.balance.currency == u'ääöö'
+        assert account.balance.currency == 'ääöö'
         assert account.balance.amount == 15
 
     def test_dict_input(self, session, Account):
@@ -102,7 +101,7 @@ class TestCompositeTypeWithRegularTypes(object):
 
 @pytest.mark.skipif('i18n.babel is None')
 @pytest.mark.usefixtures('postgresql_dsn')
-class TestCompositeTypeWithTypeDecorators(object):
+class TestCompositeTypeWithTypeDecorators:
 
     @pytest.fixture
     def Account(self, Base):
@@ -164,7 +163,7 @@ class TestCompositeTypeWithTypeDecorators(object):
 
 @pytest.mark.skipif('i18n.babel is None')
 @pytest.mark.usefixtures('postgresql_dsn')
-class TestCompositeTypeInsideArray(object):
+class TestCompositeTypeInsideArray:
 
     @pytest.fixture
     def type_(self):
@@ -228,7 +227,7 @@ class TestCompositeTypeInsideArray(object):
 
 @pytest.mark.skipif('intervals is None')
 @pytest.mark.usefixtures('postgresql_dsn')
-class TestCompositeTypeWithRangeTypeInsideArray(object):
+class TestCompositeTypeWithRangeTypeInsideArray:
 
     @pytest.fixture
     def type_(self):
@@ -347,7 +346,7 @@ class TestCompositeTypeWithRangeTypeInsideArray(object):
 
 
 @pytest.mark.usefixtures('postgresql_dsn')
-class TestCompositeTypeWhenTypeAlreadyExistsInDatabase(object):
+class TestCompositeTypeWhenTypeAlreadyExistsInDatabase:
 
     @pytest.fixture
     def Account(self, Base):
@@ -411,7 +410,7 @@ class TestCompositeTypeWhenTypeAlreadyExistsInDatabase(object):
 
 
 @pytest.mark.usefixtures('postgresql_dsn')
-class TestCompositeTypeWithMixedCase(object):
+class TestCompositeTypeWithMixedCase:
 
     @pytest.fixture
     def Account(self, Base):

@@ -55,18 +55,18 @@ def init_models(Catalog, Category, Product):
 
 
 @pytest.mark.usefixtures('postgresql_dsn')
-class TestAggregateOneToManyAndOneToMany(object):
+class TestAggregateOneToManyAndOneToMany:
 
     def test_assigns_aggregates(self, session, Category, Catalog, Product):
-        category = Category(name=u'Some category')
+        category = Category(name='Some category')
         catalog = Catalog(
             categories=[category]
         )
-        catalog.name = u'Some catalog'
+        catalog.name = 'Some catalog'
         session.add(catalog)
         session.commit()
         product = Product(
-            name=u'Some product',
+            name='Some product',
             price=Decimal('1000'),
             category=category
         )

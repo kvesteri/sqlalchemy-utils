@@ -1,6 +1,5 @@
 from collections.abc import Iterable
 
-import six
 import sqlalchemy as sa
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import attributes, class_mapper, ColumnProperty
@@ -74,7 +73,7 @@ class GenericAttributeImpl(attributes.ScalarAttributeImpl):
             pk = mapper.identity_key_from_instance(initiator)[1]
 
             # Set the identifier and the discriminator.
-            discriminator = six.text_type(class_.__name__)
+            discriminator = class_.__name__
 
             for index, id in enumerate(self.parent_token.id):
                 dict_[id.key] = pk[index]
@@ -117,7 +116,7 @@ class GenericRelationshipProperty(MapperProperty):
 
     def init(self):
         def convert_strings(column):
-            if isinstance(column, six.string_types):
+            if isinstance(column, str):
                 return self.parent.columns[column]
             return column
 
@@ -144,7 +143,7 @@ class GenericRelationshipProperty(MapperProperty):
             self._parententity = parentmapper
 
         def __eq__(self, other):
-            discriminator = six.text_type(type(other).__name__)
+            discriminator = type(other).__name__
             q = self.property._discriminator_col == discriminator
             other_id = identity(other)
             for index, id in enumerate(self.property._id_cols):
@@ -158,9 +157,9 @@ class GenericRelationshipProperty(MapperProperty):
             mapper = sa.inspect(other)
             # Iterate through the weak sequence in order to get the actual
             # mappers
-            class_names = [six.text_type(other.__name__)]
+            class_names = [other.__name__]
             class_names.extend([
-                six.text_type(submapper.class_.__name__)
+                submapper.class_.__name__
                 for submapper in mapper._inheriting_mappers
             ])
 

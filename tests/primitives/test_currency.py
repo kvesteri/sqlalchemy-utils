@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
 import pytest
-import six
 
 from sqlalchemy_utils import Currency, i18n
 
@@ -12,7 +10,7 @@ def set_get_locale():
 
 @pytest.mark.skipif('i18n.babel is None')
 @pytest.mark.usefixtures('set_get_locale')
-class TestCurrency(object):
+class TestCurrency:
 
     def test_init(self):
         assert Currency('USD') == Currency(Currency('USD'))
@@ -41,8 +39,8 @@ class TestCurrency(object):
     @pytest.mark.parametrize(
         ('code', 'symbol'),
         (
-            ('USD', u'$'),
-            ('EUR', u'€')
+            ('USD', '$'),
+            ('EUR', '€')
         )
     )
     def test_symbol_property(self, code, symbol):
@@ -59,7 +57,7 @@ class TestCurrency(object):
 
     def test_unicode(self):
         currency = Currency('USD')
-        assert six.text_type(currency) == u'USD'
+        assert str(currency) == 'USD'
 
     def test_str(self):
         currency = Currency('USD')

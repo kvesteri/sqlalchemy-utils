@@ -1,4 +1,3 @@
-import six
 from sqlalchemy import types
 
 from ..exceptions import ImproperlyConfigured
@@ -66,7 +65,7 @@ class ColorType(ScalarCoercible, types.TypeDecorator):
 
     def process_bind_param(self, value, dialect):
         if value and isinstance(value, colour.Color):
-            return six.text_type(getattr(value, self.STORE_FORMAT))
+            return str(getattr(value, self.STORE_FORMAT))
         return value
 
     def process_result_value(self, value, dialect):

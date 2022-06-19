@@ -58,7 +58,7 @@ def init_models(Device, Order, SalesInvoice):
 
 
 @pytest.mark.usefixtures('postgresql_dsn')
-class TestObservesForOneToManyToOneToMany(object):
+class TestObservesForOneToManyToOneToMany:
 
     def test_observable_root_obj_is_none(self, session, Device, Order):
         order = Order(device=Device(name='Something'))

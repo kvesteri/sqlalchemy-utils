@@ -5,7 +5,7 @@ from sqlalchemy_utils import get_mapper
 from sqlalchemy_utils.functions.orm import _get_query_compile_state
 
 
-class TestGetMapper(object):
+class TestGetMapper:
 
     @pytest.fixture
     def Building(self, Base):
@@ -66,7 +66,7 @@ class TestGetMapper(object):
         )
 
 
-class TestGetMapperWithQueryEntities(object):
+class TestGetMapperWithQueryEntities:
 
     @pytest.fixture
     def Building(self, Base):
@@ -95,7 +95,7 @@ class TestGetMapperWithQueryEntities(object):
         assert get_mapper(entity) == sa.inspect(Building)
 
 
-class TestGetMapperWithMultipleMappersFound(object):
+class TestGetMapperWithMultipleMappersFound:
 
     @pytest.fixture
     def Building(self, Base):
@@ -118,7 +118,7 @@ class TestGetMapperWithMultipleMappersFound(object):
             get_mapper(alias)
 
 
-class TestGetMapperForTableWithoutMapper(object):
+class TestGetMapperForTableWithoutMapper:
 
     @pytest.fixture
     def building(self):

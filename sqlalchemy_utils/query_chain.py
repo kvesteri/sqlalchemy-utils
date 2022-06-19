@@ -108,7 +108,7 @@ with :meth:`~QueryChain.count`::
 from copy import copy
 
 
-class QueryChain(object):
+class QueryChain:
     """
     QueryChain can be used as a wrapper for sequence of queries.
 

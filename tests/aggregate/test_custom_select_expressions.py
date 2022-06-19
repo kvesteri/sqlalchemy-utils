@@ -39,16 +39,16 @@ def init_models(Product, Catalog):
 
 
 @pytest.mark.usefixtures('postgresql_dsn')
-class TestLazyEvaluatedSelectExpressionsForAggregates(object):
+class TestLazyEvaluatedSelectExpressionsForAggregates:
 
     def test_assigns_aggregates_on_insert(self, session, Product, Catalog):
         catalog = Catalog(
-            name=u'Some catalog'
+            name='Some catalog'
         )
         session.add(catalog)
         session.commit()
         product = Product(
-            name=u'Some product',
+            name='Some product',
             price=Decimal('1000'),
             catalog=catalog
         )
@@ -59,12 +59,12 @@ class TestLazyEvaluatedSelectExpressionsForAggregates(object):
 
     def test_assigns_aggregates_on_update(self, session, Product, Catalog):
         catalog = Catalog(
-            name=u'Some catalog'
+            name='Some catalog'
         )
         session.add(catalog)
         session.commit()
         product = Product(
-            name=u'Some product',
+            name='Some product',
             price=Decimal('1000'),
             catalog=catalog
         )

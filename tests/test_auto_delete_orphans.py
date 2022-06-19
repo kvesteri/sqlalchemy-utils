@@ -70,7 +70,7 @@ def EntryWithoutTagsBackref(Base, Tag, tagging_tbl):
     return EntryWithoutTagsBackref
 
 
-class TestAutoDeleteOrphans(object):
+class TestAutoDeleteOrphans:
 
     @pytest.fixture
     def init_models(self, Entry, Tag):
@@ -101,7 +101,7 @@ class TestAutoDeleteOrphans(object):
         assert session.query(Tag).count() == 2
 
 
-class TestAutoDeleteOrphansWithoutBackref(object):
+class TestAutoDeleteOrphansWithoutBackref:
 
     @pytest.fixture
     def init_models(self, EntryWithoutTagsBackref, Tag):

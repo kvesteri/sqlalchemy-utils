@@ -4,7 +4,7 @@ import sqlalchemy as sa
 from sqlalchemy_utils import get_class_by_table
 
 
-class TestGetClassByTableWithJoinedTableInheritance(object):
+class TestGetClassByTableWithJoinedTableInheritance:
 
     @pytest.fixture
     def Entity(self, Base):
@@ -49,7 +49,7 @@ class TestGetClassByTableWithJoinedTableInheritance(object):
         assert get_class_by_table(Base, table) is None
 
 
-class TestGetClassByTableWithSingleTableInheritance(object):
+class TestGetClassByTableWithSingleTableInheritance:
 
     @pytest.fixture
     def Entity(self, Base):

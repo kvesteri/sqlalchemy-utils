@@ -75,7 +75,7 @@ def init_models(Category, Catalog, Product):
 
 
 @pytest.mark.usefixtures('postgresql_dsn')
-class TestAggregateManyToManyAndManyToMany(object):
+class TestAggregateManyToManyAndManyToMany:
 
     def test_insert(self, session, Product, Category, Catalog):
         category = Category()

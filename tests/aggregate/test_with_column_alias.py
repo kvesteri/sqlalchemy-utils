@@ -35,7 +35,7 @@ def init_models(Thread, Comment):
     pass
 
 
-class TestAggregatedWithColumnAlias(object):
+class TestAggregatedWithColumnAlias:
 
     def test_assigns_aggregates_on_insert(self, session, Thread, Comment):
         thread = Thread()

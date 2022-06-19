@@ -28,7 +28,7 @@ def Article(TextItem):
             sa.Integer, sa.ForeignKey(TextItem.id), primary_key=True
         )
         __mapper_args__ = {
-            'polymorphic_identity': u'article'
+            'polymorphic_identity': 'article'
         }
     return Article
 
@@ -38,7 +38,7 @@ def init_models(TextItem, Article):
     pass
 
 
-class TestGetTables(object):
+class TestGetTables:
 
     def test_child_class_using_join_table_inheritance(self, TextItem, Article):
         assert get_tables(Article) == [

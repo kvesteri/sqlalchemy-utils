@@ -1,4 +1,3 @@
-import six
 from sqlalchemy import types
 
 from ..exceptions import ImproperlyConfigured
@@ -42,7 +41,7 @@ class TimezoneType(ScalarCoercible, types.TypeDecorator):
 
                 self.python_type = tzfile
                 self._to = get_zonefile_instance().zones.get
-                self._from = lambda x: six.text_type(x._filename)
+                self._from = lambda x: str(x._filename)
 
             except ImportError:
                 raise ImproperlyConfigured(
@@ -57,7 +56,7 @@ class TimezoneType(ScalarCoercible, types.TypeDecorator):
 
                 self.python_type = BaseTzInfo
                 self._to = timezone
-                self._from = six.text_type
+                self._from = str
 
             except ImportError:
                 raise ImproperlyConfigured(
@@ -80,7 +79,7 @@ class TimezoneType(ScalarCoercible, types.TypeDecorator):
 
             self.python_type = zoneinfo.ZoneInfo
             self._to = zoneinfo.ZoneInfo
-            self._from = six.text_type
+            self._from = str
 
         else:
             raise ImproperlyConfigured(

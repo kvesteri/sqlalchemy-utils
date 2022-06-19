@@ -1,7 +1,5 @@
 from collections.abc import Iterable
 
-import six
-
 
 def str_coercible(cls):
     def __str__(self):
@@ -13,7 +11,7 @@ def str_coercible(cls):
 
 def is_sequence(value):
     return (
-        isinstance(value, Iterable) and not isinstance(value, six.string_types)
+        isinstance(value, Iterable) and not isinstance(value, str)
     )
 
 

@@ -23,7 +23,7 @@ def init_models(User):
     pass
 
 
-class TestUUIDType(object):
+class TestUUIDType:
     def test_repr(self):
         plain = UUIDType()
         assert repr(plain) == 'UUIDType()'

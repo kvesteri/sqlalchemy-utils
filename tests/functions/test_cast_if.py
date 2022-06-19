@@ -22,7 +22,7 @@ def article_cls(base):
     return Article
 
 
-class TestCastIf(object):
+class TestCastIf:
     def test_column(self, article_cls):
         expr = article_cls.__table__.c.name
         assert cast_if(expr, sa.String) is expr

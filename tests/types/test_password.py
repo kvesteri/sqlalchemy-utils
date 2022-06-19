@@ -55,7 +55,7 @@ def onload_callback(schemes, deprecated):
 
 
 @pytest.mark.skipif('types.password.passlib is None')
-class TestPasswordType(object):
+class TestPasswordType:
     @pytest.mark.parametrize('dialect_module,impl', [
         (sqlalchemy.dialects.sqlite, sa.dialects.sqlite.BLOB),
         (sqlalchemy.dialects.postgresql, sa.dialects.postgresql.BYTEA),

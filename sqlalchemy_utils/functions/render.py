@@ -1,6 +1,6 @@
 import inspect
+import io
 
-import six
 import sqlalchemy as sa
 
 from .mock import create_mock_engine
@@ -24,7 +24,7 @@ def render_expression(expression, bind, stream=None):
     # Create a stream if not present.
 
     if stream is None:
-        stream = six.moves.cStringIO()
+        stream = io.StringIO()
 
     engine = create_mock_engine(bind, stream)
 
@@ -36,7 +36,7 @@ def render_expression(expression, bind, stream=None):
             frame = frame[0]
             local = dict(frame.f_locals)
             local['engine'] = engine
-            six.exec_(expression, frame.f_globals, local)
+            exec(expression, frame.f_globals, local)
             break
         except Exception:
             pass
@@ -68,7 +68,7 @@ def render_statement(statement, bind=None):
     elif bind is None:
         bind = statement.bind
 
-    stream = six.moves.cStringIO()
+    stream = io.StringIO()
     engine = create_mock_engine(bind.engine, stream=stream)
     engine.execute(statement)
 

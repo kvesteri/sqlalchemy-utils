@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from functools import total_ordering
 
 from .. import i18n
@@ -7,7 +6,7 @@ from ..utils import str_coercible
 
 @str_coercible
 @total_ordering
-class WeekDay(object):
+class WeekDay:
     NUM_WEEK_DAYS = 7
 
     def __init__(self, index):

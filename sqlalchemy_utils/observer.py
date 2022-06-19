@@ -185,7 +185,7 @@ from .utils import is_sequence
 Callback = namedtuple('Callback', ['func', 'backref', 'fullpath'])
 
 
-class PropertyObserver(object):
+class PropertyObserver:
     def __init__(self):
         self.listener_args = [
             (

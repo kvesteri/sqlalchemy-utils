@@ -51,13 +51,13 @@ def init_models(Comment, Thread):
     pass
 
 
-class TestAggregateValueGenerationForSimpleModelPaths(object):
+class TestAggregateValueGenerationForSimpleModelPaths:
 
     def test_assigns_aggregates_on_insert(self, session, Thread, Comment):
         thread = Thread()
-        thread.name = u'some article name'
+        thread.name = 'some article name'
         session.add(thread)
-        comment = Comment(content=u'Some content', thread=thread)
+        comment = Comment(content='Some content', thread=thread)
         session.add(comment)
         session.commit()
         session.refresh(thread)
@@ -71,10 +71,10 @@ class TestAggregateValueGenerationForSimpleModelPaths(object):
         Comment
     ):
         thread = Thread()
-        thread.name = u'some article name'
+        thread.name = 'some article name'
         session.add(thread)
         session.commit()
-        comment = Comment(content=u'Some content', thread=thread)
+        comment = Comment(content='Some content', thread=thread)
         session.add(comment)
         session.commit()
         session.refresh(thread)
@@ -83,10 +83,10 @@ class TestAggregateValueGenerationForSimpleModelPaths(object):
 
     def test_assigns_aggregates_on_delete(self, session, Thread, Comment):
         thread = Thread()
-        thread.name = u'some article name'
+        thread.name = 'some article name'
         session.add(thread)
         session.commit()
-        comment = Comment(content=u'Some content', thread=thread)
+        comment = Comment(content='Some content', thread=thread)
         session.add(comment)
         session.commit()
         session.delete(comment)

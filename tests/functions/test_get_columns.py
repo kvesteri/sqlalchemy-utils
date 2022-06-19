@@ -18,7 +18,7 @@ def columns():
     return ['_id', '_name']
 
 
-class TestGetColumns(object):
+class TestGetColumns:
     def test_table(self, Building):
         assert isinstance(
             get_columns(Building.__table__),

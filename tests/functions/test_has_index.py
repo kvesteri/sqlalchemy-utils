@@ -4,7 +4,7 @@ import sqlalchemy as sa
 from sqlalchemy_utils import get_fk_constraint_for_columns, has_index
 
 
-class TestHasIndex(object):
+class TestHasIndex:
 
     @pytest.fixture
     def table(self, Base):
@@ -47,7 +47,7 @@ class TestHasIndex(object):
         assert not has_index(article.c.name)
 
 
-class TestHasIndexWithFKConstraint(object):
+class TestHasIndexWithFKConstraint:
     def test_composite_fk_without_index(self, Base):
 
         class User(Base):

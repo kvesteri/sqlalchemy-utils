@@ -4,7 +4,7 @@ import sqlalchemy as sa
 from sqlalchemy_utils import dependent_objects, get_referencing_foreign_keys
 
 
-class TestDependentObjects(object):
+class TestDependentObjects:
 
     @pytest.fixture
     def User(self, Base):
@@ -46,7 +46,7 @@ class TestDependentObjects(object):
         pass
 
     def test_returns_all_dependent_objects(self, session, User, Article):
-        user = User(first_name=u'John')
+        user = User(first_name='John')
         articles = [
             Article(author=user),
             Article(),
@@ -69,7 +69,7 @@ class TestDependentObjects(object):
         Article,
         BlogPost
     ):
-        user = User(first_name=u'John')
+        user = User(first_name='John')
         objects = [
             Article(author=user),
             Article(),
@@ -94,7 +94,7 @@ class TestDependentObjects(object):
         assert objects[3] in deps
 
 
-class TestDependentObjectsWithColumnAliases(object):
+class TestDependentObjectsWithColumnAliases:
 
     @pytest.fixture
     def User(self, Base):
@@ -140,7 +140,7 @@ class TestDependentObjectsWithColumnAliases(object):
         pass
 
     def test_returns_all_dependent_objects(self, session, User, Article):
-        user = User(first_name=u'John')
+        user = User(first_name='John')
         articles = [
             Article(author=user),
             Article(),
@@ -163,7 +163,7 @@ class TestDependentObjectsWithColumnAliases(object):
         Article,
         BlogPost
     ):
-        user = User(first_name=u'John')
+        user = User(first_name='John')
         objects = [
             Article(author=user),
             Article(),
@@ -188,7 +188,7 @@ class TestDependentObjectsWithColumnAliases(object):
         assert objects[3] in deps
 
 
-class TestDependentObjectsWithManyReferences(object):
+class TestDependentObjectsWithManyReferences:
 
     @pytest.fixture
     def User(self, Base):
@@ -222,7 +222,7 @@ class TestDependentObjectsWithManyReferences(object):
         pass
 
     def test_with_many_dependencies(self, session, User, Article, BlogPost):
-        user = User(first_name=u'John')
+        user = User(first_name='John')
         objects = [
             Article(author=user),
             BlogPost(author=user)
@@ -233,7 +233,7 @@ class TestDependentObjectsWithManyReferences(object):
         assert len(deps) == 2
 
 
-class TestDependentObjectsWithCompositeKeys(object):
+class TestDependentObjectsWithCompositeKeys:
 
     @pytest.fixture
     def User(self, Base):
@@ -265,7 +265,7 @@ class TestDependentObjectsWithCompositeKeys(object):
         pass
 
     def test_returns_all_dependent_objects(self, session, User, Article):
-        user = User(first_name=u'John', last_name=u'Smith')
+        user = User(first_name='John', last_name='Smith')
         articles = [
             Article(author=user),
             Article(),
@@ -281,7 +281,7 @@ class TestDependentObjectsWithCompositeKeys(object):
         assert articles[3] in deps
 
 
-class TestDependentObjectsWithSingleTableInheritance(object):
+class TestDependentObjectsWithSingleTableInheritance:
 
     @pytest.fixture
     def Category(self, Base):
@@ -318,7 +318,7 @@ class TestDependentObjectsWithSingleTableInheritance(object):
     def Article(self, TextItem):
         class Article(TextItem):
             __mapper_args__ = {
-                'polymorphic_identity': u'article'
+                'polymorphic_identity': 'article'
             }
         return Article
 
@@ -326,7 +326,7 @@ class TestDependentObjectsWithSingleTableInheritance(object):
     def BlogPost(self, TextItem):
         class BlogPost(TextItem):
             __mapper_args__ = {
-                'polymorphic_identity': u'blog_post'
+                'polymorphic_identity': 'blog_post'
             }
         return BlogPost
 
@@ -335,8 +335,8 @@ class TestDependentObjectsWithSingleTableInheritance(object):
         pass
 
     def test_returns_all_dependent_objects(self, session, Category, Article):
-        category1 = Category(name=u'Category #1')
-        category2 = Category(name=u'Category #2')
+        category1 = Category(name='Category #1')
+        category2 = Category(name='Category #2')
         articles = [
             Article(category=category1),
             Article(category=category1),

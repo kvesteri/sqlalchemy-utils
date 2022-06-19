@@ -3,7 +3,6 @@ from functools import partial
 from inspect import isclass
 from operator import attrgetter
 
-import six
 import sqlalchemy as sa
 from sqlalchemy.engine.interfaces import Dialect
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -740,7 +739,7 @@ def has_changes(obj, attrs=None, exclude=None):
 
         has_changes(user, 'name')  # False
 
-        user.name = u'someone'
+        user.name = 'someone'
 
         has_changes(user, 'name')  # True
 
@@ -772,7 +771,7 @@ def has_changes(obj, attrs=None, exclude=None):
     :param exclude: Names of the attributes to exclude
     """
     if attrs:
-        if isinstance(attrs, six.string_types):
+        if isinstance(attrs, str):
             return (
                 sa.inspect(obj)
                 .attrs
@@ -839,7 +838,7 @@ def identity(obj_or_class):
         from sqlalchemy_utils import identity
 
 
-        user = User(name=u'John Matrix')
+        user = User(name='John Matrix')
         session.add(user)
         identity(user)  # None
         inspect(user).identity  # None
@@ -881,8 +880,8 @@ def naturally_equivalent(obj, obj2):
         from sqlalchemy_utils import naturally_equivalent
 
 
-        user = User(name=u'someone')
-        user2 = User(name=u'someone')
+        user = User(name='someone')
+        user2 = User(name='someone')
 
         user == user2  # False
 

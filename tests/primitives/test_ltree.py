@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 import pytest
-import six
 
 from sqlalchemy_utils import Ltree
 
 
-class TestLtree(object):
+class TestLtree:
     def test_init(self):
         assert Ltree('path.path') == Ltree(Ltree('path.path'))
 
@@ -187,7 +185,7 @@ class TestLtree(object):
         assert Ltree('path.path') == Ltree('path.path')
 
     def test_non_equality_operator(self):
-        assert Ltree('path.path') != u'path.'
+        assert Ltree('path.path') != 'path.'
         assert not (Ltree('path.path') != 'path.path')
 
     def test_hash(self):
@@ -198,7 +196,7 @@ class TestLtree(object):
 
     def test_unicode(self):
         ltree = Ltree('path.path')
-        assert six.text_type(ltree) == 'path.path'
+        assert str(ltree) == 'path.path'
 
     def test_str(self):
         ltree = Ltree('path')

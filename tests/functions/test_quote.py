@@ -3,7 +3,7 @@ from sqlalchemy.dialects import postgresql
 from sqlalchemy_utils.functions import quote
 
 
-class TestQuote(object):
+class TestQuote:
     def test_quote_with_preserved_keyword(self, engine, connection, session):
         assert quote(connection, 'order') == '"order"'
         assert quote(session, 'order') == '"order"'

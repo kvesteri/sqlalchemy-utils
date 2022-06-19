@@ -66,17 +66,17 @@ def init_models(Document, Section, SubSection, SubSubSection):
     pass
 
 
-class TestGetDotAttr(object):
+class TestGetDotAttr:
 
     def test_simple_objects(self, Document, Section, SubSection):
-        document = Document(name=u'some document')
+        document = Document(name='some document')
         section = Section(document=document)
         subsection = SubSection(section=section)
 
         assert getdotattr(
             subsection,
             'section.document.name'
-        ) == u'some document'
+        ) == 'some document'
 
     def test_with_instrumented_lists(
         self,
@@ -85,7 +85,7 @@ class TestGetDotAttr(object):
         SubSection,
         SubSubSection
     ):
-        document = Document(name=u'some document')
+        document = Document(name='some document')
         section = Section(document=document)
         subsection = SubSection(section=section)
         subsubsection = SubSubSection(subsection=subsection)

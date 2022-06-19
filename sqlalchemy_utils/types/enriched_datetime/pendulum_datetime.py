@@ -1,7 +1,5 @@
 from datetime import datetime
 
-import six
-
 from ...exceptions import ImproperlyConfigured
 
 pendulum = None
@@ -11,7 +9,7 @@ except ImportError:
     pass
 
 
-class PendulumDateTime(object):
+class PendulumDateTime:
     def __init__(self):
         if not pendulum:
             raise ImproperlyConfigured(
@@ -24,7 +22,7 @@ class PendulumDateTime(object):
                 pass
             elif isinstance(value, (int, float)):
                 value = pendulum.from_timestamp(value)
-            elif isinstance(value, six.string_types) and value.isdigit():
+            elif isinstance(value, str) and value.isdigit():
                 value = pendulum.from_timestamp(int(value))
             elif isinstance(value, datetime):
                 value = pendulum.datetime(

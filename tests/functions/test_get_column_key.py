@@ -23,7 +23,7 @@ def Movie(Base):
     return Movie
 
 
-class TestGetColumnKey(object):
+class TestGetColumnKey:
 
     def test_supports_aliases(self, Building):
         assert (

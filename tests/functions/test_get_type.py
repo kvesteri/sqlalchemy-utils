@@ -28,7 +28,7 @@ def Article(Base, User):
     return Article
 
 
-class TestGetType(object):
+class TestGetType:
 
     def test_instrumented_attribute(self, Article):
         assert isinstance(get_type(Article.id), sa.Integer)

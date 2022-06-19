@@ -112,7 +112,6 @@ http://schinckel.net/2014/09/24/using-postgres-composite-types-in-django/
 """
 from collections import namedtuple
 
-import six
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql.psycopg2 import PGDialect_psycopg2
 from sqlalchemy.ext.compiler import compiles
@@ -295,8 +294,6 @@ def register_psycopg2_composite(dbapi_connection, composite):
                 value.prepare(dbapi_connection)
         values = [
             value.getquoted().decode(dbapi_connection.encoding)
-            if six.PY3
-            else value.getquoted()
             for value in adapted
         ]
         return AsIs(

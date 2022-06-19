@@ -1,5 +1,4 @@
 import pytest
-import six
 from flexmock import flexmock
 
 from sqlalchemy_utils import i18n
@@ -13,7 +12,7 @@ def set_get_locale():
 
 @pytest.mark.skipif('i18n.babel is None')
 @pytest.mark.usefixtures('set_get_locale')
-class TestWeekDay(object):
+class TestWeekDay:
 
     def test_constructor_with_valid_index(self):
         day = WeekDay(1)
@@ -64,30 +63,30 @@ class TestWeekDay(object):
 
     def test_get_name_returns_localized_week_day_name(self):
         day = WeekDay(0)
-        assert day.get_name() == u'maanantaina'
+        assert day.get_name() == 'maanantaina'
 
     def test_override_get_locale_as_class_method(self):
         day = WeekDay(0)
-        assert day.get_name() == u'maanantaina'
+        assert day.get_name() == 'maanantaina'
 
     def test_name_delegates_to_get_name(self):
         day = WeekDay(0)
-        flexmock(day).should_receive('get_name').and_return(u'maanantaina')
-        assert day.name == u'maanantaina'
+        flexmock(day).should_receive('get_name').and_return('maanantaina')
+        assert day.name == 'maanantaina'
 
     def test_unicode(self):
         day = WeekDay(0)
-        flexmock(day).should_receive('name').and_return(u'maanantaina')
-        assert six.text_type(day) == u'maanantaina'
+        flexmock(day).should_receive('name').and_return('maanantaina')
+        assert str(day) == 'maanantaina'
 
     def test_str(self):
         day = WeekDay(0)
-        flexmock(day).should_receive('name').and_return(u'maanantaina')
+        flexmock(day).should_receive('name').and_return('maanantaina')
         assert str(day) == 'maanantaina'
 
 
 @pytest.mark.skipif('i18n.babel is None')
-class TestWeekDays(object):
+class TestWeekDays:
     def test_constructor_with_valid_bit_string(self):
         days = WeekDays('1000100')
         assert days._days == set([WeekDay(0), WeekDay(4)])
@@ -161,7 +160,7 @@ class TestWeekDays(object):
     def test_unicode(self):
         i18n.get_locale = lambda: i18n.babel.Locale('fi')
         days = WeekDays('1000100')
-        assert six.text_type(days) == u'maanantaina, perjantaina'
+        assert str(days) == 'maanantaina, perjantaina'
 
     def test_str(self):
         i18n.get_locale = lambda: i18n.babel.Locale('fi')

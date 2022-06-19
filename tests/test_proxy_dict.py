@@ -51,7 +51,7 @@ def init_models(ArticleTranslation, Article):
     pass
 
 
-class TestProxyDict(object):
+class TestProxyDict:
 
     def test_access_key_for_pending_parent(self, session, Article):
         article = Article()
@@ -86,7 +86,7 @@ class TestProxyDict(object):
         article.translations['en']
         article.translations['en'] = ArticleTranslation(
             locale='en',
-            name=u'something'
+            name='something'
         )
         article.translations['en']
 

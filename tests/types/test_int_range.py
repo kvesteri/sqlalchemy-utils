@@ -44,7 +44,7 @@ def create_building(session, Building):
 
 
 @pytest.mark.skipif('intervals is None')
-class NumberRangeTestCase(object):
+class NumberRangeTestCase:
 
     def test_nullify_range(self, create_building):
         building = create_building(None)

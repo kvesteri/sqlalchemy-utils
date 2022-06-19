@@ -1,11 +1,8 @@
-import six
-
-
 class InvalidPaddingError(Exception):
     pass
 
 
-class Padding(object):
+class Padding:
     """Base class for padding and unpadding."""
 
     def __init__(self, block_size):
@@ -22,10 +19,10 @@ class PKCS5Padding(Padding):
     """Provide PKCS5 padding and unpadding."""
 
     def pad(self, value):
-        if not isinstance(value, six.binary_type):
+        if not isinstance(value, bytes):
             value = value.encode()
         padding_length = (self.block_size - len(value) % self.block_size)
-        padding_sequence = padding_length * six.b(chr(padding_length))
+        padding_sequence = padding_length * bytes((padding_length,))
         value_with_padding = value + padding_sequence
 
         return value_with_padding
@@ -39,15 +36,15 @@ class PKCS5Padding(Padding):
         if len(value) % self.block_size != 0:
             # PKCS5 padded output will be a multiple of the block size
             raise InvalidPaddingError()
-        if isinstance(value, six.binary_type):
+        if isinstance(value, bytes):
             padding_length = value[-1]
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             padding_length = ord(value[-1])
         if padding_length == 0 or padding_length > self.block_size:
             raise InvalidPaddingError()
 
         def convert_byte_or_char_to_number(x):
-            return ord(x) if isinstance(x, six.string_types) else x
+            return ord(x) if isinstance(x, str) else x
         if any([padding_length != convert_byte_or_char_to_number(x)
                for x in value[-padding_length:]]):
             raise InvalidPaddingError()
@@ -68,20 +65,20 @@ class OneAndZeroesPadding(Padding):
     BYTE_00 = 0x00
 
     def pad(self, value):
-        if not isinstance(value, six.binary_type):
+        if not isinstance(value, bytes):
             value = value.encode()
         padding_length = (self.block_size - len(value) % self.block_size)
-        one_part_bytes = six.b(chr(self.BYTE_80))
-        zeroes_part_bytes = (padding_length - 1) * six.b(chr(self.BYTE_00))
+        one_part_bytes = bytes((self.BYTE_80,))
+        zeroes_part_bytes = (padding_length - 1) * bytes((self.BYTE_00,))
         padding_sequence = one_part_bytes + zeroes_part_bytes
         value_with_padding = value + padding_sequence
 
         return value_with_padding
 
     def unpad(self, value):
-        value_without_padding = value.rstrip(six.b(chr(self.BYTE_00)))
+        value_without_padding = value.rstrip(bytes((self.BYTE_00,)))
         value_without_padding = value_without_padding.rstrip(
-            six.b(chr(self.BYTE_80)))
+            bytes((self.BYTE_80,)))
 
         return value_without_padding
 
@@ -97,20 +94,20 @@ class ZeroesPadding(Padding):
     BYTE_00 = 0x00
 
     def pad(self, value):
-        if not isinstance(value, six.binary_type):
+        if not isinstance(value, bytes):
             value = value.encode()
         padding_length = (self.block_size - len(value) % self.block_size)
-        zeroes_part_bytes = (padding_length - 1) * six.b(chr(self.BYTE_00))
-        last_part_bytes = six.b(chr(padding_length))
+        zeroes_part_bytes = (padding_length - 1) * bytes((self.BYTE_00,))
+        last_part_bytes = bytes((padding_length,))
         padding_sequence = zeroes_part_bytes + last_part_bytes
         value_with_padding = value + padding_sequence
 
         return value_with_padding
 
     def unpad(self, value):
-        if isinstance(value, six.binary_type):
+        if isinstance(value, bytes):
             padding_length = value[-1]
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             padding_length = ord(value[-1])
         value_without_padding = value[0:-padding_length]
 
@@ -123,7 +120,7 @@ class NaivePadding(Padding):
     The class is provided only for backwards compatibility.
     """
 
-    CHARACTER = six.b('*')
+    CHARACTER = b'*'
 
     def pad(self, value):
         num_of_bytes = (self.block_size - len(value) % self.block_size)

@@ -12,6 +12,7 @@ SQLAlchemy-Utils is currently tested against the following Python platforms.
 - cPython 3.7
 - cPython 3.8
 - cPython 3.9
+- cPython 3.10
 
 
 Installing an official release
@@ -20,7 +21,7 @@ Installing an official release
 You can install the most recent official SQLAlchemy-Utils version using
 pip_::
 
-    pip install sqlalchemy-utils    # Use `pip3` instead of `pip` for Python 3.x
+    pip install sqlalchemy-utils
 
 .. _pip: http://www.pip-installer.org/
 
@@ -35,7 +36,7 @@ copy of the source. You can do that by cloning the git_ repository::
 Then you can install the source distribution using pip::
 
     cd sqlalchemy-utils
-    pip install -e .    # Use `pip3` instead of `pip` for Python 3.x
+    pip install -e .
 
 .. _git: http://git-scm.org/
 

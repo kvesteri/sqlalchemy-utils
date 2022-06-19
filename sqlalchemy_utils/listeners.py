@@ -76,13 +76,13 @@ def force_auto_coercion(mapper=None):
         document.background_color  # Color object
         session.commit()
 
-    A useful side-effect of this is that additional validation of data will be
+    A useful side effect of this is that additional validation of data will be
     done on the moment it is being assigned to model objects. For example
-    without auto coerction set, an invalid
+    without autocorrection set, an invalid
     :class:`sqlalchemy_utils.types.IPAddressType` (eg. ``10.0.0 255.255``)
     would get through without an exception being raised. The database wouldn't
     notice this (as most databases don't have a native type for an IP address,
-    so they're usually just stored as a string), and the ``ipaddress/ipaddr``
+    so they're usually just stored as a string), and the ``ipaddress``
     package uses a string field as well.
 
     :param mapper: The mapper which the automatic data type coercion should be

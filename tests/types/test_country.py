@@ -22,18 +22,18 @@ def init_models(User):
 
 
 @pytest.mark.skipif('i18n.babel is None')
-class TestCountryType(object):
+class TestCountryType:
 
     def test_parameter_processing(self, session, User):
         user = User(
-            country=Country(u'FI')
+            country=Country('FI')
         )
 
         session.add(user)
         session.commit()
 
         user = session.query(User).first()
-        assert user.country.name == u'Finland'
+        assert user.country.name == 'Finland'
 
     def test_scalar_attributes_get_coerced_to_objects(self, User):
         user = User(country='FI')

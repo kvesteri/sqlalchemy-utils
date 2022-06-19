@@ -3,7 +3,7 @@ import pytest
 from sqlalchemy_utils import get_bind
 
 
-class TestGetBind(object):
+class TestGetBind:
     def test_with_session(self, session, connection):
         assert get_bind(session) == connection
 

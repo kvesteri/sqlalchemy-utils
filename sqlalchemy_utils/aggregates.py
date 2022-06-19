@@ -72,9 +72,9 @@ Simple aggregates
         thread_id = sa.Column(sa.Integer, sa.ForeignKey(Thread.id))
 
 
-    thread = Thread(name=u'SQLAlchemy development')
-    thread.comments.append(Comment(u'Going good!'))
-    thread.comments.append(Comment(u'Great new features!'))
+    thread = Thread(name='SQLAlchemy development')
+    thread.comments.append(Comment('Going good!'))
+    thread.comments.append(Comment('Great new features!'))
 
     session.add(thread)
     session.commit()
@@ -138,7 +138,7 @@ Now the net_worth column of Catalog model will be automatically whenever:
 
 
     catalog = Catalog(
-        name=u'My first catalog',
+        name='My first catalog',
         products=[
             product1,
             product2
@@ -252,8 +252,8 @@ scenarios includes things such as:
 
 
 
-        user = User(name=u'John Matrix')
-        user.groups = [Group(name=u'Group A'), Group(name=u'Group B')]
+        user = User(name='John Matrix')
+        user.groups = [Group(name='Group A'), Group(name='Group B')]
 
         session.add(user)
         session.commit()
@@ -434,7 +434,7 @@ def aggregate_expression(expr, class_):
         return expr(class_)
 
 
-class AggregatedValue(object):
+class AggregatedValue:
     def __init__(self, class_, attr, path, expr):
         self.class_ = class_
         self.attr = attr
@@ -499,7 +499,7 @@ class AggregatedValue(object):
                 )
 
 
-class AggregationManager(object):
+class AggregationManager:
     def __init__(self):
         self.reset()
 

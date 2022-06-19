@@ -22,10 +22,10 @@ def init_models(User):
 
 
 @pytest.mark.skipif('url.furl is None')
-class TestURLType(object):
+class TestURLType:
     def test_color_parameter_processing(self, session, User):
         user = User(
-            website=url.furl(u'www.example.com')
+            website=url.furl('www.example.com')
         )
 
         session.add(user)
@@ -35,7 +35,7 @@ class TestURLType(object):
         assert isinstance(user.website, url.furl)
 
     def test_scalar_attributes_get_coerced_to_objects(self, User):
-        user = User(website=u'www.example.com')
+        user = User(website='www.example.com')
 
         assert isinstance(user.website, url.furl)
 

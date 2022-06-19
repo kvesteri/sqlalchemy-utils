@@ -1,4 +1,3 @@
-import six
 from sqlalchemy import types
 
 from .scalar_coercible import ScalarCoercible
@@ -29,7 +28,7 @@ class URLType(ScalarCoercible, types.TypeDecorator):
             website = sa.Column(URLType)
 
 
-        user = User(website=u'www.example.com')
+        user = User(website='www.example.com')
 
         # website is coerced to furl object, hence all nice furl operations
         # come available
@@ -44,9 +43,9 @@ class URLType(ScalarCoercible, types.TypeDecorator):
 
     def process_bind_param(self, value, dialect):
         if furl is not None and isinstance(value, furl):
-            return six.text_type(value)
+            return str(value)
 
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             return value
 
     def process_result_value(self, value, dialect):

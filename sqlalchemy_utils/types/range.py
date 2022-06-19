@@ -137,7 +137,6 @@ than 500.
 from collections.abc import Iterable
 from datetime import timedelta
 
-import six
 import sqlalchemy as sa
 from sqlalchemy import types
 from sqlalchemy.dialects.postgresql import (
@@ -173,7 +172,8 @@ class RangeComparator(types.TypeEngine.Comparator):
             self.type.interval_class.type,
             tuple,
             list,
-        ) + six.string_types
+            str,
+        )
 
         if isinstance(other, coerced_types):
             return self.type.interval_class(other)
@@ -182,7 +182,7 @@ class RangeComparator(types.TypeEngine.Comparator):
     def in_(self, other):
         if (
             isinstance(other, Iterable) and
-            not isinstance(other, six.string_types)
+            not isinstance(other, str)
         ):
             other = map(self.coerce_arg, other)
         return super(RangeComparator, self).in_(other)
@@ -190,7 +190,7 @@ class RangeComparator(types.TypeEngine.Comparator):
     def notin_(self, other):
         if (
             isinstance(other, Iterable) and
-            not isinstance(other, six.string_types)
+            not isinstance(other, str)
         ):
             other = map(self.coerce_arg, other)
         return super(RangeComparator, self).notin_(other)
@@ -287,7 +287,7 @@ class RangeType(ScalarCoercible, types.TypeDecorator):
         return value
 
     def process_result_value(self, value, dialect):
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             factory_func = self.interval_class.from_string
         else:
             factory_func = self.interval_class
@@ -328,7 +328,7 @@ class IntRangeType(RangeType):
             estimated_number_of_persons = sa.Column(IntRangeType)
 
 
-        party = Event(name=u'party')
+        party = Event(name='party')
 
         # we estimate the party to contain minium of 10 persons and at max
         # 100 persons
@@ -342,7 +342,7 @@ class IntRangeType(RangeType):
     support many arithmetic operators::
 
 
-        meeting = Event(name=u'meeting')
+        meeting = Event(name='meeting')
 
         meeting.estimated_number_of_persons = [20, 40]
 
@@ -381,7 +381,7 @@ class Int8RangeType(RangeType):
             estimated_number_of_persons = sa.Column(Int8RangeType)
 
 
-        party = Event(name=u'party')
+        party = Event(name='party')
 
         # we estimate the party to contain minium of 10 persons and at max
         # 100 persons
@@ -395,7 +395,7 @@ class Int8RangeType(RangeType):
     support many arithmetic operators::
 
 
-        meeting = Event(name=u'meeting')
+        meeting = Event(name='meeting')
 
         meeting.estimated_number_of_persons = [20, 40]
 

@@ -115,17 +115,17 @@ def test_key():
 
 @pytest.fixture
 def user_name():
-    return u'someone'
+    return 'someone'
 
 
 @pytest.fixture
 def user_phone():
-    return u'(555) 555-5555'
+    return '(555) 555-5555'
 
 
 @pytest.fixture
 def user_color():
-    return u'#fff'
+    return '#fff'
 
 
 @pytest.fixture
@@ -241,7 +241,7 @@ def date_simple():
 
 
 @pytest.mark.skipif('cryptography is None')
-class EncryptedTypeTestCase(object):
+class EncryptedTypeTestCase:
 
     @pytest.fixture
     def Team(self, Base, encryption_engine, padding_mechanism):
@@ -299,14 +299,14 @@ class EncryptedTypeTestCase(object):
     def test_lookup_key(self, session, Team):
         # Add teams
         self._team_key = 'one'
-        team = Team(key=self._team_key, name=u'One')
+        team = Team(key=self._team_key, name='One')
         session.add(team)
         session.commit()
         team_1_id = team.id
 
         self._team_key = 'two'
         team = Team(key=self._team_key)
-        team.name = u'Two'
+        team.name = 'Two'
         session.add(team)
         session.commit()
         team_2_id = team.id
@@ -318,7 +318,7 @@ class EncryptedTypeTestCase(object):
 
         team = session.query(Team).get(team_1_id)
 
-        assert team.name == u'One'
+        assert team.name == 'One'
 
         session.expunge_all()
 
@@ -328,7 +328,7 @@ class EncryptedTypeTestCase(object):
 
         team = session.query(Team).get(team_2_id)
 
-        assert team.name == u'Two'
+        assert team.name == 'Two'
 
         session.expunge_all()
 
@@ -375,13 +375,13 @@ class TestAesEncryptedTypeTestcaseWithNaivePadding(AesEncryptedTypeTestCase):
 
     def test_decrypt_raises_value_error_with_invalid_key(self, session, Team):
         self._team_key = 'one'
-        team = Team(key=self._team_key, name=u'One')
+        team = Team(key=self._team_key, name='One')
         session.add(team)
         session.commit()
 
         self._team_key = 'notone'
         with pytest.raises(ValueError):
-            assert team.name == u'One'
+            assert team.name == 'One'
 
 
 class TestFernetEncryptedTypeTestCase(EncryptedTypeTestCase):
@@ -459,7 +459,7 @@ class TestDatetimeHandler:
 
 
 @pytest.mark.skipif('cryptography is None')
-class TestAesGcmEngine(object):
+class TestAesGcmEngine:
     KEY = b'0123456789ABCDEF'
 
     def setup_method(self):

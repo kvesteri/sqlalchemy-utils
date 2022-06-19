@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import pytest
 import sqlalchemy as sa
 import sqlalchemy.orm as sa_orm
@@ -41,7 +40,7 @@ def init_models(Document):
     pass
 
 
-class JSONTestCase(object):
+class JSONTestCase:
     def test_list(self, session, Document):
         document = Document(
             json=[1, 2, 3]
@@ -66,14 +65,14 @@ class JSONTestCase(object):
 
     def test_non_ascii_chars(self, session, Document):
         document = Document(
-            json={'something': u'äääööö'}
+            json={'something': 'äääööö'}
         )
 
         session.add(document)
         session.commit()
 
         document = session.query(Document).first()
-        assert document.json == {'something': u'äääööö'}
+        assert document.json == {'something': 'äääööö'}
 
     def test_compilation(self, Document, session):
         query = sa.select([Document.json])

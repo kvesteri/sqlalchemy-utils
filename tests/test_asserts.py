@@ -48,7 +48,7 @@ def user(User, session):
 
 
 @pytest.mark.usefixtures('postgresql_dsn')
-class TestAssertMaxLengthWithArray(object):
+class TestAssertMaxLengthWithArray:
 
     def test_with_max_length(self, user):
         assert_max_length(user, 'fav_numbers', 8)
@@ -68,7 +68,7 @@ class TestAssertMaxLengthWithArray(object):
 
 
 @pytest.mark.usefixtures('postgresql_dsn')
-class TestAssertNonNullable(object):
+class TestAssertNonNullable:
 
     def test_non_nullable_column(self, user):
         # Test everything twice so that session gets rolled back properly
@@ -83,7 +83,7 @@ class TestAssertNonNullable(object):
 
 
 @pytest.mark.usefixtures('postgresql_dsn')
-class TestAssertNullable(object):
+class TestAssertNullable:
 
     def test_nullable_column(self, user):
         assert_nullable(user, 'name')
@@ -97,7 +97,7 @@ class TestAssertNullable(object):
 
 
 @pytest.mark.usefixtures('postgresql_dsn')
-class TestAssertMaxLength(object):
+class TestAssertMaxLength:
 
     def test_with_max_length(self, user):
         assert_max_length(user, 'name', 20)
@@ -121,7 +121,7 @@ class TestAssertMaxLength(object):
 
 
 @pytest.mark.usefixtures('postgresql_dsn')
-class TestAssertMinValue(object):
+class TestAssertMinValue:
 
     def test_with_min_value(self, user):
         assert_min_value(user, 'age', 0)
@@ -141,7 +141,7 @@ class TestAssertMinValue(object):
 
 
 @pytest.mark.usefixtures('postgresql_dsn')
-class TestAssertMaxValue(object):
+class TestAssertMaxValue:
 
     def test_with_min_value(self, user):
         assert_max_value(user, 'age', 150)

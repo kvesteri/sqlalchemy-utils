@@ -1,4 +1,3 @@
-import six
 from sqlalchemy import types
 
 from ..primitives import Country
@@ -52,7 +51,7 @@ class CountryType(ScalarCoercible, types.TypeDecorator):
         if isinstance(value, Country):
             return value.code
 
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             return value
 
     def process_result_value(self, value, dialect):

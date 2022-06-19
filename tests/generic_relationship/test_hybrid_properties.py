@@ -1,5 +1,4 @@
 import pytest
-import six
 import sqlalchemy as sa
 from sqlalchemy.ext.hybrid import hybrid_property
 
@@ -58,7 +57,7 @@ def init_models(User, UserHistory, Event):
     pass
 
 
-class TestGenericRelationship(object):
+class TestGenericRelationship:
 
     def test_set_manual_and_get(self, session, User, UserHistory, Event):
         user = User(id=1)
@@ -69,7 +68,7 @@ class TestGenericRelationship(object):
 
         event = Event(transaction_id=1)
         event.object_id = user.id
-        event.object_type = six.text_type(type(user).__name__)
+        event.object_type = type(user).__name__
         assert event.object is None
 
         session.add(event)

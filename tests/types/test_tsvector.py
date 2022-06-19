@@ -47,7 +47,7 @@ class TestTSVector:
         assert type_.options['regconfig'] == 'pg_catalog.simple'
 
     def test_match(self, connection, User):
-        expr = User.search_index.match(u'something')
+        expr = User.search_index.match('something')
         assert str(expr.compile(connection)) == (
             '''"user".search_index @@ to_tsquery('pg_catalog.finnish', '''
             '''%(search_index_1)s)'''
@@ -68,7 +68,7 @@ class TestTSVector:
 
     def test_match_with_catalog(self, connection, User):
         expr = User.search_index.match(
-            u'something',
+            'something',
             postgresql_regconfig='pg_catalog.simple'
         )
         assert str(expr.compile(connection)) == (

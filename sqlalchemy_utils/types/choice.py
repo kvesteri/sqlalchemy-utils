@@ -6,7 +6,7 @@ from ..exceptions import ImproperlyConfigured
 from .scalar_coercible import ScalarCoercible
 
 
-class Choice(object):
+class Choice:
     def __init__(self, code, value):
         self.code = code
         self.value = value
@@ -36,10 +36,7 @@ class ChoiceType(ScalarCoercible, types.TypeDecorator):
     """
     ChoiceType offers way of having fixed set of choices for given column. It
     could work with a list of tuple (a collection of key-value pairs), or
-    integrate with :mod:`enum` in the standard library of Python 3.4+ (the
-    enum34_ backported package on PyPI is compatible too for ``< 3.4``).
-
-    .. _enum34: https://pypi.python.org/pypi/enum34
+    integrate with :mod:`enum` in the standard library of Python 3.
 
     Columns with ChoiceTypes are automatically coerced to Choice objects while
     a list of tuple been passed to the constructor. If a subclass of
@@ -50,8 +47,8 @@ class ChoiceType(ScalarCoercible, types.TypeDecorator):
 
         class User(Base):
             TYPES = [
-                (u'admin', u'Admin'),
-                (u'regular-user', u'Regular user')
+                ('admin', 'Admin'),
+                ('regular-user', 'Regular user')
             ]
 
             __tablename__ = 'user'
@@ -60,8 +57,8 @@ class ChoiceType(ScalarCoercible, types.TypeDecorator):
             type = sa.Column(ChoiceType(TYPES))
 
 
-        user = User(type=u'admin')
-        user.type  # Choice(code='admin', value=u'Admin')
+        user = User(type='admin')
+        user.type  # Choice(code='admin', value='Admin')
 
     Or::
 
@@ -94,8 +91,8 @@ class ChoiceType(ScalarCoercible, types.TypeDecorator):
 
         class User(Base):
             TYPES = [
-                (u'admin', _(u'Admin')),
-                (u'regular-user', _(u'Regular user'))
+                ('admin', _('Admin')),
+                ('regular-user', _('Regular user'))
             ]
 
             __tablename__ = 'user'
@@ -104,10 +101,10 @@ class ChoiceType(ScalarCoercible, types.TypeDecorator):
             type = sa.Column(ChoiceType(TYPES))
 
 
-        user = User(type=u'admin')
-        user.type  # Choice(code='admin', value=u'Admin')
+        user = User(type='admin')
+        user.type  # Choice(code='admin', value='Admin')
 
-        print user.type  # u'Admin'
+        print user.type  # 'Admin'
 
     Or::
 
@@ -120,8 +117,8 @@ class ChoiceType(ScalarCoercible, types.TypeDecorator):
             regular = 2
 
 
-        UserType.admin.label = _(u'Admin')
-        UserType.regular.label = _(u'Regular user')
+        UserType.admin.label = _('Admin')
+        UserType.regular.label = _('Regular user')
 
 
         class User(Base):
@@ -134,7 +131,7 @@ class ChoiceType(ScalarCoercible, types.TypeDecorator):
         user = User(type=UserType.admin)
         user.type  # <UserType.admin: 1>
 
-        print user.type.label  # u'Admin'
+        print user.type.label  # 'Admin'
     """
 
     impl = types.Unicode(255)
@@ -170,7 +167,7 @@ class ChoiceType(ScalarCoercible, types.TypeDecorator):
         return self.type_impl.process_result_value(value, dialect)
 
 
-class ChoiceTypeImpl(object):
+class ChoiceTypeImpl:
     """The implementation for the ``Choice`` usage."""
 
     def __init__(self, choices):
@@ -198,7 +195,7 @@ class ChoiceTypeImpl(object):
         return value
 
 
-class EnumTypeImpl(object):
+class EnumTypeImpl:
     """The implementation for the ``Enum`` usage."""
 
     def __init__(self, enum_class):

@@ -248,7 +248,7 @@ def dataset(
 
 
 @pytest.mark.usefixtures('dataset', 'postgresql_dsn')
-class TestSelectCorrelatedExpression(object):
+class TestSelectCorrelatedExpression:
     @pytest.mark.parametrize(
         ('model_key', 'related_model_key', 'path', 'result'),
         (

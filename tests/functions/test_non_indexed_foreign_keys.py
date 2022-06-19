@@ -6,7 +6,7 @@ import sqlalchemy as sa
 from sqlalchemy_utils.functions import non_indexed_foreign_keys
 
 
-class TestFindNonIndexedForeignKeys(object):
+class TestFindNonIndexedForeignKeys:
 
     @pytest.fixture
     def User(self, Base):

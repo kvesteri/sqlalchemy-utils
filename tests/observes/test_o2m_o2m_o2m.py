@@ -77,7 +77,7 @@ def catalog(session, Catalog, Category, SubCategory, Product):
 
 
 @pytest.mark.usefixtures('postgresql_dsn')
-class TestObservesFor3LevelDeepOneToMany(object):
+class TestObservesFor3LevelDeepOneToMany:
 
     def test_simple_insert(self, catalog):
         assert catalog.product_count == 1

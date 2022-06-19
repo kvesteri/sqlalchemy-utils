@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 import base64
 import datetime
 import json
 import os
 import warnings
 
-import six
 from sqlalchemy.types import LargeBinary, String, TypeDecorator
 
 from sqlalchemy_utils.exceptions import ImproperlyConfigured
@@ -48,7 +46,7 @@ class EncryptionDecryptionBaseEngine:
     """
 
     def _update_key(self, key):
-        if isinstance(key, six.string_types):
+        if isinstance(key, str):
             key = key.encode()
         digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
         digest.update(key)
@@ -90,7 +88,7 @@ class AesEngine(EncryptionDecryptionBaseEngine):
 
     def _set_padding_mechanism(self, padding_mechanism=None):
         """Set the padding mechanism."""
-        if isinstance(padding_mechanism, six.string_types):
+        if isinstance(padding_mechanism, str):
             if padding_mechanism not in PADDING_MECHANISM.keys():
                 raise ImproperlyConfigured(
                     "There is not padding mechanism with name {}".format(
@@ -105,9 +103,9 @@ class AesEngine(EncryptionDecryptionBaseEngine):
         self.padding_engine = padding_class(self.BLOCK_SIZE)
 
     def encrypt(self, value):
-        if not isinstance(value, six.string_types):
+        if not isinstance(value, str):
             value = repr(value)
-        if isinstance(value, six.text_type):
+        if isinstance(value, str):
             value = str(value)
         value = value.encode()
         value = self.padding_engine.pad(value)
@@ -117,13 +115,13 @@ class AesEngine(EncryptionDecryptionBaseEngine):
         return encrypted.decode('utf-8')
 
     def decrypt(self, value):
-        if isinstance(value, six.text_type):
+        if isinstance(value, str):
             value = str(value)
         decryptor = self.cipher.decryptor()
         decrypted = base64.b64decode(value)
         decrypted = decryptor.update(decrypted) + decryptor.finalize()
         decrypted = self.padding_engine.unpad(decrypted)
-        if not isinstance(decrypted, six.string_types):
+        if not isinstance(decrypted, str):
             try:
                 decrypted = decrypted.decode('utf-8')
             except UnicodeDecodeError:
@@ -153,9 +151,9 @@ class AesGcmEngine(EncryptionDecryptionBaseEngine):
         self.secret_key = parent_class_key
 
     def encrypt(self, value):
-        if not isinstance(value, six.string_types):
+        if not isinstance(value, str):
             value = repr(value)
-        if isinstance(value, six.text_type):
+        if isinstance(value, str):
             value = str(value)
         value = value.encode()
         iv = os.urandom(self.IV_BYTES_NEEDED)
@@ -171,7 +169,7 @@ class AesGcmEngine(EncryptionDecryptionBaseEngine):
         return encrypted.decode('utf-8')
 
     def decrypt(self, value):
-        if isinstance(value, six.text_type):
+        if isinstance(value, str):
             value = str(value)
         decrypted = base64.b64decode(value)
         if len(decrypted) < self.IV_BYTES_NEEDED + self.TAG_SIZE_BYTES:
@@ -190,7 +188,7 @@ class AesGcmEngine(EncryptionDecryptionBaseEngine):
             decrypted = decryptor.update(decrypted) + decryptor.finalize()
         except InvalidTag:
             raise InvalidCiphertextError()
-        if not isinstance(decrypted, six.string_types):
+        if not isinstance(decrypted, str):
             try:
                 decrypted = decrypted.decode('utf-8')
             except UnicodeDecodeError:
@@ -206,19 +204,19 @@ class FernetEngine(EncryptionDecryptionBaseEngine):
         self.fernet = Fernet(self.secret_key)
 
     def encrypt(self, value):
-        if not isinstance(value, six.string_types):
+        if not isinstance(value, str):
             value = repr(value)
-        if isinstance(value, six.text_type):
+        if isinstance(value, str):
             value = str(value)
         value = value.encode()
         encrypted = self.fernet.encrypt(value)
         return encrypted.decode('utf-8')
 
     def decrypt(self, value):
-        if isinstance(value, six.text_type):
+        if isinstance(value, str):
             value = str(value)
         decrypted = self.fernet.decrypt(value.encode())
-        if not isinstance(decrypted, six.string_types):
+        if not isinstance(decrypted, str):
             decrypted = decrypted.decode('utf-8')
         return decrypted
 
@@ -303,7 +301,7 @@ class StringEncryptedType(TypeDecorator, ScalarCoercible):
         session = Session()
 
         # example
-        user_name = u'secret_user'
+        user_name = 'secret_user'
         test_token = 'atesttoken'
         active = True
         num_of_accounts = 2
@@ -411,7 +409,7 @@ class StringEncryptedType(TypeDecorator, ScalarCoercible):
                     value = value.isoformat()
 
                 elif issubclass(type_, JSONType):
-                    value = six.text_type(json.dumps(value))
+                    value = json.dumps(value)
 
             return self.engine.encrypt(value)
 
@@ -478,7 +476,7 @@ class EncryptedType(StringEncryptedType):
         return value
 
 
-class DatetimeHandler(object):
+class DatetimeHandler:
     """
     DatetimeHandler is responsible for parsing strings and
     returning the appropriate date, datetime or time objects.

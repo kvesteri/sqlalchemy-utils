@@ -1,4 +1,3 @@
-import six
 from sqlalchemy import types
 
 from .. import i18n, ImproperlyConfigured
@@ -62,7 +61,7 @@ class CurrencyType(ScalarCoercible, types.TypeDecorator):
     def process_bind_param(self, value, dialect):
         if isinstance(value, Currency):
             return value.code
-        elif isinstance(value, six.string_types):
+        elif isinstance(value, str):
             return value
 
     def process_result_value(self, value, dialect):

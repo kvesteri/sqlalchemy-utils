@@ -18,7 +18,7 @@ def init_models(Base):
     pass
 
 
-class TestTableName(object):
+class TestTableName:
 
     def test_class(self, Building):
         assert table_name(Building) == 'building'

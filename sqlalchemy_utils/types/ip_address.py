@@ -1,9 +1,7 @@
 from ipaddress import ip_address
 
-import six
 from sqlalchemy import types
 
-from ..exceptions import ImproperlyConfigured
 from .scalar_coercible import ScalarCoercible
 
 
@@ -11,12 +9,6 @@ class IPAddressType(ScalarCoercible, types.TypeDecorator):
     """
     Changes IPAddress objects to a string representation on the way in and
     changes them back to IPAddress objects on the way out.
-
-    IPAddressType uses ipaddress package on Python >= 3 and ipaddr_ package on
-    Python 2. In order to use IPAddressType with python you need to install
-    ipaddr_ first.
-
-    .. _ipaddr: https://pypi.python.org/pypi/ipaddr
 
     ::
 
@@ -43,17 +35,11 @@ class IPAddressType(ScalarCoercible, types.TypeDecorator):
     cache_ok = True
 
     def __init__(self, max_length=50, *args, **kwargs):
-        if not ip_address:
-            raise ImproperlyConfigured(
-                "'ipaddr' package is required to use 'IPAddressType' "
-                "in python 2"
-            )
-
         super(IPAddressType, self).__init__(*args, **kwargs)
         self.impl = types.Unicode(max_length)
 
     def process_bind_param(self, value, dialect):
-        return six.text_type(value) if value else None
+        return str(value) if value else None
 
     def process_result_value(self, value, dialect):
         return ip_address(value) if value else None

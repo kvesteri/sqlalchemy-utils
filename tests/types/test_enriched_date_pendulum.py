@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from datetime import date
 
 import pytest
@@ -30,7 +28,7 @@ def init_models(User):
 
 
 @pytest.mark.skipif('pendulum_date.pendulum is None')
-class TestPendulumDateType(object):
+class TestPendulumDateType:
     def test_parameter_processing(self, session, User):
         user = User(
             birthday=pendulum_date.pendulum.date(1995, 7, 11)

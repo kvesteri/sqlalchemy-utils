@@ -45,16 +45,16 @@ def init_models(User, Group):
 
 
 @pytest.mark.usefixtures('postgresql_dsn')
-class TestAggregatesWithManyToManyRelationships(object):
+class TestAggregatesWithManyToManyRelationships:
 
     def test_assigns_aggregates_on_insert(self, session, User, Group):
         user = User(
-            name=u'John Matrix'
+            name='John Matrix'
         )
         session.add(user)
         session.commit()
         group = Group(
-            name=u'Some group',
+            name='Some group',
             users=[user]
         )
         session.add(group)
@@ -64,12 +64,12 @@ class TestAggregatesWithManyToManyRelationships(object):
 
     def test_updates_aggregates_on_delete(self, session, User, Group):
         user = User(
-            name=u'John Matrix'
+            name='John Matrix'
         )
         session.add(user)
         session.commit()
         group = Group(
-            name=u'Some group',
+            name='Some group',
             users=[user]
         )
         session.add(group)

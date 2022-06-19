@@ -68,7 +68,7 @@ def chain(session, users, articles, posts, User, Article, BlogPost):
     )
 
 
-class TestQueryChain(object):
+class TestQueryChain:
 
     def test_iter(self, chain):
         assert len(list(chain)) == 9
