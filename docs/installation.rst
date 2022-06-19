@@ -23,7 +23,7 @@ pip_::
 
     pip install sqlalchemy-utils
 
-.. _pip: http://www.pip-installer.org/
+.. _pip: https://pip.pypa.io/
 
 Installing the development version
 ----------------------------------
@@ -38,7 +38,7 @@ Then you can install the source distribution using pip::
     cd sqlalchemy-utils
     pip install -e .
 
-.. _git: http://git-scm.org/
+.. _git: https://git-scm.com/
 
 Checking the installation
 -------------------------

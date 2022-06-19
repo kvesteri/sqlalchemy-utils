@@ -17,7 +17,7 @@ class LocaleType(ScalarCoercible, types.TypeDecorator):
 
     In order to use LocaleType you need to install Babel_ first.
 
-    .. _Babel: http://babel.pocoo.org/
+    .. _Babel: https://babel.pocoo.org/
 
     ::
 

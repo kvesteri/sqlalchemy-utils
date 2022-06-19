@@ -11,8 +11,8 @@ class LtreeType(types.Concatenable, types.UserDefinedType, ScalarCoercible):
     """Postgresql LtreeType type.
 
     The LtreeType datatype can be used for representing labels of data stored
-    in hierarchial tree-like structure. For more detailed information please
-    refer to http://www.postgresql.org/docs/current/static/ltree.html
+    in hierarchical tree-like structure. For more detailed information please
+    refer to https://www.postgresql.org/docs/current/ltree.html
 
     ::
 
@@ -35,7 +35,7 @@ class LtreeType(types.Concatenable, types.UserDefinedType, ScalarCoercible):
     .. note::
         Using :class:`LtreeType`, :class:`LQUERY` and :class:`LTXTQUERY` types
         may require installation of Postgresql ltree extension on the server
-        side. Please visit http://www.postgres.org for details.
+        side. Please visit https://www.postgresql.org/ for details.
     """
     cache_ok = True
 

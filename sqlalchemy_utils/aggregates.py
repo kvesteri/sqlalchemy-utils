@@ -36,10 +36,10 @@ Features
 
 
 .. _column_property:
-    http://docs.sqlalchemy.org/en/latest/orm/mapper_config.html#using-column-property
+    https://docs.sqlalchemy.org/en/latest/orm/mapper_config.html#using-column-property
 .. _counter_culture: https://github.com/magnusvk/counter_culture
 .. _stackoverflow reply by Michael Bayer:
-    http://stackoverflow.com/questions/13693872/
+    https://stackoverflow.com/a/13765857/520932
 
 
 Simple aggregates
@@ -357,7 +357,7 @@ TODO
 
 
 .. _deadlocks:
-    http://mina.naguib.ca/blog/2010/11/22/postgresql-foreign-key-deadlocks.html
+    https://mina.naguib.ca/blog/2010/11/22/postgresql-foreign-key-deadlocks.html
 
 """
 
