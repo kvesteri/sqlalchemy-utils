@@ -73,7 +73,41 @@ def ArticleView(Base, Article, User):
 
 
 @pytest.fixture
-def init_models(ArticleMV, ArticleView):
+def view_schema(Base):
+    sa.event.listen(
+        Base.metadata,
+        "before_create",
+        sa.DDL("CREATE SCHEMA IF NOT EXISTS views"),
+    )
+
+
+@pytest.fixture
+def UserMV(Base, User):
+    class UserMV(Base):
+        __table__ = create_materialized_view(
+            name='user-mv',
+            selectable=sa.select(*_select_args(User.id)),
+            metadata=Base.metadata,
+            schema='views',
+            populate=False,
+        )
+    return UserMV
+
+
+@pytest.fixture
+def UserView(Base, User):
+    class UserView(Base):
+        __table__ = create_view(
+            name='user-view',
+            selectable=sa.select(*_select_args(User.id)),
+            metadata=Base.metadata,
+            schema='views',
+        )
+    return UserView
+
+
+@pytest.fixture
+def init_models(view_schema, ArticleMV, ArticleView, UserMV, UserView):
     pass
 
 
@@ -113,6 +147,21 @@ class TestMaterializedViews:
         row = session.query(ArticleView).first()
         assert row.name == 'Some article'
         assert row.author_name == 'Some user'
+
+    def test_querying_view_in_schema(self, session, User, UserView):
+        user = User(name='Some user')
+        session.add(user)
+        session.commit()
+        assert session.query(User).first().id == session.query(UserView).first().id
+        assert 'views."user-view"' in str(session.query(UserView))
+
+    def test_querying_unpopulated_mv_in_schema(self, session, User, UserMV):
+        with pytest.raises(sa.exc.OperationalError):
+            session.query(UserMV).first()
+        session.rollback()
+
+        refresh_materialized_view(session, 'user-mv', schema='views')
+        session.query(UserMV).all()
 
 
 class TrivialViewTestCases:
