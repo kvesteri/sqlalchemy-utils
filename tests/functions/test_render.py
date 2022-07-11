@@ -64,3 +64,15 @@ class TestRender:
 
         assert 'CREATE TABLE user' in text
         assert 'PRIMARY KEY' in text
+
+    def test_render_statement_hangul(self, User, session):
+        statement = User.__table__.select().where(
+            (User.id == 3)
+            & (User.name == "한글")
+        )
+        text = render_statement(statement, bind=session.bind)
+
+        assert "SELECT user.id, user.name" in text
+        assert "FROM user" in text
+        assert "user.id = 3" in text
+        assert "user.name = '한글'" in text
