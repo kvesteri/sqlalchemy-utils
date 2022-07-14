@@ -9,8 +9,8 @@ def _prepare_view_identifier(dialect, view_name, schema=None):
     quoted_view_name = dialect.identifier_preparer.quote(view_name)
     if schema:
         return dialect.identifier_preparer.quote_schema(schema) + '.' + quoted_view_name
-    else:
-        return quoted_view_name
+
+    return quoted_view_name
 
 
 class CreateView(DDLElement):
