@@ -1,11 +1,23 @@
+from typing import Any, Dict, List, Optional, TYPE_CHECKING
+
 import sqlalchemy as sa
 from sqlalchemy.ext import compiler
 from sqlalchemy.schema import DDLElement, PrimaryKeyConstraint
 
 from sqlalchemy_utils.functions import get_columns
 
+if TYPE_CHECKING:
+    from sqlalchemy.engine.default import DefaultDialect
+    from sqlalchemy.orm import Session
+    from sqlalchemy.sql import Selectable
+    from sqlalchemy.sql.compiler import SQLCompiler
 
-def _prepare_view_identifier(dialect, view_name, schema=None):
+
+def _prepare_view_identifier(
+    dialect: 'DefaultDialect',
+    view_name: str,
+    schema: Optional[str] = None,
+) -> str:
     quoted_view_name = dialect.identifier_preparer.quote(view_name)
     if schema:
         return dialect.identifier_preparer.quote_schema(schema) + '.' + quoted_view_name
@@ -14,14 +26,23 @@ def _prepare_view_identifier(dialect, view_name, schema=None):
 
 
 class CreateView(DDLElement):
-    def __init__(self, name, selectable, schema=None):
+    def __init__(
+        self,
+        name: str,
+        selectable: 'Selectable',
+        schema: Optional[str] = None,
+    ):
         self.name = name
         self.selectable = selectable
         self.schema = schema
 
 
 @compiler.compiles(CreateView)
-def compile_create_view(element, compiler, **kw):
+def compile_create_view(
+    element: 'CreateView',
+    compiler: 'SQLCompiler',
+    **kw: Any,
+) -> str:
     view_identifier = _prepare_view_identifier(
         compiler.dialect, element.name, element.schema
     )
@@ -32,14 +53,19 @@ def compile_create_view(element, compiler, **kw):
 
 
 class DropView(DDLElement):
-    def __init__(self, name, schema=None, cascade=None):
+    def __init__(
+        self,
+        name: str,
+        schema: Optional[str] = None,
+        cascade: Optional[bool] = None,
+    ):
         self.name = name
         self.schema = schema
         self.cascade = cascade
 
 
 @compiler.compiles(DropView)
-def compile_drop_view(element, compiler, **kw):
+def compile_drop_view(element: 'DropView', compiler: 'SQLCompiler', **kw: Any) -> str:
     view_identifier = _prepare_view_identifier(
         compiler.dialect, element.name, element.schema
     )
@@ -53,7 +79,13 @@ def compile_drop_view(element, compiler, **kw):
 
 
 class CreateMaterializedView(DDLElement):
-    def __init__(self, name, selectable, schema=None, populate=None):
+    def __init__(
+        self,
+        name: str,
+        selectable: 'Selectable',
+        schema: Optional[str] = None,
+        populate: Optional[bool] = None,
+    ):
         self.name = name
         self.selectable = selectable
         self.schema = schema
@@ -61,7 +93,11 @@ class CreateMaterializedView(DDLElement):
 
 
 @compiler.compiles(CreateMaterializedView)
-def compile_create_materialized_view(element, compiler, **kw):
+def compile_create_materialized_view(
+    element: 'CreateMaterializedView',
+    compiler: 'SQLCompiler',
+    **kw: Any,
+) -> str:
     view_identifier = _prepare_view_identifier(
         dialect=compiler.dialect, view_name=element.name, schema=element.schema
     )
@@ -78,14 +114,23 @@ def compile_create_materialized_view(element, compiler, **kw):
 
 
 class DropMaterializedView(DDLElement):
-    def __init__(self, name, schema=None, cascade=None):
+    def __init__(
+        self,
+        name: str,
+        schema: Optional[str] = None,
+        cascade: Optional[bool] = None,
+    ):
         self.name = name
         self.schema = schema
         self.cascade = cascade
 
 
 @compiler.compiles(DropMaterializedView)
-def compile_drop_materialized_view(element, compiler, **kw):
+def compile_drop_materialized_view(
+    element: 'DropMaterializedView',
+    compiler: 'SQLCompiler',
+    **kw: Any,
+) -> str:
     view_identifier = _prepare_view_identifier(
         dialect=compiler.dialect, view_name=element.name, schema=element.schema
     )
@@ -98,14 +143,14 @@ def compile_drop_materialized_view(element, compiler, **kw):
 
 
 def create_table_from_selectable(
-    name,
-    selectable,
-    indexes=None,
-    metadata=None,
-    aliases=None,
-    schema=None,
-    **kwargs
-):
+    name: str,
+    selectable: 'Selectable',
+    indexes: Optional[List[sa.Index]] = None,
+    metadata: Optional[sa.MetaData] = None,
+    aliases: Optional[Dict[str, str]] = None,
+    schema: Optional[str] = None,
+    **kwargs: Any,
+) -> sa.Table:
     if indexes is None:
         indexes = []
     if metadata is None:
@@ -131,16 +176,16 @@ def create_table_from_selectable(
 
 
 def create_materialized_view(
-    name,
-    selectable,
-    metadata,
-    indexes=None,
-    aliases=None,
+    name: str,
+    selectable: 'Selectable',
+    metadata: sa.MetaData,
+    indexes: Optional[List[sa.Index]] = None,
+    aliases: Optional[Dict[str, str]] = None,
     *,
-    schema=None,
-    populate=None,
-    cascade_on_drop=None,
-):
+    schema: Optional[str] = None,
+    populate: Optional[bool] = None,
+    cascade_on_drop: Optional[bool] = None,
+) -> sa.Table:
     """ Create a view on a given metadata
 
     :param name: The name of the view to create.
@@ -197,13 +242,13 @@ def create_materialized_view(
 
 
 def create_view(
-    name,
-    selectable,
-    metadata,
+    name: str,
+    selectable: 'Selectable',
+    metadata: sa.MetaData,
     *,
-    schema=None,
-    cascade_on_drop=None,
-):
+    schema: Optional[str] = None,
+    cascade_on_drop: Optional[str] = None,
+) -> sa.Table:
     """ Create a view on a given metadata
 
     :param name: The name of the view to create.
@@ -267,7 +312,13 @@ def create_view(
     return table
 
 
-def refresh_materialized_view(session, name, concurrently=False, *, schema=None):
+def refresh_materialized_view(
+    session: 'Session',
+    name: str,
+    concurrently: bool = False,
+    *,
+    schema: Optional[str] = None,
+) -> None:
     """ Refreshes an already existing materialized view
 
     :param session: An SQLAlchemy Session instance.
