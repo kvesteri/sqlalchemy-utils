@@ -506,6 +506,15 @@ def database_exists(url):
                 # The default SQLAlchemy database is in memory, and :memory: is
                 # not required, thus we should support that use case.
                 return True
+
+        elif dialect_name == 'oracle':
+            url = _set_url_database(url, database=None)
+            engine = sa.create_engine(url)
+            text = (
+                "SELECT name FROM master.dbo.sysdatabases WHERE name = '%s'" % database
+            )
+            return bool(_get_scalar_result(engine, sa.text(text)))
+
         else:
             text = 'SELECT 1'
             try:

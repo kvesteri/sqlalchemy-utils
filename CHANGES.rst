@@ -4,6 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+Unreleased
+^^^^^^^^^^
+
+- Fixed ``database_exists()`` for Oracle. (#627)
+
+
 0.38.3 (2022-07-11)
 ^^^^^^^^^^^^^^^^^^^
 
