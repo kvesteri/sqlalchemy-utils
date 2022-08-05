@@ -1,4 +1,8 @@
-from .. import i18n, ImproperlyConfigured
+from __future__ import annotations
+
+from typing import Any, Union
+
+from .. import ImproperlyConfigured, i18n
 from ..utils import str_coercible
 
 
@@ -50,7 +54,7 @@ class Currency:
 
 
     """
-    def __init__(self, code):
+    def __init__(self, code: Union[Currency, str]) -> None:
         if i18n.babel is None:
             raise ImproperlyConfigured(
                 "'babel' package is required in order to use Currency class."
@@ -68,7 +72,7 @@ class Currency:
             )
 
     @classmethod
-    def validate(self, code):
+    def validate(self, code: str) -> None:
         try:
             i18n.babel.Locale('en').currencies[code]
         except KeyError:
@@ -78,17 +82,17 @@ class Currency:
             pass
 
     @property
-    def symbol(self):
+    def symbol(self) -> str:
         return i18n.babel.numbers.get_currency_symbol(
             self.code,
             i18n.get_locale()
         )
 
     @property
-    def name(self):
+    def name(self) -> str:
         return i18n.get_locale().currencies[self.code]
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         if isinstance(other, Currency):
             return self.code == other.code
         elif isinstance(other, str):
@@ -96,14 +100,14 @@ class Currency:
         else:
             return NotImplemented
 
-    def __ne__(self, other):
+    def __ne__(self, other: Any) -> bool:
         return not (self == other)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.code)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '%s(%r)' % (self.__class__.__name__, self.code)
 
-    def __unicode__(self):
+    def __unicode__(self) -> str:
         return self.code

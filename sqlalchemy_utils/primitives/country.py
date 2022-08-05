@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from functools import total_ordering
+from typing import Any, Union
 
 from .. import i18n
 from ..utils import str_coercible
@@ -52,7 +55,7 @@ class Country:
         assert hash(Country('FI')) == hash('FI')
 
     """
-    def __init__(self, code_or_country):
+    def __init__(self, code_or_country: Union[Country, str]) -> None:
         if isinstance(code_or_country, Country):
             self.code = code_or_country.code
         elif isinstance(code_or_country, str):
@@ -67,11 +70,11 @@ class Country:
             )
 
     @property
-    def name(self):
+    def name(self) -> str:
         return i18n.get_locale().territories[self.code]
 
     @classmethod
-    def validate(self, code):
+    def validate(self, code: str) -> None:
         try:
             i18n.babel.Locale('en').territories[code]
         except KeyError:
@@ -82,7 +85,7 @@ class Country:
             # As babel is optional, we may raise an AttributeError accessing it
             pass
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         if isinstance(other, Country):
             return self.code == other.code
         elif isinstance(other, str):
@@ -90,21 +93,21 @@ class Country:
         else:
             return NotImplemented
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.code)
 
-    def __ne__(self, other):
+    def __ne__(self, other: Any) -> bool:
         return not (self == other)
 
-    def __lt__(self, other):
+    def __lt__(self, other: Union[Country, str]) -> bool:
         if isinstance(other, Country):
             return self.code < other.code
         elif isinstance(other, str):
             return self.code < other
         return NotImplemented
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '%s(%r)' % (self.__class__.__name__, self.code)
 
-    def __unicode__(self):
+    def __unicode__(self) -> str:
         return self.name
