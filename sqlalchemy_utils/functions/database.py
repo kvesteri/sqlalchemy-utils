@@ -439,8 +439,8 @@ def _set_url_database(url: sa.engine.url.URL, database):
 
 
 def _get_scalar_result(engine, sql):
-    with engine.begin() as conn:
-        return conn.scalar(sql)
+    connection = engine.connect()
+    return connection.scalar(sql)
 
 
 def _sqlite_file_exists(database):
