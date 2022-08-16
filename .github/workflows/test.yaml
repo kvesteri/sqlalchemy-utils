@@ -47,9 +47,9 @@ jobs:
         ports:
           - 1433:1433
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install MS SQL stuff
@@ -65,4 +65,4 @@ jobs:
       - name: Run tests
         env:
           SQLALCHEMY_UTILS_TEST_POSTGRESQL_PASSWORD: postgres
-        run: tox -e ${{matrix.tox_env }}
+        run: tox -e ${{ matrix.tox_env }}
