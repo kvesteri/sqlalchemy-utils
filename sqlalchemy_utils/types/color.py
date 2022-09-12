@@ -7,7 +7,7 @@ colour = None
 try:
     import colour
     python_colour_type = colour.Color
-except ImportError:
+except (ImportError, AttributeError):
     python_colour_type = None
 
 
