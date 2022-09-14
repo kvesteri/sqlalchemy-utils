@@ -1,7 +1,7 @@
 from datetime import datetime
 
 import sqlalchemy as sa
-from sqlalchemy.util.langhelpers import symbol
+from sqlalchemy.orm.attributes import NO_VALUE
 
 
 class Timestamp:
@@ -34,7 +34,6 @@ def timestamp_before_update(mapper, connection, target):
     target.updated = datetime.utcnow()
 
 
-NO_VALUE = symbol('NO_VALUE')
 NOT_LOADED_REPR = '<not loaded>'
 
 
@@ -45,7 +44,7 @@ def _generic_repr_method(self, fields):
         fields = state.mapper.columns.keys()
     for key in fields:
         value = state.attrs[key].loaded_value
-        if value == NO_VALUE:
+        if value is NO_VALUE:
             value = NOT_LOADED_REPR
         else:
             value = repr(value)
