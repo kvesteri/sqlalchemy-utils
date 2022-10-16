@@ -10,6 +10,7 @@ Unreleased
 - Fix a crash that occurs if the ``colour-science`` package is installed,
   which shares the same import name as the ``colour`` package that sqlalchemy-utils supports.
   (`#637 <https://github.com/kvesteri/sqlalchemy-utils/pull/637>`_, courtesy of JayPalm)
+- Fixed ``database_exists()`` for Oracle. (#627)
 
 
 0.38.3 (2022-07-11)

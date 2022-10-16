@@ -506,6 +506,16 @@ def database_exists(url):
                 # The default SQLAlchemy database is in memory, and :memory: is
                 # not required, thus we should support that use case.
                 return True
+
+        elif dialect_name == 'oracle':
+            engine = sa.create_engine(url)
+            # Oracle makes use of schemas which is same as user
+            user_name = engine.url.username
+            text = (
+                "SELECT username FROM ALL_USERS WHERE lower(username) = lower('%s')" % user_name
+            )
+            return bool(_get_scalar_result(engine, sa.text(text)))
+
         else:
             text = 'SELECT 1'
             try:
