@@ -1,11 +1,12 @@
 import uuid
 
-from sqlalchemy import __version__, types, util
+from sqlalchemy import types, util
 from sqlalchemy.dialects import mssql, postgresql
 
+from ..compat import get_sqlalchemy_version
 from .scalar_coercible import ScalarCoercible
 
-sqlalchemy_version = tuple([int(v) for v in __version__.split(".")])
+sqlalchemy_version = get_sqlalchemy_version()
 
 
 class UUIDType(ScalarCoercible, types.TypeDecorator):
