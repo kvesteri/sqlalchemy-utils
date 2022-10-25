@@ -85,14 +85,10 @@ class TestCountry:
         assert op(code_left, country_right) is is_
 
     def test_hash(self):
-        return hash(Country('FI')) == hash('FI')
+        assert hash(Country('FI')) == hash('FI')
 
     def test_repr(self):
-        return repr(Country('FI')) == "Country('FI')"
-
-    def test_unicode(self):
-        country = Country('FI')
-        assert str(country) == 'Finland'
+        assert repr(Country('FI')) == "Country('FI')"
 
     def test_str(self):
         country = Country('FI')
