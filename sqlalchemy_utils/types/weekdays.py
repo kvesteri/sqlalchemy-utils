@@ -58,7 +58,7 @@ class WeekDaysType(types.TypeDecorator, ScalarCoercible):
                 "'babel' package is required to use 'WeekDaysType'"
             )
 
-        super(WeekDaysType, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     @property
     def comparator_factory(self):

@@ -47,7 +47,7 @@ class TestLtree:
         with pytest.raises(ValueError) as e:
             Ltree.validate(path)
         assert str(e.value) == (
-            "'{0}' is not a valid ltree path.".format(path)
+            f"'{path}' is not a valid ltree path."
         )
 
     @pytest.mark.parametrize(

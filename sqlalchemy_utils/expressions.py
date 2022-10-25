@@ -24,7 +24,7 @@ def compile_array_get(element, compiler, **kw):
         raise Exception(
             "Second argument should be an integer."
         )
-    return '(%s)[%s]' % (
+    return '({})[{}]'.format(
         compiler.process(args[0]),
         sa.text(str(args[1].value + 1))
     )
@@ -37,7 +37,7 @@ class row_to_json(GenericFunction):
 
 @compiles(row_to_json, 'postgresql')
 def compile_row_to_json(element, compiler, **kw):
-    return "%s(%s)" % (element.name, compiler.process(element.clauses))
+    return f"{element.name}({compiler.process(element.clauses)})"
 
 
 class json_array_length(GenericFunction):
@@ -47,7 +47,7 @@ class json_array_length(GenericFunction):
 
 @compiles(json_array_length, 'postgresql')
 def compile_json_array_length(element, compiler, **kw):
-    return "%s(%s)" % (element.name, compiler.process(element.clauses))
+    return f"{element.name}({compiler.process(element.clauses)})"
 
 
 class Asterisk(ColumnElement):

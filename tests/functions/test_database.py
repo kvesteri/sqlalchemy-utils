@@ -66,7 +66,7 @@ class TestDatabasePostgres(DatabaseTest):
         return 'db_test_sqlalchemy_util'
 
     def test_template(self, postgresql_db_user, postgresql_db_password):
-        dsn = 'postgresql://{0}:{1}@localhost/db_test_sqlalchemy_util'.format(
+        dsn = 'postgresql://{}:{}@localhost/db_test_sqlalchemy_util'.format(
             postgresql_db_user,
             postgresql_db_password
         )
@@ -80,7 +80,7 @@ class TestDatabasePostgresPg8000(DatabaseTest):
 
     @pytest.fixture
     def dsn(self, postgresql_db_user, postgresql_db_password):
-        return 'postgresql+pg8000://{0}:{1}@localhost/{2}'.format(
+        return 'postgresql+pg8000://{}:{}@localhost/{}'.format(
             postgresql_db_user,
             postgresql_db_password,
             'db_to_test_create_and_drop_via_pg8000_driver'
@@ -91,7 +91,7 @@ class TestDatabasePostgresPsycoPG2CFFI(DatabaseTest):
 
     @pytest.fixture
     def dsn(self, postgresql_db_user, postgresql_db_password):
-        return 'postgresql+psycopg2cffi://{0}:{1}@localhost/{2}'.format(
+        return 'postgresql+psycopg2cffi://{}:{}@localhost/{}'.format(
             postgresql_db_user,
             postgresql_db_password,
             'db_to_test_create_and_drop_via_psycopg2cffi_driver'
@@ -106,7 +106,7 @@ class TestDatabasePostgresWithQuotedName(DatabaseTest):
         return 'db_test_sqlalchemy-util'
 
     def test_template(self, postgresql_db_user, postgresql_db_password):
-        dsn = 'postgresql://{0}:{1}@localhost/db_test_sqlalchemy-util'.format(
+        dsn = 'postgresql://{}:{}@localhost/db_test_sqlalchemy-util'.format(
             postgresql_db_user,
             postgresql_db_password
         )
@@ -123,11 +123,11 @@ class TestDatabasePostgresCreateDatabaseCloseConnection:
         postgresql_db_password
     ):
         dsn_list = [
-            'postgresql://{0}:{1}@localhost/db_test_sqlalchemy-util-a'.format(
+            'postgresql://{}:{}@localhost/db_test_sqlalchemy-util-a'.format(
                 postgresql_db_user,
                 postgresql_db_password
             ),
-            'postgresql://{0}:{1}@localhost/db_test_sqlalchemy-util-b'.format(
+            'postgresql://{}:{}@localhost/db_test_sqlalchemy-util-b'.format(
                 postgresql_db_user,
                 postgresql_db_password
             ),

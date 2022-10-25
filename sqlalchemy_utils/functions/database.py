@@ -93,7 +93,7 @@ def json_sql(value, scalars_to_json=True):
             )
         )
     elif isinstance(value, str):
-        return scalar_convert("'{0}'".format(value))
+        return scalar_convert(f"'{value}'")
     elif isinstance(value, Sequence):
         return sa.func.json_build_array(
             *(
@@ -165,7 +165,7 @@ def jsonb_sql(value, scalars_to_jsonb=True):
             )
         )
     elif isinstance(value, str):
-        return scalar_convert("'{0}'".format(value))
+        return scalar_convert(f"'{value}'")
     elif isinstance(value, Sequence):
         return sa.func.jsonb_build_array(
             *(
@@ -565,7 +565,7 @@ def create_database(url, encoding='utf8', template=None):
         if not template:
             template = 'template1'
 
-        text = "CREATE DATABASE {0} ENCODING '{1}' TEMPLATE {2}".format(
+        text = "CREATE DATABASE {} ENCODING '{}' TEMPLATE {}".format(
             quote(engine, database),
             encoding,
             quote(engine, template)
@@ -575,7 +575,7 @@ def create_database(url, encoding='utf8', template=None):
             connection.execute(sa.text(text))
 
     elif dialect_name == 'mysql':
-        text = "CREATE DATABASE {0} CHARACTER SET = '{1}'".format(
+        text = "CREATE DATABASE {} CHARACTER SET = '{}'".format(
             quote(engine, database),
             encoding
         )
@@ -589,7 +589,7 @@ def create_database(url, encoding='utf8', template=None):
                 connection.execute(sa.text("DROP TABLE DB;"))
 
     else:
-        text = 'CREATE DATABASE {0}'.format(quote(engine, database))
+        text = f'CREATE DATABASE {quote(engine, database)}'
         with engine.begin() as connection:
             connection.execute(sa.text(text))
 
@@ -642,18 +642,18 @@ def drop_database(url):
                 'pid' if (version >= (9, 2)) else 'procpid'
             )
             text = '''
-            SELECT pg_terminate_backend(pg_stat_activity.%(pid_column)s)
+            SELECT pg_terminate_backend(pg_stat_activity.{pid_column})
             FROM pg_stat_activity
-            WHERE pg_stat_activity.datname = '%(database)s'
-            AND %(pid_column)s <> pg_backend_pid();
-            ''' % {'pid_column': pid_column, 'database': database}
+            WHERE pg_stat_activity.datname = '{database}'
+            AND {pid_column} <> pg_backend_pid();
+            '''.format(pid_column=pid_column, database=database)
             connection.execute(sa.text(text))
 
             # Drop the database.
-            text = 'DROP DATABASE {0}'.format(quote(connection, database))
+            text = f'DROP DATABASE {quote(connection, database)}'
             connection.execute(sa.text(text))
     else:
-        text = 'DROP DATABASE {0}'.format(quote(engine, database))
+        text = f'DROP DATABASE {quote(engine, database)}'
         with engine.begin() as connection:
             connection.execute(sa.text(text))
 

@@ -79,5 +79,5 @@ class TestGenericRepr:
         article = session.query(Article).options(sa.orm.defer(Article.name)).one()
         actual_repr = repr(article)
 
-        expected_repr = 'Article(id={}, name=<not loaded>)'.format(article.id)
+        expected_repr = f'Article(id={article.id}, name=<not loaded>)'
         assert actual_repr == expected_repr

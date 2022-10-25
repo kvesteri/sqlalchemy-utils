@@ -29,7 +29,7 @@ class WeekDay:
         return self.position < other.position
 
     def __repr__(self):
-        return '%s(%r)' % (self.__class__.__name__, self.index)
+        return f'{self.__class__.__name__}({self.index!r})'
 
     def __unicode__(self):
         return self.name

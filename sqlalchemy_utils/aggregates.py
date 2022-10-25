@@ -391,7 +391,7 @@ class AggregatedAttribute(declared_attr):
         *args,
         **kwargs
     ):
-        super(AggregatedAttribute, self).__init__(fget, *args, **kwargs)
+        super().__init__(fget, *args, **kwargs)
         self.__doc__ = fget.__doc__
         self.column = column
         self.relationship = relationship

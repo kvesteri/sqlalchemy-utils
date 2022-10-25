@@ -185,7 +185,7 @@ class RangeComparator(types.TypeEngine.Comparator):
             not isinstance(other, str)
         ):
             other = map(self.coerce_arg, other)
-        return super(RangeComparator, self).in_(other)
+        return super().in_(other)
 
     def notin_(self, other):
         if (
@@ -193,7 +193,7 @@ class RangeComparator(types.TypeEngine.Comparator):
             not isinstance(other, str)
         ):
             other = map(self.coerce_arg, other)
-        return super(RangeComparator, self).notin_(other)
+        return super().notin_(other)
 
     def __rshift__(self, other, **kwargs):
         """
@@ -271,7 +271,7 @@ class RangeType(ScalarCoercible, types.TypeDecorator):
                 'RangeType needs intervals package installed.'
             )
         self.step = kwargs.pop('step', None)
-        super(RangeType, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def load_dialect_impl(self, dialect):
         if dialect.name == 'postgresql':
@@ -358,7 +358,7 @@ class IntRangeType(RangeType):
     cache_ok = True
 
     def __init__(self, *args, **kwargs):
-        super(IntRangeType, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.interval_class = intervals.IntInterval
 
 
@@ -411,7 +411,7 @@ class Int8RangeType(RangeType):
     cache_ok = True
 
     def __init__(self, *args, **kwargs):
-        super(Int8RangeType, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.interval_class = intervals.IntInterval
 
 
@@ -438,7 +438,7 @@ class DateRangeType(RangeType):
     cache_ok = True
 
     def __init__(self, *args, **kwargs):
-        super(DateRangeType, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.interval_class = intervals.DateInterval
 
 
@@ -466,7 +466,7 @@ class NumericRangeType(RangeType):
     cache_ok = True
 
     def __init__(self, *args, **kwargs):
-        super(NumericRangeType, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.interval_class = intervals.DecimalInterval
 
 
@@ -476,5 +476,5 @@ class DateTimeRangeType(RangeType):
     cache_ok = True
 
     def __init__(self, *args, **kwargs):
-        super(DateTimeRangeType, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.interval_class = intervals.DateTimeInterval

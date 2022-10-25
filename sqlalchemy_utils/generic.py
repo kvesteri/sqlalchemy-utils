@@ -97,7 +97,7 @@ class GenericRelationshipProperty(MapperProperty):
     """
 
     def __init__(self, discriminator, id, doc=None):
-        super(GenericRelationshipProperty, self).__init__()
+        super().__init__()
         self._discriminator_col = discriminator
         self._id_cols = id
         self._id = None

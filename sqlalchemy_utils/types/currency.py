@@ -56,7 +56,7 @@ class CurrencyType(ScalarCoercible, types.TypeDecorator):
                 "'babel' package is required in order to use CurrencyType."
             )
 
-        super(CurrencyType, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def process_bind_param(self, value, dialect):
         if isinstance(value, Currency):

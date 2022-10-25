@@ -59,7 +59,7 @@ class cast_locale_expr(ColumnElement):
 def compile_cast_locale_expr(element, compiler, **kw):
     locale = cast_locale(element.cls, element.locale, element.attr)
     if isinstance(locale, str):
-        return "'{0}'".format(locale)
+        return f"'{locale}'"
     return compiler.process(locale)
 
 
