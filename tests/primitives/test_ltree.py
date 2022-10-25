@@ -189,15 +189,11 @@ class TestLtree:
         assert not (Ltree('path.path') != 'path.path')
 
     def test_hash(self):
-        return hash(Ltree('path')) == hash('path')
+        assert hash(Ltree('path')) == hash('path')
 
     def test_repr(self):
-        return repr(Ltree('path')) == "Ltree('path')"
-
-    def test_unicode(self):
-        ltree = Ltree('path.path')
-        assert str(ltree) == 'path.path'
+        assert repr(Ltree('path')) == "Ltree('path')"
 
     def test_str(self):
-        ltree = Ltree('path')
-        assert str(ltree) == 'path'
+        ltree = Ltree('path.path')
+        assert str(ltree) == 'path.path'
