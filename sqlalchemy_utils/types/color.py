@@ -60,7 +60,7 @@ class ColorType(ScalarCoercible, types.TypeDecorator):
                 "'colour' package is required to use 'ColorType'"
             )
 
-        super(ColorType, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.impl = types.Unicode(max_length)
 
     def process_bind_param(self, value, dialect):

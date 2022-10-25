@@ -115,7 +115,7 @@ class TestEnumType:
             )
 
             def __repr__(self):
-                return 'Order(%r, %r)' % (self.id_, self.status)
+                return f'Order({self.id_!r}, {self.status!r})'
 
         return Order
 

@@ -51,7 +51,7 @@ def _generic_repr_method(self, fields):
             value = repr(value)
         field_reprs.append('='.join((key, value)))
 
-    return '%s(%s)' % (self.__class__.__name__, ', '.join(field_reprs))
+    return '{}({})'.format(self.__class__.__name__, ', '.join(field_reprs))
 
 
 def generic_repr(*fields):

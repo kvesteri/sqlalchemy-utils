@@ -37,7 +37,7 @@ def create_mock_engine(bind, stream=None):
                     elif isinstance(value, (datetime.date, datetime.datetime)):
                         return "'%s'" % value
 
-                    return super(Compiler, self).render_literal_value(
+                    return super().render_literal_value(
                         value, type_)
 
             text = str(Compiler(engine.dialect, sql).process(sql))

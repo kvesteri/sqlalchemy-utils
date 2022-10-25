@@ -74,7 +74,7 @@ class UUIDType(ScalarCoercible, types.TypeDecorator):
     # It is only necessary to quote UUID's in sqlalchemy < 1.4.30.
     if sqlalchemy_version < (1, 4, 30):
         def process_literal_param(self, value, dialect):
-            return "'{}'".format(value) if value else value
+            return f"'{value}'" if value else value
     else:
         def process_literal_param(self, value, dialect):
             return value

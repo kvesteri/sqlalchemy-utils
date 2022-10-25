@@ -147,7 +147,7 @@ class SupportsCascade(TrivialViewTestCases):
 class DoesntSupportCascade(SupportsCascade):
     @pytest.mark.xfail
     def test_life_cycle_cascade(self, *args, **kwargs):
-        super(DoesntSupportCascade, self).test_life_cycle_cascade(
+        super().test_life_cycle_cascade(
             *args,
             **kwargs
         )
