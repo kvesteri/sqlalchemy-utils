@@ -8,6 +8,7 @@ Unreleased
 ^^^^^^^^^^
 
 - Support Python 3.11.
+- Add pre-commit hooks for uniform text checks, isort, flake8, and pyupgrade.
 - Fix a crash that occurs if the ``colour-science`` package is installed,
   which shares the same import name as the ``colour`` package that sqlalchemy-utils supports.
   (`#637 <https://github.com/kvesteri/sqlalchemy-utils/pull/637>`_, courtesy of JayPalm)
