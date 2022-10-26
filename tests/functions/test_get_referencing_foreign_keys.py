@@ -101,4 +101,4 @@ class TestGetReferencingFksWithInheritance:
 
     def test_with_table(self, Admin):
         fks = get_referencing_foreign_keys(Admin.__table__)
-        assert fks == set([])
+        assert fks == set()

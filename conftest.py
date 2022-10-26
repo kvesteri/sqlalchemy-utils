@@ -73,7 +73,7 @@ def mysql_db_user():
 @pytest.fixture
 def postgresql_dsn(postgresql_db_user, postgresql_db_password, postgresql_db_host,
                    db_name):
-    return 'postgresql://{0}:{1}@{2}/{3}'.format(
+    return 'postgresql://{}:{}@{}/{}'.format(
         postgresql_db_user,
         postgresql_db_password,
         postgresql_db_host,
@@ -83,7 +83,7 @@ def postgresql_dsn(postgresql_db_user, postgresql_db_password, postgresql_db_hos
 
 @pytest.fixture
 def mysql_dsn(mysql_db_user, db_name):
-    return 'mysql+pymysql://{0}@localhost/{1}'.format(mysql_db_user, db_name)
+    return f'mysql+pymysql://{mysql_db_user}@localhost/{db_name}'
 
 
 @pytest.fixture
@@ -98,7 +98,7 @@ def sqlite_none_database_dsn():
 
 @pytest.fixture
 def sqlite_file_dsn(db_name):
-    return 'sqlite:///{0}.db'.format(db_name)
+    return f'sqlite:///{db_name}.db'
 
 
 @pytest.fixture
@@ -121,7 +121,7 @@ def mssql_db_driver():
 
 @pytest.fixture
 def mssql_dsn(mssql_db_user, mssql_db_password, mssql_db_driver, db_name):
-    return 'mssql+pyodbc://{0}:{1}@localhost/{2}?driver={3}'\
+    return 'mssql+pyodbc://{}:{}@localhost/{}?driver={}'\
         .format(mssql_db_user, mssql_db_password, db_name, mssql_db_driver)
 
 
@@ -177,7 +177,7 @@ def Category(Base):
 
         @hybrid_property
         def full_name(self):
-            return '%s %s' % (self.title, self.name)
+            return f'{self.title} {self.name}'
 
         @full_name.expression
         def full_name(self):

@@ -35,7 +35,7 @@ class IPAddressType(ScalarCoercible, types.TypeDecorator):
     cache_ok = True
 
     def __init__(self, max_length=50, *args, **kwargs):
-        super(IPAddressType, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.impl = types.Unicode(max_length)
 
     def process_bind_param(self, value, dialect):

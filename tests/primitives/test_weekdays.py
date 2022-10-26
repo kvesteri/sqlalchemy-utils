@@ -89,7 +89,7 @@ class TestWeekDay:
 class TestWeekDays:
     def test_constructor_with_valid_bit_string(self):
         days = WeekDays('1000100')
-        assert days._days == set([WeekDay(0), WeekDay(4)])
+        assert days._days == {WeekDay(0), WeekDay(4)}
 
     @pytest.mark.parametrize(
         'bit_string',

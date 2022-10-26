@@ -15,7 +15,7 @@ except ImportError:
     pass
 
 
-class Password(Mutable, object):
+class Password(Mutable):
 
     @classmethod
     def coerce(cls, key, value):
@@ -25,7 +25,7 @@ class Password(Mutable, object):
         if isinstance(value, (str, bytes)):
             return cls(value, secret=True)
 
-        super(Password, cls).coerce(key, value)
+        super().coerce(key, value)
 
     def __init__(self, value, context=None, secret=False):
         # Store the hash (if it is one).

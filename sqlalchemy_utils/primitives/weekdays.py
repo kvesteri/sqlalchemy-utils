@@ -10,7 +10,7 @@ class WeekDays:
 
             if len(bit_string_or_week_days) != WeekDay.NUM_WEEK_DAYS:
                 raise ValueError(
-                    'Bit string must be {0} characters long.'.format(
+                    'Bit string must be {} characters long.'.format(
                         WeekDay.NUM_WEEK_DAYS
                     )
                 )
@@ -36,14 +36,13 @@ class WeekDays:
             return NotImplemented
 
     def __iter__(self):
-        for day in sorted(self._days):
-            yield day
+        yield from sorted(self._days)
 
     def __contains__(self, value):
         return value in self._days
 
     def __repr__(self):
-        return '%s(%r)' % (
+        return '{}({!r})'.format(
             self.__class__.__name__,
             self.as_bit_string()
         )

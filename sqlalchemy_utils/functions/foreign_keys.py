@@ -13,17 +13,15 @@ from .orm import _get_class_registry, get_column_key, get_mapper, get_tables
 
 def get_foreign_key_values(fk, obj):
     mapper = get_mapper(obj)
-    return dict(
-        (
-            fk.constraint.columns.values()[index],
-            getattr(obj, element.column.key)
-            if hasattr(obj, element.column.key)
-            else getattr(
-                obj, mapper.get_property_by_column(element.column).key
-            ),
+    return {
+        fk.constraint.columns.values()[index]:
+        getattr(obj, element.column.key)
+        if hasattr(obj, element.column.key)
+        else getattr(
+            obj, mapper.get_property_by_column(element.column).key
         )
         for index, element in enumerate(fk.constraint.elements)
-    )
+    }
 
 
 def group_foreign_keys(foreign_keys):
@@ -177,7 +175,7 @@ def merge_references(from_, to, foreign_keys=None):
                 fk.constraint.table.update()
                 .where(sa.and_(*criteria))
                 .values(
-                    dict((key.key, value) for key, value in new_values.items())
+                    {key.key: value for key, value in new_values.items()}
                 )
             )
             session.execute(query)
