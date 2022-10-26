@@ -6,32 +6,36 @@ from sqlalchemy_utils.functions import get_columns
 
 
 class CreateView(DDLElement):
-    def __init__(self, name, selectable, materialized=False):
+    def __init__(self, name, selectable, materialized=False, schema=None):
         self.name = name
         self.selectable = selectable
         self.materialized = materialized
+        self.schema = schema
 
 
 @compiler.compiles(CreateView)
 def compile_create_materialized_view(element, compiler, **kw):
-    return 'CREATE {}VIEW {} AS {}'.format(
+    return 'CREATE {}VIEW {}{} AS {}'.format(
         'MATERIALIZED ' if element.materialized else '',
+        f'{compiler.dialect.identifier_preparer.quote(element.schema)}.' if element.schema else '',
         compiler.dialect.identifier_preparer.quote(element.name),
         compiler.sql_compiler.process(element.selectable, literal_binds=True),
     )
 
 
 class DropView(DDLElement):
-    def __init__(self, name, materialized=False, cascade=True):
+    def __init__(self, name, materialized=False, cascade=True, schema=None):
         self.name = name
         self.materialized = materialized
         self.cascade = cascade
+        self.schema = schema
 
 
 @compiler.compiles(DropView)
 def compile_drop_materialized_view(element, compiler, **kw):
-    return 'DROP {}VIEW IF EXISTS {} {}'.format(
+    return 'DROP {}VIEW IF EXISTS {}{} {}'.format(
         'MATERIALIZED ' if element.materialized else '',
+        f'{compiler.dialect.identifier_preparer.quote(element.schema)}.' if element.schema else '',
         compiler.dialect.identifier_preparer.quote(element.name),
         'CASCADE' if element.cascade else ''
     )
@@ -103,7 +107,7 @@ def create_materialized_view(
     sa.event.listen(
         metadata,
         'after_create',
-        CreateView(name, selectable, materialized=True)
+        CreateView(name, selectable, materialized=True, schema=metadata.schema)
     )
 
     @sa.event.listens_for(metadata, 'after_create')
@@ -114,7 +118,7 @@ def create_materialized_view(
     sa.event.listen(
         metadata,
         'before_drop',
-        DropView(name, materialized=True)
+        DropView(name, materialized=True, schema=metadata.schema)
     )
     return table
 
@@ -163,7 +167,7 @@ def create_view(
         metadata=None
     )
 
-    sa.event.listen(metadata, 'after_create', CreateView(name, selectable))
+    sa.event.listen(metadata, 'after_create', CreateView(name, selectable, schema=metadata.schema))
 
     @sa.event.listens_for(metadata, 'after_create')
     def create_indexes(target, connection, **kw):
@@ -173,7 +177,7 @@ def create_view(
     sa.event.listen(
         metadata,
         'before_drop',
-        DropView(name, cascade=cascade_on_drop)
+        DropView(name, cascade=cascade_on_drop, schema=metadata.schema)
     )
     return table
 
