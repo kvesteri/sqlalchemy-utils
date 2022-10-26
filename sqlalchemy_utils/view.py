@@ -17,7 +17,9 @@ class CreateView(DDLElement):
 def compile_create_materialized_view(element, compiler, **kw):
     return 'CREATE {}VIEW {}{} AS {}'.format(
         'MATERIALIZED ' if element.materialized else '',
-        f'{compiler.dialect.identifier_preparer.quote(element.schema)}.' if element.schema else '',
+        f'{compiler.dialect.identifier_preparer.quote(element.schema)}.'
+        if element.schema
+        else '',
         compiler.dialect.identifier_preparer.quote(element.name),
         compiler.sql_compiler.process(element.selectable, literal_binds=True),
     )
@@ -35,7 +37,9 @@ class DropView(DDLElement):
 def compile_drop_materialized_view(element, compiler, **kw):
     return 'DROP {}VIEW IF EXISTS {}{} {}'.format(
         'MATERIALIZED ' if element.materialized else '',
-        f'{compiler.dialect.identifier_preparer.quote(element.schema)}.' if element.schema else '',
+        f'{compiler.dialect.identifier_preparer.quote(element.schema)}.'
+        if element.schema
+        else '',
         compiler.dialect.identifier_preparer.quote(element.name),
         'CASCADE' if element.cascade else ''
     )
@@ -167,7 +171,11 @@ def create_view(
         metadata=None
     )
 
-    sa.event.listen(metadata, 'after_create', CreateView(name, selectable, schema=metadata.schema))
+    sa.event.listen(
+        metadata,
+        'after_create',
+        CreateView(name, selectable, schema=metadata.schema)
+    )
 
     @sa.event.listens_for(metadata, 'after_create')
     def create_indexes(target, connection, **kw):
