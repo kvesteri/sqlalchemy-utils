@@ -526,6 +526,7 @@ def create_database(url, encoding='utf8', template=None, default_db=None):
     :param template:
         The name of the template from which to create the new database. At the
         moment only supported by PostgreSQL driver.
+    :param defualt_db: Overwrite the defualt database used when connecting.
 
     To create a database, you can pass a simple URL that would have
     been passed to ``create_engine``. ::
