@@ -7,9 +7,13 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 Unreleased
 ^^^^^^^^^^
 
+- Support Python 3.11.
+- Add pre-commit hooks for uniform text checks, isort, flake8, and pyupgrade.
 - Fix a crash that occurs if the ``colour-science`` package is installed,
   which shares the same import name as the ``colour`` package that sqlalchemy-utils supports.
   (`#637 <https://github.com/kvesteri/sqlalchemy-utils/pull/637>`_, courtesy of JayPalm)
+- Fix a crash that occurs if the installed sqlalchemy version is a beta (like ``"2.0.0b3"``).
+  (Reported in `#643 <https://github.com/kvesteri/sqlalchemy-utils/pull/643>`_, thanks Dinmukhamet!)
 
 
 0.38.3 (2022-07-11)

@@ -50,7 +50,7 @@ class JSONType(sa.types.TypeDecorator):
     cache_ok = True
 
     def __init__(self, *args, **kwargs):
-        super(JSONType, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def load_dialect_impl(self, dialect):
         if dialect.name == 'postgresql':

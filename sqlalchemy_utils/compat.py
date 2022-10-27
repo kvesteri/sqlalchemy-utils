@@ -1,3 +1,4 @@
+import re
 import sys
 
 if sys.version_info >= (3, 8):
@@ -6,9 +7,17 @@ else:
     from importlib_metadata import metadata
 
 
-_sqlalchemy_version = tuple(
-    [int(i) for i in metadata("sqlalchemy")["Version"].split(".")[:2]]
-)
+def get_sqlalchemy_version(version=metadata("sqlalchemy")["Version"]):
+    """Extract the sqlalchemy version as a tuple of integers."""
+
+    match = re.search(r"^(\d+)(?:\.(\d+)(?:\.(\d+))?)?", version)
+    try:
+        return tuple(int(v) for v in match.groups() if v is not None)
+    except AttributeError:
+        return ()
+
+
+_sqlalchemy_version = get_sqlalchemy_version()
 
 
 # In sqlalchemy 2.0, some functions moved to sqlalchemy.orm.
@@ -71,6 +80,7 @@ else:
 __all__ = (
     "_declarative_base",
     "get_scalar_subquery",
+    "get_sqlalchemy_version",
     "_select_args",
     "_synonym_for",
 )

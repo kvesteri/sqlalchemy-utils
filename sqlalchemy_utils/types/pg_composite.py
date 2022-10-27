@@ -147,12 +147,12 @@ class CompositeElement(FunctionElement):
         self.name = field
         self.type = to_instance(type_)
 
-        super(CompositeElement, self).__init__(base)
+        super().__init__(base)
 
 
 @compiles(CompositeElement)
 def _compile_pgelem(expr, compiler, **kw):
-    return '(%s).%s' % (compiler.process(expr.clauses, **kw), expr.name)
+    return f'({compiler.process(expr.clauses, **kw)}).{expr.name}'
 
 
 # TODO: Make the registration work on connection level instead of global level
@@ -176,7 +176,7 @@ class CompositeType(UserDefinedType, SchemaType):
                 type_ = self.type.typemap[key]
             except KeyError:
                 raise KeyError(
-                    "Type '%s' doesn't have an attribute: '%s'" % (
+                    "Type '{}' doesn't have an attribute: '{}'".format(
                         self.name, key
                     )
                 )
@@ -297,7 +297,7 @@ def register_psycopg2_composite(dbapi_connection, composite):
             for value in adapted
         ]
         return AsIs(
-            '(%s)::%s' % (
+            '({})::{}'.format(
                 ', '.join(values),
                 dialect.identifier_preparer.quote(composite.name)
             )
@@ -379,4 +379,4 @@ class DropCompositeType(_CreateDropBase):
 def _visit_drop_composite_type(drop, compiler, **kw):
     type_ = drop.element
 
-    return 'DROP TYPE {name}'.format(name=compiler.preparer.format_type(type_))
+    return f'DROP TYPE {compiler.preparer.format_type(type_)}'
