@@ -563,7 +563,7 @@ def create_database(url, encoding='utf8', template=None):
 
     if dialect_name == 'postgresql':
         if not template:
-            template = "template1"
+            template = 'template1'
 
         text = "CREATE DATABASE {} ENCODING '{}' TEMPLATE {}".format(
             quote(engine, database),
@@ -573,7 +573,7 @@ def create_database(url, encoding='utf8', template=None):
 
         with engine.begin() as connection:
             connection.execute(sa.text(text))
-            
+
     elif dialect_name == 'mysql':
         text = "CREATE DATABASE {} CHARACTER SET = '{}'".format(
             quote(engine, database),
