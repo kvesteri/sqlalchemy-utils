@@ -545,23 +545,14 @@ def create_database(url, encoding='utf8', template=None, default_db=None):
     dialect_name = url.get_dialect().name
     dialect_driver = url.get_dialect().driver
 
-    if dialect_name == 'postgresql':
-        url = _set_url_database(url, database="postgres")
-    elif dialect_name == 'mssql':
-        url = _set_url_database(url, database="master")
-    elif dialect_name == 'cockroachdb':
-        url = _set_url_database(url, database="defaultdb")
-    elif not dialect_name == 'sqlite':
-        url = _set_url_database(url, database=None)
-    
     if default_db != None:
-         if dialect_name == "postgresql":
+         if dialect_name == 'postgresql':
              url = _set_url_database(url, database="postgres")
-         elif dialect_name == "mssql":
+         elif dialect_name == 'mssql':
              url = _set_url_database(url, database="master")
-         elif dialect_name == "cockroachdb":
+         elif dialect_name == 'cockroachdb':
              url = _set_url_database(url, database="defaultdb")
-         elif not dialect_name == "sqlite":
+         elif not dialect_name == 'sqlite':
              url = _set_url_database(url, database=None)
     else:
          url = _set_url_database(url, database=default_db)
