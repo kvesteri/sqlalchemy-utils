@@ -534,7 +534,7 @@ def create_database(url, encoding="utf8", template=None, default_db=None):
     dialect_name = url.get_dialect().name
     dialect_driver = url.get_dialect().driver
 
-    if default_db == None:
+    if default_db != None:
         if dialect_name == "postgresql":
             url = _set_url_database(url, database="postgres")
         elif dialect_name == "mssql":
