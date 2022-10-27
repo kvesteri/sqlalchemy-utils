@@ -518,7 +518,7 @@ def database_exists(url):
             engine.dispose()
 
 
-def create_database(url, encoding='utf8', template=None):
+def create_database(url, encoding='utf8', template=None, default_db=None):
     """Issue the appropriate CREATE DATABASE statement.
 
     :param url: A SQLAlchemy engine URL.
@@ -553,6 +553,18 @@ def create_database(url, encoding='utf8', template=None):
         url = _set_url_database(url, database="defaultdb")
     elif not dialect_name == 'sqlite':
         url = _set_url_database(url, database=None)
+    
+    if default_db != None:
+         if dialect_name == "postgresql":
+             url = _set_url_database(url, database="postgres")
+         elif dialect_name == "mssql":
+             url = _set_url_database(url, database="master")
+         elif dialect_name == "cockroachdb":
+             url = _set_url_database(url, database="defaultdb")
+         elif not dialect_name == "sqlite":
+             url = _set_url_database(url, database=None)
+     else:
+         url = _set_url_database(url, database=default_db)
 
     if (dialect_name == 'mssql' and dialect_driver in {'pymssql', 'pyodbc'}) \
             or (dialect_name == 'postgresql' and dialect_driver in {
