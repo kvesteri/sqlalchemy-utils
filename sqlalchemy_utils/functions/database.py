@@ -563,7 +563,7 @@ def create_database(url, encoding='utf8', template=None, default_db=None):
              url = _set_url_database(url, database="defaultdb")
          elif not dialect_name == "sqlite":
              url = _set_url_database(url, database=None)
-     else:
+    else:
          url = _set_url_database(url, database=default_db)
 
     if (dialect_name == 'mssql' and dialect_driver in {'pymssql', 'pyodbc'}) \
