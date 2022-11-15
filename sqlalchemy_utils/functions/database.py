@@ -453,10 +453,11 @@ def _sqlite_file_exists(database):
     return header[:16] == b'SQLite format 3\x00'
 
 
-def database_exists(url):
+def database_exists(url, default_db=None):
     """Check if a database exists.
 
     :param url: A SQLAlchemy engine URL.
+    :param default_db: The default database to use instead of requiring standard
 
     Performs backend-specific testing to quickly determine if a database
     exists on the server. ::
@@ -481,7 +482,7 @@ def database_exists(url):
     try:
         if dialect_name == 'postgresql':
             text = "SELECT 1 FROM pg_database WHERE datname='%s'" % database
-            for db in (database, 'postgres', 'template1', 'template0', None):
+            for db in (database, default_db or 'postgres', 'template1', 'template0', None):
                 url = _set_url_database(url, database=db)
                 engine = sa.create_engine(url)
                 try:
