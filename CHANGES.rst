@@ -23,6 +23,7 @@ Unreleased
 - Fixed create_database() and drop_database() crashing with CockroachDB (#586, pull request courtesy of kurtmckee)
 - Added mixed case support for pg composite (#584, pull request courtesy of bamartin125)
 - Support Python 3.10.
+- Drop support for Python 3.4 and 3.5.
 - Remove the dependency on the six package. (#605)
 - Introduce sqlalchemy 2.0 compatibility. (#513)
 
