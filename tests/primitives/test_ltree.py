@@ -202,7 +202,7 @@ class TestLtree:
         assert Ltree('1.2.3') < Ltree('1.2.4')
         assert Ltree('1.2.3') < Ltree('1.2.3.4')
 
-    def test_lt(self):
+    def test_lte(self):
         assert Ltree('1.2.3') <= Ltree('1.2.4')
 
     def test_gt(self):
