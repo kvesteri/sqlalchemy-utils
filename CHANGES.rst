@@ -7,6 +7,10 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 Unreleased
 ^^^^^^^^^^
 
+
+0.39.0 (2022-12-23)
+^^^^^^^^^^^^^^^^^^^
+
 - Support Python 3.11.
 - Add pre-commit hooks for uniform text checks, isort, flake8, and pyupgrade.
 - Fix a crash that occurs if the ``colour-science`` package is installed,
