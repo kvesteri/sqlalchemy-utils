@@ -183,7 +183,7 @@ class CompositeType(UserDefinedType, SchemaType):
 
             return CompositeElement(self.expr, key, type_)
 
-    def __init__(self, name, columns, quote=None):
+    def __init__(self, name, columns, schema=None, quote=None):
         if psycopg2 is None:
             raise ImproperlyConfigured(
                 "'psycopg2' package is required in order to use CompositeType."
@@ -191,6 +191,7 @@ class CompositeType(UserDefinedType, SchemaType):
         SchemaType.__init__(
             self,
             name=name,
+            schema=schema,
             quote=quote
         )
         self.columns = columns
@@ -210,7 +211,7 @@ class CompositeType(UserDefinedType, SchemaType):
         attach_composite_listeners()
 
     def get_col_spec(self):
-        return self.name
+        return f"{self.schema}.{self.name}" if self.schema else self.name
 
     def bind_processor(self, dialect):
         def process(value):
@@ -269,7 +270,7 @@ class CompositeType(UserDefinedType, SchemaType):
 
 def register_psycopg2_composite(dbapi_connection, composite):
     psycopg2.extras.register_composite(
-        composite.name,
+        composite.get_col_spec(),
         dbapi_connection,
         globally=True,
         factory=composite.caster
@@ -296,10 +297,17 @@ def register_psycopg2_composite(dbapi_connection, composite):
             value.getquoted().decode(dbapi_connection.encoding)
             for value in adapted
         ]
+        quoted_name = dialect.identifier_preparer.quote(composite.name)
+        typename = (
+            f"{composite.schema}.{quoted_name}"
+            if composite.schema
+            else quoted_name
+            )
+
         return AsIs(
             '({})::{}'.format(
                 ', '.join(values),
-                dialect.identifier_preparer.quote(composite.name)
+                typename
             )
         )
 

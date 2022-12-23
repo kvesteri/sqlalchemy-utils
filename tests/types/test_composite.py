@@ -476,3 +476,78 @@ class TestCompositeTypeWithMixedCase:
         account = session.query(Account).first()
         assert account.balance.currency == 'USD'
         assert account.balance.amount == 15
+
+
+@pytest.mark.usefixtures('postgresql_dsn')
+class TestCompositeTypeWithSchema:
+
+    @pytest.fixture
+    def Account(self, Base):
+        pg_composite.registered_composites = {}
+
+        type_ = CompositeType(
+            name='MoneyType',
+            schema='my_schema',
+            columns=[
+                sa.Column('currency', sa.String),
+                sa.Column('amount', sa.Integer)
+            ]
+        )
+
+        class Account(Base):
+            __tablename__ = 'account'
+            __table_args__ = {'schema': 'my_schema'}
+            id = sa.Column(sa.Integer, primary_key=True)
+            balance = sa.Column(type_)
+
+        return Account
+
+    @pytest.fixture
+    def session(self, request, engine, connection, Base, Account):
+        sa.orm.configure_mappers()
+
+        Session = sessionmaker(bind=connection)
+        try:
+            # Enable sqlalchemy 2.0 behavior
+            session = Session(future=True)
+        except TypeError:
+            # sqlalchemy 1.3
+            session = Session()
+        session.execute(sa.text('CREATE SCHEMA my_schema'))
+        session.execute(sa.text(
+            """CREATE TYPE my_schema."MoneyType" AS (
+                currency VARCHAR, amount INTEGER
+            )"""
+        ))
+        session.execute(sa.text(
+            """CREATE TABLE my_schema.account (
+                id SERIAL, balance my_schema."MoneyType", PRIMARY KEY(id)
+            )"""
+        ))
+
+        def teardown():
+            session.execute(sa.text('DROP TABLE my_schema.account'))
+            session.execute(sa.text('DROP TYPE my_schema."MoneyType"'))
+            session.execute(sa.text('DROP SCHEMA my_schema'))
+            session.commit()
+            close_all_sessions()
+            connection.close()
+            remove_composite_listeners()
+            engine.dispose()
+
+        register_composites(connection)
+        request.addfinalizer(teardown)
+
+        return session
+
+    def test_parameter_processing(self, session, Account):
+        account = Account(
+            balance=('USD', 15),
+        )
+
+        session.add(account)
+        session.commit()
+
+        account = session.query(Account).first()
+        assert account.balance.currency == 'USD'
+        assert account.balance.amount == 15
