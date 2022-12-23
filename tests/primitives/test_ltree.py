@@ -197,3 +197,15 @@ class TestLtree:
     def test_str(self):
         ltree = Ltree('path.path')
         assert str(ltree) == 'path.path'
+
+    def test_lt(self):
+        assert Ltree('1.2.3') < Ltree('1.2.4')
+
+    def test_lt(self):
+        assert Ltree('1.2.3') <= Ltree('1.2.4')
+
+    def test_gt(self):
+        assert Ltree('1.2.3') > Ltree('1.2.2')
+
+    def test_gte(self):
+        assert Ltree('1.2.3') >= Ltree('1.2.2')
