@@ -1,3 +1,5 @@
+import enum
+
 import pytest
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import ARRAY
@@ -551,3 +553,90 @@ class TestCompositeTypeWithSchema:
         account = session.query(Account).first()
         assert account.balance.currency == 'USD'
         assert account.balance.amount == 15
+
+
+@pytest.mark.usefixtures('postgresql_dsn')
+class TestCompositeTypeWithEnumColumn:
+    @pytest.fixture
+    def PaintColor(self):
+        class PaintColor(enum.Enum):
+            RED = "red"
+            GREEN = "green"
+            BLUE = "blue"
+        return PaintColor
+
+    @pytest.fixture
+    def PaintJob(self, Base, PaintColor):
+        pg_composite.registered_composites = {}
+
+        type_ = CompositeType(
+            name='PaintType',
+            columns=[
+                sa.Column('name', sa.Text),
+                sa.Column('color', sa.Enum(
+                    PaintColor,
+                    values_callable=lambda o: [e.value for e in o],
+                )),
+            ]
+        )
+
+        class PaintJob(Base):
+            __tablename__ = 'paint_job'
+            id = sa.Column(sa.Integer, primary_key=True)
+            paint = sa.Column(type_)
+
+        return PaintJob
+
+    @pytest.fixture
+    def session(self, request, engine, connection, Base, PaintJob):
+        sa.orm.configure_mappers()
+
+        Session = sessionmaker(bind=connection)
+        try:
+            # Enable sqlalchemy 2.0 behavior
+            session = Session(future=True)
+        except TypeError:
+            # sqlalchemy 1.3
+            session = Session()
+        session.execute(sa.text(
+            """CREATE TYPE "PaintColor" AS ENUM(
+                'red',
+                'green',
+                'blue'
+            )"""
+        ))
+        session.execute(
+            sa.text('CREATE TYPE "PaintType" AS (name TEXT, color "PaintColor")')
+        )
+        session.execute(sa.text(
+            """CREATE TABLE paint_job (
+                id SERIAL, paint "PaintType", PRIMARY KEY(id)
+            )"""
+        ))
+
+        def teardown():
+            session.execute(sa.text('DROP TABLE paint_job'))
+            session.execute(sa.text('DROP TYPE "PaintType"'))
+            session.execute(sa.text('DROP TYPE "PaintColor"'))
+            session.commit()
+            close_all_sessions()
+            connection.close()
+            remove_composite_listeners()
+            engine.dispose()
+
+        register_composites(connection)
+        request.addfinalizer(teardown)
+
+        return session
+
+    def test_parameter_processing(self, session, PaintJob, PaintColor):
+        paint_job = PaintJob(
+            paint=('awesome red', PaintColor.RED),
+        )
+
+        session.add(paint_job)
+        session.commit()
+
+        paint_job = session.query(PaintJob).first()
+        assert paint_job.paint.name == 'awesome red'
+        assert paint_job.paint.color == PaintColor.RED
