@@ -78,7 +78,7 @@ setup(
         "importlib_metadata ; python_version<'3.8'",
     ],
     extras_require=extras_require,
-    python_requires='~=3.6',
+    python_requires='>=3.6',
     classifiers=[
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
