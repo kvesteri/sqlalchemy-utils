@@ -524,6 +524,8 @@ def quote(mixed, ident):
     """
     if isinstance(mixed, Dialect):
         dialect = mixed
+    elif hasattr(mixed, 'dialect'):
+        dialect = mixed.dialect
     else:
         dialect = get_bind(mixed).dialect
     return dialect.preparer(dialect).quote(ident)
