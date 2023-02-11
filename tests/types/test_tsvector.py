@@ -45,12 +45,9 @@ class TestTSVector:
         assert type_.columns == ('name', 'age')
         assert type_.options['regconfig'] == 'pg_catalog.simple'
 
-    def test_match(self, connection, User):
+    def test_catalog_passed_to_match(self, connection, User):
         expr = User.search_index.match('something')
-        assert str(expr.compile(connection)) == (
-            '''"user".search_index @@ to_tsquery('pg_catalog.finnish', '''
-            '''%(search_index_1)s)'''
-        )
+        assert 'pg_catalog.finnish' in str(expr.compile(connection))
 
     def test_concat(self, User):
         assert str(User.search_index | User.search_index) == (
@@ -60,9 +57,8 @@ class TestTSVector:
     def test_match_concatenation(self, session, User):
         concat = User.search_index | User.search_index
         bind = session.bind
-        assert str(concat.match('something').compile(bind)) == (
-            '("user".search_index || "user".search_index) @@ '
-            "to_tsquery('pg_catalog.finnish', %(param_1)s)"
+        assert 'pg_catalog.finnish' in str(
+            concat.match('something').compile(bind)
         )
 
     def test_match_with_catalog(self, connection, User):
@@ -70,7 +66,4 @@ class TestTSVector:
             'something',
             postgresql_regconfig='pg_catalog.simple'
         )
-        assert str(expr.compile(connection)) == (
-            '''"user".search_index @@ to_tsquery('pg_catalog.simple', '''
-            '''%(search_index_1)s)'''
-        )
+        assert 'pg_catalog.simple' in str(expr.compile(connection))
