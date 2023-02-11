@@ -439,7 +439,7 @@ def _set_url_database(url: sa.engine.url.URL, database):
 
 
 def _get_scalar_result(engine, sql):
-    with engine.begin() as conn:
+    with engine.connect() as conn:
         return conn.scalar(sql)
 
 
@@ -565,33 +565,32 @@ def create_database(url, encoding='utf8', template=None):
         if not template:
             template = 'template1'
 
-        text = "CREATE DATABASE {} ENCODING '{}' TEMPLATE {}".format(
-            quote(engine, database),
-            encoding,
-            quote(engine, template)
-        )
-
-        with engine.begin() as connection:
-            connection.execute(sa.text(text))
+        with engine.begin() as conn:
+            text = "CREATE DATABASE {} ENCODING '{}' TEMPLATE {}".format(
+                quote(conn, database),
+                encoding,
+                quote(conn, template)
+            )
+            conn.execute(sa.text(text))
 
     elif dialect_name == 'mysql':
-        text = "CREATE DATABASE {} CHARACTER SET = '{}'".format(
-            quote(engine, database),
-            encoding
-        )
-        with engine.begin() as connection:
-            connection.execute(sa.text(text))
+        with engine.begin() as conn:
+            text = "CREATE DATABASE {} CHARACTER SET = '{}'".format(
+                quote(conn, database),
+                encoding
+            )
+            conn.execute(sa.text(text))
 
     elif dialect_name == 'sqlite' and database != ':memory:':
         if database:
-            with engine.begin() as connection:
-                connection.execute(sa.text("CREATE TABLE DB(id int);"))
-                connection.execute(sa.text("DROP TABLE DB;"))
+            with engine.begin() as conn:
+                conn.execute(sa.text('CREATE TABLE DB(id int)'))
+                conn.execute(sa.text('DROP TABLE DB'))
 
     else:
-        text = f'CREATE DATABASE {quote(engine, database)}'
-        with engine.begin() as connection:
-            connection.execute(sa.text(text))
+        with engine.begin() as conn:
+            text = f'CREATE DATABASE {quote(conn, database)}'
+            conn.execute(sa.text(text))
 
     engine.dispose()
 
@@ -635,9 +634,9 @@ def drop_database(url):
         if database:
             os.remove(database)
     elif dialect_name == 'postgresql':
-        with engine.begin() as connection:
+        with engine.begin() as conn:
             # Disconnect all users from the database we are dropping.
-            version = connection.dialect.server_version_info
+            version = conn.dialect.server_version_info
             pid_column = (
                 'pid' if (version >= (9, 2)) else 'procpid'
             )
@@ -647,14 +646,14 @@ def drop_database(url):
             WHERE pg_stat_activity.datname = '{database}'
             AND {pid_column} <> pg_backend_pid();
             '''.format(pid_column=pid_column, database=database)
-            connection.execute(sa.text(text))
+            conn.execute(sa.text(text))
 
             # Drop the database.
-            text = f'DROP DATABASE {quote(connection, database)}'
-            connection.execute(sa.text(text))
+            text = f'DROP DATABASE {quote(conn, database)}'
+            conn.execute(sa.text(text))
     else:
-        text = f'DROP DATABASE {quote(engine, database)}'
-        with engine.begin() as connection:
-            connection.execute(sa.text(text))
+        with engine.begin() as conn:
+            text = f'DROP DATABASE {quote(conn, database)}'
+            conn.execute(sa.text(text))
 
     engine.dispose()
