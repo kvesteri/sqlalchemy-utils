@@ -183,7 +183,7 @@ class CompositeType(UserDefinedType, SchemaType):
 
             return CompositeElement(self.expr, key, type_)
 
-    def __init__(self, name, columns, quote=None):
+    def __init__(self, name, columns, quote=None, **kwargs):
         if psycopg2 is None:
             raise ImproperlyConfigured(
                 "'psycopg2' package is required in order to use CompositeType."
@@ -306,11 +306,19 @@ def register_psycopg2_composite(dbapi_connection, composite):
     register_adapter(composite.type_cls, adapt_composite)
 
 
+def get_driver_connection(connection):
+    try:
+        # SQLAlchemy 2.0
+        return connection.connection.driver_connection
+    except AttributeError:
+        return connection.connection.connection
+
+
 def before_create(target, connection, **kw):
     for name, composite in registered_composites.items():
         composite.create(connection, checkfirst=True)
         register_psycopg2_composite(
-            connection.connection.connection,
+            get_driver_connection(connection),
             composite
         )
 
@@ -323,7 +331,7 @@ def after_drop(target, connection, **kw):
 def register_composites(connection):
     for name, composite in registered_composites.items():
         register_psycopg2_composite(
-            connection.connection.connection,
+            get_driver_connection(connection),
             composite
         )
 
