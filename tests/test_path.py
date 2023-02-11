@@ -1,6 +1,5 @@
 import pytest
 import sqlalchemy as sa
-from sqlalchemy.util.langhelpers import symbol
 
 from sqlalchemy_utils.path import AttrPath, Path
 
@@ -54,9 +53,7 @@ class TestAttrPath:
         pass
 
     def test_direction(self, SubSection):
-        assert (
-            AttrPath(SubSection, 'section').direction == symbol('MANYTOONE')
-        )
+        assert AttrPath(SubSection, 'section').direction.name == 'MANYTOONE'
 
     def test_invert(self, Document, Section, SubSection):
         path = ~ AttrPath(SubSection, 'section.document')

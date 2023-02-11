@@ -189,12 +189,12 @@ class PropertyObserver:
     def __init__(self):
         self.listener_args = [
             (
-                sa.orm.mapper,
+                sa.orm.Mapper,
                 'mapper_configured',
                 self.update_generator_registry
             ),
             (
-                sa.orm.mapper,
+                sa.orm.Mapper,
                 'after_configured',
                 self.gather_paths
             ),
