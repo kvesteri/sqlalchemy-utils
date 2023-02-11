@@ -89,7 +89,7 @@ def force_auto_coercion(mapper=None):
                    applied to
     """
     if mapper is None:
-        mapper = sa.orm.mapper
+        mapper = sa.orm.Mapper
     sa.event.listen(mapper, 'mapper_configured', coercion_listener)
 
 
@@ -125,7 +125,7 @@ def force_instant_defaults(mapper=None):
                    should be applied to
     """
     if mapper is None:
-        mapper = sa.orm.mapper
+        mapper = sa.orm.Mapper
     sa.event.listen(mapper, 'init', instant_defaults_listener)
 
 

@@ -509,7 +509,7 @@ class AggregationManager:
 
     def register_listeners(self):
         sa.event.listen(
-            sa.orm.mapper,
+            sa.orm.Mapper,
             'after_configured',
             self.update_generator_registry
         )

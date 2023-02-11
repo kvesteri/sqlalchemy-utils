@@ -35,7 +35,7 @@ def count_sql_calls(conn, cursor, statement, parameters, context, executemany):
 
 warnings.simplefilter('error', sa.exc.SAWarning)
 
-sa.event.listen(sa.orm.mapper, 'mapper_configured', coercion_listener)
+sa.event.listen(sa.orm.Mapper, 'mapper_configured', coercion_listener)
 
 
 def get_locale():
