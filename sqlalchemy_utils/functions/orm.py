@@ -818,10 +818,7 @@ def is_loaded(obj, prop):
     :param obj: SQLAlchemy declarative model object
     :param prop: Name of the property or InstrumentedAttribute
     """
-    return not isinstance(
-        getattr(sa.inspect(obj).attrs, prop).loaded_value,
-        sa.util.langhelpers._symbol
-    )
+    return prop not in sa.inspect(obj).unloaded
 
 
 def identity(obj_or_class):
