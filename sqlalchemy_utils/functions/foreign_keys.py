@@ -322,7 +322,8 @@ def non_indexed_foreign_keys(metadata, engine=None):
     """
     reflected_metadata = MetaData()
 
-    if metadata.bind is None and engine is None:
+    bind = getattr(metadata, 'bind', None)
+    if bind is None and engine is None:
         raise Exception(
             'Either pass a metadata object with bind or '
             'pass engine as a second parameter'
@@ -334,7 +335,7 @@ def non_indexed_foreign_keys(metadata, engine=None):
         table = Table(
             table_name,
             reflected_metadata,
-            autoload_with=metadata.bind or engine
+            autoload_with=bind or engine
         )
 
         for constraint in table.constraints:
