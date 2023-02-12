@@ -61,6 +61,7 @@ class TestMergeReferences:
         # Load the author for post
         assert post.author_id == john.id
         merge_references(john, jack)
+        session.commit()
         assert post.author_id == jack.id
         assert post2.author_id == jack.id
 

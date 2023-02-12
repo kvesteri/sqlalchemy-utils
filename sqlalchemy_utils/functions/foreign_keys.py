@@ -154,6 +154,11 @@ def merge_references(from_, to, foreign_keys=None):
     .. seealso: :func:`dependent_objects`
 
     .. versionadded: 0.26.1
+
+    .. versionchanged: 0.40.0
+
+        Removed possibility for old-style synchronize_session merging. Only
+        SQL based merging supported for now.
     """
     if from_.__tablename__ != to.__tablename__:
         raise TypeError('The tables of given arguments do not match.')
@@ -168,23 +173,14 @@ def merge_references(from_, to, foreign_keys=None):
             getattr(fk.constraint.table.c, key.key) == value
             for key, value in old_values.items()
         )
-        try:
-            mapper = get_mapper(fk.constraint.table)
-        except ValueError:
-            query = (
-                fk.constraint.table.update()
-                .where(sa.and_(*criteria))
-                .values(
-                    {key.key: value for key, value in new_values.items()}
-                )
+        query = (
+            fk.constraint.table.update()
+            .where(sa.and_(*criteria))
+            .values(
+                {key.key: value for key, value in new_values.items()}
             )
-            session.execute(query)
-        else:
-            (
-                session.query(mapper.class_)
-                .filter(*[k == old_values[k] for k in old_values])
-                .update(new_values, synchronize_session='fetch')
-            )
+        )
+        session.execute(query)
 
 
 def dependent_objects(obj, foreign_keys=None):
