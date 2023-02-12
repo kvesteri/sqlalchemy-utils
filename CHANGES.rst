@@ -4,8 +4,12 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
-Unreleased
-^^^^^^^^^^
+0.40.0 (2023-02-12)
+^^^^^^^^^^^^^^^^^^^
+
+- Remove Python 3.6 support
+- Add SQLAlchemy 2 support
+- Add comparison operator support for LTree type (#668, pull request by salimfadhley)
 
 
 0.39.0 (2022-12-23)
