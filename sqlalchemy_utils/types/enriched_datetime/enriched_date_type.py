@@ -43,7 +43,7 @@ class EnrichedDateType(types.TypeDecorator, ScalarCoercible):
         return self.date_object.process_result_value(self.impl, value, dialect)
 
     def process_literal_param(self, value, dialect):
-        return str(value)
+        return value
 
     @property
     def python_type(self):
