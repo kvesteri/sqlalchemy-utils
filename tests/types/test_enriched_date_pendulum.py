@@ -62,7 +62,7 @@ class TestPendulumDateType:
         assert user.birthday == time.date()
 
     def test_literal_param(self, session, User):
-        clause = User.birthday > '2015-01-01'
+        clause = User.birthday > date(2015, 1, 1)
         compiled = str(clause.compile(compile_kwargs={"literal_binds": True}))
         assert compiled == "users.birthday > '2015-01-01'"
 
