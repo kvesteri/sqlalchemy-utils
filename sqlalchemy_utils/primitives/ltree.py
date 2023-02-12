@@ -206,3 +206,15 @@ class Ltree:
 
     def __contains__(self, label):
         return label in self.path.split('.')
+
+    def __gt__(self, other):
+        return self.path > other.path
+
+    def __lt__(self, other):
+        return self.path < other.path
+
+    def __ge__(self, other):
+        return self.path >= other.path
+
+    def __le__(self, other):
+        return self.path <= other.path
