@@ -31,7 +31,7 @@ class EnrichedDateTimeType(types.TypeDecorator, ScalarCoercible):
     cache_ok = True
 
     def __init__(self, datetime_processor=PendulumDateTime, *args, **kwargs):
-        super(EnrichedDateTimeType, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.dt_object = datetime_processor()
 
     def _coerce(self, value):
@@ -44,7 +44,7 @@ class EnrichedDateTimeType(types.TypeDecorator, ScalarCoercible):
         return self.dt_object.process_result_value(self.impl, value, dialect)
 
     def process_literal_param(self, value, dialect):
-        return str(value)
+        return value
 
     @property
     def python_type(self):

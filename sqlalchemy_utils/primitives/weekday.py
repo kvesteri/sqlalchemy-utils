@@ -31,8 +31,8 @@ class WeekDay:
     def __lt__(self, other: WeekDay) -> bool:
         return self.position < other.position
 
-    def __repr__(self) -> str:
-        return '%s(%r)' % (self.__class__.__name__, self.index)
+    def __repr__(self):
+        return f'{self.__class__.__name__}({self.index!r})'
 
     def __unicode__(self) -> str:
         return self.name

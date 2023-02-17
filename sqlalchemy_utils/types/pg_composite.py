@@ -147,12 +147,12 @@ class CompositeElement(FunctionElement):
         self.name = field
         self.type = to_instance(type_)
 
-        super(CompositeElement, self).__init__(base)
+        super().__init__(base)
 
 
 @compiles(CompositeElement)
 def _compile_pgelem(expr, compiler, **kw):
-    return '(%s).%s' % (compiler.process(expr.clauses, **kw), expr.name)
+    return f'({compiler.process(expr.clauses, **kw)}).{expr.name}'
 
 
 # TODO: Make the registration work on connection level instead of global level
@@ -176,14 +176,14 @@ class CompositeType(UserDefinedType, SchemaType):
                 type_ = self.type.typemap[key]
             except KeyError:
                 raise KeyError(
-                    "Type '%s' doesn't have an attribute: '%s'" % (
+                    "Type '{}' doesn't have an attribute: '{}'".format(
                         self.name, key
                     )
                 )
 
             return CompositeElement(self.expr, key, type_)
 
-    def __init__(self, name, columns, quote=None):
+    def __init__(self, name, columns, quote=None, **kwargs):
         if psycopg2 is None:
             raise ImproperlyConfigured(
                 "'psycopg2' package is required in order to use CompositeType."
@@ -297,7 +297,7 @@ def register_psycopg2_composite(dbapi_connection, composite):
             for value in adapted
         ]
         return AsIs(
-            '(%s)::%s' % (
+            '({})::{}'.format(
                 ', '.join(values),
                 dialect.identifier_preparer.quote(composite.name)
             )
@@ -306,11 +306,19 @@ def register_psycopg2_composite(dbapi_connection, composite):
     register_adapter(composite.type_cls, adapt_composite)
 
 
+def get_driver_connection(connection):
+    try:
+        # SQLAlchemy 2.0
+        return connection.connection.driver_connection
+    except AttributeError:
+        return connection.connection.connection
+
+
 def before_create(target, connection, **kw):
     for name, composite in registered_composites.items():
         composite.create(connection, checkfirst=True)
         register_psycopg2_composite(
-            connection.connection.connection,
+            get_driver_connection(connection),
             composite
         )
 
@@ -323,7 +331,7 @@ def after_drop(target, connection, **kw):
 def register_composites(connection):
     for name, composite in registered_composites.items():
         register_psycopg2_composite(
-            connection.connection.connection,
+            get_driver_connection(connection),
             composite
         )
 
@@ -379,4 +387,4 @@ class DropCompositeType(_CreateDropBase):
 def _visit_drop_composite_type(drop, compiler, **kw):
     type_ = drop.element
 
-    return 'DROP TYPE {name}'.format(name=compiler.preparer.format_type(type_))
+    return f'DROP TYPE {compiler.preparer.format_type(type_)}'

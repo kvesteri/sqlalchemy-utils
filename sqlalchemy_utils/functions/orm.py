@@ -72,14 +72,14 @@ def get_class_by_table(base, table, data=None):
     :param data: Data row to determine the class in polymorphic scenarios
     :return: Declarative class or None.
     """
-    found_classes = set(
+    found_classes = {
         c for c in _get_class_registry(base).values()
         if hasattr(c, '__table__') and c.__table__ is table
-    )
+    }
     if len(found_classes) > 1:
         if not data:
             raise ValueError(
-                "Multiple declarative classes found for table '{0}'. "
+                "Multiple declarative classes found for table '{}'. "
                 "Please provide data parameter for this function to be able "
                 "to determine polymorphic scenarios.".format(
                     table.name
@@ -93,7 +93,7 @@ def get_class_by_table(base, table, data=None):
                     if data[polymorphic_on] == mapper.polymorphic_identity:
                         return cls
             raise ValueError(
-                "Multiple declarative classes found for table '{0}'. Given "
+                "Multiple declarative classes found for table '{}'. Given "
                 "data row does not match any polymorphic identity of the "
                 "found classes.".format(
                     table.name
@@ -650,11 +650,11 @@ def get_hybrid_properties(model):
 
     :param model: SQLAlchemy declarative model or mapper
     """
-    return dict(
-        (key, prop)
+    return {
+        key: prop
         for key, prop in get_mapper(model).all_orm_descriptors.items()
         if isinstance(prop, hybrid_property)
-    )
+    }
 
 
 def get_declarative_base(model):
@@ -818,10 +818,7 @@ def is_loaded(obj, prop):
     :param obj: SQLAlchemy declarative model object
     :param prop: Name of the property or InstrumentedAttribute
     """
-    return not isinstance(
-        getattr(sa.inspect(obj).attrs, prop).loaded_value,
-        sa.util.langhelpers._symbol
-    )
+    return prop not in sa.inspect(obj).unloaded
 
 
 def identity(obj_or_class):

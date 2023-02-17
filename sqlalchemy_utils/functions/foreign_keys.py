@@ -13,17 +13,15 @@ from .orm import _get_class_registry, get_column_key, get_mapper, get_tables
 
 def get_foreign_key_values(fk, obj):
     mapper = get_mapper(obj)
-    return dict(
-        (
-            fk.constraint.columns.values()[index],
-            getattr(obj, element.column.key)
-            if hasattr(obj, element.column.key)
-            else getattr(
-                obj, mapper.get_property_by_column(element.column).key
-            ),
+    return {
+        fk.constraint.columns.values()[index]:
+        getattr(obj, element.column.key)
+        if hasattr(obj, element.column.key)
+        else getattr(
+            obj, mapper.get_property_by_column(element.column).key
         )
         for index, element in enumerate(fk.constraint.elements)
-    )
+    }
 
 
 def group_foreign_keys(foreign_keys):
@@ -156,6 +154,11 @@ def merge_references(from_, to, foreign_keys=None):
     .. seealso: :func:`dependent_objects`
 
     .. versionadded: 0.26.1
+
+    .. versionchanged: 0.40.0
+
+        Removed possibility for old-style synchronize_session merging. Only
+        SQL based merging supported for now.
     """
     if from_.__tablename__ != to.__tablename__:
         raise TypeError('The tables of given arguments do not match.')
@@ -170,23 +173,14 @@ def merge_references(from_, to, foreign_keys=None):
             getattr(fk.constraint.table.c, key.key) == value
             for key, value in old_values.items()
         )
-        try:
-            mapper = get_mapper(fk.constraint.table)
-        except ValueError:
-            query = (
-                fk.constraint.table.update()
-                .where(sa.and_(*criteria))
-                .values(
-                    dict((key.key, value) for key, value in new_values.items())
-                )
+        query = (
+            fk.constraint.table.update()
+            .where(sa.and_(*criteria))
+            .values(
+                {key.key: value for key, value in new_values.items()}
             )
-            session.execute(query)
-        else:
-            (
-                session.query(mapper.class_)
-                .filter(*[k == old_values[k] for k in old_values])
-                .update(new_values, synchronize_session='fetch')
-            )
+        )
+        session.execute(query)
 
 
 def dependent_objects(obj, foreign_keys=None):
@@ -324,7 +318,8 @@ def non_indexed_foreign_keys(metadata, engine=None):
     """
     reflected_metadata = MetaData()
 
-    if metadata.bind is None and engine is None:
+    bind = getattr(metadata, 'bind', None)
+    if bind is None and engine is None:
         raise Exception(
             'Either pass a metadata object with bind or '
             'pass engine as a second parameter'
@@ -336,7 +331,7 @@ def non_indexed_foreign_keys(metadata, engine=None):
         table = Table(
             table_name,
             reflected_metadata,
-            autoload_with=metadata.bind or engine
+            autoload_with=bind or engine
         )
 
         for constraint in table.constraints:

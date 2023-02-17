@@ -103,7 +103,7 @@ class Ltree:
             self.path = path_or_ltree
         else:
             raise TypeError(
-                "Ltree() argument must be a string or an Ltree, not '{0}'"
+                "Ltree() argument must be a string or an Ltree, not '{}'"
                 .format(
                     type(path_or_ltree).__name__
                 )
@@ -113,7 +113,7 @@ class Ltree:
     def validate(cls, path: str) -> None:
         if path_matcher.match(path) is None:
             raise ValueError(
-                "'{0}' is not a valid ltree path.".format(path)
+                f"'{path}' is not a valid ltree path."
             )
 
     def __len__(self) -> int:
@@ -155,7 +155,7 @@ class Ltree:
         elif isinstance(key, slice):
             return Ltree('.'.join(self.path.split('.')[key]))
         raise TypeError(
-            'Ltree indices must be integers, not {0}'.format(
+            'Ltree indices must be integers, not {}'.format(
                 key.__class__.__name__
             )
         )
@@ -171,12 +171,12 @@ class Ltree:
         other_parts = [Ltree(other).path.split('.') for other in others]
         parts = self.path.split('.')
         for index, element in enumerate(parts):
-            if any((
+            if any(
                 other[index] != element or
                 len(other) <= index + 1 or
                 len(parts) == index + 1
                 for other in other_parts
-            )):
+            ):
                 if index == 0:
                     return None
                 return Ltree('.'.join(parts[0:index]))
@@ -201,11 +201,23 @@ class Ltree:
     def __ne__(self, other: Any) -> bool:
         return not (self == other)
 
-    def __repr__(self) -> str:
-        return '%s(%r)' % (self.__class__.__name__, self.path)
+    def __repr__(self):
+        return f'{self.__class__.__name__}({self.path!r})'
 
     def __unicode__(self) -> str:
         return self.path
 
     def __contains__(self, label: Iterable) -> bool:
         return label in self.path.split('.')
+
+    def __gt__(self, other):
+        return self.path > other.path
+
+    def __lt__(self, other):
+        return self.path < other.path
+
+    def __ge__(self, other):
+        return self.path >= other.path
+
+    def __le__(self, other):
+        return self.path <= other.path

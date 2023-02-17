@@ -76,7 +76,7 @@ class Currency:
         try:
             i18n.babel.Locale('en').currencies[code]
         except KeyError:
-            raise ValueError("'{0}' is not valid currency code.".format(code))
+            raise ValueError(f"'{code}' is not valid currency code.")
         except AttributeError:
             # As babel is optional, we may raise an AttributeError accessing it
             pass
@@ -106,8 +106,8 @@ class Currency:
     def __hash__(self) -> int:
         return hash(self.code)
 
-    def __repr__(self) -> str:
-        return '%s(%r)' % (self.__class__.__name__, self.code)
+    def __repr__(self):
+        return f'{self.__class__.__name__}({self.code!r})'
 
     def __unicode__(self) -> str:
         return self.code

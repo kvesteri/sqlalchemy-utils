@@ -105,4 +105,4 @@ class TSVectorType(sa.types.TypeDecorator):
         """
         self.columns = args
         self.options = kwargs
-        super(TSVectorType, self).__init__()
+        super().__init__()

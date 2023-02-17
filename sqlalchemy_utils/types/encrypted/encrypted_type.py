@@ -365,7 +365,7 @@ class StringEncryptedType(TypeDecorator, ScalarCoercible):
             raise ImproperlyConfigured(
                 "'cryptography' is required to use EncryptedType"
             )
-        super(StringEncryptedType, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         # set the underlying type
         if type_in is None:
             type_in = String()
@@ -464,7 +464,7 @@ class EncryptedType(StringEncryptedType):
             "The 'EncryptedType' class will change implementation from "
             "'LargeBinary' to 'String' in a future version. Use "
             "'StringEncryptedType' to use the 'String' implementation.",
-            DeprecationWarning)
+            DeprecationWarning, stacklevel=2)
         super().__init__(*args, **kwargs)
 
     def process_bind_param(self, value, dialect):

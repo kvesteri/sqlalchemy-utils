@@ -5,7 +5,6 @@ from sqlalchemy_utils import get_referencing_foreign_keys
 
 
 class TestGetReferencingFksWithCompositeKeys:
-
     @pytest.fixture
     def User(self, Base):
         class User(Base):
@@ -65,6 +64,9 @@ class TestGetReferencingFksWithInheritance:
             id = sa.Column(
                 sa.Integer, sa.ForeignKey(User.id), primary_key=True
             )
+            __mapper_args__ = {
+                'polymorphic_identity': 'admin'
+            }
         return Admin
 
     @pytest.fixture
@@ -101,4 +103,4 @@ class TestGetReferencingFksWithInheritance:
 
     def test_with_table(self, Admin):
         fks = get_referencing_foreign_keys(Admin.__table__)
-        assert fks == set([])
+        assert fks == set()

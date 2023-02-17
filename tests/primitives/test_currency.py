@@ -16,7 +16,7 @@ class TestCurrency:
         assert Currency('USD') == Currency(Currency('USD'))
 
     def test_hashability(self):
-        assert len(set([Currency('USD'), Currency('USD')])) == 1
+        assert len({Currency('USD'), Currency('USD')}) == 1
 
     def test_invalid_currency_code(self):
         with pytest.raises(ValueError):

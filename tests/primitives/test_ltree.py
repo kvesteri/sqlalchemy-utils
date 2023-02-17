@@ -47,7 +47,7 @@ class TestLtree:
         with pytest.raises(ValueError) as e:
             Ltree.validate(path)
         assert str(e.value) == (
-            "'{0}' is not a valid ltree path.".format(path)
+            f"'{path}' is not a valid ltree path."
         )
 
     @pytest.mark.parametrize(
@@ -189,15 +189,29 @@ class TestLtree:
         assert not (Ltree('path.path') != 'path.path')
 
     def test_hash(self):
-        return hash(Ltree('path')) == hash('path')
+        assert hash(Ltree('path')) == hash('path')
 
     def test_repr(self):
-        return repr(Ltree('path')) == "Ltree('path')"
+        assert repr(Ltree('path')) == "Ltree('path')"
 
-    def test_unicode(self):
+    def test_str(self):
         ltree = Ltree('path.path')
         assert str(ltree) == 'path.path'
 
-    def test_str(self):
-        ltree = Ltree('path')
-        assert str(ltree) == 'path'
+    def test_lt(self):
+        assert Ltree('1') < Ltree('2')
+        assert Ltree('1.2.3') < Ltree('1.2.4')
+        assert Ltree('1.2.3') < Ltree('1.2.3.4')
+
+    def test_lte(self):
+        assert Ltree('1.2.3') <= Ltree('1.2.4')
+        assert Ltree('1') <= Ltree('1')
+
+    def test_gt(self):
+        assert Ltree('2') > Ltree('1')
+        assert Ltree('1.2.3') > Ltree('1.2.2')
+        assert Ltree('1.2.3.4') > Ltree('1.2.3')
+
+    def test_gte(self):
+        assert Ltree('1.2.3') >= Ltree('1.2.2')
+        assert Ltree('1') >= Ltree('1')

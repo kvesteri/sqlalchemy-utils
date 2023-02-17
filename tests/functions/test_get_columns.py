@@ -19,11 +19,8 @@ def columns():
 
 
 class TestGetColumns:
-    def test_table(self, Building):
-        assert isinstance(
-            get_columns(Building.__table__),
-            sa.sql.base.ImmutableColumnCollection
-        )
+    def test_table(self, Building, columns):
+        assert [c.name for c in get_columns(Building.__table__)] == columns
 
     def test_instrumented_attribute(self, Building):
         assert get_columns(Building.id) == [Building.__table__.c._id]

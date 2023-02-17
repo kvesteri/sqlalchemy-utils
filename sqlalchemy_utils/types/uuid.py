@@ -1,11 +1,12 @@
 import uuid
 
-from sqlalchemy import __version__, types, util
+from sqlalchemy import types, util
 from sqlalchemy.dialects import mssql, postgresql
 
+from ..compat import get_sqlalchemy_version
 from .scalar_coercible import ScalarCoercible
 
-sqlalchemy_version = tuple([int(v) for v in __version__.split(".")])
+sqlalchemy_version = get_sqlalchemy_version()
 
 
 class UUIDType(ScalarCoercible, types.TypeDecorator):
@@ -73,7 +74,7 @@ class UUIDType(ScalarCoercible, types.TypeDecorator):
     # It is only necessary to quote UUID's in sqlalchemy < 1.4.30.
     if sqlalchemy_version < (1, 4, 30):
         def process_literal_param(self, value, dialect):
-            return "'{}'".format(value) if value else value
+            return f"'{value}'" if value else value
     else:
         def process_literal_param(self, value, dialect):
             return value

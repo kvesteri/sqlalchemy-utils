@@ -81,4 +81,4 @@ def expire_proxy_dicts(target, context):
         target._proxy_dicts = {}
 
 
-sa.event.listen(sa.orm.mapper, 'expire', expire_proxy_dicts)
+sa.event.listen(sa.orm.Mapper, 'expire', expire_proxy_dicts)

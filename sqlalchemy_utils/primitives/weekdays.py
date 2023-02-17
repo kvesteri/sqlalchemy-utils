@@ -16,7 +16,7 @@ class WeekDays:
 
             if len(bit_string_or_week_days) != WeekDay.NUM_WEEK_DAYS:
                 raise ValueError(
-                    'Bit string must be {0} characters long.'.format(
+                    'Bit string must be {} characters long.'.format(
                         WeekDay.NUM_WEEK_DAYS
                     )
                 )

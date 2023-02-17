@@ -30,7 +30,7 @@ class EnrichedDateType(types.TypeDecorator, ScalarCoercible):
     cache_ok = True
 
     def __init__(self, date_processor=PendulumDate, *args, **kwargs):
-        super(EnrichedDateType, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.date_object = date_processor()
 
     def _coerce(self, value):
@@ -43,7 +43,7 @@ class EnrichedDateType(types.TypeDecorator, ScalarCoercible):
         return self.date_object.process_result_value(self.impl, value, dialect)
 
     def process_literal_param(self, value, dialect):
-        return str(value)
+        return value
 
     @property
     def python_type(self):

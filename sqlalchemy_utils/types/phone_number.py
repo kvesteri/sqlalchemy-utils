@@ -106,7 +106,7 @@ class PhoneNumber(BasePhoneNumber):
             # bindings need to be updated.
             raise PhoneNumberParseException(getattr(e, "error_type", -1), str(e))
 
-        super(PhoneNumber, self).__init__(
+        super().__init__(
             country_code=self._phone_number.country_code,
             national_number=self._phone_number.national_number,
             extension=self._phone_number.extension,
@@ -176,7 +176,7 @@ class PhoneNumberType(ScalarCoercible, types.TypeDecorator):
                 "The 'phonenumbers' package is required to use 'PhoneNumberType'"
             )
 
-        super(PhoneNumberType, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.region = region
         self.impl = types.Unicode(max_length)
 
@@ -186,7 +186,7 @@ class PhoneNumberType(ScalarCoercible, types.TypeDecorator):
                 value = PhoneNumber(value, region=self.region)
 
             if self.STORE_FORMAT == "e164" and value.extension:
-                return "%s;ext=%s" % (value.e164, value.extension)
+                return f"{value.e164};ext={value.extension}"
 
             return getattr(value, self.STORE_FORMAT)
 

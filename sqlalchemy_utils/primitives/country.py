@@ -63,7 +63,7 @@ class Country:
             self.code = code_or_country
         else:
             raise TypeError(
-                "Country() argument must be a string or a country, not '{0}'"
+                "Country() argument must be a string or a country, not '{}'"
                 .format(
                     type(code_or_country).__name__
                 )
@@ -79,7 +79,7 @@ class Country:
             i18n.babel.Locale('en').territories[code]
         except KeyError:
             raise ValueError(
-                'Could not convert string to country code: {0}'.format(code)
+                f'Could not convert string to country code: {code}'
             )
         except AttributeError:
             # As babel is optional, we may raise an AttributeError accessing it
@@ -106,8 +106,8 @@ class Country:
             return self.code < other
         return NotImplemented
 
-    def __repr__(self) -> str:
-        return '%s(%r)' % (self.__class__.__name__, self.code)
+    def __repr__(self):
+        return f'{self.__class__.__name__}({self.code!r})'
 
     def __unicode__(self) -> str:
         return self.name

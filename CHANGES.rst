@@ -4,6 +4,26 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.40.0 (2023-02-12)
+^^^^^^^^^^^^^^^^^^^
+
+- Remove Python 3.6 support
+- Add SQLAlchemy 2 support
+- Add comparison operator support for LTree type (#668, pull request by salimfadhley)
+
+
+0.39.0 (2022-12-23)
+^^^^^^^^^^^^^^^^^^^
+
+- Support Python 3.11.
+- Add pre-commit hooks for uniform text checks, isort, flake8, and pyupgrade.
+- Fix a crash that occurs if the ``colour-science`` package is installed,
+  which shares the same import name as the ``colour`` package that sqlalchemy-utils supports.
+  (`#637 <https://github.com/kvesteri/sqlalchemy-utils/pull/637>`_, courtesy of JayPalm)
+- Fix a crash that occurs if the installed sqlalchemy version is a beta (like ``"2.0.0b3"``).
+  (Reported in `#643 <https://github.com/kvesteri/sqlalchemy-utils/pull/643>`_, thanks Dinmukhamet!)
+
+
 0.38.3 (2022-07-11)
 ^^^^^^^^^^^^^^^^^^^
 
@@ -11,6 +31,7 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 - Fixed create_database() and drop_database() crashing with CockroachDB (#586, pull request courtesy of kurtmckee)
 - Added mixed case support for pg composite (#584, pull request courtesy of bamartin125)
 - Support Python 3.10.
+- Drop support for Python 3.4 and 3.5.
 - Remove the dependency on the six package. (#605)
 - Introduce sqlalchemy 2.0 compatibility. (#513)
 

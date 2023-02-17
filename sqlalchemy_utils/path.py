@@ -19,14 +19,13 @@ class Path:
         return self.path.split(self.separator)
 
     def __iter__(self):
-        for part in self.parts:
-            yield part
+        yield from self.parts
 
     def __len__(self):
         return len(self.parts)
 
     def __repr__(self):
-        return "%s('%s')" % (self.__class__.__name__, self.path)
+        return f"{self.__class__.__name__}('{self.path}')"
 
     def index(self, element):
         return self.parts.index(element)
@@ -72,8 +71,7 @@ class AttrPath:
             self.parts.append(last_attr)
 
     def __iter__(self):
-        for part in self.parts:
-            yield part
+        yield from self.parts
 
     def __invert__(self):
         def get_backref(part):
@@ -138,7 +136,7 @@ class AttrPath:
         return len(self.path)
 
     def __repr__(self):
-        return "%s(%s, %r)" % (
+        return "{}({}, {!r})".format(
             self.__class__.__name__,
             self.class_.__name__,
             self.path.path
