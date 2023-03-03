@@ -142,6 +142,14 @@ ScalarListType
 .. autoclass:: ScalarListType
 
 
+StringEncryptedType
+-------------------
+
+.. module:: sqlalchemy_utils.types.encrypted.encrypted_type
+
+.. autoclass:: StringEncryptedType
+
+
 TimezoneType
 ------------
 
