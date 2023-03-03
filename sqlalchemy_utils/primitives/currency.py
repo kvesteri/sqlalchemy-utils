@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Union
 
-from .. import ImproperlyConfigured, i18n
+from .. import i18n, ImproperlyConfigured
 from ..utils import str_coercible
 
 

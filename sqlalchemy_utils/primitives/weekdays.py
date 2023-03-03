@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import Any, Generator, Hashable, Union
 
-from .weekday import WeekDay
 from ..utils import str_coercible
+from .weekday import WeekDay
 
 
 @str_coercible
