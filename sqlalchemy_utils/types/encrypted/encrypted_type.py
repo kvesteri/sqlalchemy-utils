@@ -457,6 +457,11 @@ class StringEncryptedType(TypeDecorator, ScalarCoercible):
 
 
 class EncryptedType(StringEncryptedType):
+    """
+    The 'EncryptedType' class will change implementation from
+    'LargeBinary' to 'String' in a future version. Use
+    'StringEncryptedType' to use the 'String' implementation.
+    """
     impl = LargeBinary
 
     def __init__(self, *args, **kwargs):
