@@ -78,7 +78,7 @@ class TSVectorType(sa.types.TypeDecorator):
     Would be equivalent to SQL::
 
 
-        search_vector @@ to_tsquery('pg_catalog.simgle', 'finland')
+        search_vector @@ to_tsquery('pg_catalog.simple', 'finland')
 
     """
     impl = TSVECTOR
