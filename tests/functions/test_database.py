@@ -98,6 +98,17 @@ class TestDatabasePostgresPsycoPG2CFFI(DatabaseTest):
         )
 
 
+class TestDatabasePostgresPsycoPG3(DatabaseTest):
+
+    @pytest.fixture
+    def dsn(self, postgresql_db_user, postgresql_db_password):
+        return 'postgresql+psycopg://{}:{}@localhost/{}'.format(
+            postgresql_db_user,
+            postgresql_db_password,
+            'db_to_test_create_and_drop_via_psycopg3_driver'
+        )
+
+
 @pytest.mark.usefixtures('postgresql_dsn')
 class TestDatabasePostgresWithQuotedName(DatabaseTest):
 
