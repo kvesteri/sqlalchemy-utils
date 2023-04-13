@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.41.0 (2023-04-13)
+^^^^^^^^^^^^^^^^^^^
+
+- Support psycopg3 for ``create_database()`` and ``delete_database()``.
+  (#701, pull request by LerikP)
+
+
 0.40.0 (2023-02-12)
 ^^^^^^^^^^^^^^^^^^^
 
