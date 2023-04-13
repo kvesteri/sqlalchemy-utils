@@ -556,7 +556,7 @@ def create_database(url, encoding='utf8', template=None):
 
     if (dialect_name == 'mssql' and dialect_driver in {'pymssql', 'pyodbc'}) \
             or (dialect_name == 'postgresql' and dialect_driver in {
-            'asyncpg', 'pg8000', 'psycopg2', 'psycopg2cffi'}):
+            'asyncpg', 'pg8000', 'psycopg', 'psycopg2', 'psycopg2cffi'}):
         engine = sa.create_engine(url, isolation_level='AUTOCOMMIT')
     else:
         engine = sa.create_engine(url)
@@ -625,7 +625,7 @@ def drop_database(url):
     if dialect_name == 'mssql' and dialect_driver in {'pymssql', 'pyodbc'}:
         engine = sa.create_engine(url, connect_args={'autocommit': True})
     elif dialect_name == 'postgresql' and dialect_driver in {
-            'asyncpg', 'pg8000', 'psycopg2', 'psycopg2cffi'}:
+            'asyncpg', 'pg8000', 'psycopg', 'psycopg2', 'psycopg2cffi'}:
         engine = sa.create_engine(url, isolation_level='AUTOCOMMIT')
     else:
         engine = sa.create_engine(url)

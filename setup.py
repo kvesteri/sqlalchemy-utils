@@ -27,6 +27,7 @@ extras_require = {
         'Jinja2>=2.3',
         'docutils>=0.10',
         'flexmock>=0.9.7',
+        'psycopg>=3.1.8',
         'psycopg2>=2.5.1',
         'psycopg2cffi>=2.8.1',
         'pg8000>=1.12.4',

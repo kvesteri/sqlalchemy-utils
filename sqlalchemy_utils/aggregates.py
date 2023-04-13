@@ -36,7 +36,7 @@ Features
 
 
 .. _column_property:
-    https://docs.sqlalchemy.org/en/latest/orm/mapper_config.html#using-column-property
+    https://docs.sqlalchemy.org/en/latest/orm/mapped_sql_expr.html#using-column-property
 .. _counter_culture: https://github.com/magnusvk/counter_culture
 .. _stackoverflow reply by Michael Bayer:
     https://stackoverflow.com/a/13765857/520932
