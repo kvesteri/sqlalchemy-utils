@@ -4,6 +4,13 @@ Changelog
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
 
+0.41.1 (2023-04-27)
+^^^^^^^^^^^^^^^^^^^
+
+- Use a custom SQL construct for refreshing materialized views in
+  `refresh_materialized_view` (#703)
+
+
 0.41.0 (2023-04-13)
 ^^^^^^^^^^^^^^^^^^^
 
