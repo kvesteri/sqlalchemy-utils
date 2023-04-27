@@ -1,6 +1,7 @@
 import sqlalchemy as sa
 from sqlalchemy.ext import compiler
 from sqlalchemy.schema import DDLElement, PrimaryKeyConstraint
+from sqlalchemy.sql.expression import ClauseElement, Executable
 
 from sqlalchemy_utils.functions import get_columns
 
@@ -178,6 +179,22 @@ def create_view(
     return table
 
 
+class RefreshMaterializedView(Executable, ClauseElement):
+    inherit_cache = True
+
+    def __init__(self, name, concurrently):
+        self.name = name
+        self.concurrently = concurrently
+
+
+@compiler.compiles(RefreshMaterializedView)
+def compile_refresh_materialized_view(element, compiler):
+    return 'REFRESH MATERIALIZED VIEW {concurrently}{name}'.format(
+        concurrently='CONCURRENTLY ' if element.concurrently else '',
+        name=compiler.dialect.identifier_preparer.quote(element.name),
+    )
+
+
 def refresh_materialized_view(session, name, concurrently=False):
     """ Refreshes an already existing materialized view
 
@@ -190,9 +207,4 @@ def refresh_materialized_view(session, name, concurrently=False):
     # Since session.execute() bypasses autoflush, we must manually flush in
     # order to include newly-created/modified objects in the refresh.
     session.flush()
-    session.execute(
-        sa.text('REFRESH MATERIALIZED VIEW {}{}'.format(
-            'CONCURRENTLY ' if concurrently else '',
-            session.bind.engine.dialect.identifier_preparer.quote(name)
-        ))
-    )
+    session.execute(RefreshMaterializedView(name, concurrently))
