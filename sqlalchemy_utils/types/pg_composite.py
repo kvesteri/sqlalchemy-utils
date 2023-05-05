@@ -197,8 +197,11 @@ class CompositeType(UserDefinedType, SchemaType):
         if name in registered_composites:
             self.type_cls = registered_composites[name].type_cls
         else:
+            # The first argument to namedtuple must be a valid identifier.
+            # So if self.name is a schema qualified name, then we need to remove the dot.
+            type_cls_name = self.name.replace('.', '_')
             self.type_cls = namedtuple(
-                self.name, [c.name for c in columns]
+                type_cls_name, [c.name for c in columns]
             )
         registered_composites[name] = self
 
