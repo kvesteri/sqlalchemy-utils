@@ -11,6 +11,11 @@ try:
 except ImportError:
     babel = None
 
+try:
+    from sqlalchemy.orm import MappedColumn
+except ImportError:
+    MappedColumn = None
+
 
 def get_locale():
     try:
@@ -24,6 +29,13 @@ def get_locale():
         )
 
 
+def get_key(attr):
+    if MappedColumn is not None and isinstance(attr, MappedColumn):
+        return attr.column.key
+    else:
+        return attr.key
+
+
 def cast_locale(obj, locale, attr):
     """
     Cast given locale to string. Supports also callbacks that return locales.
@@ -35,7 +47,7 @@ def cast_locale(obj, locale, attr):
     """
     if callable(locale):
         try:
-            locale = locale(obj, attr.key)
+            locale = locale(obj, get_key(attr))
         except TypeError:
             try:
                 locale = locale(obj)
@@ -83,26 +95,26 @@ class TranslationHybrid:
         def getter(obj):
             current_locale = cast_locale(obj, self.current_locale, attr)
             try:
-                return getattr(obj, attr.key)[current_locale]
+                return getattr(obj, get_key(attr))[current_locale]
             except (TypeError, KeyError):
                 default_locale = cast_locale(obj, self.default_locale, attr)
                 try:
-                    return getattr(obj, attr.key)[default_locale]
+                    return getattr(obj, get_key(attr))[default_locale]
                 except (TypeError, KeyError):
                     return self.default_value
         return getter
 
     def setter_factory(self, attr):
         def setter(obj, value):
-            if getattr(obj, attr.key) is None:
-                setattr(obj, attr.key, {})
+            if getattr(obj, get_key(attr)) is None:
+                setattr(obj, get_key(attr), {})
             locale = cast_locale(obj, self.current_locale, attr)
-            getattr(obj, attr.key)[locale] = value
+            getattr(obj, get_key(attr))[locale] = value
         return setter
 
     def expr_factory(self, attr):
         def expr(cls):
-            cls_attr = getattr(cls, attr.key)
+            cls_attr = getattr(cls, get_key(attr))
             current_locale = cast_locale_expr(cls, self.current_locale, attr)
             default_locale = cast_locale_expr(cls, self.default_locale, attr)
             return sa.func.coalesce(
