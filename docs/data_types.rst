@@ -76,6 +76,9 @@ EncryptedType
 
 .. module:: sqlalchemy_utils.types.encrypted.encrypted_type
 
+.. deprecated:: 0.36.6
+    Use StringEncryptedType instead
+
 .. autoclass:: EncryptedType
 
 JSONType
@@ -140,6 +143,14 @@ ScalarListType
 .. module:: sqlalchemy_utils.types.scalar_list
 
 .. autoclass:: ScalarListType
+
+
+StringEncryptedType
+-------------------
+
+.. module:: sqlalchemy_utils.types.encrypted.encrypted_type
+
+.. autoclass:: StringEncryptedType
 
 
 TimezoneType
