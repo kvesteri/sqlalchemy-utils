@@ -13,7 +13,7 @@ from .orm import quote
 
 def escape_like(string, escape_char='*'):
     """
-    Escape the string paremeter used in SQL LIKE expressions.
+    Escape the string parameter used in SQL LIKE expressions.
 
     ::
 
