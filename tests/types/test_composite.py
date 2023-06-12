@@ -71,7 +71,6 @@ class TestCompositeTypeWithRegularTypes:
         assert account.balance.currency == 'USD'
         assert account.balance.amount == 15
 
-
     @pytest.fixture
     def init_models(self, Account):
         pass
