@@ -27,6 +27,7 @@ class TestCompositeTypeWithRegularTypes:
             id = sa.Column(sa.Integer, primary_key=True)
             balance = sa.Column(
                 CompositeType(
+                    # 'myschema.money_type',
                     'money_type',
                     [
                         sa.Column('currency', sa.String),
@@ -36,6 +37,40 @@ class TestCompositeTypeWithRegularTypes:
             )
 
         return Account
+
+    @pytest.fixture
+    def AccountWithSchema(self, Base):
+        class AccountWithSchema(Base):
+            __tablename__ = 'account_with_schema'
+            id = sa.Column(sa.Integer, primary_key=True)
+            balance = sa.Column(
+                CompositeType(
+                    'myschema.money_type',
+                    [
+                        sa.Column('currency', sa.String),
+                        sa.Column('amount', sa.Integer)
+                    ]
+                )
+            )
+
+        return AccountWithSchema
+
+    def test_schema_prefix(self, session, AccountWithSchema):
+        """
+        Verify that CompositeType with schema prefix works.
+        """
+
+        account = AccountWithSchema(
+            balance=('USD', 15)
+        )
+
+        session.add(account)
+        session.commit()
+
+        account = session.query(AccountWithSchema).first()
+        assert account.balance.currency == 'USD'
+        assert account.balance.amount == 15
+
 
     @pytest.fixture
     def init_models(self, Account):
