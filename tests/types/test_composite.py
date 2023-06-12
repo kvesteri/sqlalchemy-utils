@@ -72,7 +72,7 @@ class TestCompositeTypeWithRegularTypes:
         assert account.balance.amount == 15
 
     @pytest.fixture
-    def init_models(self, Account):
+    def init_models(self, Account, AccountWithSchema):
         pass
 
     def test_parameter_processing(self, session, Account):
