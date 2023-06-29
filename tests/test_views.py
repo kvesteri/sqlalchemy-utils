@@ -8,6 +8,7 @@ from sqlalchemy_utils import (
     refresh_materialized_view
 )
 from sqlalchemy_utils.compat import _select_args
+from sqlalchemy_utils.view import CreateView
 
 
 @pytest.fixture
@@ -15,7 +16,7 @@ def Article(Base, User):
     class Article(Base):
         __tablename__ = 'article'
         id = sa.Column(sa.Integer, primary_key=True)
-        name = sa.Column(sa.String)
+        name = sa.Column(sa.String(128))
         author_id = sa.Column(sa.Integer, sa.ForeignKey(User.id))
         author = sa.orm.relationship(User)
     return Article
@@ -26,7 +27,7 @@ def User(Base):
     class User(Base):
         __tablename__ = 'user'
         id = sa.Column(sa.Integer, primary_key=True)
-        name = sa.Column(sa.String)
+        name = sa.Column(sa.String(128))
     return User
 
 
@@ -121,16 +122,18 @@ class TrivialViewTestCases:
         engine,
         metadata,
         column,
-        cascade_on_drop
+        cascade_on_drop,
+        replace=False,
     ):
-        __table__ = create_view(
+        create_view(
             name='trivial_view',
             selectable=sa.select(*_select_args(column)),
             metadata=metadata,
-            cascade_on_drop=cascade_on_drop
+            cascade_on_drop=cascade_on_drop,
+            replace=replace,
         )
-        __table__.create(engine)
-        __table__.drop(engine)
+        metadata.create_all(engine)
+        metadata.drop_all(engine)
 
 
 class SupportsCascade(TrivialViewTestCases):
@@ -164,13 +167,67 @@ class SupportsNoCascade(TrivialViewTestCases):
         self.life_cycle(engine, Base.metadata, User.id, cascade_on_drop=False)
 
 
+class SupportsReplace(TrivialViewTestCases):
+    def test_life_cycle_replace(
+        self,
+        connection,
+        engine,
+        Base,
+        User
+    ):
+        self.life_cycle(
+            engine,
+            Base.metadata,
+            User.id,
+            cascade_on_drop=False,
+            replace=True,
+        )
+
+    def test_life_cycle_replace_existing(
+        self,
+        connection,
+        engine,
+        Base,
+        User
+    ):
+        create_view(
+            name='trivial_view',
+            selectable=sa.select(*_select_args(User.id)),
+            metadata=Base.metadata,
+        )
+        Base.metadata.create_all(engine)
+        view = CreateView(
+            name='trivial_view',
+            selectable=sa.select(*_select_args(User.id)),
+            replace=True,
+        )
+        with connection.begin():
+            connection.execute(view)
+        Base.metadata.drop_all(engine)
+
+    def test_replace_materialized(
+        self,
+        connection,
+        engine,
+        Base,
+        User
+    ):
+        with pytest.raises(ValueError):
+            CreateView(
+                name='trivial_view',
+                selectable=sa.select(*_select_args(User.id)),
+                materialized=True,
+                replace=True,
+            )
+
+
 @pytest.mark.usefixtures('postgresql_dsn')
-class TestPostgresTrivialView(SupportsCascade, SupportsNoCascade):
+class TestPostgresTrivialView(SupportsCascade, SupportsNoCascade, SupportsReplace):
     pass
 
 
 @pytest.mark.usefixtures('mysql_dsn')
-class TestMySqlTrivialView(SupportsCascade, SupportsNoCascade):
+class TestMySqlTrivialView(SupportsCascade, SupportsNoCascade, SupportsReplace):
     pass
 
 
