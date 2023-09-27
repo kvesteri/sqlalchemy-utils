@@ -41,6 +41,8 @@ class GenericAttributeImpl(attributes.ScalarAttributeImpl):
             # sqlalchemy 1.3
             target = session.query(target_class).get(id)
 
+        # Cache result for after session expires
+        dict_[self.key] = target
         # Return found (or not found) target.
         return target
 
