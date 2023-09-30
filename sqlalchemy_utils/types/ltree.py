@@ -1,5 +1,5 @@
 from sqlalchemy import types
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql import ARRAY, dialect
 from sqlalchemy.dialects.postgresql.base import ischema_names, PGTypeCompiler
 from sqlalchemy.sql import expression
 
@@ -84,6 +84,9 @@ class LtreeType(types.Concatenable, types.UserDefinedType, ScalarCoercible):
         if value:
             return Ltree(value)
 
+    def _default_dialect(self, default=None):
+        return dialect()
+
 
 class LQUERY(types.TypeEngine):
     """Postresql LQUERY type.
@@ -91,12 +94,18 @@ class LQUERY(types.TypeEngine):
     """
     __visit_name__ = 'LQUERY'
 
+    def _default_dialect(self, default=None):
+        return dialect()
+
 
 class LTXTQUERY(types.TypeEngine):
     """Postresql LTXTQUERY type.
     See :class:`LTREE` for details.
     """
     __visit_name__ = 'LTXTQUERY'
+
+    def _default_dialect(self, default=None):
+        return dialect()
 
 
 ischema_names['ltree'] = LtreeType
