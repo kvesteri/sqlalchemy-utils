@@ -13,6 +13,13 @@ from .functions.orm import _get_class_registry
 
 
 class GenericAttributeImpl(attributes.ScalarAttributeImpl):
+    def __init__(self, *args, **kwargs):
+        # arguments received (class, key, dispatch)
+        # The attributes.AttributeImpl requires (class, key, default_function, dispatch)
+        # Setting None as default_function here
+        args = args[:2] + (None, ) + args[2:]
+        super().__init__(*args, **kwargs)
+
     def get(self, state, dict_, passive=attributes.PASSIVE_OFF):
         if self.key in dict_:
             return dict_[self.key]
