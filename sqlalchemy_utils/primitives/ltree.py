@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 import re
+from typing import Any, Iterable, Optional, Union
 
 from ..utils import str_coercible
 
-path_matcher = re.compile(r'^[A-Za-z0-9_]+(\.[A-Za-z0-9_]+)*$')
+path_matcher: re.Pattern = re.compile(r'^[A-Za-z0-9_]+(\.[A-Za-z0-9_]+)*$')
 
 
 @str_coercible
@@ -92,7 +95,7 @@ class Ltree:
         assert Ltree('1.2') + Ltree('1.2') == Ltree('1.2.1.2')
     """
 
-    def __init__(self, path_or_ltree):
+    def __init__(self, path_or_ltree: Union[Ltree, str]) -> None:
         if isinstance(path_or_ltree, Ltree):
             self.path = path_or_ltree.path
         elif isinstance(path_or_ltree, str):
@@ -107,16 +110,16 @@ class Ltree:
             )
 
     @classmethod
-    def validate(cls, path):
+    def validate(cls, path: str) -> None:
         if path_matcher.match(path) is None:
             raise ValueError(
                 f"'{path}' is not a valid ltree path."
             )
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.path.split('.'))
 
-    def index(self, other):
+    def index(self, other: Union[Ltree, str]) -> int:
         subpath = Ltree(other).path.split('.')
         parts = self.path.split('.')
         for index, _ in enumerate(parts):
@@ -124,7 +127,7 @@ class Ltree:
                 return index
         raise ValueError('subpath not found')
 
-    def descendant_of(self, other):
+    def descendant_of(self, other: Union[Ltree, str]) -> bool:
         """
         is left argument a descendant of right (or equal)?
 
@@ -135,7 +138,7 @@ class Ltree:
         subpath = self[:len(Ltree(other))]
         return subpath == other
 
-    def ancestor_of(self, other):
+    def ancestor_of(self, other: Union[Ltree, str]) -> bool:
         """
         is left argument an ancestor of right (or equal)?
 
@@ -146,7 +149,7 @@ class Ltree:
         subpath = Ltree(other)[:len(self)]
         return subpath == self
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: Union[int, slice]) -> Ltree:
         if isinstance(key, int):
             return Ltree(self.path.split('.')[key])
         elif isinstance(key, slice):
@@ -157,7 +160,7 @@ class Ltree:
             )
         )
 
-    def lca(self, *others):
+    def lca(self, *others: Union[Ltree, str]) -> Optional[Ltree]:
         """
         Lowest common ancestor, i.e., longest common prefix of paths
 
@@ -178,13 +181,13 @@ class Ltree:
                     return None
                 return Ltree('.'.join(parts[0:index]))
 
-    def __add__(self, other):
+    def __add__(self, other: Union[Ltree, str]) -> Ltree:
         return Ltree(self.path + '.' + Ltree(other).path)
 
-    def __radd__(self, other):
+    def __radd__(self, other: Union[Ltree, str]) -> Ltree:
         return Ltree(other) + self
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         if isinstance(other, Ltree):
             return self.path == other.path
         elif isinstance(other, str):
@@ -192,19 +195,19 @@ class Ltree:
         else:
             return NotImplemented
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.path)
 
-    def __ne__(self, other):
+    def __ne__(self, other: Any) -> bool:
         return not (self == other)
 
     def __repr__(self):
         return f'{self.__class__.__name__}({self.path!r})'
 
-    def __unicode__(self):
+    def __unicode__(self) -> str:
         return self.path
 
-    def __contains__(self, label):
+    def __contains__(self, label: Iterable) -> bool:
         return label in self.path.split('.')
 
     def __gt__(self, other):
