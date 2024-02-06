@@ -43,7 +43,7 @@ def init_models(Booking):
 
 
 @pytest.mark.skipif('intervals is None')
-class DateRangeTestCase:
+class TestDateRange:
     def test_nullify_range(self, create_booking):
         booking = create_booking(None)
         assert booking.during is None
@@ -91,7 +91,7 @@ class DateRangeTestCase:
 
 
 @pytest.mark.usefixtures('postgresql_dsn')
-class TestDateRangeOnPostgres(DateRangeTestCase):
+class TestDateRangeOnPostgres(TestDateRange):
     @pytest.mark.parametrize(
         ('date_range', 'length'),
         (
