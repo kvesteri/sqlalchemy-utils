@@ -89,6 +89,7 @@ from .types import (  # noqa
     ScalarListException,
     ScalarListType,
     StringEncryptedType,
+    TextEncryptedType,
     TimezoneType,
     TSVectorType,
     URLType,
