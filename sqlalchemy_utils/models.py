@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 
 import sqlalchemy as sa
+from sqlalchemy import func
 
 
 class Timestamp:
@@ -22,8 +23,8 @@ class Timestamp:
             id = sa.Column(sa.Integer, primary_key=True)
     """
 
-    created = sa.Column(sa.DateTime, default=datetime.now(timezone.utc), nullable=False)
-    updated = sa.Column(sa.DateTime, default=datetime.now(timezone.utc), nullable=False)
+    created = sa.Column(sa.DateTime(timezone=True), default=func.now(), nullable=False)
+    updated = sa.Column(sa.DateTime(timezone=True), default=func.now(), nullable=False)
 
 
 @sa.event.listens_for(Timestamp, 'before_update', propagate=True)
