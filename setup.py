@@ -22,7 +22,7 @@ def get_version():
 
 extras_require = {
     'test': [
-        'pytest>=2.7.1',
+        'pytest==7.4.4',
         'Pygments>=1.2',
         'Jinja2>=2.3',
         'docutils>=0.10',
@@ -79,7 +79,7 @@ setup(
         "importlib_metadata ; python_version<'3.8'",
     ],
     extras_require=extras_require,
-    python_requires='>=3.6',
+    python_requires='>=3.7',
     classifiers=[
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
@@ -87,7 +87,6 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
