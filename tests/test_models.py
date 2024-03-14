@@ -1,8 +1,9 @@
+from datetime import datetime, timezone
+
 import pytest
 import sqlalchemy as sa
 import sqlalchemy.orm
 
-from datetime import datetime, timezone
 from sqlalchemy_utils import generic_repr, Timestamp
 
 
