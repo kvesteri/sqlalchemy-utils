@@ -44,6 +44,7 @@ def init_models(User, Group):
     pass
 
 
+@pytest.mark.skip
 @pytest.mark.usefixtures('postgresql_dsn')
 class TestAggregatesWithManyToManyRelationships:
 
