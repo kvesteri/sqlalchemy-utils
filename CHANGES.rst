@@ -3,6 +3,11 @@ Changelog
 
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
+0.41.1 (2024-03-21)
+^^^^^^^^^^^^^^^^^^^
+
+- Fix breaking change introduced on SQLAlchemy 2.0.22 changes to `attributes.AttributeImpl` constructor (#733)
+
 
 0.41.1 (2023-04-27)
 ^^^^^^^^^^^^^^^^^^^
