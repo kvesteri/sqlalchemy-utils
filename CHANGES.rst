@@ -3,6 +3,18 @@ Changelog
 
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
+0.41.2 (2024-03-22)
+^^^^^^^^^^^^^^^^^^^
+
+- Fix breaking change introduced on SQLAlchemy 2.0.22 changes to `attributes.AttributeImpl` constructor (#733)
+
+
+0.41.1 (2023-04-27)
+^^^^^^^^^^^^^^^^^^^
+
+- Use a custom SQL construct for refreshing materialized views in
+  `refresh_materialized_view` (#703)
+
 
 0.41.0 (2023-04-13)
 ^^^^^^^^^^^^^^^^^^^

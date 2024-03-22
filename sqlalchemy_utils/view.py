@@ -1,20 +1,25 @@
 import sqlalchemy as sa
 from sqlalchemy.ext import compiler
 from sqlalchemy.schema import DDLElement, PrimaryKeyConstraint
+from sqlalchemy.sql.expression import ClauseElement, Executable
 
 from sqlalchemy_utils.functions import get_columns
 
 
 class CreateView(DDLElement):
-    def __init__(self, name, selectable, materialized=False):
+    def __init__(self, name, selectable, materialized=False, replace=False):
+        if materialized and replace:
+            raise ValueError("Cannot use CREATE OR REPLACE with materialized views")
         self.name = name
         self.selectable = selectable
         self.materialized = materialized
+        self.replace = replace
 
 
 @compiler.compiles(CreateView)
 def compile_create_materialized_view(element, compiler, **kw):
-    return 'CREATE {}VIEW {} AS {}'.format(
+    return 'CREATE {}{}VIEW {} AS {}'.format(
+        'OR REPLACE ' if element.replace else '',
         'MATERIALIZED ' if element.materialized else '',
         compiler.dialect.identifier_preparer.quote(element.name),
         compiler.sql_compiler.process(element.selectable, literal_binds=True),
@@ -123,7 +128,8 @@ def create_view(
     name,
     selectable,
     metadata,
-    cascade_on_drop=True
+    cascade_on_drop=True,
+    replace=False,
 ):
     """ Create a view on a given metadata
 
@@ -132,6 +138,10 @@ def create_view(
     :param metadata:
         An SQLAlchemy Metadata instance that stores the features of the
         database being described.
+    :param cascade_on_drop: If ``True`` the view will be dropped with
+        ``CASCADE``, deleting all dependent objects as well.
+    :param replace: If ``True`` the view will be created with ``OR REPLACE``,
+        replacing an existing view with the same name.
 
     The process for creating a view is similar to the standard way that a
     table is constructed, except that a selectable is provided instead of
@@ -163,7 +173,11 @@ def create_view(
         metadata=None
     )
 
-    sa.event.listen(metadata, 'after_create', CreateView(name, selectable))
+    sa.event.listen(
+        metadata,
+        'after_create',
+        CreateView(name, selectable, replace=replace),
+    )
 
     @sa.event.listens_for(metadata, 'after_create')
     def create_indexes(target, connection, **kw):
@@ -178,6 +192,22 @@ def create_view(
     return table
 
 
+class RefreshMaterializedView(Executable, ClauseElement):
+    inherit_cache = True
+
+    def __init__(self, name, concurrently):
+        self.name = name
+        self.concurrently = concurrently
+
+
+@compiler.compiles(RefreshMaterializedView)
+def compile_refresh_materialized_view(element, compiler):
+    return 'REFRESH MATERIALIZED VIEW {concurrently}{name}'.format(
+        concurrently='CONCURRENTLY ' if element.concurrently else '',
+        name=compiler.dialect.identifier_preparer.quote(element.name),
+    )
+
+
 def refresh_materialized_view(session, name, concurrently=False):
     """ Refreshes an already existing materialized view
 
@@ -190,9 +220,4 @@ def refresh_materialized_view(session, name, concurrently=False):
     # Since session.execute() bypasses autoflush, we must manually flush in
     # order to include newly-created/modified objects in the refresh.
     session.flush()
-    session.execute(
-        sa.text('REFRESH MATERIALIZED VIEW {}{}'.format(
-            'CONCURRENTLY ' if concurrently else '',
-            session.bind.engine.dialect.identifier_preparer.quote(name)
-        ))
-    )
+    session.execute(RefreshMaterializedView(name, concurrently))

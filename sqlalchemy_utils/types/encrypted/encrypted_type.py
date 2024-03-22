@@ -223,15 +223,15 @@ class FernetEngine(EncryptionDecryptionBaseEngine):
 
 class StringEncryptedType(TypeDecorator, ScalarCoercible):
     """
-    EncryptedType provides a way to encrypt and decrypt values,
+    StringEncryptedType provides a way to encrypt and decrypt values,
     to and from databases, that their type is a basic SQLAlchemy type.
     For example Unicode, String or even Boolean.
     On the way in, the value is encrypted and on the way out the stored value
     is decrypted.
 
-    EncryptedType needs Cryptography_ library in order to work.
+    StringEncryptedType needs Cryptography_ library in order to work.
 
-    When declaring a column which will be of type EncryptedType
+    When declaring a column which will be of type StringEncryptedType
     it is better to be as precise as possible and follow the pattern
     below.
 
@@ -240,11 +240,11 @@ class StringEncryptedType(TypeDecorator, ScalarCoercible):
     ::
 
 
-        a_column = sa.Column(EncryptedType(sa.Unicode,
+        a_column = sa.Column(StringEncryptedType(sa.Unicode,
                                            secret_key,
                                            FernetEngine))
 
-        another_column = sa.Column(EncryptedType(sa.Unicode,
+        another_column = sa.Column(StringEncryptedType(sa.Unicode,
                                            secret_key,
                                            AesEngine,
                                            'pkcs5'))
@@ -264,7 +264,7 @@ class StringEncryptedType(TypeDecorator, ScalarCoercible):
             from sqlalchemy.ext.declarative import declarative_base
         from sqlalchemy.orm import sessionmaker
 
-        from sqlalchemy_utils import EncryptedType
+        from sqlalchemy_utils import StringEncryptedType
         from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
 
         secret_key = 'secretkey1234'
@@ -277,19 +277,19 @@ class StringEncryptedType(TypeDecorator, ScalarCoercible):
         class User(Base):
             __tablename__ = "user"
             id = sa.Column(sa.Integer, primary_key=True)
-            username = sa.Column(EncryptedType(sa.Unicode,
+            username = sa.Column(StringEncryptedType(sa.Unicode,
                                                secret_key,
                                                AesEngine,
                                                'pkcs5'))
-            access_token = sa.Column(EncryptedType(sa.String,
+            access_token = sa.Column(StringEncryptedType(sa.String,
                                                    secret_key,
                                                    AesEngine,
                                                    'pkcs5'))
-            is_active = sa.Column(EncryptedType(sa.Boolean,
+            is_active = sa.Column(StringEncryptedType(sa.Boolean,
                                                 secret_key,
                                                 AesEngine,
                                                 'zeroes'))
-            number_of_accounts = sa.Column(EncryptedType(sa.Integer,
+            number_of_accounts = sa.Column(StringEncryptedType(sa.Integer,
                                                          secret_key,
                                                          AesEngine,
                                                          'oneandzeroes'))
@@ -345,7 +345,7 @@ class StringEncryptedType(TypeDecorator, ScalarCoercible):
         class User(Base):
             __tablename__ = 'user'
             id = sa.Column(sa.Integer, primary_key=True)
-            username = sa.Column(EncryptedType(
+            username = sa.Column(StringEncryptedType(
                 sa.Unicode, get_key))
 
     """
@@ -363,7 +363,7 @@ class StringEncryptedType(TypeDecorator, ScalarCoercible):
         """Initialization."""
         if not cryptography:
             raise ImproperlyConfigured(
-                "'cryptography' is required to use EncryptedType"
+                "'cryptography' is required to use StringEncryptedType"
             )
         super().__init__(**kwargs)
         # set the underlying type
@@ -457,6 +457,11 @@ class StringEncryptedType(TypeDecorator, ScalarCoercible):
 
 
 class EncryptedType(StringEncryptedType):
+    """
+    The 'EncryptedType' class will change implementation from
+    'LargeBinary' to 'String' in a future version. Use
+    'StringEncryptedType' to use the 'String' implementation.
+    """
     impl = LargeBinary
 
     def __init__(self, *args, **kwargs):

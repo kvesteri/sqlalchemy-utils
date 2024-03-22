@@ -13,6 +13,24 @@ from .functions.orm import _get_class_registry
 
 
 class GenericAttributeImpl(attributes.ScalarAttributeImpl):
+    def __init__(self, *args, **kwargs):
+        """
+        The constructor of attributes.AttributeImpl changed in SQLAlchemy 2.0.22,
+        adding a 'default_function' required positional argument before 'dispatch'.
+        This adjustment ensures compatibility across versions by inserting None for
+        'default_function' in versions >= 2.0.22.
+
+        Arguments received: (class, key, dispatch)
+        Required by AttributeImpl: (class, key, default_function, dispatch)
+        Setting None as default_function here.
+        """
+        # Adjust for SQLAlchemy version change
+        sqlalchemy_version = tuple(map(int, sa.__version__.split('.')))
+        if sqlalchemy_version >= (2, 0, 22):
+            args = (*args[:2], None, *args[2:])
+
+        super().__init__(*args, **kwargs)
+
     def get(self, state, dict_, passive=attributes.PASSIVE_OFF):
         if self.key in dict_:
             return dict_[self.key]
