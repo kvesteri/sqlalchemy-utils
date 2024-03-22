@@ -23,14 +23,7 @@ class Timestamp:
     """
 
     created = sa.Column(sa.DateTime, default=datetime.utcnow, nullable=False)
-    updated = sa.Column(sa.DateTime, default=datetime.utcnow, nullable=False)
-
-
-@sa.event.listens_for(Timestamp, 'before_update', propagate=True)
-def timestamp_before_update(mapper, connection, target):
-    # When a model with a timestamp is updated; force update the updated
-    # timestamp.
-    target.updated = datetime.utcnow()
+    updated = sa.Column(sa.DateTime, default=datetime.utcnow, nullable=False, onupdate=datetime.utcnow)
 
 
 NOT_LOADED_REPR = '<not loaded>'
