@@ -163,6 +163,28 @@ class TestPhoneNumberType:
         # the type should be cacheable and not throw exception
         session.execute(query)
 
+    def test_op_like_notlike_and_ilike_notilike(self, session, User):
+        user1 = User(phone_number="040 1234567")
+        user2 = User(phone_number="040 1234568")
+        user3 = User(phone_number="041 1234568")
+
+        session.add_all([user1, user2, user3])
+        session.commit()
+
+        result = session.query(User).filter(User.phone_number.like("%568"))
+        assert len(result.all()) == 2
+
+        result = session.query(User).filter(User.phone_number.notlike("+1040%"))
+        assert len(result.all()) == 1
+        assert result[0] == user3
+
+        result = session.query(User).filter(User.phone_number.ilike("%568"))
+        assert len(result.all()) == 2
+
+        result = session.query(User).filter(User.phone_number.notilike("+1040%"))
+        assert len(result.all()) == 1
+        assert result[0] == user3
+
 
 @pytest.mark.skipif("types.phone_number.phonenumbers is None")
 class TestPhoneNumberComposite:
