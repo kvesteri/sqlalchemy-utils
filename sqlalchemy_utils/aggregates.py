@@ -534,6 +534,10 @@ class AggregationManager:
                 )
 
     def construct_aggregate_queries(self, session, ctx):
+        if not self.generator_registry:
+            # short-circuit looping through objects if there are no aggregates defined
+            return
+
         object_dict = defaultdict(list)
         for obj in session:
             for class_ in self.generator_registry:
