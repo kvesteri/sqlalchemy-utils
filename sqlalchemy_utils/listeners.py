@@ -241,7 +241,7 @@ def auto_delete_orphans(attr):
     parent_class = attr.parent.class_
     target_class = attr.property.mapper.class_
 
-    backref = attr.property.backref
+    backref = attr.property.backref or attr.property.back_populates
     if not backref:
         raise ImproperlyConfigured(
             'The relationship argument given for auto_delete_orphans needs to '
