@@ -1,10 +1,5 @@
 import re
-import sys
-
-if sys.version_info >= (3, 8):
-    from importlib.metadata import metadata
-else:
-    from importlib_metadata import metadata
+from importlib.metadata import metadata
 
 
 def get_sqlalchemy_version(version=metadata("sqlalchemy")["Version"]):
