@@ -602,8 +602,10 @@ def drop_database(url):
 
     :param url: A SQLAlchemy engine URL.
 
-    Works similar to the :ref:`create_database` method in that both url text
-    and a constructed url are accepted. ::
+    Works similar to the :func:`create_database` method in that both url text
+    and a constructed url are accepted.
+
+    ::
 
         drop_database('postgresql://postgres@localhost/name')
         drop_database(engine.url)

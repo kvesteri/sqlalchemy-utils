@@ -150,7 +150,7 @@ Category has many Products.
 
 
 Observing multiple columns
------------------------
+--------------------------
 
 You can also observe multiple columns by specifying all the observable columns
 in the decorator.
@@ -360,9 +360,9 @@ def observes(*paths, **observer_kw):
 
     .. versionadded: 0.28.0
 
-    :param *paths: One or more dot-notated property paths, eg.
+    :param paths: One or more dot-notated property paths, eg.
        'categories.products.price'
-    :param **observer: A dictionary where value for key 'observer' contains
+    :param observer_kw: A dictionary where value for key 'observer' contains
        :meth:`PropertyObserver` object
     """
     observer_ = observer_kw.pop('observer', observer)

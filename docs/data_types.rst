@@ -74,12 +74,11 @@ EmailType
 EncryptedType
 -------------
 
-.. module:: sqlalchemy_utils.types.encrypted.encrypted_type
-
 .. deprecated:: 0.36.6
     Use StringEncryptedType instead
 
-.. autoclass:: EncryptedType
+.. autoclass:: sqlalchemy_utils.types.encrypted.encrypted_type.EncryptedType
+
 
 JSONType
 --------

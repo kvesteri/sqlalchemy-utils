@@ -4,8 +4,6 @@ Range data types
 .. automodule:: sqlalchemy_utils.types.range
 
 
-
-
 DateRangeType
 -------------
 
