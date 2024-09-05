@@ -197,20 +197,22 @@ class RangeComparator(types.TypeEngine.Comparator):
 
     def __rshift__(self, other, **kwargs):
         """
-        Returns whether or not given interval is strictly right of another
-        interval.
+        Returns whether or not given interval is strictly right of another interval.
 
-        [a, b] >> [c, d]        True, if a > d
+        ..  code-block::
+
+            [a, b] >> [c, d]        True, if a > d
         """
         other = self.coerce_arg(other)
         return self.op('>>')(other)
 
     def __lshift__(self, other, **kwargs):
         """
-        Returns whether or not given interval is strictly left of another
-        interval.
+        Returns whether or not given interval is strictly left of another interval.
 
-        [a, b] << [c, d]        True, if b < c
+        ..  code-block::
+
+            [a, b] << [c, d]        True, if b < c
         """
         other = self.coerce_arg(other)
         return self.op('<<')(other)

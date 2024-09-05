@@ -106,9 +106,9 @@ class GenericRelationshipProperty(MapperProperty):
     """A generic form of the relationship property.
 
     Creates a 1 to many relationship between the parent model
-    and any other models using a descriminator (the table name).
+    and any other models using a discriminator (the table name).
 
-    :param discriminator
+    :param discriminator:
         Field to discriminate which model we are referring to.
     :param id:
         Field to point to the model we are referring to.

@@ -77,3 +77,16 @@ jobs:
         env:
           SQLALCHEMY_UTILS_TEST_POSTGRESQL_PASSWORD: postgres
         run: tox -e ${{ matrix.tox_env }}
+
+  docs:
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install tox
+        run: pip install tox
+      - name: Build documentation
+        run: tox -e docs
