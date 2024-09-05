@@ -146,7 +146,6 @@ class PasswordType(ScalarCoercible, types.TypeDecorator):
     """
 
     impl = types.VARBINARY(1024)
-    python_type = Password
     cache_ok = True
 
     def __init__(self, max_length=None, **kwargs):

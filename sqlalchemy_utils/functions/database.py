@@ -80,10 +80,11 @@ def json_sql(value, scalars_to_json=True):
     :param value:
         value to be converted to SQLAlchemy PostgreSQL function constructs
     """
-    scalar_convert = sa.text
     if scalars_to_json:
         def scalar_convert(a):
             return sa.func.to_json(sa.text(a))
+    else:
+        scalar_convert = sa.text
 
     if isinstance(value, Mapping):
         return sa.func.json_build_object(
@@ -152,10 +153,11 @@ def jsonb_sql(value, scalars_to_jsonb=True):
     :boolean jsonbb:
         Flag to alternatively convert the return with a to_jsonb construct
     """
-    scalar_convert = sa.text
     if scalars_to_jsonb:
         def scalar_convert(a):
             return sa.func.to_jsonb(sa.text(a))
+    else:
+        scalar_convert = sa.text
 
     if isinstance(value, Mapping):
         return sa.func.jsonb_build_object(
