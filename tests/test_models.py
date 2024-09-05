@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 import pytest
 import sqlalchemy as sa
@@ -17,13 +17,14 @@ class TestTimestamp:
         return Article
 
     def test_created(self, session, Article):
-        then = datetime.utcnow()
+        then = datetime.now(tz=timezone.utc).replace(tzinfo=None)
         article = Article()
 
         session.add(article)
         session.commit()
 
-        assert article.created >= then and article.created <= datetime.utcnow()
+        assert article.created >= then
+        assert article.created <= datetime.now(tz=timezone.utc).replace(tzinfo=None)
 
     def test_updated(self, session, Article):
         article = Article()
@@ -31,12 +32,13 @@ class TestTimestamp:
         session.add(article)
         session.commit()
 
-        then = datetime.utcnow()
+        then = datetime.now(tz=timezone.utc).replace(tzinfo=None)
         article.name = "Something"
 
         session.commit()
 
-        assert article.updated >= then and article.updated <= datetime.utcnow()
+        assert article.updated >= then
+        assert article.updated <= datetime.now(tz=timezone.utc).replace(tzinfo=None)
 
 
 class TestGenericRepr:
