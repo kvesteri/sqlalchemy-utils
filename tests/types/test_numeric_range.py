@@ -4,7 +4,6 @@ import pytest
 import sqlalchemy as sa
 
 from sqlalchemy_utils import NumericRangeType
-from sqlalchemy_utils.compat import _select_args
 
 intervals = None
 inf = 0
@@ -91,7 +90,7 @@ class NumericRangeTestCase:
         assert car.price_range.upper == 15
 
     def test_compilation(self, session, Car):
-        query = sa.select(*_select_args(Car.price_range))
+        query = sa.select(Car.price_range)
 
         # the type should be cacheable and not throw exception
         session.execute(query)

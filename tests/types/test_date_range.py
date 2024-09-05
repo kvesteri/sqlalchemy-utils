@@ -4,7 +4,6 @@ import pytest
 import sqlalchemy as sa
 
 from sqlalchemy_utils import DateRangeType
-from sqlalchemy_utils.compat import _select_args
 
 intervals = None
 inf = 0
@@ -84,7 +83,7 @@ class DateRangeTestCase:
         assert booking.during.upper == datetime(2015, 1, 1).date()
 
     def test_compilation(self, session, Booking):
-        query = sa.select(*_select_args(Booking.during))
+        query = sa.select(Booking.during)
 
         # the type should be cacheable and not throw exception
         session.execute(query)

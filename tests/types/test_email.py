@@ -2,7 +2,6 @@ import pytest
 import sqlalchemy as sa
 
 from sqlalchemy_utils import EmailType
-from sqlalchemy_utils.compat import _select_args
 
 
 @pytest.fixture
@@ -37,6 +36,6 @@ class TestEmailType:
         assert User.short_email.type.impl.length == 70
 
     def test_compilation(self, User, session):
-        query = sa.select(*_select_args(User.email))
+        query = sa.select(User.email)
         # the type should be cacheable and not throw exception
         session.execute(query)

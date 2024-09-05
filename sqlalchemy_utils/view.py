@@ -160,8 +160,6 @@ def create_view(
             )
 
         premium_members = select(users).where(users.c.premium_user == True)
-        # sqlalchemy 1.3:
-        # premium_members = select([users]).where(users.c.premium_user == True)
         create_view('premium_users', premium_members, metadata)
 
         metadata.create_all(engine) # View is created at this point

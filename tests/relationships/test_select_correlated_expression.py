@@ -3,7 +3,6 @@ import sqlalchemy as sa
 import sqlalchemy.orm
 from sqlalchemy.ext.hybrid import hybrid_property
 
-from sqlalchemy_utils.compat import _select_args, get_scalar_subquery
 from sqlalchemy_utils.relationships import select_correlated_expression
 
 
@@ -68,14 +67,14 @@ def User(Base, group_user_tbl, friendship_tbl):
         )
 
     friendship_union = (
-        sa.select(*_select_args(
+        sa.select(
             friendship_tbl.c.friend_a_id,
             friendship_tbl.c.friend_b_id,
-        )).union(
-            sa.select(*_select_args(
+        ).union(
+            sa.select(
                 friendship_tbl.c.friend_b_id,
                 friendship_tbl.c.friend_a_id,
-            ))
+            )
         ).alias()
     )
 
@@ -157,11 +156,10 @@ def Comment(Base, Article, User):
         author = sa.orm.relationship(User, backref='comments')
 
     Article.comment_count = sa.orm.column_property(
-        get_scalar_subquery(
-            sa.select(*_select_args(sa.func.count(Comment.id)))
-            .where(Comment.article_id == Article.id)
-            .correlate_except(Article)
-        )
+        sa.select(sa.func.count(Comment.id))
+        .where(Comment.article_id == Article.id)
+        .correlate_except(Article)
+        .scalar_subquery()
     )
 
     return Comment

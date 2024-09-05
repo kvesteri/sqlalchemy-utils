@@ -5,7 +5,6 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 from sqlalchemy_utils import UUIDType
-from sqlalchemy_utils.compat import _select_args
 
 
 @pytest.fixture
@@ -59,7 +58,7 @@ class TestUUIDType:
         assert obj.id.bytes == identifier
 
     def test_compilation(self, User, session):
-        query = sa.select(*_select_args(User.id))
+        query = sa.select(User.id)
 
         # the type should be cacheable and not throw exception
         session.execute(query)

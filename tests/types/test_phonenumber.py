@@ -8,7 +8,6 @@ from sqlalchemy_utils import (  # noqa
     PhoneNumberType,
     types
 )
-from sqlalchemy_utils.compat import _select_args
 
 VALID_PHONE_NUMBERS = (
     "040 1234567",
@@ -159,7 +158,7 @@ class TestPhoneNumberType:
         assert isinstance(user.phone_number, PhoneNumber)
 
     def test_compilation(self, User, session):
-        query = sa.select(*_select_args(User.phone_number))
+        query = sa.select(User.phone_number)
         # the type should be cacheable and not throw exception
         session.execute(query)
 

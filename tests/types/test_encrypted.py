@@ -205,11 +205,7 @@ def user(
     session.add(user)
     session.commit()
 
-    try:
-        return session.get(User, user.id)
-    except AttributeError:
-        # sqlalchemy 1.3
-        return session.query(User).get(user.id)
+    return session.get(User, user.id)
 
 
 @pytest.fixture
@@ -320,11 +316,7 @@ class EncryptedTypeTestCase:
             id=team_1_id
         ).one()[0]
 
-        try:
-            team = session.get(Team, team_1_id)
-        except AttributeError:
-            # sqlalchemy 1.3
-            team = session.query(Team).get(team_1_id)
+        team = session.get(Team, team_1_id)
 
         assert team.name == 'One'
 
@@ -334,11 +326,7 @@ class EncryptedTypeTestCase:
             id=team_2_id
         ).one()[0]
 
-        try:
-            team = session.get(Team, team_2_id)
-        except AttributeError:
-            # sqlalchemy 1.3
-            team = session.query(Team).get(team_2_id)
+        team = session.get(Team, team_2_id)
 
         assert team.name == 'Two'
 
