@@ -1,7 +1,6 @@
 import pytest
 import sqlalchemy as sa
 
-from sqlalchemy_utils.compat import _select_args
 from sqlalchemy_utils.types import ip_address
 
 
@@ -36,6 +35,6 @@ class TestIPAddressType:
         assert str(visitor.ip_address) == '111.111.111.111'
 
     def test_compilation(self, Visitor, session):
-        query = sa.select(*_select_args(Visitor.ip_address))
+        query = sa.select(Visitor.ip_address)
         # the type should be cacheable and not throw exception
         session.execute(query)

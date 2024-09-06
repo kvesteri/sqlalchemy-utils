@@ -1,7 +1,6 @@
 import pytest
 import sqlalchemy as sa
 
-from sqlalchemy_utils.compat import _select_args
 from sqlalchemy_utils.types import locale
 
 
@@ -62,7 +61,7 @@ class TestLocaleType:
         assert compiled == '"user".locale = \'en_US\''
 
     def test_compilation(self, User, session):
-        query = sa.select(*_select_args(User.locale))
+        query = sa.select(User.locale)
 
         # the type should be cacheable and not throw exception
         session.execute(query)

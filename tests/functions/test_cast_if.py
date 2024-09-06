@@ -3,16 +3,11 @@ import sqlalchemy as sa
 import sqlalchemy.orm
 
 from sqlalchemy_utils import cast_if
-from sqlalchemy_utils.compat import (
-    _declarative_base,
-    _select_args,
-    get_scalar_subquery
-)
 
 
 @pytest.fixture(scope='class')
 def base():
-    return _declarative_base()
+    return sqlalchemy.orm.declarative_base()
 
 
 @pytest.fixture(scope='class')
@@ -44,7 +39,7 @@ class TestCastIf:
         assert cast_if(expr, sa.String) is expr
 
     def test_scalar_selectable(self, article_cls):
-        expr = get_scalar_subquery(sa.select(*_select_args(article_cls.id)))
+        expr = sa.select(article_cls.id).scalar_subquery()
         assert cast_if(expr, sa.Integer) is expr
 
     def test_scalar(self):

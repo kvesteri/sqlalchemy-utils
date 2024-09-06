@@ -143,8 +143,6 @@ def auto_delete_orphans(attr):
         from sqlalchemy.ext.associationproxy import association_proxy
         from sqlalchemy import *
         from sqlalchemy.orm import *
-        # Necessary in sqlalchemy 1.3:
-        # from sqlalchemy.ext.declarative import declarative_base
         from sqlalchemy import event
 
 

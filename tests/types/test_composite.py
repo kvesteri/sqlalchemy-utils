@@ -436,12 +436,7 @@ class TestCompositeTypeWithMixedCase:
         sa.orm.configure_mappers()
 
         Session = sessionmaker(bind=connection)
-        try:
-            # Enable sqlalchemy 2.0 behavior
-            session = Session(future=True)
-        except TypeError:
-            # sqlalchemy 1.3
-            session = Session()
+        session = Session(future=True)
         session.execute(
             sa.text('CREATE TYPE "MoneyType" AS (currency VARCHAR, amount INTEGER)')
         )

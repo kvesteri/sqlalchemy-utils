@@ -53,11 +53,7 @@ class GenericAttributeImpl(attributes.ScalarAttributeImpl):
 
         id = self.get_state_id(state)
 
-        try:
-            target = session.get(target_class, id)
-        except AttributeError:
-            # sqlalchemy 1.3
-            target = session.query(target_class).get(id)
+        target = session.get(target_class, id)
 
         # Return found (or not found) target.
         return target

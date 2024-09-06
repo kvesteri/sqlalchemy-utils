@@ -2,7 +2,6 @@ import pytest
 import sqlalchemy as sa
 
 from sqlalchemy_utils import Currency, CurrencyType, i18n
-from sqlalchemy_utils.compat import _select_args
 
 
 @pytest.fixture
@@ -55,6 +54,6 @@ class TestCurrencyType:
         assert compiled == '"user".currency = \'USD\''
 
     def test_compilation(self, User, session):
-        query = sa.select(*_select_args(User.currency))
+        query = sa.select(User.currency)
         # the type should be cacheable and not throw exception
         session.execute(query)

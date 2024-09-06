@@ -2,7 +2,6 @@ import pytest
 import sqlalchemy as sa
 
 from sqlalchemy_utils import jsonb_sql
-from sqlalchemy_utils.compat import _select_args
 
 
 @pytest.mark.usefixtures('postgresql_dsn')
@@ -22,12 +21,12 @@ class TestJSONBSQL:
             ([1, 2], [1, 2]),
             ([], []),
             (
-                [sa.select(*_select_args(sa.text('1'))).label('alias')],
+                [sa.select(sa.text('1')).label('alias')],
                 [1]
             )
         )
     )
     def test_compiled_scalars(self, connection, value, result):
         assert result == (
-            connection.execute(sa.select(*_select_args(jsonb_sql(value)))).fetchone()[0]
+            connection.execute(sa.select(jsonb_sql(value))).fetchone()[0]
         )

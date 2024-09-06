@@ -1,7 +1,6 @@
 import pytest
 import sqlalchemy as sa
 
-from sqlalchemy_utils.compat import _select_args
 from sqlalchemy_utils.functions import (
     mock_engine,
     render_expression,
@@ -40,7 +39,7 @@ class TestRender:
         assert 'WHERE user.id = 3' in text
 
     def test_render_statement_without_mapper(self, session):
-        statement = sa.select(*_select_args(sa.text('1')))
+        statement = sa.select(sa.text('1'))
         text = render_statement(statement, bind=session.bind)
 
         assert 'SELECT 1' in text

@@ -371,7 +371,6 @@ import sqlalchemy.orm
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.sql.functions import _FunctionGenerator
 
-from .compat import _select_args, get_scalar_subquery
 from .functions.orm import get_column_key
 from .relationships import (
     chained_join,
@@ -455,7 +454,7 @@ class AggregatedValue:
             self.relationships[0].mapper.class_
         )
 
-        return get_scalar_subquery(query)
+        return query.scalar_subquery()
 
     def update_query(self, objects):
         table = self.class_.__table__
@@ -490,7 +489,7 @@ class AggregatedValue:
                 return query.where(
                     local.in_(
                         sa.select(
-                            *_select_args(remote)
+                            remote
                         ).select_from(
                             chained_join(*reversed(self.relationships))
                         ).where(

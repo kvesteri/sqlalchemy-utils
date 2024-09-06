@@ -2,7 +2,6 @@ import pytest
 import sqlalchemy as sa
 
 from sqlalchemy_utils import IntRangeType
-from sqlalchemy_utils.compat import _select_args, get_scalar_subquery
 
 intervals = None
 inf = -1
@@ -101,7 +100,7 @@ class NumberRangeTestCase:
         assert building.persons_at_night.upper == 15
 
     def test_compilation(self, session, Building):
-        query = sa.select(*_select_args(Building.persons_at_night))
+        query = sa.select(Building.persons_at_night)
 
         # the type should be cacheable and not throw exception
         session.execute(query)
@@ -290,7 +289,7 @@ class TestIntRangeTypeOnPostgres(NumberRangeTestCase):
             session.query(Building)
             .filter(
                 Building.persons_at_night ==
-                get_scalar_subquery(session.query(Building.persons_at_night))
+                session.query(Building.persons_at_night).scalar_subquery()
             ).order_by(Building.persons_at_night).limit(1)
         )
         assert query.count()
