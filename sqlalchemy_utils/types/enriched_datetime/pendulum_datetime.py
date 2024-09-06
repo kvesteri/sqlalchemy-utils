@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime
 
 from ...exceptions import ImproperlyConfigured
 
@@ -24,26 +24,20 @@ class PendulumDateTime:
                 value = pendulum.from_timestamp(value)
             elif isinstance(value, str) and value.isdigit():
                 value = pendulum.from_timestamp(int(value))
-            elif isinstance(value, datetime):
-                value = pendulum.datetime(
-                    value.year,
-                    value.month,
-                    value.day,
-                    value.hour,
-                    value.minute,
-                    value.second,
-                    value.microsecond
-                )
+            elif isinstance(value, datetime.datetime):
+                value = pendulum.DateTime.instance(value)
             else:
                 value = pendulum.parse(value)
         return value
 
     def process_bind_param(self, impl, value, dialect):
         if value:
-            return self._coerce(impl, value).in_tz('UTC')
+            return self._coerce(impl, value).in_tz('UTC').naive()
         return value
 
     def process_result_value(self, impl, value, dialect):
         if value:
-            return pendulum.parse(value.isoformat())
+            return pendulum.DateTime.instance(
+                value.replace(tzinfo=datetime.timezone.utc)
+            )
         return value

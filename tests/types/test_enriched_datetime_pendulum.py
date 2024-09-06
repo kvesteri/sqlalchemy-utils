@@ -66,6 +66,15 @@ class TestPendulumDateTimeType:
         session.commit()
         assert user.created_at == time
 
+    @pytest.mark.usefixtures('postgresql_dsn')
+    def test_utc_postgres(self, session, User):
+        time = pendulum_datetime.pendulum.now("UTC")
+        user = User(created_at=time)
+        session.add(user)
+        assert user.created_at == time
+        session.commit()
+        assert user.created_at == time
+
     def test_other_tz(self, session, User):
         time = pendulum_datetime.pendulum.now("UTC")
         local = time.in_tz('Asia/Tokyo')
