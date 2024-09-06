@@ -1,4 +1,14 @@
-import importlib.metadata
+import pathlib
+
+
+def get_version() -> str:
+    path = pathlib.Path(__file__).parent.parent / "sqlalchemy_utils/__init__.py"
+    content = path.read_text()
+    for line in content.splitlines():
+        if line.strip().startswith("__version__"):
+            _, _, version_ = line.partition("=")
+            return version_.strip("'\" ")
+
 
 # -- General configuration -----------------------------------------------------
 
@@ -24,7 +34,7 @@ master_doc = "index"
 project = "SQLAlchemy-Utils"
 copyright = "2013-2022, Konsta Vesterinen"
 
-version = importlib.metadata.version("sqlalchemy_utils")
+version = get_version()
 release = version
 
 # List of patterns, relative to source directory, that match files and
