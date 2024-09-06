@@ -37,5 +37,7 @@ class PendulumDateTime:
 
     def process_result_value(self, impl, value, dialect):
         if value:
-            return pendulum.DateTime.instance(value.replace(tzinfo=datetime.timezone.utc))
+            return pendulum.DateTime.instance(
+                value.replace(tzinfo=datetime.timezone.utc)
+            )
         return value
