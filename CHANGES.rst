@@ -12,6 +12,7 @@ Unreleased changes
 - Add a Read the Docs configuration file.
 - Make documentation builds reproducible.
 - Test documentation builds in CI.
+- Fix Pendulum parsing of datetime instances with timezones. (#755)
 
 0.41.2 (2024-03-22)
 ^^^^^^^^^^^^^^^^^^^
