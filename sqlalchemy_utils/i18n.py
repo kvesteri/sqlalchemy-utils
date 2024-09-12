@@ -98,6 +98,7 @@ class TranslationHybrid:
                 setattr(obj, attr.key, {})
             locale = cast_locale(obj, self.current_locale, attr)
             getattr(obj, attr.key)[locale] = value
+            sa.orm.attributes.flag_modified(obj, attr.key)
         return setter
 
     def expr_factory(self, attr):
