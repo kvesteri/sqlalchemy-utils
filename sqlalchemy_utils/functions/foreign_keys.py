@@ -88,12 +88,11 @@ def get_referencing_foreign_keys(mixed):
     referencing_foreign_keys = set()
 
     for table in mixed.metadata.tables.values():
-        if table not in tables:
-            for constraint in table.constraints:
-                if isinstance(constraint, sa.sql.schema.ForeignKeyConstraint):
-                    for fk in constraint.elements:
-                        if any(fk.references(t) for t in tables):
-                            referencing_foreign_keys.add(fk)
+        for constraint in table.constraints:
+            if isinstance(constraint, sa.sql.schema.ForeignKeyConstraint):
+                for fk in constraint.elements:
+                    if any(fk.references(t) for t in tables):
+                        referencing_foreign_keys.add(fk)
     return referencing_foreign_keys
 
 
