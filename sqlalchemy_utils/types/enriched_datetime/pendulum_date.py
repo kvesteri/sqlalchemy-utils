@@ -1,3 +1,5 @@
+from sqlalchemy import types
+
 from ...exceptions import ImproperlyConfigured
 from .pendulum_datetime import PendulumDateTime
 
@@ -9,24 +11,22 @@ except ImportError:
 
 
 class PendulumDate(PendulumDateTime):
-    def __init__(self):
-        if not pendulum:
-            raise ImproperlyConfigured(
-                "'pendulum' package is required to use 'PendulumDate'"
-            )
 
-    def _coerce(self, impl, value):
+    cache_ok = True
+    impl = types.Date
+
+    def _coerce(self, value):
         if value:
             if not isinstance(value, pendulum.Date):
-                value = super()._coerce(impl, value).date()
+                value = super()._coerce(value).date()
         return value
 
-    def process_result_value(self, impl, value, dialect):
+    def process_result_value(self, value, dialect):
         if value:
             return pendulum.parse(value.isoformat()).date()
         return value
 
-    def process_bind_param(self, impl, value, dialect):
+    def process_bind_param(self, value, dialect):
         if value:
-            return self._coerce(impl, value)
+            return self._coerce(value)
         return value

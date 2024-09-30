@@ -3,10 +3,12 @@ from datetime import date
 import pytest
 import sqlalchemy as sa
 
-from sqlalchemy_utils.types.enriched_datetime import (
-    enriched_date_type,
-    pendulum_date
-)
+from sqlalchemy_utils.types.enriched_datetime import PendulumDate
+
+try:
+    import pendulum
+except ImportError:
+    pendulum = None
 
 
 @pytest.fixture
@@ -14,11 +16,7 @@ def User(Base):
     class User(Base):
         __tablename__ = 'users'
         id = sa.Column(sa.Integer, primary_key=True)
-        birthday = sa.Column(
-            enriched_date_type.EnrichedDateType(
-                date_processor=pendulum_date.PendulumDate
-            )
-        )
+        birthday = sa.Column(PendulumDate())
     return User
 
 
@@ -27,11 +25,11 @@ def init_models(User):
     pass
 
 
-@pytest.mark.skipif('pendulum_date.pendulum is None')
+@pytest.mark.skipif('pendulum is None')
 class TestPendulumDateType:
     def test_parameter_processing(self, session, User):
         user = User(
-            birthday=pendulum_date.pendulum.date(1995, 7, 11)
+            birthday=pendulum.date(1995, 7, 11)
         )
 
         session.add(user)
@@ -53,7 +51,7 @@ class TestPendulumDateType:
         assert user.birthday.year == 2013
 
     def test_utc(self, session, User):
-        time = pendulum_date.pendulum.now("UTC")
+        time = pendulum.now("UTC")
         user = User(birthday=time)
         session.add(user)
         assert user.birthday == time
