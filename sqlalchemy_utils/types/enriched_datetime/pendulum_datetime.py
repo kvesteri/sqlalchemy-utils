@@ -1,5 +1,8 @@
 import datetime
 
+from sqlalchemy import types
+
+from ..scalar_coercible import ScalarCoercible
 from ...exceptions import ImproperlyConfigured
 
 pendulum = None
@@ -9,14 +12,38 @@ except ImportError:
     pass
 
 
-class PendulumDateTime:
-    def __init__(self):
+class PendulumDateTime(types.TypeDecorator, ScalarCoercible):
+    """Datetime column that uses PendulumDateTime as values.
+
+    Example::
+
+
+        from sqlalchemy_utils.enriched_datetime import PendulumDateTime
+        import pendulum
+
+        class User(Base):
+            __tablename__ = 'user'
+            id = sa.Column(sa.Integer, primary_key=True)
+            created_at = sa.Column(PendulumDateTime)
+
+        user = User()
+        user.created_at = pendulum.now()
+        session.add(user)
+        session.commit()
+    """
+
+    impl = types.DateTime
+    cache_ok = True
+
+    def __init__(self, *args, **kwargs):
         if not pendulum:
             raise ImproperlyConfigured(
                 "'pendulum' package is required to use 'PendulumDateTime'"
             )
+        super().__init__(*args, **kwargs)
 
-    def _coerce(self, impl, value):
+
+    def _coerce(self, value):
         if value is not None:
             if isinstance(value, pendulum.DateTime):
                 pass
@@ -30,14 +57,17 @@ class PendulumDateTime:
                 value = pendulum.parse(value)
         return value
 
-    def process_bind_param(self, impl, value, dialect):
+    def process_bind_param(self, value, dialect):
         if value:
-            return self._coerce(impl, value).in_tz('UTC').naive()
+            return self._coerce(value).in_tz('UTC').naive()
         return value
 
-    def process_result_value(self, impl, value, dialect):
+    def process_result_value(self, value, dialect):
         if value:
             return pendulum.DateTime.instance(
                 value.replace(tzinfo=datetime.timezone.utc)
             )
+        return value
+
+    def process_literal_param(self, value, dialect):
         return value
