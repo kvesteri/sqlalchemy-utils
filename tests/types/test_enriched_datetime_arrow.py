@@ -11,6 +11,7 @@ try:
 except ImportError:
     arrow = None
 
+
 @pytest.fixture
 def Article(Base):
     class Article(Base):
@@ -71,8 +72,7 @@ class TestArrowDateTimeType:
     @pytest.mark.usefixtures('postgresql_dsn')
     def test_timezone(self, session, Article):
         timezone = tz.gettz('Europe/Stockholm')
-        dt = arrow.get(datetime(2015, 1, 1, 15, 30, 45),
-                                      timezone)
+        dt = arrow.get(datetime(2015, 1, 1, 15, 30, 45), timezone)
         article = Article(published_at=dt, published_at_dt=dt.datetime)
 
         session.add(article)

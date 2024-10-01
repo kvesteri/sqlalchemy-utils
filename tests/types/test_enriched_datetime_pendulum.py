@@ -10,6 +10,7 @@ try:
 except ImportError:
     pendulum = None
 
+
 @pytest.fixture
 def User(Base):
     class User(Base):

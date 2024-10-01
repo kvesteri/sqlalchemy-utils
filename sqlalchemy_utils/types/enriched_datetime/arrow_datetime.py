@@ -3,8 +3,8 @@ from datetime import datetime
 
 from sqlalchemy import types
 
-from ..scalar_coercible import ScalarCoercible
 from ...exceptions import ImproperlyConfigured
+from ..scalar_coercible import ScalarCoercible
 
 arrow = None
 try:
