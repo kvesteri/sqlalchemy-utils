@@ -1,1 +1,1 @@
-from .enriched_datetime import ArrowDateTime as ArrowType
+from .enriched_datetime import ArrowDateTime as ArrowType  # noqa

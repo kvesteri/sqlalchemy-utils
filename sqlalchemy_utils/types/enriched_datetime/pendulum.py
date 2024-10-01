@@ -2,8 +2,8 @@ import datetime
 
 from sqlalchemy import types
 
-from ..scalar_coercible import ScalarCoercible
 from ...exceptions import ImproperlyConfigured
+from ..scalar_coercible import ScalarCoercible
 
 pendulum = None
 try:
@@ -41,7 +41,6 @@ class PendulumDateTime(types.TypeDecorator, ScalarCoercible):
                 "'pendulum' package is required to use 'PendulumDateTime'"
             )
         super().__init__(*args, **kwargs)
-
 
     def _coerce(self, value):
         if value is not None:
