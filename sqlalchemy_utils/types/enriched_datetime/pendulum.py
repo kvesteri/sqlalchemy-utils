@@ -71,3 +71,25 @@ class PendulumDateTime(types.TypeDecorator, ScalarCoercible):
 
     def process_literal_param(self, value, dialect):
         return value
+
+
+class PendulumDate(PendulumDateTime):
+
+    cache_ok = True
+    impl = types.Date
+
+    def _coerce(self, value):
+        if value:
+            if not isinstance(value, pendulum.Date):
+                value = super()._coerce(value).date()
+        return value
+
+    def process_result_value(self, value, dialect):
+        if value:
+            return pendulum.parse(value.isoformat()).date()
+        return value
+
+    def process_bind_param(self, value, dialect):
+        if value:
+            return self._coerce(value)
+        return value
