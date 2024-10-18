@@ -14,6 +14,7 @@ from .encrypted.encrypted_type import (  # noqa
 )
 from .enriched_datetime.enriched_date_type import EnrichedDateType  # noqa
 from .ip_address import IPAddressType  # noqa
+from .eui import EUIType
 from .json import JSONType  # noqa
 from .locale import LocaleType  # noqa
 from .ltree import LtreeType  # noqa

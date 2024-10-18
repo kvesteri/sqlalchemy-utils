@@ -70,6 +70,7 @@ from .types import (  # noqa
     EncryptedType,
     EnrichedDateTimeType,
     EnrichedDateType,
+    EUIType,
     instrumented_list,
     InstrumentedList,
     Int8RangeType,
