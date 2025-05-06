@@ -655,6 +655,18 @@ def drop_database(url):
             # Drop the database.
             text = f'DROP DATABASE {quote(conn, database)}'
             conn.execute(sa.text(text))
+    elif dialect_name == 'mssql':
+        with engine.begin() as conn:
+            # Set the database to single user mode to disconnect all users
+            text = f'''
+            ALTER DATABASE {quote(conn, database)}
+            SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+            '''
+            conn.execute(sa.text(text))
+
+            # Drop the database
+            text = f'DROP DATABASE {quote(conn, database)}'
+            conn.execute(sa.text(text))
     else:
         with engine.begin() as conn:
             text = f'DROP DATABASE {quote(conn, database)}'

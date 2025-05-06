@@ -110,13 +110,13 @@ def mssql_db_password():
 @pytest.fixture
 def mssql_db_driver():
     driver = os.environ.get('SQLALCHEMY_UTILS_TEST_MSSQL_DRIVER',
-                            'ODBC Driver 17 for SQL Server')
+                            'ODBC Driver 18 for SQL Server')
     return driver.replace(' ', '+')
 
 
 @pytest.fixture
 def mssql_dsn(mssql_db_user, mssql_db_password, mssql_db_driver, db_name):
-    return 'mssql+pyodbc://{}:{}@localhost/{}?driver={}'\
+    return 'mssql+pyodbc://{}:{}@localhost/{}?driver={}&TrustServerCertificate=yes'\
         .format(mssql_db_user, mssql_db_password, db_name, mssql_db_driver)
 
 
