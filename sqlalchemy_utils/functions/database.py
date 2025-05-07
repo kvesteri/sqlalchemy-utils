@@ -648,3 +648,5 @@ def drop_database(url):
         with engine.begin() as conn:
             text = f'DROP DATABASE {quote(conn, database)}'
             conn.execute(sa.text(text))
+
+    engine.dispose()
