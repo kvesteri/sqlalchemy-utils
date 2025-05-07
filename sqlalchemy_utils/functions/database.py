@@ -485,7 +485,7 @@ def database_exists(url):
             text = "SELECT 1 FROM pg_database WHERE datname='%s'" % database
             for db in (database, 'postgres', 'template1', 'template0', None):
                 url = _set_url_database(url, database=db)
-                engine = sa.create_engine(url)
+                engine = sa.create_engine(url, isolation_level='AUTOCOMMIT')
                 try:
                     return bool(_get_scalar_result(engine, sa.text(text)))
                 except (ProgrammingError, OperationalError):
@@ -508,6 +508,14 @@ def database_exists(url):
                 # The default SQLAlchemy database is in memory, and :memory: is
                 # not required, thus we should support that use case.
                 return True
+        elif dialect_name == 'mssql':
+            text = "SELECT 1 FROM sys.databases WHERE name = '%s'" % database
+            url = _set_url_database(url, database='master')
+            engine = sa.create_engine(url, isolation_level='AUTOCOMMIT')
+            try:
+                return bool(_get_scalar_result(engine, sa.text(text)))
+            except (ProgrammingError, OperationalError):
+                return False
         else:
             text = 'SELECT 1'
             try:
@@ -626,10 +634,9 @@ def drop_database(url):
     elif not dialect_name == 'sqlite':
         url = _set_url_database(url, database=None)
 
-    if dialect_name == 'mssql' and dialect_driver in {'pymssql', 'pyodbc'}:
-        engine = sa.create_engine(url, connect_args={'autocommit': True})
-    elif dialect_name == 'postgresql' and dialect_driver in {
-            'asyncpg', 'pg8000', 'psycopg', 'psycopg2', 'psycopg2cffi'}:
+    if (dialect_name == 'mssql' and dialect_driver in {'pymssql', 'pyodbc'}) \
+            or (dialect_name == 'postgresql' and dialect_driver in {
+            'asyncpg', 'pg8000', 'psycopg', 'psycopg2', 'psycopg2cffi'}):
         engine = sa.create_engine(url, isolation_level='AUTOCOMMIT')
     else:
         engine = sa.create_engine(url)
@@ -637,39 +644,7 @@ def drop_database(url):
     if dialect_name == 'sqlite' and database != ':memory:':
         if database:
             os.remove(database)
-    elif dialect_name == 'postgresql':
-        with engine.begin() as conn:
-            # Disconnect all users from the database we are dropping.
-            version = conn.dialect.server_version_info
-            pid_column = (
-                'pid' if (version >= (9, 2)) else 'procpid'
-            )
-            text = '''
-            SELECT pg_terminate_backend(pg_stat_activity.{pid_column})
-            FROM pg_stat_activity
-            WHERE pg_stat_activity.datname = '{database}'
-            AND {pid_column} <> pg_backend_pid();
-            '''.format(pid_column=pid_column, database=database)
-            conn.execute(sa.text(text))
-
-            # Drop the database.
-            text = f'DROP DATABASE {quote(conn, database)}'
-            conn.execute(sa.text(text))
-    elif dialect_name == 'mssql':
-        with engine.begin() as conn:
-            # Set the database to single user mode to disconnect all users
-            text = f'''
-            ALTER DATABASE {quote(conn, database)}
-            SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-            '''
-            conn.execute(sa.text(text))
-
-            # Drop the database
-            text = f'DROP DATABASE {quote(conn, database)}'
-            conn.execute(sa.text(text))
     else:
         with engine.begin() as conn:
             text = f'DROP DATABASE {quote(conn, database)}'
             conn.execute(sa.text(text))
-
-    engine.dispose()
