@@ -4,7 +4,7 @@ import json
 import os
 import warnings
 
-from sqlalchemy.types import LargeBinary, String, TypeDecorator
+from sqlalchemy.types import LargeBinary, String, Text, TypeDecorator
 
 from sqlalchemy_utils.exceptions import ImproperlyConfigured
 from sqlalchemy_utils.types.encrypted.padding import PADDING_MECHANISM
@@ -449,6 +449,28 @@ class StringEncryptedType(TypeDecorator, ScalarCoercible):
         if isinstance(self.underlying_type, ScalarCoercible):
             return self.underlying_type._coerce(value)
 
+        return value
+
+
+class TextEncryptedType(StringEncryptedType):
+    """
+    The 'TextEncryptedType' creates a Text column instead of a String column
+    """
+    impl = Text
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def process_bind_param(self, value, dialect):
+        value = super().process_bind_param(value=value, dialect=dialect)
+        if isinstance(value, str):
+            value = value.encode()
+        return value
+
+    def process_result_value(self, value, dialect):
+        if isinstance(value, bytes):
+            value = value.decode()
+            value = super().process_result_value(value=value, dialect=dialect)
         return value
 
 
