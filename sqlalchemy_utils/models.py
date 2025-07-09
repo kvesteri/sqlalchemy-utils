@@ -95,10 +95,9 @@ def generic_repr(*fields):
         target.__repr__ = lambda self: _generic_repr_method(self, fields=None)
         return target
     else:
+
         def decorator(cls):
-            cls.__repr__ = lambda self: _generic_repr_method(
-                self,
-                fields=fields
-            )
+            cls.__repr__ = lambda self: _generic_repr_method(self, fields=fields)
             return cls
+
         return decorator

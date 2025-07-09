@@ -43,6 +43,7 @@ class CountryType(ScalarCoercible, types.TypeDecorator):
         user.country = 'US'
         user.country  # Country('US')
     """
+
     impl = types.String(2)
     python_type = Country
     cache_ok = True

@@ -10,7 +10,7 @@ from .currency import CurrencyType  # noqa
 from .email import EmailType  # noqa
 from .encrypted.encrypted_type import (  # noqa
     EncryptedType,
-    StringEncryptedType
+    StringEncryptedType,
 )
 from .enriched_datetime.enriched_date_type import EnrichedDateType  # noqa
 from .ip_address import IPAddressType  # noqa
@@ -21,19 +21,19 @@ from .password import Password, PasswordType  # noqa
 from .pg_composite import (  # noqa
     CompositeType,
     register_composites,
-    remove_composite_listeners
+    remove_composite_listeners,
 )
 from .phone_number import (  # noqa
     PhoneNumber,
     PhoneNumberParseException,
-    PhoneNumberType
+    PhoneNumberType,
 )
 from .range import (  # noqa
     DateRangeType,
     DateTimeRangeType,
     Int8RangeType,
     IntRangeType,
-    NumericRangeType
+    NumericRangeType,
 )
 from .scalar_list import ScalarListException, ScalarListType  # noqa
 from .timezone import TimezoneType  # noqa
@@ -60,4 +60,5 @@ def instrumented_list(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
         return InstrumentedList([item for item in f(*args, **kwargs)])
+
     return wrapper

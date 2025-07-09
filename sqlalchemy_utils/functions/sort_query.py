@@ -68,7 +68,5 @@ def make_order_by_deterministic(query):
             pass
 
     base_table = get_tables(_get_query_compile_state(query)._entities[0])[0]
-    query = query.order_by(
-        *(order_by_func(c) for c in base_table.c if c.primary_key)
-    )
+    query = query.order_by(*(order_by_func(c) for c in base_table.c if c.primary_key))
     return query

@@ -7,7 +7,7 @@ from .database import (  # noqa
     has_unique_index,
     is_auto_assigned_date_column,
     json_sql,
-    jsonb_sql
+    jsonb_sql,
 )
 from .foreign_keys import (  # noqa
     dependent_objects,
@@ -15,7 +15,7 @@ from .foreign_keys import (  # noqa
     get_referencing_foreign_keys,
     group_foreign_keys,
     merge_references,
-    non_indexed_foreign_keys
+    non_indexed_foreign_keys,
 )
 from .mock import create_mock_engine, mock_engine  # noqa
 from .orm import (  # noqa
@@ -36,7 +36,7 @@ from .orm import (  # noqa
     is_loaded,
     naturally_equivalent,
     quote,
-    table_name
+    table_name,
 )
 from .render import render_expression, render_statement  # noqa
 from .sort_query import make_order_by_deterministic  # noqa

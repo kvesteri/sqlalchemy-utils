@@ -60,11 +60,10 @@ class TimezoneType(ScalarCoercible, types.TypeDecorator):
 
             except ImportError:
                 raise ImproperlyConfigured(
-                    "'pytz' is required to use the 'pytz' backend "
-                    "for 'TimezoneType'"
+                    "'pytz' is required to use the 'pytz' backend for 'TimezoneType'"
                 )
 
-        elif backend == "zoneinfo":
+        elif backend == 'zoneinfo':
             try:
                 import zoneinfo
             except ImportError:
@@ -74,7 +73,7 @@ class TimezoneType(ScalarCoercible, types.TypeDecorator):
                     raise ImproperlyConfigured(
                         "'backports.zoneinfo' is required to use "
                         "the 'zoneinfo' backend for 'TimezoneType'"
-                        "on Python version < 3.9"
+                        'on Python version < 3.9'
                     )
 
             self.python_type = zoneinfo.ZoneInfo

@@ -13,12 +13,7 @@ def coercion_listener(mapper, class_):
             listener = prop.columns[0].type.coercion_listener
         except AttributeError:
             continue
-        sa.event.listen(
-            getattr(class_, prop.key),
-            'set',
-            listener,
-            retval=True
-        )
+        sa.event.listen(getattr(class_, prop.key), 'set', listener, retval=True)
 
 
 def instant_defaults_listener(target, args, kwargs):
@@ -28,10 +23,7 @@ def instant_defaults_listener(target, args, kwargs):
     kwargs.clear()
 
     for key, column in sa.inspect(target.__class__).columns.items():
-        if (
-            hasattr(column, 'default') and
-            column.default is not None
-        ):
+        if hasattr(column, 'default') and column.default is not None:
             if callable(column.default.arg):
                 kwargs[key] = column.default.arg(target)
             else:
@@ -252,24 +244,16 @@ def auto_delete_orphans(attr):
     def delete_orphan_listener(session, ctx):
         # Look through Session state to see if we want to emit a DELETE for
         # orphans
-        orphans_found = (
-            any(
-                isinstance(obj, parent_class) and
-                sa.orm.attributes.get_history(obj, attr.key).deleted
-                for obj in session.dirty
-            ) or
-            any(
-                isinstance(obj, parent_class)
-                for obj in session.deleted
-            )
-        )
+        orphans_found = any(
+            isinstance(obj, parent_class)
+            and sa.orm.attributes.get_history(obj, attr.key).deleted
+            for obj in session.dirty
+        ) or any(isinstance(obj, parent_class) for obj in session.deleted)
 
         if orphans_found:
             # Emit a DELETE for all orphans
             (
                 session.query(target_class)
-                .filter(
-                    ~getattr(target_class, backref).any()
-                )
+                .filter(~getattr(target_class, backref).any())
                 .delete(synchronize_session=False)
             )

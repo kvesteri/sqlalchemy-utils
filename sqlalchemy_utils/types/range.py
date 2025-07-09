@@ -134,6 +134,7 @@ than 500.
 
 .. _intervals: https://github.com/kvesteri/intervals
 """
+
 from collections.abc import Iterable
 from datetime import timedelta
 
@@ -144,7 +145,7 @@ from sqlalchemy.dialects.postgresql import (
     INT4RANGE,
     INT8RANGE,
     NUMRANGE,
-    TSRANGE
+    TSRANGE,
 )
 
 from ..exceptions import ImproperlyConfigured
@@ -162,9 +163,8 @@ class RangeComparator(types.TypeEngine.Comparator):
     def coerced_func(cls, func):
         def operation(self, other, **kwargs):
             other = self.coerce_arg(other)
-            return getattr(types.TypeEngine.Comparator, func)(
-                self, other, **kwargs
-            )
+            return getattr(types.TypeEngine.Comparator, func)(self, other, **kwargs)
+
         return operation
 
     def coerce_arg(self, other):
@@ -180,18 +180,12 @@ class RangeComparator(types.TypeEngine.Comparator):
         return other
 
     def in_(self, other):
-        if (
-            isinstance(other, Iterable) and
-            not isinstance(other, str)
-        ):
+        if isinstance(other, Iterable) and not isinstance(other, str):
             other = map(self.coerce_arg, other)
         return super().in_(other)
 
     def notin_(self, other):
-        if (
-            isinstance(other, Iterable) and
-            not isinstance(other, str)
-        ):
+        if isinstance(other, Iterable) and not isinstance(other, str):
             other = map(self.coerce_arg, other)
         return super().notin_(other)
 
@@ -257,11 +251,7 @@ funcs = [
 
 
 for func in funcs:
-    setattr(
-        RangeComparator,
-        func,
-        RangeComparator.coerced_func(func)
-    )
+    setattr(RangeComparator, func, RangeComparator.coerced_func(func))
 
 
 class RangeType(ScalarCoercible, types.TypeDecorator):
@@ -269,9 +259,7 @@ class RangeType(ScalarCoercible, types.TypeDecorator):
 
     def __init__(self, *args, **kwargs):
         if intervals is None:
-            raise ImproperlyConfigured(
-                'RangeType needs intervals package installed.'
-            )
+            raise ImproperlyConfigured('RangeType needs intervals package installed.')
         self.step = kwargs.pop('step', None)
         super().__init__(*args, **kwargs)
 
@@ -355,6 +343,7 @@ class IntRangeType(RangeType):
         print total
         # '30-140'
     """
+
     impl = INT4RANGE
     comparator_factory = IntRangeComparator
     cache_ok = True
@@ -408,6 +397,7 @@ class Int8RangeType(RangeType):
         print total
         # '30-140'
     """
+
     impl = INT8RANGE
     comparator_factory = IntRangeComparator
     cache_ok = True
@@ -435,6 +425,7 @@ class DateRangeType(RangeType):
             room_id = sa.Column(sa.Integer))
             during = sa.Column(DateRangeType)
     """
+
     impl = DATERANGE
     comparator_factory = DateRangeComparator
     cache_ok = True

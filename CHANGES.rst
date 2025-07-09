@@ -13,6 +13,8 @@ Unreleased changes
 - Make documentation builds reproducible.
 - Test documentation builds in CI.
 - Fix Pendulum parsing of datetime instances with timezones. (#755)
+- Migrate to `uv <https://docs.astral.sh/uv/>`_ for dependency management and package installation, improving build performance and reproducibility. (#780)
+- Migrate to `ruff <https://docs.astral.sh/ruff/>`_ for code linting and formatting, replacing flake8 with a faster Rust-based tool. (#780)
 
 0.41.2 (2024-03-22)
 ^^^^^^^^^^^^^^^^^^^

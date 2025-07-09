@@ -73,17 +73,16 @@ def get_class_by_table(base, table, data=None):
     :return: Declarative class or None.
     """
     found_classes = {
-        c for c in _get_class_registry(base).values()
+        c
+        for c in _get_class_registry(base).values()
         if hasattr(c, '__table__') and c.__table__ is table
     }
     if len(found_classes) > 1:
         if not data:
             raise ValueError(
                 "Multiple declarative classes found for table '{}'. "
-                "Please provide data parameter for this function to be able "
-                "to determine polymorphic scenarios.".format(
-                    table.name
-                )
+                'Please provide data parameter for this function to be able '
+                'to determine polymorphic scenarios.'.format(table.name)
             )
         else:
             for cls in found_classes:
@@ -94,10 +93,8 @@ def get_class_by_table(base, table, data=None):
                         return cls
             raise ValueError(
                 "Multiple declarative classes found for table '{}'. Given "
-                "data row does not match any polymorphic identity of the "
-                "found classes.".format(
-                    table.name
-                )
+                'data row does not match any polymorphic identity of the '
+                'found classes.'.format(table.name)
             )
     elif found_classes:
         return found_classes.pop()
@@ -233,8 +230,7 @@ def get_column_key(model, column):
             if c.name == column.name and c.table is column.table:
                 return key
     raise sa.orm.exc.UnmappedColumnError(
-        'No column %s is configured on mapper %s...' %
-        (column, mapper)
+        'No column %s is configured on mapper %s...' % (column, mapper)
     )
 
 
@@ -291,18 +287,11 @@ def get_mapper(mixed):
                 all_mappers.update(mapper_registry.mappers)
         else:  # SQLAlchemy <1.4
             all_mappers = mapperlib._mapper_registry
-        mappers = [
-            mapper for mapper in all_mappers
-            if mixed in mapper.tables
-        ]
+        mappers = [mapper for mapper in all_mappers if mixed in mapper.tables]
         if len(mappers) > 1:
-            raise ValueError(
-                "Multiple mappers found for table '%s'." % mixed.name
-            )
+            raise ValueError("Multiple mappers found for table '%s'." % mixed.name)
         elif not mappers:
-            raise ValueError(
-                "Could not get mapper for table '%s'." % mixed.name
-            )
+            raise ValueError("Could not get mapper for table '%s'." % mixed.name)
         else:
             return mappers[0]
     if not isclass(mixed):
@@ -376,7 +365,8 @@ def get_primary_keys(mixed):
     """
     return OrderedDict(
         (
-            (key, column) for key, column in get_columns(mixed).items()
+            (key, column)
+            for key, column in get_columns(mixed).items()
             if column.primary_key
         )
     )
@@ -548,11 +538,7 @@ def get_descriptor(entity, attr):
 
     for key, descriptor in get_all_descriptors(mapper).items():
         if attr == key:
-            prop = (
-                descriptor.property
-                if hasattr(descriptor, 'property')
-                else None
-            )
+            prop = descriptor.property if hasattr(descriptor, 'property') else None
             if isinstance(prop, ColumnProperty):
                 if isinstance(entity, sa.orm.util.AliasedClass):
                     for c in mapper.selectable.c:
@@ -772,13 +758,7 @@ def has_changes(obj, attrs=None, exclude=None):
     """
     if attrs:
         if isinstance(attrs, str):
-            return (
-                sa.inspect(obj)
-                .attrs
-                .get(attrs)
-                .history
-                .has_changes()
-            )
+            return sa.inspect(obj).attrs.get(attrs).history.has_changes()
         else:
             return any(has_changes(obj, attr) for attr in attrs)
     else:

@@ -1,18 +1,23 @@
 name: Python linting
 on: [push, pull_request]
 jobs:
-  test:
+  lint:
     name: Lint
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.11']
+        python-version: ['3.13']
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install tox
-        run: pip install tox
-      - name: Run linting
-        run: tox -e flake8,isort
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v3
+      - name: Set up Python
+        run: uv python install ${{ matrix.python-version }}
+      - name: Create virtual environment
+        run: uv venv
+      - name: Install dependencies
+        run: uv pip install -e ".[dev]"
+      - name: Run ruff check
+        run: uv run ruff check .
+      - name: Run ruff format check
+        run: uv run ruff format --check .

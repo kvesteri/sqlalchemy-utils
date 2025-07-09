@@ -69,9 +69,7 @@ def proxy_dict(parent, collection_name, mapping_attr):
         return parent._proxy_dicts[collection_name]
     except KeyError:
         parent._proxy_dicts[collection_name] = ProxyDict(
-            parent,
-            collection_name,
-            mapping_attr
+            parent, collection_name, mapping_attr
         )
     return parent._proxy_dicts[collection_name]
 

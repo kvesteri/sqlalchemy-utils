@@ -17,9 +17,7 @@ class WeekDays:
 
             for index, bit in enumerate(bit_string_or_week_days):
                 if bit not in '01':
-                    raise ValueError(
-                        'Bit string may only contain zeroes and ones.'
-                    )
+                    raise ValueError('Bit string may only contain zeroes and ones.')
                 if bit == '1':
                     self._days.add(WeekDay(index))
         elif isinstance(bit_string_or_week_days, WeekDays):
@@ -42,10 +40,7 @@ class WeekDays:
         return value in self._days
 
     def __repr__(self):
-        return '{}({!r})'.format(
-            self.__class__.__name__,
-            self.as_bit_string()
-        )
+        return '{}({!r})'.format(self.__class__.__name__, self.as_bit_string())
 
     def __unicode__(self):
         return ', '.join(str(day) for day in self)

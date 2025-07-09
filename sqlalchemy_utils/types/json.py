@@ -5,12 +5,15 @@ from sqlalchemy.dialects.postgresql.base import ischema_names
 
 try:
     from sqlalchemy.dialects.postgresql import JSON
+
     has_postgres_json = True
 except ImportError:
+
     class PostgresJSONType(sa.types.UserDefinedType):
         """
         Text search vector type for postgresql.
         """
+
         def get_col_spec(self):
             return 'json'
 
@@ -45,6 +48,7 @@ class JSONType(sa.types.TypeDecorator):
         }
         session.commit()
     """
+
     impl = sa.UnicodeText
     hashable = False
     cache_ok = True

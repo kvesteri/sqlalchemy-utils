@@ -11,11 +11,8 @@ jobs:
           - '3.10'
           - '3.11'
           - '3.12'
+          - '3.13'
         tox_env: ['sqlalchemy14', 'sqlalchemy2']
-        #include:
-        #  - os: 'ubuntu-20.04'
-        #    python-version: '3.6'
-        #    tox_env: 'sqlalchemy14'
     runs-on: ${{ matrix.os }}
     services:
       postgres:
@@ -54,10 +51,12 @@ jobs:
           - 1433:1433
     steps:
       - uses: actions/checkout@v4
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v3
       - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
+        run: uv python install ${{ matrix.python-version }}
+      - name: Create virtual environment
+        run: uv venv
       - name: Install MS SQL stuff
         run: bash .ci/install_mssql.sh
       - name: Add hstore extension to the sqlalchemy_utils_test database
@@ -67,21 +66,23 @@ jobs:
           PGPORT: 5432
         run: psql -U postgres -d sqlalchemy_utils_test -c 'CREATE EXTENSION hstore;'
       - name: Install tox
-        run: pip install tox
+        run: uv pip install tox
       - name: Run tests
         env:
           SQLALCHEMY_UTILS_TEST_POSTGRESQL_PASSWORD: postgres
-        run: tox -e ${{ matrix.tox_env }}
+        run: uv run tox -e ${{ matrix.tox_env }}
 
   docs:
     runs-on: 'ubuntu-latest'
     steps:
       - uses: actions/checkout@v4
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v3
       - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
+        run: uv python install 3.13
+      - name: Create virtual environment
+        run: uv venv
       - name: Install tox
-        run: pip install tox
+        run: uv pip install tox
       - name: Build documentation
-        run: tox -e docs
+        run: uv run tox -e docs

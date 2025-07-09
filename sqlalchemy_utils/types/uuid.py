@@ -29,6 +29,7 @@ class UUIDType(ScalarCoercible, types.TypeDecorator):
                 default=uuid.uuid4
             )
     """
+
     impl = types.BINARY(16)
 
     python_type = uuid.UUID
@@ -73,9 +74,11 @@ class UUIDType(ScalarCoercible, types.TypeDecorator):
     # sqlalchemy >= 1.4.30 quotes UUID's automatically.
     # It is only necessary to quote UUID's in sqlalchemy < 1.4.30.
     if sqlalchemy_version < (1, 4, 30):
+
         def process_literal_param(self, value, dialect):
             return f"'{value}'" if value else value
     else:
+
         def process_literal_param(self, value, dialect):
             return value
 
@@ -86,11 +89,7 @@ class UUIDType(ScalarCoercible, types.TypeDecorator):
         if not isinstance(value, uuid.UUID):
             value = self._coerce(value)
 
-        if self.native and dialect.name in (
-            'postgresql',
-            'mssql',
-            'cockroachdb'
-        ):
+        if self.native and dialect.name in ('postgresql', 'mssql', 'cockroachdb'):
             return str(value)
 
         return value.bytes if self.binary else value.hex
@@ -99,11 +98,7 @@ class UUIDType(ScalarCoercible, types.TypeDecorator):
         if value is None:
             return value
 
-        if self.native and dialect.name in (
-            'postgresql',
-            'mssql',
-            'cockroachdb'
-        ):
+        if self.native and dialect.name in ('postgresql', 'mssql', 'cockroachdb'):
             if isinstance(value, uuid.UUID):
                 # Some drivers convert PostgreSQL's uuid values to
                 # Python's uuid.UUID objects by themselves
