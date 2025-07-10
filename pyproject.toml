@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=45", "wheel"]
+requires = ["setuptools>=77.0.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,7 +7,7 @@ name = "SQLAlchemy-Utils"
 version = "0.41.2"
 description = "Various utility functions for SQLAlchemy."
 readme = "README.rst"
-license = {text = "BSD"}
+license = "BSD-3-Clause"
 authors = [
     {name = "Konsta Vesterinen", email = "konsta@fastmonkeys.com"},
     {name = "Ryan Leckey"},
@@ -18,7 +18,6 @@ requires-python = ">=3.9"
 classifiers = [
     "Environment :: Web Environment",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3.9",
