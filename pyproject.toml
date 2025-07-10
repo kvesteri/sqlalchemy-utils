@@ -65,19 +65,6 @@ color = ["colour>=0.0.4"]
 timezone = ["python-dateutil"]
 url = ["furl >= 0.4.1"]
 encrypted = ["cryptography>=0.6"]
-
-[tool.flake8]
-max-line-length = 88
-extend-ignore = ["E203"]
-exclude = [
-    ".eggs",
-    ".git",
-    ".tox",
-    ".venv",
-    "build",
-    "docs/conf.py"
-]
-
 test_all = [
     "pytest==7.4.4",
     "Pygments>=1.2",
