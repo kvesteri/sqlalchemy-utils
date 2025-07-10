@@ -8,11 +8,12 @@ Unreleased changes
 
 - Drop support for Python 3.7 and 3.8.
 - Drop support for sqlalchemy 1.3.
-- Add support for Python 3.12.
+- Add support for Python 3.12 and 3.13.
 - Add a Read the Docs configuration file.
 - Make documentation builds reproducible.
 - Test documentation builds in CI.
 - Fix Pendulum parsing of datetime instances with timezones. (#755)
+- Migrate package metadata to PEP 621 format in pyproject.toml
 
 0.41.2 (2024-03-22)
 ^^^^^^^^^^^^^^^^^^^

@@ -2,9 +2,9 @@
 max-line-length = 88
 extend-ignore = E203
 exclude =
-    .eggs
-    .git
-    .tox
-    .venv
-    build
+    .eggs,
+    .git,
+    .tox,
+    .venv,
+    build,
     docs/conf.py
