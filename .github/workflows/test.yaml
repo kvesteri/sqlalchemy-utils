@@ -11,6 +11,7 @@ jobs:
           - '3.10'
           - '3.11'
           - '3.12'
+          - '3.13'
         tox_env: ['sqlalchemy14', 'sqlalchemy2']
         #include:
         #  - os: 'ubuntu-20.04'
@@ -80,7 +81,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.13'
       - name: Install tox
         run: pip install tox
       - name: Build documentation
