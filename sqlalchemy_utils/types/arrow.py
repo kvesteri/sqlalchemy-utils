@@ -47,16 +47,11 @@ class ArrowType(EnrichedDateTimeType):
         # 'an hour ago'
 
     """
+
     cache_ok = True
 
     def __init__(self, *args, **kwargs):
         if not arrow:
-            raise ImproperlyConfigured(
-                "'arrow' package is required to use 'ArrowType'"
-            )
+            raise ImproperlyConfigured("'arrow' package is required to use 'ArrowType'")
 
-        super().__init__(
-            datetime_processor=ArrowDateTime,
-            *args,
-            **kwargs
-        )
+        super().__init__(datetime_processor=ArrowDateTime, *args, **kwargs)

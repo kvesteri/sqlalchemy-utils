@@ -32,6 +32,7 @@ We can easily test the constraints by assert_* functions::
     # raises AssertionError because the max length of email is 255
     assert_max_length(user, 'email', 300)
 """
+
 from decimal import Decimal
 
 import sqlalchemy as sa
@@ -50,7 +51,7 @@ def _update_field(obj, field, value):
 def _expect_successful_update(obj, field, value, reraise_exc):
     try:
         _update_field(obj, field, value)
-    except (reraise_exc) as e:
+    except reraise_exc as e:
         session = sa.orm.object_session(obj)
         session.rollback()
         assert False, str(e)
@@ -145,16 +146,13 @@ def assert_max_length(obj, column, max_length):
     """
     type_ = sa.inspect(obj.__class__).columns[column].type
     _expect_successful_update(
-        obj,
-        column,
-        _repeated_value(type_) * max_length,
-        _expected_exception(type_)
+        obj, column, _repeated_value(type_) * max_length, _expected_exception(type_)
     )
     _expect_failing_update(
         obj,
         column,
         _repeated_value(type_) * (max_length + 1),
-        _expected_exception(type_)
+        _expected_exception(type_),
     )
 
 

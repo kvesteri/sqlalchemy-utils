@@ -64,6 +64,7 @@ class ScalarListType(types.TypeDecorator):
 
 
     """
+
     impl = sa.UnicodeText()
 
     cache_ok = True
@@ -79,19 +80,14 @@ class ScalarListType(types.TypeDecorator):
             if any(self.separator in str(item) for item in value):
                 raise ScalarListException(
                     "List values can't contain string '%s' (its being used as "
-                    "separator. If you wish for scalar list values to contain "
-                    "these strings, use a different separator string.)"
-                    % self.separator
+                    'separator. If you wish for scalar list values to contain '
+                    'these strings, use a different separator string.)' % self.separator
                 )
-            return self.separator.join(
-                map(str, value)
-            )
+            return self.separator.join(map(str, value))
 
     def process_result_value(self, value, dialect):
         if value is not None:
             if value == '':
                 return []
             # coerce each value
-            return list(map(
-                self.coerce_func, value.split(self.separator)
-            ))
+            return list(map(self.coerce_func, value.split(self.separator)))

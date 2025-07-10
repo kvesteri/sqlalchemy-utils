@@ -11,9 +11,7 @@ class WeekDay:
 
     def __init__(self, index):
         if not (0 <= index < self.NUM_WEEK_DAYS):
-            raise ValueError(
-                "index must be between 0 and %d" % self.NUM_WEEK_DAYS
-            )
+            raise ValueError('index must be between 0 and %d' % self.NUM_WEEK_DAYS)
         self.index = index
 
     def __eq__(self, other):
@@ -35,11 +33,7 @@ class WeekDay:
         return self.name
 
     def get_name(self, width='wide', context='format'):
-        names = i18n.babel.dates.get_day_names(
-            width,
-            context,
-            i18n.get_locale()
-        )
+        names = i18n.babel.dates.get_day_names(width, context, i18n.get_locale())
         return names[self.index]
 
     @property
@@ -48,7 +42,4 @@ class WeekDay:
 
     @property
     def position(self):
-        return (
-            self.index -
-            i18n.get_locale().first_week_day
-        ) % self.NUM_WEEK_DAYS
+        return (self.index - i18n.get_locale().first_week_day) % self.NUM_WEEK_DAYS

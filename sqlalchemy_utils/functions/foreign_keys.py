@@ -14,12 +14,9 @@ from .orm import _get_class_registry, get_column_key, get_mapper, get_tables
 def get_foreign_key_values(fk, obj):
     mapper = get_mapper(obj)
     return {
-        fk.constraint.columns.values()[index]:
-        getattr(obj, element.column.key)
+        fk.constraint.columns.values()[index]: getattr(obj, element.column.key)
         if hasattr(obj, element.column.key)
-        else getattr(
-            obj, mapper.get_property_by_column(element.column).key
-        )
+        else getattr(obj, mapper.get_property_by_column(element.column).key)
         for index, element in enumerate(fk.constraint.elements)
     }
 
@@ -44,9 +41,7 @@ def group_foreign_keys(foreign_keys):
 
     .. versionadded: 0.26.1
     """
-    foreign_keys = sorted(
-        foreign_keys, key=lambda key: key.constraint.table.name
-    )
+    foreign_keys = sorted(foreign_keys, key=lambda key: key.constraint.table.name)
     return groupby(foreign_keys, lambda key: key.constraint.table)
 
 
@@ -176,9 +171,7 @@ def merge_references(from_, to, foreign_keys=None):
         query = (
             fk.constraint.table.update()
             .where(sa.and_(*criteria))
-            .values(
-                {key.key: value for key, value in new_values.items()}
-            )
+            .values({key.key: value for key, value in new_values.items()})
         )
         session.execute(query)
 
@@ -269,9 +262,8 @@ def dependent_objects(obj, foreign_keys=None):
             except NoInspectionAvailable:
                 continue
             parent_mapper = mapper.inherits
-            if (
-                table in mapper.tables and
-                not (parent_mapper and table in parent_mapper.tables)
+            if table in mapper.tables and not (
+                parent_mapper and table in parent_mapper.tables
             ):
                 query = session.query(class_).filter(
                     sa.or_(*_get_criteria(keys, class_, obj))
@@ -290,17 +282,12 @@ def _get_criteria(keys, class_, obj):
 
         subcriteria = []
         for index, column in enumerate(key.constraint.columns):
-            foreign_column = (
-                key.constraint.elements[index].column
-            )
+            foreign_column = key.constraint.elements[index].column
             subcriteria.append(
-                getattr(class_, get_column_key(class_, column)) ==
-                getattr(
+                getattr(class_, get_column_key(class_, column))
+                == getattr(
                     obj,
-                    sa.inspect(type(obj))
-                    .get_property_by_column(
-                        foreign_column
-                    ).key
+                    sa.inspect(type(obj)).get_property_by_column(foreign_column).key,
                 )
             )
         criteria.append(sa.and_(*subcriteria))
@@ -328,11 +315,7 @@ def non_indexed_foreign_keys(metadata, engine=None):
     constraints = defaultdict(list)
 
     for table_name in metadata.tables.keys():
-        table = Table(
-            table_name,
-            reflected_metadata,
-            autoload_with=bind or engine
-        )
+        table = Table(table_name, reflected_metadata, autoload_with=bind or engine)
 
         for constraint in table.constraints:
             if not isinstance(constraint, ForeignKeyConstraint):

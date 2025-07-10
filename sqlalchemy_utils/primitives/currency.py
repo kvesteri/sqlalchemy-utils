@@ -50,6 +50,7 @@ class Currency:
 
 
     """
+
     def __init__(self, code):
         if i18n.babel is None:
             raise ImproperlyConfigured(
@@ -79,10 +80,7 @@ class Currency:
 
     @property
     def symbol(self):
-        return i18n.babel.numbers.get_currency_symbol(
-            self.code,
-            i18n.get_locale()
-        )
+        return i18n.babel.numbers.get_currency_symbol(self.code, i18n.get_locale())
 
     @property
     def name(self):

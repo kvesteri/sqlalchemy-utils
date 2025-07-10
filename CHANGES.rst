@@ -14,6 +14,7 @@ Unreleased changes
 - Test documentation builds in CI.
 - Fix Pendulum parsing of datetime instances with timezones. (#755)
 - Migrate package metadata to PEP 621 format in pyproject.toml
+- Migrate to `ruff <https://docs.astral.sh/ruff/>`_ for code linting and formatting, replacing flake8 and isort with a faster Rust-based tool.
 
 0.41.2 (2024-03-22)
 ^^^^^^^^^^^^^^^^^^^

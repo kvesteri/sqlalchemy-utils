@@ -90,3 +90,35 @@ test_all = [
     "furl >= 0.4.1",
     "cryptography>=0.6",
 ]
+
+[tool.ruff]
+exclude = [
+    ".eggs",
+    ".git",
+    ".tox",
+    ".venv",
+    "__pycache__",
+    "build",
+    "dist",
+    "docs",
+    "migrations",
+    "tests",
+    "venv",
+]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
+ignore = ["E231", "E402", "E702", "E501", "F403", "F541", "E713"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+"tests/*" = ["F401", "F811"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["sqlalchemy_utils"]
+
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
