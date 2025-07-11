@@ -180,11 +180,13 @@ class RangeComparator(types.TypeEngine.Comparator):
         return other
 
     def in_(self, other):
+        """Determine whether the given interval is contained by another interval."""
         if isinstance(other, Iterable) and not isinstance(other, str):
             other = map(self.coerce_arg, other)
         return super().in_(other)
 
     def notin_(self, other):
+        """Determine whether the given interval is not contained by another interval."""
         if isinstance(other, Iterable) and not isinstance(other, str):
             other = map(self.coerce_arg, other)
         return super().notin_(other)
@@ -212,6 +214,7 @@ class RangeComparator(types.TypeEngine.Comparator):
         return self.op('<<')(other)
 
     def contains(self, other, **kwargs):
+        """Determine whether the given interval contains another interval."""
         other = self.coerce_arg(other)
         return self.op('@>')(other)
 
