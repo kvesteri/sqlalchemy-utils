@@ -40,7 +40,7 @@ class WeekDays:
         return value in self._days
 
     def __repr__(self):
-        return '{}({!r})'.format(self.__class__.__name__, self.as_bit_string())
+        return f'{self.__class__.__name__}({self.as_bit_string()!r})'
 
     def __unicode__(self):
         return ', '.join(str(day) for day in self)
