@@ -13,10 +13,6 @@ jobs:
           - '3.12'
           - '3.13'
         tox_env: ['sqlalchemy14', 'sqlalchemy2']
-        #include:
-        #  - os: 'ubuntu-20.04'
-        #    python-version: '3.6'
-        #    tox_env: 'sqlalchemy14'
     runs-on: ${{ matrix.os }}
     services:
       postgres:
