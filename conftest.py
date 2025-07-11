@@ -10,12 +10,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import declarative_base, sessionmaker, synonym_for
 from sqlalchemy.orm.session import close_all_sessions
 
-from sqlalchemy_utils import (
-    aggregates,
-    coercion_listener,
-    i18n,
-    InstrumentedList
-)
+from sqlalchemy_utils import aggregates, coercion_listener, i18n, InstrumentedList
 from sqlalchemy_utils.functions.orm import _get_class_registry
 from sqlalchemy_utils.types.pg_composite import remove_composite_listeners
 
@@ -34,7 +29,7 @@ sa.event.listen(sa.orm.Mapper, 'mapper_configured', coercion_listener)
 
 
 def get_locale():
-    class Locale():
+    class Locale:
         territories = {'FI': 'Finland'}
 
     return Locale()
@@ -66,13 +61,11 @@ def mysql_db_user():
 
 
 @pytest.fixture
-def postgresql_dsn(postgresql_db_user, postgresql_db_password, postgresql_db_host,
-                   db_name):
+def postgresql_dsn(
+    postgresql_db_user, postgresql_db_password, postgresql_db_host, db_name
+):
     return 'postgresql://{}:{}@{}/{}'.format(
-        postgresql_db_user,
-        postgresql_db_password,
-        postgresql_db_host,
-        db_name
+        postgresql_db_user, postgresql_db_password, postgresql_db_host, db_name
     )
 
 
@@ -103,21 +96,24 @@ def mssql_db_user():
 
 @pytest.fixture
 def mssql_db_password():
-    return os.environ.get('SQLALCHEMY_UTILS_TEST_MSSQL_PASSWORD',
-                          'Strong_Passw0rd')
+    return os.environ.get('SQLALCHEMY_UTILS_TEST_MSSQL_PASSWORD', 'Strong_Passw0rd')
 
 
 @pytest.fixture
 def mssql_db_driver():
-    driver = os.environ.get('SQLALCHEMY_UTILS_TEST_MSSQL_DRIVER',
-                            'ODBC Driver 18 for SQL Server')
+    driver = os.environ.get(
+        'SQLALCHEMY_UTILS_TEST_MSSQL_DRIVER', 'ODBC Driver 18 for SQL Server'
+    )
     return driver.replace(' ', '+')
 
 
 @pytest.fixture
 def mssql_dsn(mssql_db_user, mssql_db_password, mssql_db_driver, db_name):
-    return 'mssql+pyodbc://{}:{}@localhost/{}?driver={}&TrustServerCertificate=yes'\
-        .format(mssql_db_user, mssql_db_password, db_name, mssql_db_driver)
+    return (
+        'mssql+pyodbc://{}:{}@localhost/{}?driver={}&TrustServerCertificate=yes'.format(
+            mssql_db_user, mssql_db_password, db_name, mssql_db_driver
+        )
+    )
 
 
 @pytest.fixture
@@ -158,12 +154,12 @@ def User(Base):
         __tablename__ = 'user'
         id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
         name = sa.Column(sa.Unicode(255))
+
     return User
 
 
 @pytest.fixture
 def Category(Base):
-
     class Category(Base):
         __tablename__ = 'category'
         id = sa.Column(sa.Integer, primary_key=True)
@@ -200,6 +196,7 @@ def Category(Base):
         @property
         def name_synonym(self):
             return self.name
+
     return Category
 
 
@@ -214,11 +211,9 @@ def Article(Base, Category):
         category = sa.orm.relationship(
             Category,
             primaryjoin=category_id == Category.id,
-            backref=sa.orm.backref(
-                'articles',
-                collection_class=InstrumentedList
-            )
+            backref=sa.orm.backref('articles', collection_class=InstrumentedList),
         )
+
     return Article
 
 

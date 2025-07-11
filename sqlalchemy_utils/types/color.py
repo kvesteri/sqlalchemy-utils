@@ -6,6 +6,7 @@ from .scalar_coercible import ScalarCoercible
 colour = None
 try:
     import colour
+
     python_colour_type = colour.Color
 except (ImportError, AttributeError):
     python_colour_type = None
@@ -48,6 +49,7 @@ class ColorType(ScalarCoercible, types.TypeDecorator):
 
     .. _colour: https://github.com/vaab/colour
     """
+
     STORE_FORMAT = 'hex'
     impl = types.Unicode(20)
     python_type = python_colour_type

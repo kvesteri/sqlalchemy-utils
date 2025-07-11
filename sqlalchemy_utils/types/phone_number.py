@@ -104,7 +104,7 @@ class PhoneNumber(BasePhoneNumber):
             # Worth noting that if -1 shows up as the error_type
             # it's likely because the API has changed upstream and these
             # bindings need to be updated.
-            raise PhoneNumberParseException(getattr(e, "error_type", -1), str(e))
+            raise PhoneNumberParseException(getattr(e, 'error_type', -1), str(e))
 
         super().__init__(
             country_code=self._phone_number.country_code,
@@ -164,12 +164,12 @@ class PhoneNumberType(ScalarCoercible, types.TypeDecorator):
         user.phone_number.national  # '040 1234567'
     """
 
-    STORE_FORMAT = "e164"
+    STORE_FORMAT = 'e164'
     impl = types.Unicode(20)
     python_type = PhoneNumber
     cache_ok = True
 
-    def __init__(self, region="US", max_length=20, *args, **kwargs):
+    def __init__(self, region='US', max_length=20, *args, **kwargs):
         # Bail if phonenumbers is not found.
         if phonenumbers is None:
             raise ImproperlyConfigured(
@@ -185,8 +185,8 @@ class PhoneNumberType(ScalarCoercible, types.TypeDecorator):
             if not isinstance(value, PhoneNumber):
                 value = PhoneNumber(value, region=self.region)
 
-            if self.STORE_FORMAT == "e164" and value.extension:
-                return f"{value.e164};ext={value.extension}"
+            if self.STORE_FORMAT == 'e164' and value.extension:
+                return f'{value.e164};ext={value.extension}'
 
             return getattr(value, self.STORE_FORMAT)
 

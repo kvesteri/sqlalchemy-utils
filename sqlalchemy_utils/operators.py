@@ -12,15 +12,11 @@ def inspect_type(mixed):
 
 def is_case_insensitive(mixed):
     try:
-        return isinstance(
-            inspect_type(mixed).comparator,
-            CaseInsensitiveComparator
-        )
+        return isinstance(inspect_type(mixed).comparator, CaseInsensitiveComparator)
     except AttributeError:
         try:
             return issubclass(
-                inspect_type(mixed).comparator_factory,
-                CaseInsensitiveComparator
+                inspect_type(mixed).comparator_factory, CaseInsensitiveComparator
             )
         except AttributeError:
             return False
@@ -36,6 +32,7 @@ class CaseInsensitiveComparator(sa.Unicode.Comparator):
             if not is_case_insensitive(other):
                 other = sa.func.lower(other)
             return operator(self, other, **kwargs)
+
         return operation
 
     def in_(self, other):
@@ -68,7 +65,5 @@ string_operator_funcs = [
 
 for func in string_operator_funcs:
     setattr(
-        CaseInsensitiveComparator,
-        func,
-        CaseInsensitiveComparator.lowercase_arg(func)
+        CaseInsensitiveComparator, func, CaseInsensitiveComparator.lowercase_arg(func)
     )

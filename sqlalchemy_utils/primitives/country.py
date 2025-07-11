@@ -52,6 +52,7 @@ class Country:
         assert hash(Country('FI')) == hash('FI')
 
     """
+
     def __init__(self, code_or_country):
         if isinstance(code_or_country, Country):
             self.code = code_or_country.code
@@ -60,8 +61,7 @@ class Country:
             self.code = code_or_country
         else:
             raise TypeError(
-                "Country() argument must be a string or a country, not '{}'"
-                .format(
+                "Country() argument must be a string or a country, not '{}'".format(
                     type(code_or_country).__name__
                 )
             )
@@ -75,9 +75,7 @@ class Country:
         try:
             i18n.babel.Locale('en').territories[code]
         except KeyError:
-            raise ValueError(
-                f'Could not convert string to country code: {code}'
-            )
+            raise ValueError(f'Could not convert string to country code: {code}')
         except AttributeError:
             # As babel is optional, we may raise an AttributeError accessing it
             pass

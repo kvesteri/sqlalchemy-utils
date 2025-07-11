@@ -15,4 +15,4 @@ jobs:
       - name: Install tox
         run: pip install tox
       - name: Run linting
-        run: tox -e flake8,isort
+        run: tox -e ruff

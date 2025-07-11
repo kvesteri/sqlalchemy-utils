@@ -27,6 +27,7 @@ class EnrichedDateTimeType(types.TypeDecorator, ScalarCoercible):
         session.add(user)
         session.commit()
     """
+
     impl = types.DateTime
     cache_ok = True
 

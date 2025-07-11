@@ -28,15 +28,15 @@ def inverse_join(selectable, left_alias, right_alias, relationship):
             adapt_expr(
                 relationship.property.secondaryjoin,
                 sa.inspect(left_alias).selectable,
-                secondary_alias
-            )
+                secondary_alias,
+            ),
         ).join(
             right_alias,
             adapt_expr(
                 relationship.property.primaryjoin,
                 sa.inspect(right_alias).selectable,
-                secondary_alias
-            )
+                secondary_alias,
+            ),
         )
     else:
         join = sa.orm.join(right_alias, left_alias, relationship)
@@ -51,11 +51,7 @@ def relationship_to_correlation(relationship, alias):
             alias,
         )
     else:
-        return sa.orm.join(
-            relationship.parent,
-            alias,
-            relationship
-        ).onclause
+        return sa.orm.join(relationship.parent, alias, relationship).onclause
 
 
 def chained_inverse_join(relationships, leaf_model):
@@ -64,10 +60,7 @@ def chained_inverse_join(relationships, leaf_model):
     for index, relationship in enumerate(relationships[1:]):
         aliases.append(sa.orm.aliased(relationship.mapper.class_))
         selectable = inverse_join(
-            selectable,
-            aliases[index],
-            aliases[index + 1],
-            relationships[index]
+            selectable, aliases[index], aliases[index + 1], relationships[index]
         )
 
     if relationships[-1].property.secondary is not None:
@@ -77,21 +70,15 @@ def chained_inverse_join(relationships, leaf_model):
             adapt_expr(
                 relationships[-1].property.secondaryjoin,
                 secondary_alias,
-                sa.inspect(aliases[-1]).selectable
-            )
+                sa.inspect(aliases[-1]).selectable,
+            ),
         )
         aliases.append(secondary_alias)
     return selectable, aliases
 
 
 def select_correlated_expression(
-    root_model,
-    expr,
-    path,
-    leaf_model,
-    from_obj=None,
-    order_by=None,
-    correlate=True
+    root_model, expr, path, leaf_model, from_obj=None, order_by=None, correlate=True
 ):
     relationships = list(reversed(path_to_relationships(path, root_model)))
 
@@ -102,18 +89,12 @@ def select_correlated_expression(
     if order_by:
         query = query.order_by(
             *[
-                adapt_expr(
-                    o,
-                    *(sa.inspect(alias).selectable for alias in aliases)
-                )
+                adapt_expr(o, *(sa.inspect(alias).selectable for alias in aliases))
                 for o in order_by
             ]
         )
 
-    condition = relationship_to_correlation(
-        relationships[-1],
-        aliases[-1]
-    )
+    condition = relationship_to_correlation(relationships[-1], aliases[-1])
 
     if from_obj is not None:
         condition = adapt_expr(condition, from_obj)
@@ -121,7 +102,5 @@ def select_correlated_expression(
     query = query.select_from(join_expr.selectable)
 
     if correlate:
-        query = query.correlate(
-            from_obj if from_obj is not None else root_model
-        )
+        query = query.correlate(from_obj if from_obj is not None else root_model)
     return query.where(condition)

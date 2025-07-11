@@ -172,6 +172,7 @@ in the decorator.
 
 
 """
+
 import itertools
 from collections import defaultdict, namedtuple
 from collections.abc import Iterable
@@ -188,21 +189,9 @@ Callback = namedtuple('Callback', ['func', 'backref', 'fullpath'])
 class PropertyObserver:
     def __init__(self):
         self.listener_args = [
-            (
-                sa.orm.Mapper,
-                'mapper_configured',
-                self.update_generator_registry
-            ),
-            (
-                sa.orm.Mapper,
-                'after_configured',
-                self.gather_paths
-            ),
-            (
-                sa.orm.session.Session,
-                'before_flush',
-                self.invoke_callbacks
-            )
+            (sa.orm.Mapper, 'mapper_configured', self.update_generator_registry),
+            (sa.orm.Mapper, 'after_configured', self.gather_paths),
+            (sa.orm.session.Session, 'before_flush', self.invoke_callbacks),
         ]
         self.callback_map = defaultdict(list)
         # TODO: make the registry a WeakKey dict
@@ -227,9 +216,7 @@ class PropertyObserver:
 
         for generator in class_.__dict__.values():
             if hasattr(generator, '__observes__'):
-                self.generator_registry[class_].append(
-                    generator
-                )
+                self.generator_registry[class_].append(generator)
 
     def gather_paths(self):
         for class_, generators in self.generator_registry.items():
@@ -240,11 +227,7 @@ class PropertyObserver:
 
                 for path in full_paths:
                     self.callback_map[class_].append(
-                        Callback(
-                            func=callback,
-                            backref=None,
-                            fullpath=full_paths
-                        )
+                        Callback(func=callback, backref=None, fullpath=full_paths)
                     )
 
                     for index in range(len(path)):
@@ -255,8 +238,8 @@ class PropertyObserver:
                             self.callback_map[prop_class].append(
                                 Callback(
                                     func=callback,
-                                    backref=~ (path[:i]),
-                                    fullpath=full_paths
+                                    backref=~(path[:i]),
+                                    fullpath=full_paths,
                                 )
                             )
 
@@ -279,19 +262,14 @@ class PropertyObserver:
 
     def get_callback_args(self, root_obj, callback):
         session = sa.orm.object_session(root_obj)
-        objects = [getdotattr(
-            root_obj,
-            path,
-            lambda obj: obj not in session.deleted
-        ) for path in callback.fullpath]
+        objects = [
+            getdotattr(root_obj, path, lambda obj: obj not in session.deleted)
+            for path in callback.fullpath
+        ]
         paths = [str(path) for path in callback.fullpath]
         for path in paths:
             if '.' in path or has_changes(root_obj, path):
-                return (
-                    root_obj,
-                    callback.func,
-                    objects
-                )
+                return (root_obj, callback.func, objects)
 
     def iterate_objects_and_callbacks(self, session):
         objs = itertools.chain(session.new, session.dirty, session.deleted)
@@ -304,15 +282,14 @@ class PropertyObserver:
         callback_args = defaultdict(lambda: defaultdict(set))
         for obj, callbacks in self.iterate_objects_and_callbacks(session):
             args = self.gather_callback_args(obj, callbacks)
-            for (root_obj, func, objects) in args:
+            for root_obj, func, objects in args:
                 if not callback_args[root_obj][func]:
                     callback_args[root_obj][func] = {}
                 for i, object_ in enumerate(objects):
                     if is_sequence(object_):
-                        callback_args[root_obj][func][i] = (
-                            callback_args[root_obj][func].get(i, set()) |
-                            set(object_)
-                        )
+                        callback_args[root_obj][func][i] = callback_args[root_obj][
+                            func
+                        ].get(i, set()) | set(object_)
                     else:
                         callback_args[root_obj][func][i] = object_
 
@@ -371,6 +348,8 @@ def observes(*paths, **observer_kw):
     def wraps(func):
         def wrapper(self, *args, **kwargs):
             return func(self, *args, **kwargs)
+
         wrapper.__observes__ = paths
         return wrapper
+
     return wraps

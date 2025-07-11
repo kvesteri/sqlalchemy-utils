@@ -31,6 +31,7 @@ class EmailType(sa.types.TypeDecorator):
                        .one())
         assert user.name == 'John Smith'
     """
+
     impl = sa.Unicode
     comparator_factory = CaseInsensitiveComparator
     cache_ok = True

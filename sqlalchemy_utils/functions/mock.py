@@ -23,12 +23,9 @@ def create_mock_engine(bind, stream=None):
     if stream is not None:
 
         def dump(sql, *args, **kwargs):
-
             class Compiler(type(sql._compiler(engine.dialect))):
-
                 def visit_bindparam(self, bindparam, *args, **kwargs):
-                    return self.render_literal_value(
-                        bindparam.value, bindparam.type)
+                    return self.render_literal_value(bindparam.value, bindparam.type)
 
                 def render_literal_value(self, value, type_):
                     if isinstance(value, int):
@@ -37,8 +34,7 @@ def create_mock_engine(bind, stream=None):
                     elif isinstance(value, (datetime.date, datetime.datetime)):
                         return "'%s'" % value
 
-                    return super().render_literal_value(
-                        value, type_)
+                    return super().render_literal_value(value, type_)
 
             text = str(Compiler(engine.dialect, sql).process(sql))
             text = re.sub(r'\n+', '\n', text)
@@ -47,6 +43,7 @@ def create_mock_engine(bind, stream=None):
             stream.write('\n%s;' % text)
 
     else:
+
         def dump(*args, **kw):
             return None
 
@@ -77,7 +74,6 @@ def mock_engine(engine, stream=None):
     # expression to execute.
 
     for frame in inspect.stack()[1:]:
-
         try:
             frame = frame[0]
             expression = '__target = %s' % engine
@@ -89,7 +85,6 @@ def mock_engine(engine, stream=None):
             pass
 
     else:
-
         raise ValueError('Not a valid python expression', engine)
 
     # Evaluate the expression and get the target engine.

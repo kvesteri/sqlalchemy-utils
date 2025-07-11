@@ -6,6 +6,7 @@ class BitType(sa.types.TypeDecorator):
     """
     BitType offers way of saving BITs into database.
     """
+
     impl = sa.types.BINARY
 
     cache_ok = True
