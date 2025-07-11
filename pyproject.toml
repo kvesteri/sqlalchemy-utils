@@ -92,18 +92,10 @@ test_all = [
 ]
 
 [tool.ruff]
-exclude = [
-    ".eggs",
-    ".git",
-    ".tox",
-    ".venv",
-    "__pycache__",
-    "build",
-    "dist",
+extend-exclude = [
     "docs",
     "migrations",
     "tests",
-    "venv",
 ]
 
 [tool.ruff.lint]
