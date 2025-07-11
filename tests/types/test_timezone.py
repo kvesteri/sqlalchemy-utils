@@ -3,10 +3,7 @@ import pytz
 import sqlalchemy as sa
 from dateutil.zoneinfo import get_zonefile_instance, tzfile
 
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
+import zoneinfo
 
 from sqlalchemy_utils.types import timezone, TimezoneType
 

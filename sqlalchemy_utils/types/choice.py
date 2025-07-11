@@ -192,10 +192,6 @@ class EnumTypeImpl:
     """The implementation for the ``Enum`` usage."""
 
     def __init__(self, enum_class):
-        if Enum is None:
-            raise ImproperlyConfigured(
-                "'enum34' package is required to use 'EnumType' in Python < 3.4"
-            )
         if not issubclass(enum_class, Enum):
             raise ImproperlyConfigured('EnumType needs a class of enum defined.')
 
