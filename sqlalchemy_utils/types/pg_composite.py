@@ -173,9 +173,7 @@ class CompositeType(UserDefinedType, SchemaType):
             try:
                 type_ = self.type.typemap[key]
             except KeyError:
-                raise KeyError(
-                    "Type '{}' doesn't have an attribute: '{}'".format(self.name, key)
-                )
+                raise KeyError(f"Type '{self.name}' doesn't have an attribute: '{key}'")
 
             return CompositeElement(self.expr, key, type_)
 

@@ -230,7 +230,7 @@ def get_column_key(model, column):
             if c.name == column.name and c.table is column.table:
                 return key
     raise sa.orm.exc.UnmappedColumnError(
-        'No column %s is configured on mapper %s...' % (column, mapper)
+        f'No column {column} is configured on mapper {mapper}...'
     )
 
 

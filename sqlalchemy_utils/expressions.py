@@ -21,7 +21,7 @@ def compile_array_get(element, compiler, **kw):
 
     if not hasattr(args[1], 'value') or not isinstance(args[1].value, int):
         raise Exception('Second argument should be an integer.')
-    return '({})[{}]'.format(compiler.process(args[0]), sa.text(str(args[1].value + 1)))
+    return f'({compiler.process(args[0])})[{sa.text(str(args[1].value + 1))}]'
 
 
 class row_to_json(GenericFunction):
