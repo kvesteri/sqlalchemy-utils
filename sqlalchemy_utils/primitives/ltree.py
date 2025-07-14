@@ -148,9 +148,7 @@ class Ltree:
             return Ltree(self.path.split('.')[key])
         elif isinstance(key, slice):
             return Ltree('.'.join(self.path.split('.')[key]))
-        raise TypeError(
-            'Ltree indices must be integers, not {}'.format(key.__class__.__name__)
-        )
+        raise TypeError(f'Ltree indices must be integers, not {key.__class__.__name__}')
 
     def lca(self, *others):
         """
