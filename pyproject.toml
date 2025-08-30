@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "SQLAlchemy-Utils"
-version = "0.41.2"
+version = "0.42.0"
 description = "Various utility functions for SQLAlchemy."
 readme = "README.rst"
 license = "BSD-3-Clause"
