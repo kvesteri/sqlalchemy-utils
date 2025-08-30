@@ -3,8 +3,8 @@ Changelog
 
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
-Unreleased changes
-^^^^^^^^^^^^^^^^^^
+0.42.0 (2025-08-30)
+^^^^^^^^^^^^^^^^^^^
 
 - Drop support for Python 3.7 and 3.8.
 - Drop support for sqlalchemy 1.3.
