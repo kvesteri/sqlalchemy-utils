@@ -53,11 +53,7 @@ class GenericAttributeImpl(attributes.ScalarAttributeImpl):
 
         id = self.get_state_id(state)
 
-        try:
-            target = session.get(target_class, id)
-        except AttributeError:
-            # sqlalchemy 1.3
-            target = session.query(target_class).get(id)
+        target = session.get(target_class, id)
 
         # Return found (or not found) target.
         return target
@@ -73,11 +69,15 @@ class GenericAttributeImpl(attributes.ScalarAttributeImpl):
         # Lookup row with the discriminator and id.
         return tuple(state.attrs[id.key].value for id in self.parent_token.id)
 
-    def set(self, state, dict_, initiator,
-            passive=attributes.PASSIVE_OFF,
-            check_old=None,
-            pop=False):
-
+    def set(
+        self,
+        state,
+        dict_,
+        initiator,
+        passive=attributes.PASSIVE_OFF,
+        check_old=None,
+        pop=False,
+    ):
         # Set us on the state.
         dict_[self.key] = initiator
 
@@ -106,9 +106,9 @@ class GenericRelationshipProperty(MapperProperty):
     """A generic form of the relationship property.
 
     Creates a 1 to many relationship between the parent model
-    and any other models using a descriminator (the table name).
+    and any other models using a discriminator (the table name).
 
-    :param discriminator
+    :param discriminator:
         Field to discriminate which model we are referring to.
     :param id:
         Field to point to the model we are referring to.
@@ -153,9 +153,7 @@ class GenericRelationshipProperty(MapperProperty):
         self.discriminator = self._column_to_property(self._discriminator_col)
 
         if self.discriminator is None:
-            raise ImproperlyConfigured(
-                'Could not find discriminator descriptor.'
-            )
+            raise ImproperlyConfigured('Could not find discriminator descriptor.')
 
         self.id = list(map(self._column_to_property, self._id_cols))
 
@@ -180,10 +178,9 @@ class GenericRelationshipProperty(MapperProperty):
             # Iterate through the weak sequence in order to get the actual
             # mappers
             class_names = [other.__name__]
-            class_names.extend([
-                submapper.class_.__name__
-                for submapper in mapper._inheriting_mappers
-            ])
+            class_names.extend(
+                [submapper.class_.__name__ for submapper in mapper._inheriting_mappers]
+            )
 
             return self.property._discriminator_col.in_(class_names)
 
@@ -195,7 +192,7 @@ class GenericRelationshipProperty(MapperProperty):
             parententity=mapper,
             doc=self.doc,
             impl_class=GenericAttributeImpl,
-            parent_token=self
+            parent_token=self,
         )
 
 

@@ -6,4 +6,4 @@ if [ ! -f /etc/apt/sources.list.d/microsoft-prod.list ]; then
 fi
 
 sudo apt-get update
-sudo ACCEPT_EULA=Y apt-get -y install msodbcsql17 unixodbc
+sudo ACCEPT_EULA=Y apt-get -y install msodbcsql18 unixodbc

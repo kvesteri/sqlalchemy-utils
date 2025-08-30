@@ -80,6 +80,7 @@ class TranslationHybrid:
         locale. If not it tries to get translation for default locale. If there
         is no translation found for default locale it returns None.
         """
+
         def getter(obj):
             current_locale = cast_locale(obj, self.current_locale, attr)
             try:
@@ -90,6 +91,7 @@ class TranslationHybrid:
                     return getattr(obj, attr.key)[default_locale]
                 except (TypeError, KeyError):
                     return self.default_value
+
         return getter
 
     def setter_factory(self, attr):
@@ -98,6 +100,7 @@ class TranslationHybrid:
                 setattr(obj, attr.key, {})
             locale = cast_locale(obj, self.current_locale, attr)
             getattr(obj, attr.key)[locale] = value
+
         return setter
 
     def expr_factory(self, attr):
@@ -105,15 +108,13 @@ class TranslationHybrid:
             cls_attr = getattr(cls, attr.key)
             current_locale = cast_locale_expr(cls, self.current_locale, attr)
             default_locale = cast_locale_expr(cls, self.default_locale, attr)
-            return sa.func.coalesce(
-                cls_attr[current_locale],
-                cls_attr[default_locale]
-            )
+            return sa.func.coalesce(cls_attr[current_locale], cls_attr[default_locale])
+
         return expr
 
     def __call__(self, attr):
         return hybrid_property(
             fget=self.getter_factory(attr),
             fset=self.setter_factory(attr),
-            expr=self.expr_factory(attr)
+            expr=self.expr_factory(attr),
         )

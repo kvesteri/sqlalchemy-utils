@@ -21,7 +21,7 @@ class PKCS5Padding(Padding):
     def pad(self, value):
         if not isinstance(value, bytes):
             value = value.encode()
-        padding_length = (self.block_size - len(value) % self.block_size)
+        padding_length = self.block_size - len(value) % self.block_size
         padding_sequence = padding_length * bytes((padding_length,))
         value_with_padding = value + padding_sequence
 
@@ -45,8 +45,13 @@ class PKCS5Padding(Padding):
 
         def convert_byte_or_char_to_number(x):
             return ord(x) if isinstance(x, str) else x
-        if any([padding_length != convert_byte_or_char_to_number(x)
-               for x in value[-padding_length:]]):
+
+        if any(
+            [
+                padding_length != convert_byte_or_char_to_number(x)
+                for x in value[-padding_length:]
+            ]
+        ):
             raise InvalidPaddingError()
 
         value_without_padding = value[0:-padding_length]
@@ -67,7 +72,7 @@ class OneAndZeroesPadding(Padding):
     def pad(self, value):
         if not isinstance(value, bytes):
             value = value.encode()
-        padding_length = (self.block_size - len(value) % self.block_size)
+        padding_length = self.block_size - len(value) % self.block_size
         one_part_bytes = bytes((self.BYTE_80,))
         zeroes_part_bytes = (padding_length - 1) * bytes((self.BYTE_00,))
         padding_sequence = one_part_bytes + zeroes_part_bytes
@@ -77,8 +82,7 @@ class OneAndZeroesPadding(Padding):
 
     def unpad(self, value):
         value_without_padding = value.rstrip(bytes((self.BYTE_00,)))
-        value_without_padding = value_without_padding.rstrip(
-            bytes((self.BYTE_80,)))
+        value_without_padding = value_without_padding.rstrip(bytes((self.BYTE_80,)))
 
         return value_without_padding
 
@@ -96,7 +100,7 @@ class ZeroesPadding(Padding):
     def pad(self, value):
         if not isinstance(value, bytes):
             value = value.encode()
-        padding_length = (self.block_size - len(value) % self.block_size)
+        padding_length = self.block_size - len(value) % self.block_size
         zeroes_part_bytes = (padding_length - 1) * bytes((self.BYTE_00,))
         last_part_bytes = bytes((padding_length,))
         padding_sequence = zeroes_part_bytes + last_part_bytes
@@ -123,7 +127,7 @@ class NaivePadding(Padding):
     CHARACTER = b'*'
 
     def pad(self, value):
-        num_of_bytes = (self.block_size - len(value) % self.block_size)
+        num_of_bytes = self.block_size - len(value) % self.block_size
         value_with_padding = value + num_of_bytes * self.CHARACTER
 
         return value_with_padding
@@ -138,5 +142,5 @@ PADDING_MECHANISM = {
     'pkcs5': PKCS5Padding,
     'oneandzeroes': OneAndZeroesPadding,
     'zeroes': ZeroesPadding,
-    'naive': NaivePadding
+    'naive': NaivePadding,
 }

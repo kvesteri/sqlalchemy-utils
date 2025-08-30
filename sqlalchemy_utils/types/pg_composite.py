@@ -110,6 +110,7 @@ Related links:
 
 https://schinckel.net/2014/09/24/using-postgres-composite-types-in-django/
 """
+
 from collections import namedtuple
 
 import sqlalchemy as sa
@@ -117,12 +118,7 @@ from sqlalchemy.dialects.postgresql.psycopg2 import PGDialect_psycopg2
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.schema import _CreateDropBase
 from sqlalchemy.sql.expression import FunctionElement
-from sqlalchemy.types import (
-    SchemaType,
-    to_instance,
-    TypeDecorator,
-    UserDefinedType
-)
+from sqlalchemy.types import SchemaType, to_instance, TypeDecorator, UserDefinedType
 
 from .. import ImproperlyConfigured
 
@@ -143,6 +139,7 @@ class CompositeElement(FunctionElement):
     """
     Instances of this class wrap a Postgres composite type.
     """
+
     def __init__(self, base, field, type_):
         self.name = field
         self.type = to_instance(type_)
@@ -168,6 +165,7 @@ class CompositeType(UserDefinedType, SchemaType):
     :param columns:
         List of columns that this composite type consists of
     """
+
     python_type = tuple
 
     class comparator_factory(UserDefinedType.Comparator):
@@ -175,11 +173,7 @@ class CompositeType(UserDefinedType, SchemaType):
             try:
                 type_ = self.type.typemap[key]
             except KeyError:
-                raise KeyError(
-                    "Type '{}' doesn't have an attribute: '{}'".format(
-                        self.name, key
-                    )
-                )
+                raise KeyError(f"Type '{self.name}' doesn't have an attribute: '{key}'")
 
             return CompositeElement(self.expr, key, type_)
 
@@ -188,18 +182,12 @@ class CompositeType(UserDefinedType, SchemaType):
             raise ImproperlyConfigured(
                 "'psycopg2' package is required in order to use CompositeType."
             )
-        SchemaType.__init__(
-            self,
-            name=name,
-            quote=quote
-        )
+        SchemaType.__init__(self, name=name, quote=quote)
         self.columns = columns
         if name in registered_composites:
             self.type_cls = registered_composites[name].type_cls
         else:
-            self.type_cls = namedtuple(
-                self.name, [c.name for c in columns]
-            )
+            self.type_cls = namedtuple(self.name, [c.name for c in columns])
         registered_composites[name] = self
 
         class Caster(CompositeCaster):
@@ -220,20 +208,17 @@ class CompositeType(UserDefinedType, SchemaType):
             processed_value = []
             for i, column in enumerate(self.columns):
                 current_value = (
-                    value.get(column.name)
-                    if isinstance(value, dict)
-                    else value[i]
+                    value.get(column.name) if isinstance(value, dict) else value[i]
                 )
 
                 if isinstance(column.type, TypeDecorator):
                     processed_value.append(
-                        column.type.process_bind_param(
-                            current_value, dialect
-                        )
+                        column.type.process_bind_param(current_value, dialect)
                     )
                 else:
                     processed_value.append(current_value)
             return self.type_cls(*processed_value)
+
         return process
 
     def result_processor(self, dialect, coltype):
@@ -250,29 +235,23 @@ class CompositeType(UserDefinedType, SchemaType):
                 else:
                     kwargs[column.name] = getattr(value, column.name)
             return cls(**kwargs)
+
         return process
 
     def create(self, bind=None, checkfirst=None):
-        if (
-            not checkfirst or
-            not bind.dialect.has_type(bind, self.name, schema=self.schema)
+        if not checkfirst or not bind.dialect.has_type(
+            bind, self.name, schema=self.schema
         ):
             bind.execute(CreateCompositeType(self))
 
     def drop(self, bind=None, checkfirst=True):
-        if (
-            checkfirst and
-            bind.dialect.has_type(bind, self.name, schema=self.schema)
-        ):
+        if checkfirst and bind.dialect.has_type(bind, self.name, schema=self.schema):
             bind.execute(DropCompositeType(self))
 
 
 def register_psycopg2_composite(dbapi_connection, composite):
     psycopg2.extras.register_composite(
-        composite.name,
-        dbapi_connection,
-        globally=True,
-        factory=composite.caster
+        composite.name, dbapi_connection, globally=True, factory=composite.caster
     )
 
     def adapt_composite(value):
@@ -282,24 +261,20 @@ def register_psycopg2_composite(dbapi_connection, composite):
                 getattr(value, column.name)
                 if not isinstance(column.type, TypeDecorator)
                 else column.type.process_bind_param(
-                    getattr(value, column.name),
-                    dialect
+                    getattr(value, column.name), dialect
                 )
             )
-            for column in
-            composite.columns
+            for column in composite.columns
         ]
         for value in adapted:
             if hasattr(value, 'prepare'):
                 value.prepare(dbapi_connection)
         values = [
-            value.getquoted().decode(dbapi_connection.encoding)
-            for value in adapted
+            value.getquoted().decode(dbapi_connection.encoding) for value in adapted
         ]
         return AsIs(
             '({})::{}'.format(
-                ', '.join(values),
-                dialect.identifier_preparer.quote(composite.name)
+                ', '.join(values), dialect.identifier_preparer.quote(composite.name)
             )
         )
 
@@ -317,10 +292,7 @@ def get_driver_connection(connection):
 def before_create(target, connection, **kw):
     for name, composite in registered_composites.items():
         composite.create(connection, checkfirst=True)
-        register_psycopg2_composite(
-            get_driver_connection(connection),
-            composite
-        )
+        register_psycopg2_composite(get_driver_connection(connection), composite)
 
 
 def after_drop(target, connection, **kw):
@@ -330,10 +302,7 @@ def after_drop(target, connection, **kw):
 
 def register_composites(connection):
     for name, composite in registered_composites.items():
-        register_psycopg2_composite(
-            get_driver_connection(connection),
-            composite
-        )
+        register_psycopg2_composite(get_driver_connection(connection), composite)
 
 
 def attach_composite_listeners():
@@ -366,16 +335,13 @@ def _visit_create_composite_type(create, compiler, **kw):
     fields = ', '.join(
         '{name} {type}'.format(
             name=column.name,
-            type=compiler.dialect.type_compiler.process(
-                to_instance(column.type)
-            )
+            type=compiler.dialect.type_compiler.process(to_instance(column.type)),
         )
         for column in type_.columns
     )
 
     return 'CREATE TYPE {name} AS ({fields})'.format(
-        name=compiler.preparer.format_type(type_),
-        fields=fields
+        name=compiler.preparer.format_type(type_), fields=fields
     )
 
 

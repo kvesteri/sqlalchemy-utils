@@ -29,8 +29,7 @@ def escape_like(string, escape_char='*'):
     :param escape_char: escape character
     """
     return (
-        string
-        .replace(escape_char, escape_char * 2)
+        string.replace(escape_char, escape_char * 2)
         .replace('%', escape_char + '%')
         .replace('_', escape_char + '_')
     )
@@ -80,10 +79,12 @@ def json_sql(value, scalars_to_json=True):
     :param value:
         value to be converted to SQLAlchemy PostgreSQL function constructs
     """
-    scalar_convert = sa.text
     if scalars_to_json:
+
         def scalar_convert(a):
             return sa.func.to_json(sa.text(a))
+    else:
+        scalar_convert = sa.text
 
     if isinstance(value, Mapping):
         return sa.func.json_build_object(
@@ -96,10 +97,7 @@ def json_sql(value, scalars_to_json=True):
         return scalar_convert(f"'{value}'")
     elif isinstance(value, Sequence):
         return sa.func.json_build_array(
-            *(
-                json_sql(v, scalars_to_json=False)
-                for v in value
-            )
+            *(json_sql(v, scalars_to_json=False) for v in value)
         )
     elif isinstance(value, (int, float)):
         return scalar_convert(str(value))
@@ -152,10 +150,12 @@ def jsonb_sql(value, scalars_to_jsonb=True):
     :boolean jsonbb:
         Flag to alternatively convert the return with a to_jsonb construct
     """
-    scalar_convert = sa.text
     if scalars_to_jsonb:
+
         def scalar_convert(a):
             return sa.func.to_jsonb(sa.text(a))
+    else:
+        scalar_convert = sa.text
 
     if isinstance(value, Mapping):
         return sa.func.jsonb_build_object(
@@ -168,10 +168,7 @@ def jsonb_sql(value, scalars_to_jsonb=True):
         return scalar_convert(f"'{value}'")
     elif isinstance(value, Sequence):
         return sa.func.jsonb_build_array(
-            *(
-                jsonb_sql(v, scalars_to_jsonb=False)
-                for v in value
-            )
+            *(jsonb_sql(v, scalars_to_jsonb=False) for v in value)
         )
     elif isinstance(value, (int, float)):
         return scalar_convert(str(value))
@@ -284,12 +281,8 @@ def has_index(column_or_constraint):
     else:
         columns = [column_or_constraint]
 
-    return (
-        (primary_keys and starts_with(primary_keys, columns)) or
-        any(
-            starts_with(index.columns.values(), columns)
-            for index in table.indexes
-        )
+    return (primary_keys and starts_with(primary_keys, columns)) or any(
+        starts_with(index.columns.values(), columns) for index in table.indexes
     )
 
 
@@ -385,13 +378,13 @@ def has_unique_index(column_or_constraint):
         columns = [column_or_constraint]
 
     return (
-        (columns == primary_keys) or
-        any(
+        (columns == primary_keys)
+        or any(
             columns == list(constraint.columns.values())
             for constraint in table.constraints
             if isinstance(constraint, sa.sql.schema.UniqueConstraint)
-        ) or
-        any(
+        )
+        or any(
             columns == list(index.columns.values())
             for index in table.indexes
             if index.unique
@@ -407,16 +400,12 @@ def is_auto_assigned_date_column(column):
     :param column: SQLAlchemy Column object
     """
     return (
-        (
-            isinstance(column.type, sa.DateTime) or
-            isinstance(column.type, sa.Date)
-        ) and
-        (
-            column.default or
-            column.server_default or
-            column.onupdate or
-            column.server_onupdate
-        )
+        isinstance(column.type, sa.DateTime) or isinstance(column.type, sa.Date)
+    ) and (
+        column.default
+        or column.server_default
+        or column.onupdate
+        or column.server_onupdate
     )
 
 
@@ -483,7 +472,7 @@ def database_exists(url):
             text = "SELECT 1 FROM pg_database WHERE datname='%s'" % database
             for db in (database, 'postgres', 'template1', 'template0', None):
                 url = _set_url_database(url, database=db)
-                engine = sa.create_engine(url)
+                engine = sa.create_engine(url, isolation_level='AUTOCOMMIT')
                 try:
                     return bool(_get_scalar_result(engine, sa.text(text)))
                 except (ProgrammingError, OperationalError):
@@ -493,8 +482,10 @@ def database_exists(url):
         elif dialect_name == 'mysql':
             url = _set_url_database(url, database=None)
             engine = sa.create_engine(url)
-            text = ("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA "
-                    "WHERE SCHEMA_NAME = '%s'" % database)
+            text = (
+                'SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA '
+                "WHERE SCHEMA_NAME = '%s'" % database
+            )
             return bool(_get_scalar_result(engine, sa.text(text)))
 
         elif dialect_name == 'sqlite':
@@ -506,6 +497,14 @@ def database_exists(url):
                 # The default SQLAlchemy database is in memory, and :memory: is
                 # not required, thus we should support that use case.
                 return True
+        elif dialect_name == 'mssql':
+            text = "SELECT 1 FROM sys.databases WHERE name = '%s'" % database
+            url = _set_url_database(url, database='master')
+            engine = sa.create_engine(url, isolation_level='AUTOCOMMIT')
+            try:
+                return bool(_get_scalar_result(engine, sa.text(text)))
+            except (ProgrammingError, OperationalError):
+                return False
         else:
             text = 'SELECT 1'
             try:
@@ -546,17 +545,19 @@ def create_database(url, encoding='utf8', template=None):
     dialect_driver = url.get_dialect().driver
 
     if dialect_name == 'postgresql':
-        url = _set_url_database(url, database="postgres")
+        url = _set_url_database(url, database='postgres')
     elif dialect_name == 'mssql':
-        url = _set_url_database(url, database="master")
+        url = _set_url_database(url, database='master')
     elif dialect_name == 'cockroachdb':
-        url = _set_url_database(url, database="defaultdb")
+        url = _set_url_database(url, database='defaultdb')
     elif not dialect_name == 'sqlite':
         url = _set_url_database(url, database=None)
 
-    if (dialect_name == 'mssql' and dialect_driver in {'pymssql', 'pyodbc'}) \
-            or (dialect_name == 'postgresql' and dialect_driver in {
-            'asyncpg', 'pg8000', 'psycopg', 'psycopg2', 'psycopg2cffi'}):
+    if (dialect_name == 'mssql' and dialect_driver in {'pymssql', 'pyodbc'}) or (
+        dialect_name == 'postgresql'
+        and dialect_driver
+        in {'asyncpg', 'pg8000', 'psycopg', 'psycopg2', 'psycopg2cffi'}
+    ):
         engine = sa.create_engine(url, isolation_level='AUTOCOMMIT')
     else:
         engine = sa.create_engine(url)
@@ -567,17 +568,14 @@ def create_database(url, encoding='utf8', template=None):
 
         with engine.begin() as conn:
             text = "CREATE DATABASE {} ENCODING '{}' TEMPLATE {}".format(
-                quote(conn, database),
-                encoding,
-                quote(conn, template)
+                quote(conn, database), encoding, quote(conn, template)
             )
             conn.execute(sa.text(text))
 
     elif dialect_name == 'mysql':
         with engine.begin() as conn:
             text = "CREATE DATABASE {} CHARACTER SET = '{}'".format(
-                quote(conn, database),
-                encoding
+                quote(conn, database), encoding
             )
             conn.execute(sa.text(text))
 
@@ -600,8 +598,10 @@ def drop_database(url):
 
     :param url: A SQLAlchemy engine URL.
 
-    Works similar to the :ref:`create_database` method in that both url text
-    and a constructed url are accepted. ::
+    Works similar to the :func:`create_database` method in that both url text
+    and a constructed url are accepted.
+
+    ::
 
         drop_database('postgresql://postgres@localhost/name')
         drop_database(engine.url)
@@ -614,18 +614,19 @@ def drop_database(url):
     dialect_driver = url.get_dialect().driver
 
     if dialect_name == 'postgresql':
-        url = _set_url_database(url, database="postgres")
+        url = _set_url_database(url, database='postgres')
     elif dialect_name == 'mssql':
-        url = _set_url_database(url, database="master")
+        url = _set_url_database(url, database='master')
     elif dialect_name == 'cockroachdb':
-        url = _set_url_database(url, database="defaultdb")
+        url = _set_url_database(url, database='defaultdb')
     elif not dialect_name == 'sqlite':
         url = _set_url_database(url, database=None)
 
-    if dialect_name == 'mssql' and dialect_driver in {'pymssql', 'pyodbc'}:
-        engine = sa.create_engine(url, connect_args={'autocommit': True})
-    elif dialect_name == 'postgresql' and dialect_driver in {
-            'asyncpg', 'pg8000', 'psycopg', 'psycopg2', 'psycopg2cffi'}:
+    if (dialect_name == 'mssql' and dialect_driver in {'pymssql', 'pyodbc'}) or (
+        dialect_name == 'postgresql'
+        and dialect_driver
+        in {'asyncpg', 'pg8000', 'psycopg', 'psycopg2', 'psycopg2cffi'}
+    ):
         engine = sa.create_engine(url, isolation_level='AUTOCOMMIT')
     else:
         engine = sa.create_engine(url)
@@ -633,24 +634,6 @@ def drop_database(url):
     if dialect_name == 'sqlite' and database != ':memory:':
         if database:
             os.remove(database)
-    elif dialect_name == 'postgresql':
-        with engine.begin() as conn:
-            # Disconnect all users from the database we are dropping.
-            version = conn.dialect.server_version_info
-            pid_column = (
-                'pid' if (version >= (9, 2)) else 'procpid'
-            )
-            text = '''
-            SELECT pg_terminate_backend(pg_stat_activity.{pid_column})
-            FROM pg_stat_activity
-            WHERE pg_stat_activity.datname = '{database}'
-            AND {pid_column} <> pg_backend_pid();
-            '''.format(pid_column=pid_column, database=database)
-            conn.execute(sa.text(text))
-
-            # Drop the database.
-            text = f'DROP DATABASE {quote(conn, database)}'
-            conn.execute(sa.text(text))
     else:
         with engine.begin() as conn:
             text = f'DROP DATABASE {quote(conn, database)}'

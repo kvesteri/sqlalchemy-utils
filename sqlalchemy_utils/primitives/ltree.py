@@ -2,7 +2,7 @@ import re
 
 from ..utils import str_coercible
 
-path_matcher = re.compile(r'^[A-Za-z0-9_]+(\.[A-Za-z0-9_]+)*$')
+path_matcher = re.compile(r'^[A-Za-z0-9_-]+(\.[A-Za-z0-9_-]+)*$')
 
 
 @str_coercible
@@ -100,8 +100,7 @@ class Ltree:
             self.path = path_or_ltree
         else:
             raise TypeError(
-                "Ltree() argument must be a string or an Ltree, not '{}'"
-                .format(
+                "Ltree() argument must be a string or an Ltree, not '{}'".format(
                     type(path_or_ltree).__name__
                 )
             )
@@ -109,9 +108,7 @@ class Ltree:
     @classmethod
     def validate(cls, path):
         if path_matcher.match(path) is None:
-            raise ValueError(
-                f"'{path}' is not a valid ltree path."
-            )
+            raise ValueError(f"'{path}' is not a valid ltree path.")
 
     def __len__(self):
         return len(self.path.split('.'))
@@ -120,7 +117,7 @@ class Ltree:
         subpath = Ltree(other).path.split('.')
         parts = self.path.split('.')
         for index, _ in enumerate(parts):
-            if parts[index:len(subpath) + index] == subpath:
+            if parts[index : len(subpath) + index] == subpath:
                 return index
         raise ValueError('subpath not found')
 
@@ -132,7 +129,7 @@ class Ltree:
 
             assert Ltree('1.2.3.4.5').descendant_of('1.2.3')
         """
-        subpath = self[:len(Ltree(other))]
+        subpath = self[: len(Ltree(other))]
         return subpath == other
 
     def ancestor_of(self, other):
@@ -143,7 +140,7 @@ class Ltree:
 
             assert Ltree('1.2.3').ancestor_of('1.2.3.4.5')
         """
-        subpath = Ltree(other)[:len(self)]
+        subpath = Ltree(other)[: len(self)]
         return subpath == self
 
     def __getitem__(self, key):
@@ -151,11 +148,7 @@ class Ltree:
             return Ltree(self.path.split('.')[key])
         elif isinstance(key, slice):
             return Ltree('.'.join(self.path.split('.')[key]))
-        raise TypeError(
-            'Ltree indices must be integers, not {}'.format(
-                key.__class__.__name__
-            )
-        )
+        raise TypeError(f'Ltree indices must be integers, not {key.__class__.__name__}')
 
     def lca(self, *others):
         """
@@ -169,9 +162,9 @@ class Ltree:
         parts = self.path.split('.')
         for index, element in enumerate(parts):
             if any(
-                other[index] != element or
-                len(other) <= index + 1 or
-                len(parts) == index + 1
+                other[index] != element
+                or len(other) <= index + 1
+                or len(parts) == index + 1
                 for other in other_parts
             ):
                 if index == 0:

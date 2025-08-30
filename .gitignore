@@ -61,3 +61,5 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+
+poetry.lock

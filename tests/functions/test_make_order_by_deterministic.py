@@ -2,7 +2,6 @@ import pytest
 import sqlalchemy as sa
 import sqlalchemy.orm
 
-from sqlalchemy_utils.compat import _select_args
 from sqlalchemy_utils.functions.sort_query import make_order_by_deterministic
 
 from .. import assert_contains
@@ -31,7 +30,7 @@ def User(Base, Article):
         )
 
     User.article_count = sa.orm.column_property(
-        sa.select(*_select_args(sa.func.count()))
+        sa.select(sa.func.count())
         .select_from(Article)
         .where(Article.author_id == User.id)
         .label('article_count')

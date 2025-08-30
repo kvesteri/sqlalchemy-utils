@@ -18,11 +18,7 @@ try:
     from cryptography.fernet import Fernet
     from cryptography.hazmat.backends import default_backend
     from cryptography.hazmat.primitives import hashes
-    from cryptography.hazmat.primitives.ciphers import (
-        algorithms,
-        Cipher,
-        modes
-    )
+    from cryptography.hazmat.primitives.ciphers import algorithms, Cipher, modes
 except ImportError:
     pass
 
@@ -83,7 +79,7 @@ class AesEngine(EncryptionDecryptionBaseEngine):
         self.cipher = Cipher(
             algorithms.AES(self.secret_key),
             modes.CBC(self.iv),
-            backend=default_backend()
+            backend=default_backend(),
         )
 
     def _set_padding_mechanism(self, padding_mechanism=None):
@@ -91,7 +87,7 @@ class AesEngine(EncryptionDecryptionBaseEngine):
         if isinstance(padding_mechanism, str):
             if padding_mechanism not in PADDING_MECHANISM.keys():
                 raise ImproperlyConfigured(
-                    "There is not padding mechanism with name {}".format(
+                    'There is not padding mechanism with name {}'.format(
                         padding_mechanism
                     )
                 )
@@ -158,9 +154,7 @@ class AesGcmEngine(EncryptionDecryptionBaseEngine):
         value = value.encode()
         iv = os.urandom(self.IV_BYTES_NEEDED)
         cipher = Cipher(
-            algorithms.AES(self.secret_key),
-            modes.GCM(iv),
-            backend=default_backend()
+            algorithms.AES(self.secret_key), modes.GCM(iv), backend=default_backend()
         )
         encryptor = cipher.encryptor()
         encrypted = encryptor.update(value) + encryptor.finalize()
@@ -174,14 +168,15 @@ class AesGcmEngine(EncryptionDecryptionBaseEngine):
         decrypted = base64.b64decode(value)
         if len(decrypted) < self.IV_BYTES_NEEDED + self.TAG_SIZE_BYTES:
             raise InvalidCiphertextError()
-        iv = decrypted[:self.IV_BYTES_NEEDED]
-        tag = decrypted[self.IV_BYTES_NEEDED:
-                        self.IV_BYTES_NEEDED + self.TAG_SIZE_BYTES]
-        decrypted = decrypted[self.IV_BYTES_NEEDED + self.TAG_SIZE_BYTES:]
+        iv = decrypted[: self.IV_BYTES_NEEDED]
+        tag = decrypted[
+            self.IV_BYTES_NEEDED : self.IV_BYTES_NEEDED + self.TAG_SIZE_BYTES
+        ]
+        decrypted = decrypted[self.IV_BYTES_NEEDED + self.TAG_SIZE_BYTES :]
         cipher = Cipher(
             algorithms.AES(self.secret_key),
             modes.GCM(iv, tag),
-            backend=default_backend()
+            backend=default_backend(),
         )
         decryptor = cipher.decryptor()
         try:
@@ -257,11 +252,7 @@ class StringEncryptedType(TypeDecorator, ScalarCoercible):
 
         import sqlalchemy as sa
         from sqlalchemy import create_engine
-        try:
-            from sqlalchemy.orm import declarative_base
-        except ImportError:
-            # sqlalchemy 1.3
-            from sqlalchemy.ext.declarative import declarative_base
+        from sqlalchemy.orm import declarative_base
         from sqlalchemy.orm import sessionmaker
 
         from sqlalchemy_utils import StringEncryptedType
@@ -349,17 +340,11 @@ class StringEncryptedType(TypeDecorator, ScalarCoercible):
                 sa.Unicode, get_key))
 
     """
+
     impl = String
     cache_ok = True
 
-    def __init__(
-        self,
-        type_in=None,
-        key=None,
-        engine=None,
-        padding=None,
-        **kwargs
-    ):
+    def __init__(self, type_in=None, key=None, engine=None, padding=None, **kwargs):
         """Initialization."""
         if not cryptography:
             raise ImproperlyConfigured(
@@ -397,9 +382,7 @@ class StringEncryptedType(TypeDecorator, ScalarCoercible):
             self._update_key()
 
             try:
-                value = self.underlying_type.process_bind_param(
-                    value, dialect
-                )
+                value = self.underlying_type.process_bind_param(value, dialect)
 
             except AttributeError:
                 # Doesn't have 'process_bind_param'
@@ -439,9 +422,7 @@ class StringEncryptedType(TypeDecorator, ScalarCoercible):
                     return decrypted_value == 'true'
 
                 elif type_ in date_types:
-                    return DatetimeHandler.process_value(
-                        decrypted_value, type_
-                    )
+                    return DatetimeHandler.process_value(decrypted_value, type_)
 
                 elif issubclass(type_, JSONType):
                     return json.loads(decrypted_value)
@@ -462,6 +443,7 @@ class EncryptedType(StringEncryptedType):
     'LargeBinary' to 'String' in a future version. Use
     'StringEncryptedType' to use the 'String' implementation.
     """
+
     impl = LargeBinary
 
     def __init__(self, *args, **kwargs):
@@ -469,7 +451,9 @@ class EncryptedType(StringEncryptedType):
             "The 'EncryptedType' class will change implementation from "
             "'LargeBinary' to 'String' in a future version. Use "
             "'StringEncryptedType' to use the 'String' implementation.",
-            DeprecationWarning, stacklevel=2)
+            DeprecationWarning,
+            stacklevel=2,
+        )
         super().__init__(*args, **kwargs)
 
     def process_bind_param(self, value, dialect):

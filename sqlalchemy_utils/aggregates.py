@@ -361,7 +361,6 @@ TODO
 
 """
 
-
 from collections import defaultdict
 from weakref import WeakKeyDictionary
 
@@ -371,26 +370,18 @@ import sqlalchemy.orm
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.sql.functions import _FunctionGenerator
 
-from .compat import _select_args, get_scalar_subquery
 from .functions.orm import get_column_key
 from .relationships import (
     chained_join,
     path_to_relationships,
-    select_correlated_expression
+    select_correlated_expression,
 )
 
 aggregated_attrs = WeakKeyDictionary()
 
 
 class AggregatedAttribute(declared_attr):
-    def __init__(
-        self,
-        fget,
-        relationship,
-        column,
-        *args,
-        **kwargs
-    ):
+    def __init__(self, fget, relationship, column, *args, **kwargs):
         super().__init__(fget, *args, **kwargs)
         self.__doc__ = fget.__doc__
         self.column = column
@@ -441,27 +432,20 @@ class AggregatedValue:
         self.class_ = class_
         self.attr = attr
         self.path = path
-        self.relationships = list(
-            reversed(path_to_relationships(path, class_))
-        )
+        self.relationships = list(reversed(path_to_relationships(path, class_)))
         self.expr = aggregate_expression(expr, class_)
 
     @property
     def aggregate_query(self):
         query = select_correlated_expression(
-            self.class_,
-            self.expr,
-            self.path,
-            self.relationships[0].mapper.class_
+            self.class_, self.expr, self.path, self.relationships[0].mapper.class_
         )
 
-        return get_scalar_subquery(query)
+        return query.scalar_subquery()
 
     def update_query(self, objects):
         table = self.class_.__table__
-        query = table.update().values(
-            {self.attr: self.aggregate_query}
-        )
+        query = table.update().values({self.attr: self.aggregate_query})
         if len(self.relationships) == 1:
             prop = self.relationships[-1].property
             condition = local_condition(prop, objects)
@@ -482,20 +466,13 @@ class AggregatedValue:
             remote_pairs = property_.local_remote_pairs
             local = remote_pairs[0][0]
             remote = remote_pairs[0][1]
-            condition = local_condition(
-                self.relationships[0].property,
-                objects
-            )
+            condition = local_condition(self.relationships[0].property, objects)
             if condition is not None:
                 return query.where(
                     local.in_(
-                        sa.select(
-                            *_select_args(remote)
-                        ).select_from(
-                            chained_join(*reversed(self.relationships))
-                        ).where(
-                            condition
-                        )
+                        sa.select(remote)
+                        .select_from(chained_join(*reversed(self.relationships)))
+                        .where(condition)
                     )
                 )
 
@@ -509,29 +486,20 @@ class AggregationManager:
 
     def register_listeners(self):
         sa.event.listen(
-            sa.orm.Mapper,
-            'after_configured',
-            self.update_generator_registry
+            sa.orm.Mapper, 'after_configured', self.update_generator_registry
         )
         sa.event.listen(
-            sa.orm.session.Session,
-            'after_flush',
-            self.construct_aggregate_queries
+            sa.orm.session.Session, 'after_flush', self.construct_aggregate_queries
         )
 
     def update_generator_registry(self):
         for class_, attrs in aggregated_attrs.items():
             for expr, path, column in attrs:
                 value = AggregatedValue(
-                    class_=class_,
-                    attr=column,
-                    path=path,
-                    expr=expr(class_)
+                    class_=class_, attr=column, path=path, expr=expr(class_)
                 )
                 key = value.relationships[0].mapper.class_
-                self.generator_registry[key].append(
-                    value
-                )
+                self.generator_registry[key].append(value)
 
     def construct_aggregate_queries(self, session, ctx):
         object_dict = defaultdict(list)
@@ -551,10 +519,7 @@ manager = AggregationManager()
 manager.register_listeners()
 
 
-def aggregated(
-    relationship,
-    column
-):
+def aggregated(relationship, column):
     """
     Decorator that generates an aggregated attribute. The decorated function
     should return an aggregate select expression.
@@ -567,10 +532,8 @@ def aggregated(
         SQLAlchemy Column object. The column definition of this aggregate
         attribute.
     """
+
     def wraps(func):
-        return AggregatedAttribute(
-            func,
-            relationship,
-            column
-        )
+        return AggregatedAttribute(func, relationship, column)
+
     return wraps

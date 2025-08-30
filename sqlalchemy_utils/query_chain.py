@@ -105,6 +105,7 @@ with :meth:`~QueryChain.count`::
 
 
 """
+
 from copy import copy
 
 
@@ -120,6 +121,7 @@ class QueryChain:
 
     .. versionadded: 0.26.0
     """
+
     def __init__(self, queries, limit=None, offset=None):
         self.queries = queries
         self._limit = limit
@@ -163,7 +165,7 @@ class QueryChain:
             return self.__class__(
                 queries=self.queries,
                 limit=key.stop if key.stop is not None else self._limit,
-                offset=key.start if key.start is not None else self._offset
+                offset=key.start if key.start is not None else self._offset,
             )
         else:
             for obj in self[key:1]:

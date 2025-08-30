@@ -81,6 +81,7 @@ class TSVectorType(sa.types.TypeDecorator):
         search_vector @@ to_tsquery('pg_catalog.simple', 'finland')
 
     """
+
     impl = TSVECTOR
     cache_ok = True
 
@@ -88,9 +89,7 @@ class TSVectorType(sa.types.TypeDecorator):
         def match(self, other, **kwargs):
             if 'postgresql_regconfig' not in kwargs:
                 if 'regconfig' in self.type.options:
-                    kwargs['postgresql_regconfig'] = (
-                        self.type.options['regconfig']
-                    )
+                    kwargs['postgresql_regconfig'] = self.type.options['regconfig']
             return TSVECTOR.Comparator.match(self, other, **kwargs)
 
         def __or__(self, other):

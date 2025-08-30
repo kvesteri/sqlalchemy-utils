@@ -4,7 +4,7 @@ from .asserts import (  # noqa
     assert_max_value,
     assert_min_value,
     assert_non_nullable,
-    assert_nullable
+    assert_nullable,
 )
 from .exceptions import ImproperlyConfigured  # noqa
 from .expressions import Asterisk, row_to_json  # noqa
@@ -41,7 +41,7 @@ from .functions import (  # noqa
     naturally_equivalent,
     render_expression,
     render_statement,
-    table_name
+    table_name,
 )
 from .generic import generic_relationship  # noqa
 from .i18n import TranslationHybrid  # noqa
@@ -49,7 +49,7 @@ from .listeners import (  # noqa
     auto_delete_orphans,
     coercion_listener,
     force_auto_coercion,
-    force_instant_defaults
+    force_instant_defaults,
 )
 from .models import generic_repr, Timestamp  # noqa
 from .observer import observes  # noqa
@@ -93,12 +93,12 @@ from .types import (  # noqa
     TSVectorType,
     URLType,
     UUIDType,
-    WeekDaysType
+    WeekDaysType,
 )
 from .view import (  # noqa
     create_materialized_view,
     create_view,
-    refresh_materialized_view
+    refresh_materialized_view,
 )
 
 __version__ = '0.41.2'

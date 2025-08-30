@@ -10,13 +10,11 @@ def str_coercible(cls):
 
 
 def is_sequence(value):
-    return (
-        isinstance(value, Iterable) and not isinstance(value, str)
-    )
+    return isinstance(value, Iterable) and not isinstance(value, str)
 
 
 def starts_with(iterable, prefix):
     """
     Returns whether or not given iterable starts with given prefix.
     """
-    return list(iterable)[0:len(prefix)] == list(prefix)
+    return list(iterable)[0 : len(prefix)] == list(prefix)

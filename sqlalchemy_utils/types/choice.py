@@ -27,8 +27,7 @@ class Choice:
 
     def __repr__(self):
         return 'Choice(code={code}, value={value})'.format(
-            code=self.code,
-            value=self.value
+            code=self.code, value=self.value
         )
 
 
@@ -141,11 +140,7 @@ class ChoiceType(ScalarCoercible, types.TypeDecorator):
     def __init__(self, choices, impl=None):
         self.choices = tuple(choices) if isinstance(choices, list) else choices
 
-        if (
-            Enum is not None and
-            isinstance(choices, type) and
-            issubclass(choices, Enum)
-        ):
+        if Enum is not None and isinstance(choices, type) and issubclass(choices, Enum):
             self.type_impl = EnumTypeImpl(enum_class=choices)
         else:
             self.type_impl = ChoiceTypeImpl(choices=choices)
@@ -172,9 +167,7 @@ class ChoiceTypeImpl:
 
     def __init__(self, choices):
         if not choices:
-            raise ImproperlyConfigured(
-                'ChoiceType needs list of choices defined.'
-            )
+            raise ImproperlyConfigured('ChoiceType needs list of choices defined.')
         self.choices_dict = dict(choices)
 
     def _coerce(self, value):
@@ -199,15 +192,8 @@ class EnumTypeImpl:
     """The implementation for the ``Enum`` usage."""
 
     def __init__(self, enum_class):
-        if Enum is None:
-            raise ImproperlyConfigured(
-                "'enum34' package is required to use 'EnumType' in Python "
-                "< 3.4"
-            )
         if not issubclass(enum_class, Enum):
-            raise ImproperlyConfigured(
-                "EnumType needs a class of enum defined."
-            )
+            raise ImproperlyConfigured('EnumType needs a class of enum defined.')
 
         self.enum_class = enum_class
 

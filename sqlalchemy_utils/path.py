@@ -33,10 +33,7 @@ class Path:
     def __getitem__(self, slice):
         result = self.parts[slice]
         if isinstance(result, list):
-            return self.__class__(
-                self.separator.join(result),
-                separator=self.separator
-            )
+            return self.__class__(self.separator.join(result), separator=self.separator)
         return result
 
     def __eq__(self, other):
@@ -51,10 +48,7 @@ class Path:
 
 def get_attr(mixed, attr):
     if isinstance(mixed, InstrumentedAttribute):
-        return getattr(
-            mixed.property.mapper.class_,
-            attr
-        )
+        return getattr(mixed.property.mapper.class_, attr)
     else:
         return getattr(mixed, attr)
 
@@ -80,10 +74,7 @@ class AttrPath:
             if backref is None:
                 raise Exception(
                     "Invert failed because property '%s' of class "
-                    "%s has no backref." % (
-                        prop.key,
-                        prop.parent.class_.__name__
-                    )
+                    '%s has no backref.' % (prop.key, prop.parent.class_.__name__)
                 )
             if isinstance(backref, tuple):
                 return backref[0]
@@ -95,10 +86,7 @@ class AttrPath:
         else:
             class_ = self.parts[-1].mapper.class_
 
-        return self.__class__(
-            class_,
-            '.'.join(map(get_backref, reversed(self.parts)))
-        )
+        return self.__class__(class_, '.'.join(map(get_backref, reversed(self.parts))))
 
     def index(self, element):
         for index, el in enumerate(self.parts):
@@ -125,10 +113,7 @@ class AttrPath:
                 class_ = self.class_
             else:
                 class_ = result[0].parent.class_
-            return self.__class__(
-                class_,
-                self.path[slice]
-            )
+            return self.__class__(class_, self.path[slice])
         else:
             return result
 
@@ -136,10 +121,8 @@ class AttrPath:
         return len(self.path)
 
     def __repr__(self):
-        return "{}({}, {!r})".format(
-            self.__class__.__name__,
-            self.class_.__name__,
-            self.path.path
+        return '{}({}, {!r})'.format(
+            self.__class__.__name__, self.class_.__name__, self.path.path
         )
 
     def __eq__(self, other):

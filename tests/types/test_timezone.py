@@ -3,12 +3,8 @@ import pytz
 import sqlalchemy as sa
 from dateutil.zoneinfo import get_zonefile_instance, tzfile
 
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
+import zoneinfo
 
-from sqlalchemy_utils.compat import _select_args
 from sqlalchemy_utils.types import timezone, TimezoneType
 
 
@@ -63,7 +59,7 @@ class TestTimezoneType:
         assert visitor_zoneinfo is not None
 
     def test_compilation(self, Visitor, session):
-        query = sa.select(*_select_args(Visitor.timezone_pytz))
+        query = sa.select(Visitor.timezone_pytz)
         # the type should be cacheable and not throw exception
         session.execute(query)
 

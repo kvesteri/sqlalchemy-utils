@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 import sqlalchemy as sa
 
@@ -22,15 +22,23 @@ class Timestamp:
             id = sa.Column(sa.Integer, primary_key=True)
     """
 
-    created = sa.Column(sa.DateTime, default=datetime.utcnow, nullable=False)
-    updated = sa.Column(sa.DateTime, default=datetime.utcnow, nullable=False)
+    created = sa.Column(
+        sa.DateTime,
+        default=lambda: datetime.now(tz=timezone.utc).replace(tzinfo=None),
+        nullable=False,
+    )
+    updated = sa.Column(
+        sa.DateTime,
+        default=lambda: datetime.now(tz=timezone.utc).replace(tzinfo=None),
+        nullable=False,
+    )
 
 
 @sa.event.listens_for(Timestamp, 'before_update', propagate=True)
 def timestamp_before_update(mapper, connection, target):
     # When a model with a timestamp is updated; force update the updated
     # timestamp.
-    target.updated = datetime.utcnow()
+    target.updated = datetime.now(tz=timezone.utc).replace(tzinfo=None)
 
 
 NOT_LOADED_REPR = '<not loaded>'
@@ -87,10 +95,9 @@ def generic_repr(*fields):
         target.__repr__ = lambda self: _generic_repr_method(self, fields=None)
         return target
     else:
+
         def decorator(cls):
-            cls.__repr__ = lambda self: _generic_repr_method(
-                self,
-                fields=fields
-            )
+            cls.__repr__ = lambda self: _generic_repr_method(self, fields=fields)
             return cls
+
         return decorator

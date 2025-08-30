@@ -16,7 +16,6 @@ except ImportError:
 
 
 class Password(Mutable):
-
     @classmethod
     def coerce(cls, key, value):
         if isinstance(value, Password):
@@ -146,15 +145,12 @@ class PasswordType(ScalarCoercible, types.TypeDecorator):
     """
 
     impl = types.VARBINARY(1024)
-    python_type = Password
     cache_ok = True
 
     def __init__(self, max_length=None, **kwargs):
         # Fail if passlib is not found.
         if passlib is None:
-            raise ImproperlyConfigured(
-                "'passlib' is required to use 'PasswordType'"
-            )
+            raise ImproperlyConfigured("'passlib' is required to use 'PasswordType'")
 
         # Construct the passlib crypt context.
         self.context = LazyCryptContext(**kwargs)
@@ -162,11 +158,7 @@ class PasswordType(ScalarCoercible, types.TypeDecorator):
 
     @property
     def hashing_method(self):
-        return (
-            'hash'
-            if hasattr(self.context, 'hash')
-            else 'encrypt'
-        )
+        return 'hash' if hasattr(self.context, 'hash') else 'encrypt'
 
     @property
     def length(self):
@@ -184,12 +176,8 @@ class PasswordType(ScalarCoercible, types.TypeDecorator):
             scheme = getattr(__import__('passlib.hash').hash, name)
             length = 4 + len(scheme.name)
             length += len(str(getattr(scheme, 'max_rounds', '')))
-            length += (getattr(scheme, 'max_salt_size', 0) or 0)
-            length += getattr(
-                scheme,
-                'encoded_checksum_size',
-                scheme.checksum_size
-            )
+            length += getattr(scheme, 'max_salt_size', 0) or 0
+            length += getattr(scheme, 'encoded_checksum_size', scheme.checksum_size)
             max_lengths.append(length)
 
         # Return the maximum calculated max length.
@@ -231,7 +219,6 @@ class PasswordType(ScalarCoercible, types.TypeDecorator):
         return getattr(self.context, self.hashing_method)(value)
 
     def _coerce(self, value):
-
         if value is None:
             return
 

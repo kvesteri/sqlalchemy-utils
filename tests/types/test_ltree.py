@@ -2,7 +2,6 @@ import pytest
 import sqlalchemy as sa
 
 from sqlalchemy_utils import Ltree, LtreeType
-from sqlalchemy_utils.compat import _select_args
 
 
 @pytest.fixture
@@ -43,6 +42,6 @@ class TestLTREE:
         assert compiled == 'section.path = \'path\''
 
     def test_compilation(self, Section, session):
-        query = sa.select(*_select_args(Section.path))
+        query = sa.select(Section.path)
         # the type should be cacheable and not throw exception
         session.execute(query)

@@ -7,20 +7,10 @@ import sqlalchemy.event
 import sqlalchemy.exc
 from sqlalchemy import create_engine
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import declarative_base, sessionmaker, synonym_for
 from sqlalchemy.orm.session import close_all_sessions
 
-from sqlalchemy_utils import (
-    aggregates,
-    coercion_listener,
-    i18n,
-    InstrumentedList
-)
-from sqlalchemy_utils.compat import (
-    _declarative_base,
-    _select_args,
-    _synonym_for
-)
+from sqlalchemy_utils import aggregates, coercion_listener, i18n, InstrumentedList
 from sqlalchemy_utils.functions.orm import _get_class_registry
 from sqlalchemy_utils.types.pg_composite import remove_composite_listeners
 
@@ -39,7 +29,7 @@ sa.event.listen(sa.orm.Mapper, 'mapper_configured', coercion_listener)
 
 
 def get_locale():
-    class Locale():
+    class Locale:
         territories = {'FI': 'Finland'}
 
     return Locale()
@@ -71,13 +61,11 @@ def mysql_db_user():
 
 
 @pytest.fixture
-def postgresql_dsn(postgresql_db_user, postgresql_db_password, postgresql_db_host,
-                   db_name):
+def postgresql_dsn(
+    postgresql_db_user, postgresql_db_password, postgresql_db_host, db_name
+):
     return 'postgresql://{}:{}@{}/{}'.format(
-        postgresql_db_user,
-        postgresql_db_password,
-        postgresql_db_host,
-        db_name
+        postgresql_db_user, postgresql_db_password, postgresql_db_host, db_name
     )
 
 
@@ -108,21 +96,24 @@ def mssql_db_user():
 
 @pytest.fixture
 def mssql_db_password():
-    return os.environ.get('SQLALCHEMY_UTILS_TEST_MSSQL_PASSWORD',
-                          'Strong_Passw0rd')
+    return os.environ.get('SQLALCHEMY_UTILS_TEST_MSSQL_PASSWORD', 'Strong_Passw0rd')
 
 
 @pytest.fixture
 def mssql_db_driver():
-    driver = os.environ.get('SQLALCHEMY_UTILS_TEST_MSSQL_DRIVER',
-                            'ODBC Driver 17 for SQL Server')
+    driver = os.environ.get(
+        'SQLALCHEMY_UTILS_TEST_MSSQL_DRIVER', 'ODBC Driver 18 for SQL Server'
+    )
     return driver.replace(' ', '+')
 
 
 @pytest.fixture
 def mssql_dsn(mssql_db_user, mssql_db_password, mssql_db_driver, db_name):
-    return 'mssql+pyodbc://{}:{}@localhost/{}?driver={}'\
-        .format(mssql_db_user, mssql_db_password, db_name, mssql_db_driver)
+    return (
+        'mssql+pyodbc://{}:{}@localhost/{}?driver={}&TrustServerCertificate=yes'.format(
+            mssql_db_user, mssql_db_password, db_name, mssql_db_driver
+        )
+    )
 
 
 @pytest.fixture
@@ -154,7 +145,7 @@ def connection(engine):
 
 @pytest.fixture
 def Base():
-    return _declarative_base()
+    return declarative_base()
 
 
 @pytest.fixture
@@ -163,12 +154,12 @@ def User(Base):
         __tablename__ = 'user'
         id = sa.Column(sa.Integer, autoincrement=True, primary_key=True)
         name = sa.Column(sa.Unicode(255))
+
     return User
 
 
 @pytest.fixture
 def Category(Base):
-
     class Category(Base):
         __tablename__ = 'category'
         id = sa.Column(sa.Integer, primary_key=True)
@@ -191,7 +182,7 @@ def Category(Base):
         def articles_count(cls):
             Article = _get_class_registry(Base)['Article']
             return (
-                sa.select(*_select_args(sa.func.count(Article.id)))
+                sa.select(sa.func.count(Article.id))
                 .where(Article.category_id == cls.id)
                 .correlate(Article.__table__)
                 .label('article_count')
@@ -201,10 +192,11 @@ def Category(Base):
         def name_alias(self):
             return self.name
 
-        @_synonym_for('name')
+        @synonym_for('name')
         @property
         def name_synonym(self):
             return self.name
+
     return Category
 
 
@@ -219,11 +211,9 @@ def Article(Base, Category):
         category = sa.orm.relationship(
             Category,
             primaryjoin=category_id == Category.id,
-            backref=sa.orm.backref(
-                'articles',
-                collection_class=InstrumentedList
-            )
+            backref=sa.orm.backref('articles', collection_class=InstrumentedList),
         )
+
     return Article
 
 
@@ -238,12 +228,7 @@ def session(request, engine, connection, Base, init_models):
     with connection.begin():
         Base.metadata.create_all(connection)
     Session = sessionmaker(bind=connection)
-    try:
-        # Enable sqlalchemy 2.0 behavior.
-        session = Session(future=True)
-    except TypeError:
-        # sqlalchemy 1.3
-        session = Session()
+    session = Session(future=True)
     i18n.get_locale = get_locale
 
     def teardown():

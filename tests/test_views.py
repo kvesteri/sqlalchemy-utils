@@ -7,7 +7,6 @@ from sqlalchemy_utils import (
     create_view,
     refresh_materialized_view
 )
-from sqlalchemy_utils.compat import _select_args
 from sqlalchemy_utils.view import CreateView
 
 
@@ -37,12 +36,10 @@ def ArticleMV(Base, Article, User):
         __table__ = create_materialized_view(
             name='article-mv',
             selectable=sa.select(
-                *_select_args(
-                    Article.id,
-                    Article.name,
-                    User.id.label('author_id'),
-                    User.name.label('author_name'),
-                )
+                Article.id,
+                Article.name,
+                User.id.label('author_id'),
+                User.name.label('author_name'),
             ).select_from(
                 Article.__table__.join(User, Article.author_id == User.id)
             ),
@@ -59,12 +56,10 @@ def ArticleView(Base, Article, User):
         __table__ = create_view(
             name='article-view',
             selectable=sa.select(
-                *_select_args(
-                    Article.id,
-                    Article.name,
-                    User.id.label('author_id'),
-                    User.name.label('author_name'),
-                )
+                Article.id,
+                Article.name,
+                User.id.label('author_id'),
+                User.name.label('author_name'),
             ).select_from(
                 Article.__table__.join(User, Article.author_id == User.id)
             ),
@@ -127,7 +122,7 @@ class TrivialViewTestCases:
     ):
         create_view(
             name='trivial_view',
-            selectable=sa.select(*_select_args(column)),
+            selectable=sa.select(column),
             metadata=metadata,
             cascade_on_drop=cascade_on_drop,
             replace=replace,
@@ -192,13 +187,13 @@ class SupportsReplace(TrivialViewTestCases):
     ):
         create_view(
             name='trivial_view',
-            selectable=sa.select(*_select_args(User.id)),
+            selectable=sa.select(User.id),
             metadata=Base.metadata,
         )
         Base.metadata.create_all(engine)
         view = CreateView(
             name='trivial_view',
-            selectable=sa.select(*_select_args(User.id)),
+            selectable=sa.select(User.id),
             replace=True,
         )
         with connection.begin():
@@ -215,7 +210,7 @@ class SupportsReplace(TrivialViewTestCases):
         with pytest.raises(ValueError):
             CreateView(
                 name='trivial_view',
-                selectable=sa.select(*_select_args(User.id)),
+                selectable=sa.select(User.id),
                 materialized=True,
                 replace=True,
             )

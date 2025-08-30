@@ -21,10 +21,9 @@ class TimezoneType(ScalarCoercible, types.TypeDecorator):
             # 'dateutil' (default), and 'zoneinfo'.
             timezone = sa.Column(TimezoneType(backend='pytz'))
 
-    :param backend: Whether to use 'dateutil', 'pytz' or 'zoneinfo' for
-        timezones. 'zoneinfo' uses the standard library module in Python 3.9+,
-        but requires the external 'backports.zoneinfo' package for older
-        Python versions.
+    :param backend:
+        Whether to use 'dateutil', 'pytz' or 'zoneinfo' for timezones.
+        'zoneinfo' uses the standard library module.
 
     """
 
@@ -60,22 +59,11 @@ class TimezoneType(ScalarCoercible, types.TypeDecorator):
 
             except ImportError:
                 raise ImproperlyConfigured(
-                    "'pytz' is required to use the 'pytz' backend "
-                    "for 'TimezoneType'"
+                    "'pytz' is required to use the 'pytz' backend for 'TimezoneType'"
                 )
 
-        elif backend == "zoneinfo":
-            try:
-                import zoneinfo
-            except ImportError:
-                try:
-                    from backports import zoneinfo
-                except ImportError:
-                    raise ImproperlyConfigured(
-                        "'backports.zoneinfo' is required to use "
-                        "the 'zoneinfo' backend for 'TimezoneType'"
-                        "on Python version < 3.9"
-                    )
+        elif backend == 'zoneinfo':
+            import zoneinfo
 
             self.python_type = zoneinfo.ZoneInfo
             self._to = zoneinfo.ZoneInfo

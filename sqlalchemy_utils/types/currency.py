@@ -46,6 +46,7 @@ class CurrencyType(ScalarCoercible, types.TypeDecorator):
         user.currency = 'US'
         user.currency  # Currency('US')
     """
+
     impl = types.String(3)
     python_type = Currency
     cache_ok = True

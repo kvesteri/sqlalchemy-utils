@@ -3,17 +3,30 @@ Changelog
 
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
+Unreleased changes
+^^^^^^^^^^^^^^^^^^
+
+- Drop support for Python 3.7 and 3.8.
+- Drop support for sqlalchemy 1.3.
+- Add support for Python 3.12 and 3.13.
+- Add a Read the Docs configuration file.
+- Make documentation builds reproducible.
+- Test documentation builds in CI.
+- Fix Pendulum parsing of datetime instances with timezones. (#755)
+- Migrate package metadata to PEP 621 format in pyproject.toml
+- Migrate to `ruff <https://docs.astral.sh/ruff/>`_ for code linting and formatting, replacing flake8 and isort with a faster Rust-based tool.
+
 0.41.2 (2024-03-22)
 ^^^^^^^^^^^^^^^^^^^
 
-- Fix breaking change introduced on SQLAlchemy 2.0.22 changes to `attributes.AttributeImpl` constructor (#733)
+- Fix breaking change introduced on SQLAlchemy 2.0.22 changes to ``attributes.AttributeImpl`` constructor (#733)
 
 
 0.41.1 (2023-04-27)
 ^^^^^^^^^^^^^^^^^^^
 
 - Use a custom SQL construct for refreshing materialized views in
-  `refresh_materialized_view` (#703)
+  ``refresh_materialized_view`` (#703)
 
 
 0.41.0 (2023-04-13)
@@ -58,7 +71,7 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 0.38.2 (2021-12-29)
 ^^^^^^^^^^^^^^^^^^^
 
-- Added inherit_cache=False in order to avoid SQLAlchemy warnings in `cast_locale_expr` (#571)
+- Added inherit_cache=False in order to avoid SQLAlchemy warnings in ``cast_locale_expr`` (#571)
 
 
 0.38.1 (2021-12-21)
@@ -98,7 +111,7 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 0.37.6 (2021-06-02)
 ^^^^^^^^^^^^^^^^^^^
 
-- Added `cache_ok=True` for TSVectorType
+- Added ``cache_ok=True`` for TSVectorType
 
 
 0.37.5 (2021-05-31)
@@ -116,7 +129,7 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 0.37.3 (2021-05-16)
 ^^^^^^^^^^^^^^^^^^^
 
-- Added `cache_ok=True` for all custom types
+- Added ``cache_ok=True`` for all custom types
 - Added CockroachDB support for UUIDType (#526, pull request courtesy of chrishemmings)
 
 
@@ -138,7 +151,7 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 - Added SQLAlchemy 1.4 support
 - Fixed database_exists() on PostgreSQL (#462)
 - Added create_database support pymssql (#486)
-- Removed `sort_query`, `get_query_entities` and `get_query_entity_by_alias` functions
+- Removed ``sort_query``, ``get_query_entities`` and ``get_query_entity_by_alias`` functions
 
 
 0.36.8 (2020-07-08)
@@ -193,7 +206,7 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 ^^^^^^^^^^^^^^^^^^^
 
 - Added support for CASCADE option when dropping views (#406, pull request courtesy of amicks)
-- Added `aliases` parameter to create_materialized_view function.
+- Added ``aliases`` parameter to create_materialized_view function.
 
 
 0.36.0 (2019-12-08)
@@ -283,7 +296,7 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 0.33.4 (2018-09-11)
 ^^^^^^^^^^^^^^^^^^^
 
-- Made PasswordType use `hash` function instead of deprecated `encrypt` function (#341, pull request courtesy of libre-man)
+- Made PasswordType use ``hash`` function instead of deprecated ``encrypt`` function (#341, pull request courtesy of libre-man)
 
 
 0.33.3 (2018-04-29)
@@ -323,7 +336,7 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 0.32.20 (2017-11-04)
 ^^^^^^^^^^^^^^^^^^^^
 
-- Added `__hash__` method for choice objects (#294, pull request courtesy of havelock)
+- Added ``__hash__`` method for choice objects (#294, pull request courtesy of havelock)
 
 
 0.32.19 (2017-10-17)

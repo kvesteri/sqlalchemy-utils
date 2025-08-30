@@ -16,18 +16,12 @@ def compile_array_get(element, compiler, **kw):
     args = list(element.clauses)
     if len(args) != 2:
         raise Exception(
-            "Function 'array_get' expects two arguments (%d given)." %
-            len(args)
+            "Function 'array_get' expects two arguments (%d given)." % len(args)
         )
 
     if not hasattr(args[1], 'value') or not isinstance(args[1].value, int):
-        raise Exception(
-            "Second argument should be an integer."
-        )
-    return '({})[{}]'.format(
-        compiler.process(args[0]),
-        sa.text(str(args[1].value + 1))
-    )
+        raise Exception('Second argument should be an integer.')
+    return f'({compiler.process(args[0])})[{sa.text(str(args[1].value + 1))}]'
 
 
 class row_to_json(GenericFunction):
@@ -37,7 +31,7 @@ class row_to_json(GenericFunction):
 
 @compiles(row_to_json, 'postgresql')
 def compile_row_to_json(element, compiler, **kw):
-    return f"{element.name}({compiler.process(element.clauses)})"
+    return f'{element.name}({compiler.process(element.clauses)})'
 
 
 class json_array_length(GenericFunction):
@@ -47,7 +41,7 @@ class json_array_length(GenericFunction):
 
 @compiles(json_array_length, 'postgresql')
 def compile_json_array_length(element, compiler, **kw):
-    return f"{element.name}({compiler.process(element.clauses)})"
+    return f'{element.name}({compiler.process(element.clauses)})'
 
 
 class Asterisk(ColumnElement):

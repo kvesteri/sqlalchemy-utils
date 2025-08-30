@@ -1,22 +1,18 @@
 name: Tests
-on: [push, pull_request]
+on: [push, pull_request, workflow_dispatch]
 jobs:
   test:
     strategy:
       fail-fast: false
       matrix:
         os: ['ubuntu-latest']
-        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
+        python-version:
+          - '3.9'
+          - '3.10'
+          - '3.11'
+          - '3.12'
+          - '3.13'
         tox_env: ['sqlalchemy14', 'sqlalchemy2']
-        include:
-          # Test against Python 3.7 and sqlalchemy 1.3
-          - os: 'ubuntu-20.04'
-            python-version: '3.7'
-            tox_env: 'sqlalchemy13'
-          # Test against Python 3.7 and sqlalchemy 1.4
-          - os: 'ubuntu-20.04'
-            python-version: '3.7'
-            tox_env: 'sqlalchemy14'
     runs-on: ${{ matrix.os }}
     services:
       postgres:
@@ -54,9 +50,9 @@ jobs:
         ports:
           - 1433:1433
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install MS SQL stuff
@@ -73,3 +69,16 @@ jobs:
         env:
           SQLALCHEMY_UTILS_TEST_POSTGRESQL_PASSWORD: postgres
         run: tox -e ${{ matrix.tox_env }}
+
+  docs:
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install tox
+        run: pip install tox
+      - name: Build documentation
+        run: tox -e docs

@@ -4,7 +4,6 @@ import pytest
 import sqlalchemy as sa
 from dateutil import tz
 
-from sqlalchemy_utils.compat import _select_args
 from sqlalchemy_utils.types import arrow
 
 
@@ -80,6 +79,6 @@ class TestArrowDateTimeType:
         assert item.published_at.to(timezone) == dt
 
     def test_compilation(self, Article, session):
-        query = sa.select(*_select_args(Article.created_at))
+        query = sa.select(Article.created_at)
         # the type should be cacheable and not throw exception
         session.execute(query)

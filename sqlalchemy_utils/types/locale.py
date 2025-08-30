@@ -55,9 +55,7 @@ class LocaleType(ScalarCoercible, types.TypeDecorator):
 
     def __init__(self):
         if babel is None:
-            raise ImproperlyConfigured(
-                'Babel packaged is required with LocaleType.'
-            )
+            raise ImproperlyConfigured('Babel packaged is required with LocaleType.')
 
     def process_bind_param(self, value, dialect):
         if isinstance(value, babel.Locale):

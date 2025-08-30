@@ -37,6 +37,7 @@ class LtreeType(types.Concatenable, types.UserDefinedType, ScalarCoercible):
         may require installation of Postgresql ltree extension on the server
         side. Please visit https://www.postgresql.org/ for details.
     """
+
     cache_ok = True
 
     class comparator_factory(types.Concatenable.Comparator):
@@ -65,17 +66,20 @@ class LtreeType(types.Concatenable, types.UserDefinedType, ScalarCoercible):
         def process(value):
             if value:
                 return value.path
+
         return process
 
     def result_processor(self, dialect, coltype):
         def process(value):
             return self._coerce(value)
+
         return process
 
     def literal_processor(self, dialect):
         def process(value):
             value = value.replace("'", "''")
             return "'%s'" % value
+
         return process
 
     __visit_name__ = 'LTREE'
@@ -89,6 +93,7 @@ class LQUERY(types.TypeEngine):
     """Postresql LQUERY type.
     See :class:`LTREE` for details.
     """
+
     __visit_name__ = 'LQUERY'
 
 
@@ -96,6 +101,7 @@ class LTXTQUERY(types.TypeEngine):
     """Postresql LTXTQUERY type.
     See :class:`LTREE` for details.
     """
+
     __visit_name__ = 'LTXTQUERY'
 
 

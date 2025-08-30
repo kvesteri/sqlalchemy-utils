@@ -5,14 +5,10 @@ Model mixins
 Timestamp
 ---------
 
-.. module:: sqlalchemy_utils.models
-
-.. autoclass:: Timestamp
+.. autoclass:: sqlalchemy_utils.models.Timestamp
 
 
 generic_repr
 ------------
 
-.. module:: sqlalchemy_utils.models
-
-.. autofunction:: generic_repr
+.. autofunction:: sqlalchemy_utils.models.generic_repr
