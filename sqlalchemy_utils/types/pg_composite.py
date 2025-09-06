@@ -171,7 +171,10 @@ class CompositeType(UserDefinedType, SchemaType):
     class comparator_factory(UserDefinedType.Comparator):
         def __getattr__(self, key):
             try:
-                type_ = self.type.typemap[key]
+                if key in self.type.column_map:
+                    type_ = self.type.column_map[key].type
+                else:
+                    type_ = self.type.typemap[key]
             except KeyError:
                 raise KeyError(f"Type '{self.name}' doesn't have an attribute: '{key}'")
 
@@ -184,6 +187,7 @@ class CompositeType(UserDefinedType, SchemaType):
             )
         SchemaType.__init__(self, name=name, quote=quote)
         self.columns = columns
+        self.column_map = {col.name: col for col in columns}
         if name in registered_composites:
             self.type_cls = registered_composites[name].type_cls
         else:
