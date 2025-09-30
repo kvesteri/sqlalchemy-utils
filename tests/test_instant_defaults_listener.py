@@ -28,6 +28,20 @@ def Article(Base):
     return Article
 
 
+@pytest.fixture
+def Document(Base):
+    class Document(Base):
+        __tablename__ = 'document'
+        id = sa.Column(
+            sa.Integer,
+            sa.Sequence('document_id_seq'),
+            primary_key=True
+        )
+        title = sa.Column(sa.Unicode(255), default='Untitled')
+
+    return Document
+
+
 class TestInstantDefaultListener:
     def test_assigns_defaults_on_object_construction(self, Article):
         article = Article()
@@ -40,3 +54,8 @@ class TestInstantDefaultListener:
     def test_override_default_with_setter_function(self, Article):
         article = Article(byline='provided byline')
         assert article.byline == 'provided byline'
+
+    def test_handles_sequence_defaults(self, Document):
+        document = Document()
+        assert document.title == 'Untitled'
+        assert document.id is None
