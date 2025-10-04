@@ -562,35 +562,37 @@ def create_database(url, encoding='utf8', template=None):
     else:
         engine = sa.create_engine(url)
 
-    if dialect_name == 'postgresql':
-        if not template:
-            template = 'template1'
+    try:
+        if dialect_name == 'postgresql':
+            if not template:
+                template = 'template1'
 
-        with engine.begin() as conn:
-            text = "CREATE DATABASE {} ENCODING '{}' TEMPLATE {}".format(
-                quote(conn, database), encoding, quote(conn, template)
-            )
-            conn.execute(sa.text(text))
-
-    elif dialect_name == 'mysql':
-        with engine.begin() as conn:
-            text = "CREATE DATABASE {} CHARACTER SET = '{}'".format(
-                quote(conn, database), encoding
-            )
-            conn.execute(sa.text(text))
-
-    elif dialect_name == 'sqlite' and database != ':memory:':
-        if database:
             with engine.begin() as conn:
-                conn.execute(sa.text('CREATE TABLE DB(id int)'))
-                conn.execute(sa.text('DROP TABLE DB'))
+                text = "CREATE DATABASE {} ENCODING '{}' TEMPLATE {}".format(
+                    quote(conn, database), encoding, quote(conn, template)
+                )
+                conn.execute(sa.text(text))
 
-    else:
-        with engine.begin() as conn:
-            text = f'CREATE DATABASE {quote(conn, database)}'
-            conn.execute(sa.text(text))
+        elif dialect_name == 'mysql':
+            with engine.begin() as conn:
+                text = "CREATE DATABASE {} CHARACTER SET = '{}'".format(
+                    quote(conn, database), encoding
+                )
+                conn.execute(sa.text(text))
 
-    engine.dispose()
+        elif dialect_name == 'sqlite' and database != ':memory:':
+            if database:
+                with engine.begin() as conn:
+                    conn.execute(sa.text('CREATE TABLE DB(id int)'))
+                    conn.execute(sa.text('DROP TABLE DB'))
+
+        else:
+            with engine.begin() as conn:
+                text = f'CREATE DATABASE {quote(conn, database)}'
+                conn.execute(sa.text(text))
+
+    finally:
+        engine.dispose()
 
 
 def drop_database(url):
@@ -631,12 +633,14 @@ def drop_database(url):
     else:
         engine = sa.create_engine(url)
 
-    if dialect_name == 'sqlite' and database != ':memory:':
-        if database:
-            os.remove(database)
-    else:
-        with engine.begin() as conn:
-            text = f'DROP DATABASE {quote(conn, database)}'
-            conn.execute(sa.text(text))
+    try:
+        if dialect_name == 'sqlite' and database != ':memory:':
+            if database:
+                os.remove(database)
+        else:
+            with engine.begin() as conn:
+                text = f'DROP DATABASE {quote(conn, database)}'
+                conn.execute(sa.text(text))
 
-    engine.dispose()
+    finally:
+        engine.dispose()
