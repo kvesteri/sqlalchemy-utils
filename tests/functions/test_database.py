@@ -177,7 +177,7 @@ def test_create_engine(sqlite_memory_dsn):
 
 
 def test_create_engine_always_disposes(sqlite_memory_dsn):
-    """Test that engine creation context manager still dispoes of an engine when an exception is raised."""
+    """Test that engine creation context manager still disposes of an engine when an exception is raised."""
     with pytest.raises(RuntimeError, match='it failed'):
         with _create_engine(sqlite_memory_dsn) as engine:
             pool = engine.pool
