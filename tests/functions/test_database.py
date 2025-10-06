@@ -3,6 +3,7 @@ import sqlalchemy as sa
 
 from sqlalchemy_utils import create_database, database_exists, drop_database
 from sqlalchemy_utils.compat import get_sqlalchemy_version
+from sqlalchemy_utils.functions.database import _create_engine
 
 pymysql = None
 try:
@@ -163,3 +164,11 @@ class TestDatabaseMssql(DatabaseTest):
     def db_name(self):
         pytest.importorskip('pyodbc')
         return 'db_test_sqlalchemy_util'
+
+
+def test_create_engine(sqlite_memory_dsn):
+    with _create_engine(sqlite_memory_dsn) as engine:
+        pool = engine.pool
+
+    # a disposed engine should not have the same pool
+    assert engine.pool is not pool
