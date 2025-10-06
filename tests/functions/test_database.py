@@ -167,8 +167,20 @@ class TestDatabaseMssql(DatabaseTest):
 
 
 def test_create_engine(sqlite_memory_dsn):
+    """Test that engine creation context manager creates an engine and disposes of it"""
     with _create_engine(sqlite_memory_dsn) as engine:
         pool = engine.pool
+        with engine.connect() as conn:
+            assert conn.execute(sa.text('SELECT 1')).scalar() == 1
 
-    # a disposed engine should not have the same pool
-    assert engine.pool is not pool
+    assert engine.pool is not pool, "Engine was not disposed because pool is the same"
+
+
+def test_create_engine_always_disposes(sqlite_memory_dsn):
+    """Test that engine creation context manager still dispoes of an engine when an exception is raised."""
+    with pytest.raises(RuntimeError, match='it failed'):
+        with _create_engine(sqlite_memory_dsn) as engine:
+            pool = engine.pool
+            raise RuntimeError('it failed')
+
+    assert engine.pool is not pool, "Engine was not disposed because pool is the same"
