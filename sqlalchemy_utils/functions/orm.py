@@ -412,6 +412,9 @@ def get_tables(mixed):
     elif isinstance(mixed, _ColumnEntity):
         mixed = mixed.expr
 
+        if isinstance(mixed, sa.Column):
+            return [mixed.table]
+
     mapper = get_mapper(mixed)
 
     polymorphic_mappers = get_polymorphic_mappers(mapper)
