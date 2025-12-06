@@ -634,6 +634,26 @@ def drop_database(url):
     if dialect_name == 'sqlite' and database != ':memory:':
         if database:
             os.remove(database)
+    elif dialect_name == 'postgresql':
+        with engine.begin() as conn:
+            version = conn.dialect.server_version_info
+            if version < (13, 0):
+                pid_column = 'pid' if (version >= (9, 2)) else 'procpid'
+
+                text = """
+                SELECT pg_terminate_backend(pg_stat_activity.{pid_column})
+                FROM pg_stat_activity
+                WHERE pg_stat_activity.datname = '{database}'
+                AND {pid_column} <> pg_backend_pid();
+                """.format(pid_column=pid_column, database=database)
+                conn.execute(sa.text(text))
+
+            text = (
+                f'DROP DATABASE {quote(conn, database)}'
+                if version < (13, 0)
+                else f'DROP DATABASE {quote(conn, database)} WITH (FORCE)'
+            )
+            conn.execute(sa.text(text))
     else:
         with engine.begin() as conn:
             text = f'DROP DATABASE {quote(conn, database)}'
