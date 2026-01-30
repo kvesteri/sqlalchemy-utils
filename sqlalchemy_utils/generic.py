@@ -11,95 +11,108 @@ from .exceptions import ImproperlyConfigured
 from .functions import identity
 from .functions.orm import _get_class_registry
 
+try:
+    BaseScalarImpl = attributes.ScalarAttributeImpl
+except AttributeError:
+    BaseScalarImpl = None
 
-class GenericAttributeImpl(attributes.ScalarAttributeImpl):
-    def __init__(self, *args, **kwargs):
-        """
-        The constructor of attributes.AttributeImpl changed in SQLAlchemy 2.0.22,
-        adding a 'default_function' required positional argument before 'dispatch'.
-        This adjustment ensures compatibility across versions by inserting None for
-        'default_function' in versions >= 2.0.22.
+if BaseScalarImpl is None:
 
-        Arguments received: (class, key, dispatch)
-        Required by AttributeImpl: (class, key, default_function, dispatch)
-        Setting None as default_function here.
-        """
-        # Adjust for SQLAlchemy version change
-        sqlalchemy_version = tuple(map(int, sa.__version__.split('.')))
-        if sqlalchemy_version >= (2, 0, 22):
-            args = (*args[:2], None, *args[2:])
+    class GenericAttributeImpl:
+        def __init__(self, *args, **kwargs):
+            raise RuntimeError(
+                'GenericAttributeImpl is unavailable with SQLAlchemy >=2.1'
+            )
+else:
 
-        super().__init__(*args, **kwargs)
+    class GenericAttributeImpl(attributes.ScalarAttributeImpl):
+        def __init__(self, *args, **kwargs):
+            """
+            The constructor of attributes.AttributeImpl changed in SQLAlchemy 2.0.22,
+            adding a 'default_function' required positional argument before 'dispatch'.
+            This adjustment ensures compatibility across versions by inserting None for
+            'default_function' in versions >= 2.0.22.
 
-    def get(self, state, dict_, passive=attributes.PASSIVE_OFF):
-        if self.key in dict_:
-            return dict_[self.key]
+            Arguments received: (class, key, dispatch)
+            Required by AttributeImpl: (class, key, default_function, dispatch)
+            Setting None as default_function here.
+            """
+            # Adjust for SQLAlchemy version change
+            sqlalchemy_version = tuple(map(int, sa.__version__.split('.')))
+            if sqlalchemy_version >= (2, 0, 22):
+                args = (*args[:2], None, *args[2:])
 
-        # Retrieve the session bound to the state in order to perform
-        # a lazy query for the attribute.
-        session = _state_session(state)
-        if session is None:
-            # State is not bound to a session; we cannot proceed.
-            return None
+            super().__init__(*args, **kwargs)
 
-        # Find class for discriminator.
-        # TODO: Perhaps optimize with some sort of lookup?
-        discriminator = self.get_state_discriminator(state)
-        target_class = _get_class_registry(state.class_).get(discriminator)
+        def get(self, state, dict_, passive=attributes.PASSIVE_OFF):
+            if self.key in dict_:
+                return dict_[self.key]
 
-        if target_class is None:
-            # Unknown discriminator; return nothing.
-            return None
+            # Retrieve the session bound to the state in order to perform
+            # a lazy query for the attribute.
+            session = _state_session(state)
+            if session is None:
+                # State is not bound to a session; we cannot proceed.
+                return None
 
-        id = self.get_state_id(state)
+            # Find class for discriminator.
+            # TODO: Perhaps optimize with some sort of lookup?
+            discriminator = self.get_state_discriminator(state)
+            target_class = _get_class_registry(state.class_).get(discriminator)
 
-        target = session.get(target_class, id)
+            if target_class is None:
+                # Unknown discriminator; return nothing.
+                return None
 
-        # Return found (or not found) target.
-        return target
+            id = self.get_state_id(state)
 
-    def get_state_discriminator(self, state):
-        discriminator = self.parent_token.discriminator
-        if isinstance(discriminator, hybrid_property):
-            return getattr(state.obj(), discriminator.__name__)
-        else:
-            return state.attrs[discriminator.key].value
+            target = session.get(target_class, id)
 
-    def get_state_id(self, state):
-        # Lookup row with the discriminator and id.
-        return tuple(state.attrs[id.key].value for id in self.parent_token.id)
+            # Return found (or not found) target.
+            return target
 
-    def set(
-        self,
-        state,
-        dict_,
-        initiator,
-        passive=attributes.PASSIVE_OFF,
-        check_old=None,
-        pop=False,
-    ):
-        # Set us on the state.
-        dict_[self.key] = initiator
+        def get_state_discriminator(self, state):
+            discriminator = self.parent_token.discriminator
+            if isinstance(discriminator, hybrid_property):
+                return getattr(state.obj(), discriminator.__name__)
+            else:
+                return state.attrs[discriminator.key].value
 
-        if initiator is None:
-            # Nullify relationship args
-            for id in self.parent_token.id:
-                dict_[id.key] = None
-            dict_[self.parent_token.discriminator.key] = None
-        else:
-            # Get the primary key of the initiator and ensure we
-            # can support this assignment.
-            class_ = type(initiator)
-            mapper = class_mapper(class_)
+        def get_state_id(self, state):
+            # Lookup row with the discriminator and id.
+            return tuple(state.attrs[id.key].value for id in self.parent_token.id)
 
-            pk = mapper.identity_key_from_instance(initiator)[1]
+        def set(
+            self,
+            state,
+            dict_,
+            initiator,
+            passive=attributes.PASSIVE_OFF,
+            check_old=None,
+            pop=False,
+        ):
+            # Set us on the state.
+            dict_[self.key] = initiator
 
-            # Set the identifier and the discriminator.
-            discriminator = class_.__name__
+            if initiator is None:
+                # Nullify relationship args
+                for id in self.parent_token.id:
+                    dict_[id.key] = None
+                dict_[self.parent_token.discriminator.key] = None
+            else:
+                # Get the primary key of the initiator and ensure we
+                # can support this assignment.
+                class_ = type(initiator)
+                mapper = class_mapper(class_)
 
-            for index, id in enumerate(self.parent_token.id):
-                dict_[id.key] = pk[index]
-            dict_[self.parent_token.discriminator.key] = discriminator
+                pk = mapper.identity_key_from_instance(initiator)[1]
+
+                # Set the identifier and the discriminator.
+                discriminator = class_.__name__
+
+                for index, id in enumerate(self.parent_token.id):
+                    dict_[id.key] = pk[index]
+                dict_[self.parent_token.discriminator.key] = discriminator
 
 
 class GenericRelationshipProperty(MapperProperty):
