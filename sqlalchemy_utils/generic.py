@@ -55,6 +55,8 @@ class GenericAttributeImpl(attributes.ScalarAttributeImpl):
 
         target = session.get(target_class, id)
 
+        # Cache result for after session expires
+        dict_[self.key] = target
         # Return found (or not found) target.
         return target
 
