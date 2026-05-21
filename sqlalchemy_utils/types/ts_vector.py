@@ -85,6 +85,10 @@ class TSVectorType(sa.types.TypeDecorator):
     impl = TSVECTOR
     cache_ok = True
 
+    @property
+    def python_type(self) -> type[str]:
+        return str
+    
     class comparator_factory(TSVECTOR.Comparator):
         def match(self, other, **kwargs):
             if 'postgresql_regconfig' not in kwargs:
