@@ -42,6 +42,12 @@ class Password(Mutable):
 
     def __eq__(self, value):
         if self.hash is None or value is None:
+            if self.secret is not None and value is None:
+                # A pending secret (set but not yet hashed) is a real value
+                # and must not compare equal to None, otherwise SQLAlchemy's
+                # change detection sees no change and skips the UPDATE.
+                return False
+
             # Ensure that we don't continue comparison if one of us is None.
             return self.hash is value
 
