@@ -42,8 +42,10 @@ class Password(Mutable):
 
     def __eq__(self, value):
         if self.hash is None or value is None:
-            # Ensure that we don't continue comparison if one of us is None.
-            return self.hash is value
+            # If either the hash or the value is None,
+            # equivalence depends on *all* values being None,
+            # including the secret.
+            return self.hash is None and self.secret is None and value is None
 
         if isinstance(value, Password):
             # Comparing 2 hashes isn't very useful; but this equality

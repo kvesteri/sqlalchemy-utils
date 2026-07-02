@@ -164,7 +164,7 @@ class TestPasswordType:
     def test_update_none(self, session, User):
         """
         Should be able to change a password from ``None`` to a valid
-        password.
+        password, and the change must be persisted to the database.
         """
 
         obj = User()
@@ -177,6 +177,36 @@ class TestPasswordType:
         obj.password = 'b'
 
         session.commit()
+
+        # Re-read from the database to confirm the None -> 'b' update was
+        # actually persisted and not dropped by change detection.
+        session.expire_all()
+        obj = session.get(User, obj.id)
+
+        assert obj.password is not None
+        assert obj.password == b'b'
+        assert obj.password != 'a'
+
+    def test_pending_password_not_equal_to_none(self):
+        """
+        A pending (coerced but not-yet-hashed) password holds a real secret
+        and must not compare equal to ``None``.
+
+        If it did, SQLAlchemy's scalar change detection would treat setting a
+        value on a previously-``NULL`` column as "unchanged" and skip the
+        ``UPDATE``, silently dropping the new password.
+        """
+
+        pending = Password('b', secret=True)
+
+        assert pending.hash is None
+        assert pending.secret == 'b'
+        assert not (pending == None)  # noqa: E711
+        assert pending != None  # noqa: E711
+
+        # A genuinely empty password still equals ``None``.
+        empty = Password(None)
+        assert empty == None  # noqa: E711
 
     def test_compare_none(self, User):
         """
