@@ -183,7 +183,7 @@ class ChoiceTypeImpl:
         return value
 
     def process_result_value(self, value, dialect):
-        if value:
+        if value is not None:
             return Choice(value, self.choices_dict[value])
         return value
 
