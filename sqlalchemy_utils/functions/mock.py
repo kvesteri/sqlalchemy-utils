@@ -47,10 +47,7 @@ def create_mock_engine(bind, stream=None):
         def dump(*args, **kw):
             return None
 
-    try:
-        engine = sa.create_mock_engine(bind_url, executor=dump)
-    except AttributeError:  # SQLAlchemy <1.4
-        engine = sa.create_engine(bind_url, strategy='mock', executor=dump)
+    engine = sa.create_mock_engine(bind_url, executor=dump)
     return engine
 
 

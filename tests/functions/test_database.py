@@ -2,15 +2,12 @@ import pytest
 import sqlalchemy as sa
 
 from sqlalchemy_utils import create_database, database_exists, drop_database
-from sqlalchemy_utils.compat import get_sqlalchemy_version
 
 pymysql = None
 try:
     import pymysql  # noqa
 except ImportError:
     pass
-
-sqlalchemy_version = get_sqlalchemy_version()
 
 
 class DatabaseTest:
@@ -101,7 +98,6 @@ class TestDatabasePostgresPsycoPG2CFFI(DatabaseTest):
         )
 
 
-@pytest.mark.skipif('sqlalchemy_version < (2, 0, 0)')
 class TestDatabasePostgresPsycoPG3(DatabaseTest):
 
     @pytest.fixture

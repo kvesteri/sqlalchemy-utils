@@ -40,10 +40,7 @@ def make_order_by_deterministic(query):
     """
     order_by_func = sa.asc
 
-    try:
-        order_by_clauses = query._order_by_clauses
-    except AttributeError:  # SQLAlchemy <1.4
-        order_by_clauses = query._order_by
+    order_by_clauses = query._order_by_clauses
     if not order_by_clauses:
         column = None
     else:

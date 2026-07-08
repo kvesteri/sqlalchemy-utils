@@ -12,7 +12,6 @@ jobs:
           - '3.12'
           - '3.13'
           - '3.14'
-        tox_env: ['sqlalchemy14', 'sqlalchemy2']
     runs-on: ${{ matrix.os }}
     services:
       postgres:
@@ -68,7 +67,7 @@ jobs:
       - name: Run tests
         env:
           SQLALCHEMY_UTILS_TEST_POSTGRESQL_PASSWORD: postgres
-        run: tox -e ${{ matrix.tox_env }}
+        run: tox -e py${{ matrix.python-version }}
 
   docs:
     runs-on: 'ubuntu-latest'
