@@ -6,6 +6,7 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 Unreleased
 ^^^^^^^^^^
 
+- Drop support for Python 3.9.
 - Support Python 3.14.
 - Fix ``ChoiceType`` returning the raw scalar instead of a ``Choice`` for falsy codes such as ``0`` or the empty string. (#813)
 

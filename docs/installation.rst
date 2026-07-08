@@ -6,12 +6,7 @@ This part of the documentation covers the installation of SQLAlchemy-Utils.
 Supported platforms
 -------------------
 
-SQLAlchemy-Utils is currently tested against the following Python platforms:
-
-- CPython 3.9
-- CPython 3.10
-- CPython 3.11
-- CPython 3.12
+SQLAlchemy-Utils is tested against supported CPython versions.
 
 
 Installing an official release
