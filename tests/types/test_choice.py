@@ -212,15 +212,9 @@ class TestEnumType:
 
 
 class TestChoiceTypeFalsyCode:
-    """A list-of-tuples ``ChoiceType`` must coerce *every* non-NULL stored
-    code back into a :class:`Choice`, exactly like the ``Enum`` variant does.
-
-    A falsy-but-valid code (integer ``0`` or the empty string) used to be
-    returned verbatim from the database because ``process_result_value``
-    tested ``if value:`` instead of ``if value is not None:``. The ``Enum``
-    sibling already guards with ``is None`` (see
-    ``TestEnumType.test_setting_value_that_resolves_to_none``), so the two
-    implementations disagreed on the shared contract.
+    """A list-of-tuples ``ChoiceType`` must coerce *every* non-NULL value
+    back into a :class:`Choice`, including false-y values like ``0``
+    or the empty string.
     """
 
     @pytest.fixture
@@ -274,6 +268,7 @@ class TestChoiceTypeFalsyCode:
 
         item = session.query(Item).first()
         assert isinstance(item.status, Choice)
+        assert type(item.status.code) is int  # must be an int, not a bool
         assert item.status.code == 0
         assert item.status.value == 'inactive'
         assert item.status == 0
