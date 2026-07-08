@@ -82,10 +82,7 @@ class JSONTestCase:
     def test_unhashable_type(self, AAA, BBB, session):
         """Verify there are no TypeErrors with certain JSON queries.
 
-        This test will fail under these conditions:
-
-        1.  sqlalchemy versions 1.4.19 through 1.4.23 are installed.
-        2.  `JSONType.hashable` is not set to False.
+        This test will fail if `JSONType.hashable` is not set to False.
 
         For more info, see:
 

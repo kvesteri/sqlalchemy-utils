@@ -10,10 +10,7 @@ from sqlalchemy.orm import ColumnProperty, mapperlib, RelationshipProperty
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.orm.exc import UnmappedInstanceError
 
-try:
-    from sqlalchemy.orm.context import _ColumnEntity, _MapperEntity
-except ImportError:  # SQLAlchemy <1.4
-    from sqlalchemy.orm.query import _ColumnEntity, _MapperEntity
+from sqlalchemy.orm.context import _ColumnEntity, _MapperEntity
 
 from sqlalchemy.orm.session import object_session
 from sqlalchemy.orm.util import AliasedInsp
@@ -281,12 +278,9 @@ def get_mapper(mixed):
     if isinstance(mixed, sa.orm.attributes.InstrumentedAttribute):
         mixed = mixed.class_
     if isinstance(mixed, sa.Table):
-        if hasattr(mapperlib, '_all_registries'):
-            all_mappers = set()
-            for mapper_registry in mapperlib._all_registries():
-                all_mappers.update(mapper_registry.mappers)
-        else:  # SQLAlchemy <1.4
-            all_mappers = mapperlib._mapper_registry
+        all_mappers = set()
+        for mapper_registry in mapperlib._all_registries():
+            all_mappers.update(mapper_registry.mappers)
         mappers = [mapper for mapper in all_mappers if mixed in mapper.tables]
         if len(mappers) > 1:
             raise ValueError("Multiple mappers found for table '%s'." % mixed.name)
@@ -449,11 +443,10 @@ def get_columns(mixed):
         SA Table object, SA Mapper, SA declarative class, SA declarative class
         instance or an alias of any of these objects
     """
+    if isinstance(mixed, sa.SelectBase):
+        return mixed.subquery().c
     if isinstance(mixed, sa.sql.selectable.Selectable):
-        try:
-            return mixed.selected_columns
-        except AttributeError:  # SQLAlchemy <1.4
-            return mixed.c
+        return mixed.c
     if isinstance(mixed, sa.orm.util.AliasedClass):
         return sa.inspect(mixed).mapper.columns
     if isinstance(mixed, sa.orm.Mapper):
@@ -520,10 +513,7 @@ def quote(mixed, ident):
 
 
 def _get_query_compile_state(query):
-    if hasattr(query, '_compile_state'):
-        return query._compile_state()
-    else:  # SQLAlchemy <1.4
-        return query
+    return query._compile_state()
 
 
 def get_polymorphic_mappers(mixed):
@@ -878,7 +868,4 @@ def naturally_equivalent(obj, obj2):
 
 
 def _get_class_registry(class_):
-    try:
-        return class_.registry._class_registry
-    except AttributeError:  # SQLAlchemy <1.4
-        return class_._decl_class_registry
+    return class_.registry._class_registry

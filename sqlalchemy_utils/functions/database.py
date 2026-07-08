@@ -1,7 +1,6 @@
 import itertools
 import os
 from collections.abc import Mapping, Sequence
-from copy import copy
 
 import sqlalchemy as sa
 from sqlalchemy.engine.url import make_url
@@ -416,13 +415,8 @@ def _set_url_database(url: sa.engine.url.URL, database):
     :param database: New database to set.
 
     """
-    if hasattr(url, '_replace'):
-        # Cannot use URL.set() as database may need to be set to None.
-        ret = url._replace(database=database)
-    else:  # SQLAlchemy <1.4
-        url = copy(url)
-        url.database = database
-        ret = url
+    # Cannot use URL.set() as database may need to be set to None.
+    ret = url._replace(database=database)
     assert ret.database == database, ret
     return ret
 
