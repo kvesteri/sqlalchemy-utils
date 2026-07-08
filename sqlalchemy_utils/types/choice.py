@@ -183,9 +183,9 @@ class ChoiceTypeImpl:
         return value
 
     def process_result_value(self, value, dialect):
-        if value:
-            return Choice(value, self.choices_dict[value])
-        return value
+        if value is None:
+            return None
+        return Choice(value, self.choices_dict[value])
 
 
 class EnumTypeImpl:

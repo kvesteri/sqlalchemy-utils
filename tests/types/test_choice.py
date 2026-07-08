@@ -209,3 +209,66 @@ class TestEnumType:
         session.commit()
 
         assert order_nullable.status is None
+
+
+class TestChoiceTypeFalsyCode:
+    """A list-of-tuples ``ChoiceType`` must coerce *every* non-NULL value
+    back into a :class:`Choice`, including false-y values like ``0``
+    or the empty string.
+    """
+
+    @pytest.fixture
+    def Item(self, Base):
+        class Item(Base):
+            STATUSES = [(0, 'inactive'), (1, 'active')]
+
+            __tablename__ = 'item'
+            id = sa.Column(sa.Integer, primary_key=True)
+            status = sa.Column(ChoiceType(STATUSES, impl=sa.Integer()))
+
+        return Item
+
+    @pytest.fixture
+    def init_models(self, Item):
+        pass
+
+    def test_result_value_wraps_falsy_int_code(self):
+        type_ = ChoiceType([(0, 'inactive'), (1, 'active')], impl=sa.Integer())
+        result = type_.process_result_value(0, None)
+        assert isinstance(result, Choice)
+        assert result.code == 0
+        assert result.value == 'inactive'
+
+    def test_result_value_wraps_empty_string_code(self):
+        type_ = ChoiceType([('', 'blank'), ('a', 'Letter A')])
+        result = type_.process_result_value('', None)
+        assert isinstance(result, Choice)
+        assert result.code == ''
+        assert result.value == 'blank'
+
+    def test_matches_enum_sibling_for_falsy_code(self):
+        class Status(Enum):
+            inactive = 0
+            active = 1
+
+        tuple_type = ChoiceType([(0, 'inactive'), (1, 'active')], impl=sa.Integer())
+        enum_type = ChoiceType(Status, impl=sa.Integer())
+
+        # Both siblings must wrap the falsy code, not leak the raw scalar.
+        assert type(tuple_type.process_result_value(0, None)) is Choice
+        assert enum_type.process_result_value(0, None) is Status.inactive
+        assert tuple_type.process_result_value(0, None) is not None
+
+    def test_falsy_code_roundtrips_through_database(self, session, Item):
+        item = Item()
+        item.status = 0
+
+        session.add(item)
+        session.commit()
+
+        item = session.query(Item).first()
+        assert isinstance(item.status, Choice)
+        assert type(item.status.code) is int  # must be an int, not a bool
+        assert item.status.code == 0
+        assert item.status.value == 'inactive'
+        assert item.status == 0
