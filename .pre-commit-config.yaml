@@ -19,5 +19,5 @@ repos:
     rev: 75992aaa40730136014f34227e0135f63fc951b4  # frozen: v3.21.2
     hooks:
       - id: pyupgrade
-        name: "Enforce Python 3.9+ idioms"
-        args: ["--py39-plus"]
+        name: "Enforce Python 3.10+ idioms"
+        args: ["--py310-plus"]
