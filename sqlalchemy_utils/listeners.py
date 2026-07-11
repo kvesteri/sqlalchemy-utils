@@ -10,6 +10,8 @@ def coercion_listener(mapper, class_):
     """
     for prop in mapper.iterate_properties:
         try:
+            if not prop.columns:
+                continue
             listener = prop.columns[0].type.coercion_listener
         except AttributeError:
             continue
