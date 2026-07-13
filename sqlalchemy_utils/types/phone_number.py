@@ -6,7 +6,8 @@
 ..  _phonenumbers: https://github.com/daviddrysdale/python-phonenumbers
 """
 
-from sqlalchemy import exc, types
+from sqlalchemy import exc, String, types
+from sqlalchemy.sql.operators import ilike_op, like_op, notilike_op, notlike_op
 
 from ..exceptions import ImproperlyConfigured
 from ..utils import str_coercible
@@ -179,6 +180,12 @@ class PhoneNumberType(ScalarCoercible, types.TypeDecorator):
         super().__init__(*args, **kwargs)
         self.region = region
         self.impl = types.Unicode(max_length)
+
+    def coerce_compared_value(self, op, value):
+        if op in (like_op, notlike_op, ilike_op, notilike_op):
+            return String()
+        else:
+            return self
 
     def process_bind_param(self, value, dialect):
         if value:
