@@ -471,3 +471,70 @@ class TestCompositeTypeWithMixedCase:
         account = session.query(Account).first()
         assert account.balance.currency == 'USD'
         assert account.balance.amount == 15
+
+
+@pytest.mark.usefixtures('postgresql_dsn')
+class TestCompositeTypeWithAddWithKwArgs(object):
+
+    @pytest.fixture
+    def type_(self):
+        return CompositeType(
+            'money_type',
+            [
+                sa.Column('currency', sa.String),
+                sa.Column('amount', sa.Integer)
+            ]
+        )
+
+    @pytest.fixture
+    def Account(self, Base, type_):
+        class Account(Base):
+            __tablename__ = 'account'
+            id = sa.Column(sa.Integer, primary_key=True)
+            balance = sa.Column(type_)
+
+        return Account
+
+    @pytest.fixture
+    def init_models(self, Account):
+        pass
+
+    def test_parameter_processing_with_keyword_args(
+        self,
+        session,
+        type_,
+        Account
+    ):
+
+        account = Account(
+            balance=type_.type_cls(
+                amount=15,
+                currency='USD',
+            )
+        )
+
+        session.add(account)
+        session.commit()
+
+        account = session.query(Account).first()
+        assert account.balance.currency == 'USD'
+        assert account.balance.amount == 15
+
+    def test_parameter_processing_with_dict(
+        self,
+        session,
+        type_,
+        Account
+    ):
+
+        balance = dict(amount=15, currency='USD')
+        account = Account(
+            balance=type_.type_cls(**balance)
+        )
+
+        session.add(account)
+        session.commit()
+
+        account = session.query(Account).first()
+        assert account.balance.currency == 'USD'
+        assert account.balance.amount == 15
