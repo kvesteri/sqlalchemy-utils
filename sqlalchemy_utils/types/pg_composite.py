@@ -184,6 +184,7 @@ class CompositeType(UserDefinedType, SchemaType):
             )
         SchemaType.__init__(self, name=name, quote=quote)
         self.columns = columns
+        self.typemap = dict((col.name, col.type) for col in columns)
         if name in registered_composites:
             self.type_cls = registered_composites[name].type_cls
         else:
