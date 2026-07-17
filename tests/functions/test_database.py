@@ -19,6 +19,57 @@ class DatabaseTest:
         assert not database_exists(dsn)
 
 
+@pytest.mark.parametrize('dialect', ['postgresql', 'mysql', 'mssql'])
+def test_database_exists_binds_database_name_as_parameter(
+    dialect, monkeypatch
+):
+    """Regression test for GH-760.
+
+    ``database_exists`` used to build its existence-check query with
+    ``%``-string interpolation, so a database name containing SQL
+    metacharacters could inject additional statements. The database name
+    must instead be sent as a bound parameter, never spliced into the SQL
+    text.
+    """
+    payload = "x'; CREATE TABLE hacked (id int); --"
+    url = f'{dialect}://user:pass@localhost/{payload}'
+
+    captured = []
+
+    def record(conn, cursor, statement, parameters, context, executemany):
+        captured.append((statement, parameters))
+
+    real_create_engine = sa.create_engine
+
+    # Redirect every engine created by database_exists() to an in-memory
+    # sqlite database so we can inspect exactly what gets sent to the
+    # DBAPI, without needing a live postgres/mysql/mssql server. The
+    # query itself will fail against sqlite (wrong system tables), which
+    # is fine -- database_exists() treats that as "does not exist".
+    def fake_create_engine(*args, **kwargs):
+        engine = real_create_engine('sqlite://')
+        sa.event.listen(engine, 'before_cursor_execute', record)
+        return engine
+
+    monkeypatch.setattr(sa, 'create_engine', fake_create_engine)
+
+    # The stub sqlite engine lacks the real system tables/views that
+    # postgres/mysql/mssql would query, so the statement itself fails.
+    # database_exists() only swallows that failure for postgres/mssql;
+    # what we actually care about here is what was sent to the DBAPI.
+    try:
+        database_exists(url)
+    except (sa.exc.OperationalError, sa.exc.ProgrammingError):
+        pass
+
+    assert captured, 'expected database_exists() to execute a query'
+    for statement, parameters in captured:
+        # The malicious payload must never appear inside the SQL text
+        # itself -- it may only appear as a bound parameter value.
+        assert payload not in statement
+        assert 'hacked' not in statement
+
+
 @pytest.mark.usefixtures('sqlite_memory_dsn')
 class TestDatabaseSQLiteMemory:
 
