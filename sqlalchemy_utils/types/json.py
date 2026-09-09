@@ -56,6 +56,12 @@ class JSONType(sa.types.TypeDecorator):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+    def _dump_json(self, value):
+        return json.dumps(value)
+
+    def _load_json(self, value):
+        return json.loads(value)
+
     def load_dialect_impl(self, dialect):
         if dialect.name == 'postgresql':
             # Use the native JSON type.
@@ -70,12 +76,12 @@ class JSONType(sa.types.TypeDecorator):
         if dialect.name == 'postgresql' and has_postgres_json:
             return value
         if value is not None:
-            value = json.dumps(value)
+            value = self._dump_json(value)
         return value
 
     def process_result_value(self, value, dialect):
         if dialect.name == 'postgresql':
             return value
         if value is not None:
-            value = json.loads(value)
+            value = self._load_json(value)
         return value
