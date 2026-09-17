@@ -6,6 +6,8 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 Unreleased
 ^^^^^^^^^^
 
+- Fix ``database_exists()`` always returning ``False`` for SQLite URI
+  connections such as ``sqlite:///file:/tmp/db.sqlite?uri=true``. (#824)
 - Drop support for sqlalchemy 1.4.
 - Drop support for Python 3.9.
 - Support Python 3.14.
