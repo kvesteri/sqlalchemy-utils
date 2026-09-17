@@ -40,6 +40,47 @@ class TestDatabaseSQLiteFile(DatabaseTest):
         self.test_create_and_drop(dsn)
 
 
+class TestDatabaseSQLiteURI:
+    def _uri(self, path, query='uri=true'):
+        return f'sqlite:///file:{path}?{query}'
+
+    def test_database_exists_with_sqlite_uri(self, tmp_path):
+        path = tmp_path / 'tmp.sqlite'
+        uri = self._uri(path)
+        classic = f'sqlite:///{path}'
+
+        assert not database_exists(uri)
+        create_database(uri)
+        assert database_exists(uri)
+        assert database_exists(classic)
+        drop_database(uri)
+        assert not database_exists(uri)
+        assert not database_exists(classic)
+
+    def test_database_exists_with_triple_slash_file_uri(self, tmp_path):
+        path = tmp_path / 'tmp.sqlite'
+        uri = f'sqlite:///file:///{path}?uri=true'
+
+        assert not database_exists(uri)
+        create_database(uri)
+        assert database_exists(uri)
+        drop_database(uri)
+        assert not database_exists(uri)
+
+    def test_database_exists_with_sqlite_uri_query_params(self, tmp_path):
+        path = tmp_path / 'tmp.sqlite'
+        create_uri = self._uri(path)
+        readonly_uri = self._uri(path, query='mode=ro&uri=true')
+
+        assert not database_exists(readonly_uri)
+        create_database(create_uri)
+        assert database_exists(readonly_uri)
+        drop_database(create_uri)
+
+    def test_memory_sqlite_uri_exists(self):
+        assert database_exists('sqlite:///file::memory:?cache=shared&uri=true')
+
+
 @pytest.mark.skipif('pymysql is None')
 @pytest.mark.usefixtures('mysql_dsn')
 class TestDatabaseMySQL(DatabaseTest):
