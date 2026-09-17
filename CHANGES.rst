@@ -6,6 +6,8 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 Unreleased
 ^^^^^^^^^^
 
+- Fix ``merge_references()`` ignoring the ``foreign_keys`` keyword argument.
+  (#775)
 - Drop support for sqlalchemy 1.4.
 - Drop support for Python 3.9.
 - Support Python 3.14.
