@@ -1,7 +1,7 @@
 import pytest
 import sqlalchemy as sa
 
-from sqlalchemy_utils import merge_references
+from sqlalchemy_utils import get_referencing_foreign_keys, merge_references
 
 
 class TestMergeReferences:
@@ -251,3 +251,53 @@ class TestMergeReferencesWithMappedProperties:
         merge_references(john, jack)
         assert john not in team.members
         assert jack in team.members
+
+
+class TestMergeReferencesWithForeignKeysParameter:
+
+    @pytest.fixture
+    def User(self, Base):
+        class User(Base):
+            __tablename__ = 'user'
+            id = sa.Column(sa.Integer, primary_key=True)
+            name = sa.Column(sa.Unicode(255))
+
+            def __repr__(self):
+                return 'User(%r)' % self.name
+        return User
+
+    @pytest.fixture
+    def Article(self, Base, User):
+        class Article(Base):
+            __tablename__ = 'article'
+            id = sa.Column(sa.Integer, primary_key=True)
+            title = sa.Column(sa.Unicode(255))
+            author_id = sa.Column(sa.Integer, sa.ForeignKey('user.id'))
+            owner_id = sa.Column(sa.Integer, sa.ForeignKey('user.id'))
+
+            author = sa.orm.relationship(User, foreign_keys=[author_id])
+            owner = sa.orm.relationship(User, foreign_keys=[owner_id])
+        return Article
+
+    @pytest.fixture
+    def init_models(self, User, Article):
+        pass
+
+    def test_respects_foreign_keys_parameter(self, session, User, Article):
+        john = User(name='John')
+        jack = User(name='Jack')
+        authored = Article(title='Authored by John', author=john)
+        owned = Article(title='Owned by John', owner=john)
+        session.add_all([john, jack, authored, owned])
+        session.commit()
+
+        author_fks = [
+            fk
+            for fk in get_referencing_foreign_keys(User)
+            if list(fk.constraint.columns)[0].name == 'author_id'
+        ]
+        merge_references(john, jack, foreign_keys=author_fks)
+        session.commit()
+
+        assert authored.author_id == jack.id
+        assert owned.owner_id == john.id
