@@ -6,6 +6,10 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 Unreleased
 ^^^^^^^^^^
 
+- Add support for SQLAlchemy 2.1.
+- Reimplement ``generic_relationship`` as a hybrid property built only on public SQLAlchemy APIs, instead of private attribute internals.
+
+  Assigning to a generic relationship now sets the discriminator and id attributes through regular attribute instrumentation, so re-assigning it on a persistent object is flushed to the database.
 - Drop support for sqlalchemy 1.4.
 - Drop support for Python 3.9.
 - Support Python 3.14.
