@@ -64,7 +64,7 @@ def mysql_db_user():
 def postgresql_dsn(
     postgresql_db_user, postgresql_db_password, postgresql_db_host, db_name
 ):
-    return 'postgresql://{}:{}@{}/{}'.format(
+    return 'postgresql+psycopg2://{}:{}@{}/{}'.format(
         postgresql_db_user, postgresql_db_password, postgresql_db_host, db_name
     )
 

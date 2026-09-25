@@ -1,3 +1,4 @@
+import re
 from collections.abc import Iterable
 
 import sqlalchemy as sa
@@ -11,8 +12,21 @@ from .exceptions import ImproperlyConfigured
 from .functions import identity
 from .functions.orm import _get_class_registry
 
+try:
+    # SQLAlchemy >= 2.1 made these attribute internals private.
+    from sqlalchemy.orm.attributes import (
+        _register_attribute as register_attribute,
+        _ScalarAttributeImpl as ScalarAttributeImpl,
+    )
+except ImportError:
+    from sqlalchemy.orm.attributes import register_attribute, ScalarAttributeImpl
 
-class GenericAttributeImpl(attributes.ScalarAttributeImpl):
+_SQLALCHEMY_VERSION = tuple(
+    int(part) for part in re.findall(r'\d+', sa.__version__)[:3]
+)
+
+
+class GenericAttributeImpl(ScalarAttributeImpl):
     def __init__(self, *args, **kwargs):
         """
         The constructor of attributes.AttributeImpl changed in SQLAlchemy 2.0.22,
@@ -25,8 +39,7 @@ class GenericAttributeImpl(attributes.ScalarAttributeImpl):
         Setting None as default_function here.
         """
         # Adjust for SQLAlchemy version change
-        sqlalchemy_version = tuple(map(int, sa.__version__.split('.')))
-        if sqlalchemy_version >= (2, 0, 22):
+        if _SQLALCHEMY_VERSION >= (2, 0, 22):
             args = (*args[:2], None, *args[2:])
 
         super().__init__(*args, **kwargs)
@@ -185,7 +198,7 @@ class GenericRelationshipProperty(MapperProperty):
             return self.property._discriminator_col.in_(class_names)
 
     def instrument_class(self, mapper):
-        attributes.register_attribute(
+        register_attribute(
             mapper.class_,
             self.key,
             comparator=self.Comparator(self, mapper),

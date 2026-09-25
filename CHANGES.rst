@@ -6,6 +6,7 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 Unreleased
 ^^^^^^^^^^
 
+- Add support for SQLAlchemy 2.1.
 - Drop support for sqlalchemy 1.4.
 - Drop support for Python 3.9.
 - Support Python 3.14.
