@@ -1,3 +1,6 @@
+from sqlalchemy.orm import aliased
+
+
 class GenericRelationshipTestCase:
     def test_set_as_none(self, Event):
         event = Event()
@@ -100,3 +103,46 @@ class GenericRelationshipTestCase:
         statement = Event.object.is_type(User)
         q = session.query(Event).filter(statement)
         assert q.first() is not None
+
+    def test_reassign_persistent_relationship(self, session, User, Event):
+        user1 = User()
+        user2 = User()
+        session.add_all([user1, user2])
+        session.commit()
+        event = Event(object=user1)
+        session.add(event)
+        session.commit()
+
+        event.object = user2
+        session.commit()
+        session.expunge(event)
+
+        event = session.query(Event).one()
+        assert event.object == user2
+
+    def test_compare_aliased_query(self, session, User, Event):
+        user = User()
+        session.add(user)
+        session.commit()
+        event = Event(object=user)
+        session.add(event)
+        session.commit()
+
+        event_alias = aliased(Event)
+        query = session.query(event_alias)
+        assert query.filter(event_alias.object == user).one() == event
+
+    def test_change_identifier(self, session, User, Event):
+        user1 = User()
+        user2 = User()
+        session.add_all([user1, user2])
+        session.commit()
+        event = Event(object=user1)
+        session.add(event)
+        session.commit()
+
+        event.object_id = user2.id
+        if hasattr(event, 'object_code'):
+            event.object_code = user2.code
+
+        assert event.object == user2

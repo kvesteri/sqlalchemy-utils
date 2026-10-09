@@ -68,7 +68,7 @@ class GenericRelationship:
         if isinstance(column, hybrid_property):
             return column.__name__
         try:
-            return sa.inspect(cls).get_property_by_column(column).key
+            return sa.inspect(cls).mapper.get_property_by_column(column).key
         except sa.orm.exc.UnmappedColumnError:
             raise ImproperlyConfigured(
                 f'Could not find generic relationship attribute for {column!r}.'
