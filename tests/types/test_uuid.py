@@ -2,7 +2,7 @@ import uuid
 
 import pytest
 import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
+from sqlalchemy.dialects import mssql, mysql, postgresql
 
 from sqlalchemy_utils import UUIDType
 
@@ -71,3 +71,20 @@ class TestUUIDType:
         assert str(expr) == (
             '''"user".id = \'b4e794d6-5750-4844-958c-fa382649719d\''''
         )
+
+    @pytest.mark.parametrize('dialect', [mysql.dialect(), mssql.dialect()])
+    def test_literal_bind_non_native_fallback(self, User, dialect):
+        # UUIDType(binary=False) falls back to a CHAR(32) hex column on
+        # dialects without native UUID support (e.g. MySQL). A UUID value
+        # must be coerced to a hex string when rendered as a SQL literal,
+        # not just when bound as a parameter, or compilation raises
+        # TypeError: sequence item 0: expected str instance, UUID found
+        # Regression test for
+        # https://github.com/kvesteri/sqlalchemy-utils/issues/625
+        identifier = uuid.uuid4()
+        column = sa.column('id', UUIDType(binary=False, native=False))
+        expr = (column == identifier).compile(
+            dialect=dialect,
+            compile_kwargs={'literal_binds': True},
+        )
+        assert str(expr) == "id = '%s'" % identifier.hex
