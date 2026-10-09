@@ -26,6 +26,7 @@ class TestLtree:
             'path.path',
             '1_.2',
             '_._',
+            'path.äö',
         )
     )
     def test_validate_with_valid_codes(self, code):
@@ -40,7 +41,7 @@ class TestLtree:
             'path..path',
             'path.path..path',
             'path.path..',
-            'path.äö',
+            'path. path',
         )
     )
     def test_validate_with_invalid_path(self, path):
