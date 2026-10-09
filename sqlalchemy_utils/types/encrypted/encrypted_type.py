@@ -4,7 +4,7 @@ import json
 import os
 import warnings
 
-from sqlalchemy.types import LargeBinary, String, TypeDecorator
+from sqlalchemy.types import JSON, LargeBinary, String, TypeDecorator
 
 from sqlalchemy_utils.exceptions import ImproperlyConfigured
 from sqlalchemy_utils.types.encrypted.padding import PADDING_MECHANISM
@@ -395,7 +395,13 @@ class StringEncryptedType(TypeDecorator, ScalarCoercible):
                 elif issubclass(type_, (datetime.date, datetime.time)):
                     value = value.isoformat()
 
-                elif issubclass(type_, JSONType):
+                elif issubclass(type_, JSONType) or isinstance(
+                    self.underlying_type, JSON
+                ):
+                    # sqlalchemy.types.JSON (and dialects such as
+                    # postgresql.JSONB) use bind_processor rather than
+                    # process_bind_param, so serialize here. JSONType is
+                    # handled above via issubclass.
                     value = json.dumps(value)
 
             return self.engine.encrypt(value)
@@ -424,7 +430,11 @@ class StringEncryptedType(TypeDecorator, ScalarCoercible):
                 elif type_ in date_types:
                     return DatetimeHandler.process_value(decrypted_value, type_)
 
-                elif issubclass(type_, JSONType):
+                elif issubclass(type_, JSONType) or isinstance(
+                    self.underlying_type, JSON
+                ):
+                    # Avoid dict(json_string), which raises ValueError for
+                    # sqlalchemy.types.JSON (python_type is dict).
                     return json.loads(decrypted_value)
 
                 # Handle all others
