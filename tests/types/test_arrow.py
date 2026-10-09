@@ -1,10 +1,45 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 import pytest
 import sqlalchemy as sa
 from dateutil import tz
+from sqlalchemy.dialects import mssql, mysql, postgresql, sqlite
 
 from sqlalchemy_utils.types import arrow
+from sqlalchemy_utils.types.enriched_datetime import ArrowDateTime
+from sqlalchemy_utils.types.enriched_datetime.enriched_datetime_type import (
+    EnrichedDateTimeType,
+)
+
+
+@pytest.mark.skipif('arrow.arrow is None')
+@pytest.mark.parametrize('dialect', [sqlite, postgresql, mysql, mssql])
+@pytest.mark.parametrize('with_timezone', [False, True])
+@pytest.mark.parametrize('value_kind', ['arrow', 'datetime', 'string'])
+@pytest.mark.parametrize('type_cls', [arrow.ArrowType, EnrichedDateTimeType])
+def test_arrow_literal_binds(dialect, with_timezone, value_kind, type_cls):
+    value = arrow.arrow.get('2015-01-01T15:30:45+02:00')
+    if value_kind == 'datetime':
+        value = value.datetime
+    elif value_kind == 'string':
+        value = value.isoformat()
+
+    kwargs = {'timezone': with_timezone}
+    if type_cls is EnrichedDateTimeType:
+        kwargs['datetime_processor'] = ArrowDateTime
+    column = sa.column('created_at', type_cls(**kwargs))
+    expected_value = datetime(2015, 1, 1, 13, 30, 45)
+    if with_timezone:
+        expected_value = expected_value.replace(tzinfo=timezone.utc)
+    expected_column = sa.column('created_at', sa.DateTime(timezone=with_timezone))
+    compile_kwargs = {
+        'dialect': dialect.dialect(),
+        'compile_kwargs': {'literal_binds': True},
+    }
+
+    assert str((column > value).compile(**compile_kwargs)) == str(
+        (expected_column > expected_value).compile(**compile_kwargs)
+    )
 
 
 @pytest.fixture

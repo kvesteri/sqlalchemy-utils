@@ -45,7 +45,7 @@ class EnrichedDateTimeType(types.TypeDecorator, ScalarCoercible):
         return self.dt_object.process_result_value(self.impl, value, dialect)
 
     def process_literal_param(self, value, dialect):
-        return value
+        return self.process_bind_param(value, dialect)
 
     @property
     def python_type(self):
