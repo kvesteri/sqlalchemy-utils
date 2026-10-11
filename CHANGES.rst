@@ -17,6 +17,10 @@ Here you can see the full list of changes between each SQLAlchemy-Utils release.
 - Fix ``ChoiceType`` returning the raw scalar instead of a ``Choice`` for falsy codes such as ``0`` or the empty string. (#813)
 
   NULL values continue to return ``None``.
+- Fix ``EncryptedType`` / ``StringEncryptedType`` round-trip when the
+  underlying type is ``sqlalchemy.types.JSON`` (or dialect JSON variants).
+  Decrypt used to call ``dict(json_string)`` and raise
+  ``ValueError``. (#789)
 
 0.42.1 (2025-12-12)
 ^^^^^^^^^^^^^^^^^^^

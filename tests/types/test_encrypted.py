@@ -5,7 +5,7 @@ from datetime import date, datetime, time
 import pytest
 import sqlalchemy as sa
 
-from sqlalchemy_utils import ColorType, PhoneNumberType, StringEncryptedType
+from sqlalchemy_utils import ColorType, EncryptedType, PhoneNumberType, StringEncryptedType
 from sqlalchemy_utils.types import JSONType
 from sqlalchemy_utils.types.encrypted.encrypted_type import (
     AesEngine,
@@ -547,3 +547,43 @@ class TestAesGcmEncryptedType(EncryptedTypeTestCase):
         # we're really searching for the same username. Hence, the above search
         # will fail
         assert test is None
+
+
+@pytest.mark.skipif('cryptography is None')
+class TestSqlalchemyJsonEncryptedType:
+    """Regression for #789: sqlalchemy.types.JSON is not JSONType."""
+
+    @pytest.mark.parametrize('type_', [StringEncryptedType, EncryptedType])
+    @pytest.mark.parametrize('payload', [
+        {'message': 'This is a test', 'value': 123},
+        [1, 'two', {'three': 3}],
+    ])
+    def test_roundtrip_with_sqlalchemy_json(
+        self, connection, type_, payload, request
+    ):
+        import warnings
+
+        Base = sa.orm.declarative_base()
+
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', DeprecationWarning)
+
+            class Document(Base):
+                __tablename__ = (
+                    'document_' + request.node.callspec.id.replace('-', '_')
+                )
+                id = sa.Column(sa.Integer, primary_key=True)
+                data = sa.Column(type_(sa.JSON, 'secretkey1234'))
+
+        Base.metadata.create_all(connection)
+        Session = sa.orm.sessionmaker(bind=connection)
+        session = Session()
+        try:
+            doc = Document(data=payload)
+            session.add(doc)
+            session.commit()
+            session.refresh(doc)
+            assert doc.data == payload
+        finally:
+            session.close()
+            Base.metadata.drop_all(connection)
