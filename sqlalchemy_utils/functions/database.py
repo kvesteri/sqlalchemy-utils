@@ -93,7 +93,9 @@ def json_sql(value, scalars_to_json=True):
             )
         )
     elif isinstance(value, str):
-        return scalar_convert(f"'{value}'")
+        if scalars_to_json:
+            return sa.func.to_json(sa.literal(value))
+        return sa.literal(value)
     elif isinstance(value, Sequence):
         return sa.func.json_build_array(
             *(json_sql(v, scalars_to_json=False) for v in value)
@@ -164,7 +166,9 @@ def jsonb_sql(value, scalars_to_jsonb=True):
             )
         )
     elif isinstance(value, str):
-        return scalar_convert(f"'{value}'")
+        if scalars_to_jsonb:
+            return sa.func.to_jsonb(sa.literal(value))
+        return sa.literal(value)
     elif isinstance(value, Sequence):
         return sa.func.jsonb_build_array(
             *(jsonb_sql(v, scalars_to_jsonb=False) for v in value)

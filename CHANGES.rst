@@ -3,6 +3,12 @@ Changelog
 
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
+Unreleased
+^^^^^^^^^^
+
+- Fix SQL injection in ``json_sql`` and ``jsonb_sql``: string values are now rendered as bound parameters instead of being interpolated into the SQL text.
+- Escape the ``TranslationHybrid`` locale when it is rendered as a SQL literal.
+
 0.43.0 (2026-10-09)
 ^^^^^^^^^^^^^^^^^^^
 
