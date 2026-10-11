@@ -254,7 +254,6 @@ class TestMergeReferencesWithMappedProperties:
 
 
 class TestMergeReferencesWithForeignKeysParameter:
-
     @pytest.fixture
     def User(self, Base):
         class User(Base):
@@ -264,6 +263,7 @@ class TestMergeReferencesWithForeignKeysParameter:
 
             def __repr__(self):
                 return 'User(%r)' % self.name
+
         return User
 
     @pytest.fixture
@@ -277,6 +277,7 @@ class TestMergeReferencesWithForeignKeysParameter:
 
             author = sa.orm.relationship(User, foreign_keys=[author_id])
             owner = sa.orm.relationship(User, foreign_keys=[owner_id])
+
         return Article
 
     @pytest.fixture

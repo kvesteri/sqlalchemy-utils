@@ -1,112 +1,51 @@
+import builtins
 from collections.abc import Iterable
 
 import sqlalchemy as sa
-from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import attributes, class_mapper, ColumnProperty
-from sqlalchemy.orm.interfaces import MapperProperty, PropComparator
-from sqlalchemy.orm.session import _state_session
-from sqlalchemy.util import set_creation_order
+from sqlalchemy.ext.hybrid import Comparator, hybrid_property
+from sqlalchemy.orm import object_session
 
 from .exceptions import ImproperlyConfigured
 from .functions import identity
-from .functions.orm import _get_class_registry
 
 
-class GenericAttributeImpl(attributes.ScalarAttributeImpl):
-    def __init__(self, *args, **kwargs):
-        """
-        The constructor of attributes.AttributeImpl changed in SQLAlchemy 2.0.22,
-        adding a 'default_function' required positional argument before 'dispatch'.
-        This adjustment ensures compatibility across versions by inserting None for
-        'default_function' in versions >= 2.0.22.
+class GenericComparator(Comparator):
+    def __init__(self, relationship, cls):
+        self.relationship = relationship
+        self.cls = cls
 
-        Arguments received: (class, key, dispatch)
-        Required by AttributeImpl: (class, key, default_function, dispatch)
-        Setting None as default_function here.
-        """
-        # Adjust for SQLAlchemy version change
-        sqlalchemy_version = tuple(map(int, sa.__version__.split('.')))
-        if sqlalchemy_version >= (2, 0, 22):
-            args = (*args[:2], None, *args[2:])
+    def __clause_element__(self):
+        raise NotImplementedError(
+            'A generic relationship can only be compared against a model '
+            'instance or with is_type().'
+        )
 
-        super().__init__(*args, **kwargs)
+    def __eq__(self, other):
+        discriminator, ids = self.relationship._attributes(self.cls)
+        q = discriminator == type(other).__name__
+        for column, value in zip(ids, identity(other)):
+            q &= column == value
+        return q
 
-    def get(self, state, dict_, passive=attributes.PASSIVE_OFF):
-        if self.key in dict_:
-            return dict_[self.key]
+    def __ne__(self, other):
+        return ~(self == other)
 
-        # Retrieve the session bound to the state in order to perform
-        # a lazy query for the attribute.
-        session = _state_session(state)
-        if session is None:
-            # State is not bound to a session; we cannot proceed.
-            return None
-
-        # Find class for discriminator.
-        # TODO: Perhaps optimize with some sort of lookup?
-        discriminator = self.get_state_discriminator(state)
-        target_class = _get_class_registry(state.class_).get(discriminator)
-
-        if target_class is None:
-            # Unknown discriminator; return nothing.
-            return None
-
-        id = self.get_state_id(state)
-
-        target = session.get(target_class, id)
-
-        # Return found (or not found) target.
-        return target
-
-    def get_state_discriminator(self, state):
-        discriminator = self.parent_token.discriminator
-        if isinstance(discriminator, hybrid_property):
-            return getattr(state.obj(), discriminator.__name__)
-        else:
-            return state.attrs[discriminator.key].value
-
-    def get_state_id(self, state):
-        # Lookup row with the discriminator and id.
-        return tuple(state.attrs[id.key].value for id in self.parent_token.id)
-
-    def set(
-        self,
-        state,
-        dict_,
-        initiator,
-        passive=attributes.PASSIVE_OFF,
-        check_old=None,
-        pop=False,
-    ):
-        # Set us on the state.
-        dict_[self.key] = initiator
-
-        if initiator is None:
-            # Nullify relationship args
-            for id in self.parent_token.id:
-                dict_[id.key] = None
-            dict_[self.parent_token.discriminator.key] = None
-        else:
-            # Get the primary key of the initiator and ensure we
-            # can support this assignment.
-            class_ = type(initiator)
-            mapper = class_mapper(class_)
-
-            pk = mapper.identity_key_from_instance(initiator)[1]
-
-            # Set the identifier and the discriminator.
-            discriminator = class_.__name__
-
-            for index, id in enumerate(self.parent_token.id):
-                dict_[id.key] = pk[index]
-            dict_[self.parent_token.discriminator.key] = discriminator
+    def is_type(self, other):
+        discriminator, _ = self.relationship._attributes(self.cls)
+        class_names = [
+            mapper.class_.__name__ for mapper in sa.inspect(other).self_and_descendants
+        ]
+        return discriminator.in_(class_names)
 
 
-class GenericRelationshipProperty(MapperProperty):
+class GenericRelationship:
     """A generic form of the relationship property.
 
     Creates a 1 to many relationship between the parent model
-    and any other models using a discriminator (the table name).
+    and any other models using a discriminator (the class name).
+
+    Implemented as a hybrid property on top of the discriminator and id
+    attributes, so it only relies on public SQLAlchemy APIs.
 
     :param discriminator:
         Field to discriminate which model we are referring to.
@@ -114,87 +53,94 @@ class GenericRelationshipProperty(MapperProperty):
         Field to point to the model we are referring to.
     """
 
-    def __init__(self, discriminator, id, doc=None):
-        super().__init__()
-        self._discriminator_col = discriminator
-        self._id_cols = id
-        self._id = None
-        self._discriminator = None
-        self.doc = doc
-
-        set_creation_order(self)
-
-    def _column_to_property(self, column):
-        if isinstance(column, hybrid_property):
-            attr_key = column.__name__
-            for key, attr in self.parent.all_orm_descriptors.items():
-                if key == attr_key:
-                    return attr
+    def __init__(self, discriminator, id):
+        self.discriminator = discriminator
+        if isinstance(id, Iterable) and not isinstance(id, str):
+            self.ids = list(id)
         else:
-            for attr in self.parent.attrs.values():
-                if isinstance(attr, ColumnProperty):
-                    if attr.columns[0].name == column.name:
-                        return attr
+            self.ids = [id]
+        # Key for caching the assigned target object on the instance dict.
+        self.cache_key = f'_generic_relationship_{builtins.id(self)}'
 
-    def init(self):
-        def convert_strings(column):
-            if isinstance(column, str):
-                return self.parent.columns[column]
+    def _key(self, cls, column):
+        if isinstance(column, str):
             return column
-
-        self._discriminator_col = convert_strings(self._discriminator_col)
-        self._id_cols = convert_strings(self._id_cols)
-
-        if isinstance(self._id_cols, Iterable):
-            self._id_cols = list(map(convert_strings, self._id_cols))
-        else:
-            self._id_cols = [self._id_cols]
-
-        self.discriminator = self._column_to_property(self._discriminator_col)
-
-        if self.discriminator is None:
-            raise ImproperlyConfigured('Could not find discriminator descriptor.')
-
-        self.id = list(map(self._column_to_property, self._id_cols))
-
-    class Comparator(PropComparator):
-        def __init__(self, prop, parentmapper):
-            self.property = prop
-            self._parententity = parentmapper
-
-        def __eq__(self, other):
-            discriminator = type(other).__name__
-            q = self.property._discriminator_col == discriminator
-            other_id = identity(other)
-            for index, id in enumerate(self.property._id_cols):
-                q &= id == other_id[index]
-            return q
-
-        def __ne__(self, other):
-            return ~(self == other)
-
-        def is_type(self, other):
-            mapper = sa.inspect(other)
-            # Iterate through the weak sequence in order to get the actual
-            # mappers
-            class_names = [other.__name__]
-            class_names.extend(
-                [submapper.class_.__name__ for submapper in mapper._inheriting_mappers]
+        if isinstance(column, hybrid_property):
+            return column.__name__
+        try:
+            return sa.inspect(cls).mapper.get_property_by_column(column).key
+        except sa.orm.exc.UnmappedColumnError:
+            raise ImproperlyConfigured(
+                f'Could not find generic relationship attribute for {column!r}.'
             )
 
-            return self.property._discriminator_col.in_(class_names)
-
-    def instrument_class(self, mapper):
-        attributes.register_attribute(
-            mapper.class_,
-            self.key,
-            comparator=self.Comparator(self, mapper),
-            parententity=mapper,
-            doc=self.doc,
-            impl_class=GenericAttributeImpl,
-            parent_token=self,
+    def _keys(self, cls):
+        return (
+            self._key(cls, self.discriminator),
+            [self._key(cls, column) for column in self.ids],
         )
 
+    def _attributes(self, cls):
+        discriminator, ids = self._keys(cls)
+        return getattr(cls, discriminator), [getattr(cls, key) for key in ids]
 
-def generic_relationship(*args, **kwargs):
-    return GenericRelationshipProperty(*args, **kwargs)
+    def _target_class(self, cls, discriminator):
+        for mapper in sa.inspect(cls).registry.mappers:
+            if mapper.class_.__name__ == discriminator:
+                return mapper.class_
+
+    def get(self, obj):
+        discriminator_key, id_keys = self._keys(type(obj))
+        discriminator = getattr(obj, discriminator_key)
+        id = tuple(getattr(obj, key) for key in id_keys)
+
+        # Return the object assigned to this relationship as long as the
+        # discriminator and id still point to it.
+        cached = obj.__dict__.get(self.cache_key)
+        if (
+            cached is not None
+            and type(cached).__name__ == discriminator
+            and identity(cached) == id
+        ):
+            return cached
+
+        # Use the session the object is bound to in order to perform
+        # a lazy query for the target.
+        session = object_session(obj)
+        if session is None:
+            return None
+
+        target_class = self._target_class(type(obj), discriminator)
+        if target_class is None:
+            # Unknown discriminator; return nothing.
+            return None
+
+        return session.get(target_class, id)
+
+    def set(self, obj, value):
+        discriminator_key, id_keys = self._keys(type(obj))
+        obj.__dict__[self.cache_key] = value
+
+        if value is None:
+            # Nullify relationship args
+            for key in id_keys:
+                setattr(obj, key, None)
+            setattr(obj, discriminator_key, None)
+        else:
+            for key, pk in zip(id_keys, identity(value)):
+                setattr(obj, key, pk)
+            setattr(obj, discriminator_key, type(value).__name__)
+
+    def comparator(self, cls):
+        return GenericComparator(self, cls)
+
+
+def generic_relationship(discriminator, id, doc=None):
+    relationship = GenericRelationship(discriminator, id)
+    prop = hybrid_property(
+        relationship.get,
+        relationship.set,
+        custom_comparator=relationship.comparator,
+    )
+    prop.__doc__ = doc
+    return prop
