@@ -3,6 +3,12 @@ Changelog
 
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
+Unreleased
+^^^^^^^^^^
+
+- Fix ``merge_references()`` ignoring the ``foreign_keys`` keyword argument.
+  (#775)
+
 0.43.0 (2026-10-09)
 ^^^^^^^^^^^^^^^^^^^
 

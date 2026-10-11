@@ -159,7 +159,8 @@ def merge_references(from_, to, foreign_keys=None):
         raise TypeError('The tables of given arguments do not match.')
 
     session = object_session(from_)
-    foreign_keys = get_referencing_foreign_keys(from_)
+    if foreign_keys is None:
+        foreign_keys = get_referencing_foreign_keys(from_)
 
     for fk in foreign_keys:
         old_values = get_foreign_key_values(fk, from_)
