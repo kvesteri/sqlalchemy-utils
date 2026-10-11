@@ -3,6 +3,12 @@ Changelog
 
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
+Unreleased
+^^^^^^^^^^
+
+- Fix ``database_exists()`` always returning ``False`` for SQLite URI
+  connections such as ``sqlite:///file:/tmp/db.sqlite?uri=true``. (#824)
+
 0.43.0 (2026-10-09)
 ^^^^^^^^^^^^^^^^^^^
 

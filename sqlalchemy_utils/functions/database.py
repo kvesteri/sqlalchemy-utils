@@ -1,6 +1,7 @@
 import itertools
 import os
 from collections.abc import Mapping, Sequence
+from urllib.parse import unquote, urlparse
 
 import sqlalchemy as sa
 from sqlalchemy.engine.url import make_url
@@ -426,6 +427,31 @@ def _get_scalar_result(engine, sql):
         return conn.scalar(sql)
 
 
+def _query_value_is_true(value):
+    if isinstance(value, (list, tuple)):
+        value = value[0] if value else ''
+    return str(value).lower() in {'1', 'true', 'yes'}
+
+
+def _sqlite_database_path(url):
+    """Return the filesystem path for a SQLite URL.
+
+    In-memory databases, including URI ``file::memory:`` forms, return
+    ``None``.
+    """
+    database = url.database
+    if not database or database == ':memory:':
+        return None
+
+    if _query_value_is_true(url.query.get('uri')) and database.startswith('file:'):
+        path = unquote(urlparse(database).path or '')
+        if not path or path == ':memory:' or path.startswith(':memory:'):
+            return None
+        return path
+
+    return database
+
+
 def _sqlite_file_exists(database):
     if not os.path.isfile(database) or os.path.getsize(database) < 100:
         return False
@@ -483,14 +509,12 @@ def database_exists(url):
             return bool(_get_scalar_result(engine, sa.text(text)))
 
         elif dialect_name == 'sqlite':
-            url = _set_url_database(url, database=None)
-            engine = sa.create_engine(url)
-            if database:
-                return database == ':memory:' or _sqlite_file_exists(database)
-            else:
+            path = _sqlite_database_path(url)
+            if path is None:
                 # The default SQLAlchemy database is in memory, and :memory: is
                 # not required, thus we should support that use case.
                 return True
+            return _sqlite_file_exists(path)
         elif dialect_name == 'mssql':
             text = "SELECT 1 FROM sys.databases WHERE name = '%s'" % database
             url = _set_url_database(url, database='master')
@@ -625,9 +649,10 @@ def drop_database(url):
     else:
         engine = sa.create_engine(url)
 
-    if dialect_name == 'sqlite' and database != ':memory:':
-        if database:
-            os.remove(database)
+    if dialect_name == 'sqlite':
+        path = _sqlite_database_path(url)
+        if path:
+            os.remove(path)
     else:
         with engine.begin() as conn:
             text = f'DROP DATABASE {quote(conn, database)}'
