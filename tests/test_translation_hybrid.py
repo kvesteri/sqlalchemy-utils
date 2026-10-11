@@ -110,6 +110,17 @@ class TestTranslationHybrid:
             in str(Article.name.expression)
         )
 
+    def test_locale_with_quote_is_rendered_as_escaped_literal(self, Base):
+        translation_hybrid = TranslationHybrid("fi' AND 1=1 --", 'en')
+
+        class Article(Base):
+            __tablename__ = 'article'
+            id = sa.Column(sa.Integer, primary_key=True)
+            name_translations = sa.Column(HSTORE)
+            name = translation_hybrid(name_translations)
+
+        assert "'fi'' AND 1=1 --'" in str(Article.name.expression)
+
     def test_locales_casted_only_in_compilation_phase(self, Base):
         class LocaleGetter:
             def current_locale(self):

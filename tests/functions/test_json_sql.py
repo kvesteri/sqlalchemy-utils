@@ -20,6 +20,12 @@ class TestJSONSQL:
             ({}, {}),
             ([1, 2], [1, 2]),
             ([], []),
+            ({'a': "O'Brien"}, {'a': "O'Brien"}),
+            (["O'Brien"], ["O'Brien"]),
+            (
+                {'a': "x' || (SELECT current_user) || 'y"},
+                {'a': "x' || (SELECT current_user) || 'y"}
+            ),
             (
                 [sa.select(sa.text('1')).label('alias')],
                 [1]
