@@ -3,6 +3,12 @@ Changelog
 
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
+Unreleased
+^^^^^^^^^^
+
+- Fix ``database_exists()`` for named in-memory SQLite URIs such as
+  ``file:name?mode=memory&uri=true``. (#542)
+
 0.43.0 (2026-10-09)
 ^^^^^^^^^^^^^^^^^^^
 
