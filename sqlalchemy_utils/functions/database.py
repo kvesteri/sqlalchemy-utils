@@ -1,6 +1,7 @@
 import itertools
 import os
 from collections.abc import Mapping, Sequence
+from urllib.parse import unquote
 
 import sqlalchemy as sa
 from sqlalchemy.engine.url import make_url
@@ -426,6 +427,34 @@ def _get_scalar_result(engine, sql):
         return conn.scalar(sql)
 
 
+def _sqlite_named_memory_uri(url, database):
+    """Return True for a named in-memory SQLite URI.
+
+    ``file:name?mode=memory&uri=true`` opens an in-memory database, same as
+    ``:memory:``. Without ``uri=true``, SQLAlchemy ignores the SQLite URI
+    query string and the name is a filesystem path. See #542.
+    """
+    if not database:
+        return False
+    name = unquote(database)
+    if not name.startswith('file:'):
+        return False
+
+    def query_value(key):
+        value = url.query.get(key)
+        if isinstance(value, (list, tuple)):
+            value = value[-1] if value else None
+        if value is None:
+            return ''
+        return str(value).strip()
+
+    # Match SQLAlchemy's bool coercion for the uri= driver flag.
+    uri = query_value('uri').lower()
+    return uri in {'1', 'true', 'yes', 'on', 'y', 't'} and (
+        query_value('mode') == 'memory'
+    )
+
+
 def _sqlite_file_exists(database):
     if not os.path.isfile(database) or os.path.getsize(database) < 100:
         return False
@@ -483,14 +512,19 @@ def database_exists(url):
             return bool(_get_scalar_result(engine, sa.text(text)))
 
         elif dialect_name == 'sqlite':
+            # The default SQLAlchemy database is in memory, and :memory: is
+            # not required, thus we should support that use case. Named
+            # in-memory URIs have no filesystem path either. (#542)
+            if (
+                not database
+                or database == ':memory:'
+                or _sqlite_named_memory_uri(url, database)
+            ):
+                return True
+
             url = _set_url_database(url, database=None)
             engine = sa.create_engine(url)
-            if database:
-                return database == ':memory:' or _sqlite_file_exists(database)
-            else:
-                # The default SQLAlchemy database is in memory, and :memory: is
-                # not required, thus we should support that use case.
-                return True
+            return _sqlite_file_exists(database)
         elif dialect_name == 'mssql':
             text = "SELECT 1 FROM sys.databases WHERE name = '%s'" % database
             url = _set_url_database(url, database='master')

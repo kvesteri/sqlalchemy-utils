@@ -32,6 +32,21 @@ class TestDatabaseSQLiteMemoryNoDatabaseString:
         assert database_exists(sqlite_none_database_dsn)
 
 
+class TestDatabaseSQLiteNamedMemory:
+    def test_exists_named_memory(self):
+        # Issue #542.
+        dsn = (
+            'sqlite+pysqlite:///file:EXPLICIT-NAME'
+            '?mode=memory&cache=shared&uri=true'
+        )
+        assert database_exists(dsn)
+        assert database_exists(sa.engine.url.make_url(dsn))
+
+    def test_file_uri_without_memory_mode_is_not_memory(self):
+        dsn = 'sqlite:///file:EXPLICIT-NAME-not-memory'
+        assert not database_exists(dsn)
+
+
 @pytest.mark.usefixtures('sqlite_file_dsn')
 class TestDatabaseSQLiteFile(DatabaseTest):
     def test_existing_non_sqlite_file(self, dsn):
