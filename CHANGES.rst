@@ -3,6 +3,11 @@ Changelog
 
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
+Unreleased changes
+^^^^^^^^^^^^^^^^^^^
+
+- Fix ``Ltree.validate`` rejecting non-ASCII letters (e.g. Cyrillic, accented Latin) in path labels, even though Postgres' ``ltree`` accepts them. (#443)
+
 0.43.0 (2026-10-09)
 ^^^^^^^^^^^^^^^^^^^
 
