@@ -69,7 +69,7 @@ class UUIDType(ScalarCoercible, types.TypeDecorator):
         return value
 
     def process_literal_param(self, value, dialect):
-        return value
+        return self.process_bind_param(value, dialect)
 
     def process_bind_param(self, value, dialect):
         if value is None:
