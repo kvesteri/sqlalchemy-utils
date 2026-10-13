@@ -48,6 +48,15 @@ class TestDatabaseMySQL(DatabaseTest):
     def db_name(self):
         return 'db_test_sqlalchemy_util'
 
+    def test_database_name_with_quote_is_not_injectable(self, mysql_db_user):
+        url = sa.engine.url.URL.create(
+            'mysql+pymysql',
+            username=mysql_db_user,
+            host='localhost',
+            database="x' OR SCHEMA_NAME = 'information_schema"
+        )
+        assert not database_exists(url)
+
 
 @pytest.mark.skipif('pymysql is None')
 @pytest.mark.usefixtures('mysql_dsn')
@@ -64,6 +73,18 @@ class TestDatabasePostgres(DatabaseTest):
     @pytest.fixture
     def db_name(self):
         return 'db_test_sqlalchemy_util'
+
+    def test_database_name_with_quote_is_not_injectable(
+        self, postgresql_db_user, postgresql_db_password
+    ):
+        url = sa.engine.url.URL.create(
+            'postgresql',
+            username=postgresql_db_user,
+            password=postgresql_db_password,
+            host='localhost',
+            database="x' OR datname = 'postgres"
+        )
+        assert not database_exists(url)
 
     def test_template(self, postgresql_db_user, postgresql_db_password):
         dsn = 'postgresql://{}:{}@localhost/db_test_sqlalchemy_util'.format(
@@ -159,3 +180,19 @@ class TestDatabaseMssql(DatabaseTest):
     def db_name(self):
         pytest.importorskip('pyodbc')
         return 'db_test_sqlalchemy_util'
+
+    def test_database_name_with_quote_is_not_injectable(
+        self, mssql_db_user, mssql_db_password, mssql_db_driver
+    ):
+        url = sa.engine.url.URL.create(
+            'mssql+pyodbc',
+            username=mssql_db_user,
+            password=mssql_db_password,
+            host='localhost',
+            database="x' OR name = 'master",
+            query={
+                'driver': mssql_db_driver.replace('+', ' '),
+                'TrustServerCertificate': 'yes'
+            }
+        )
+        assert not database_exists(url)
