@@ -463,12 +463,14 @@ def database_exists(url):
     engine = None
     try:
         if dialect_name == 'postgresql':
-            text = "SELECT 1 FROM pg_database WHERE datname='%s'" % database
+            text = sa.text(
+                'SELECT 1 FROM pg_database WHERE datname = :database'
+            ).bindparams(database=database)
             for db in (database, 'postgres', 'template1', 'template0', None):
                 url = _set_url_database(url, database=db)
                 engine = sa.create_engine(url, isolation_level='AUTOCOMMIT')
                 try:
-                    return bool(_get_scalar_result(engine, sa.text(text)))
+                    return bool(_get_scalar_result(engine, text))
                 except (ProgrammingError, OperationalError):
                     pass
             return False
@@ -476,11 +478,11 @@ def database_exists(url):
         elif dialect_name == 'mysql':
             url = _set_url_database(url, database=None)
             engine = sa.create_engine(url)
-            text = (
+            text = sa.text(
                 'SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA '
-                "WHERE SCHEMA_NAME = '%s'" % database
-            )
-            return bool(_get_scalar_result(engine, sa.text(text)))
+                'WHERE SCHEMA_NAME = :database'
+            ).bindparams(database=database)
+            return bool(_get_scalar_result(engine, text))
 
         elif dialect_name == 'sqlite':
             url = _set_url_database(url, database=None)
@@ -492,11 +494,13 @@ def database_exists(url):
                 # not required, thus we should support that use case.
                 return True
         elif dialect_name == 'mssql':
-            text = "SELECT 1 FROM sys.databases WHERE name = '%s'" % database
+            text = sa.text(
+                'SELECT 1 FROM sys.databases WHERE name = :database'
+            ).bindparams(database=database)
             url = _set_url_database(url, database='master')
             engine = sa.create_engine(url, isolation_level='AUTOCOMMIT')
             try:
-                return bool(_get_scalar_result(engine, sa.text(text)))
+                return bool(_get_scalar_result(engine, text))
             except (ProgrammingError, OperationalError):
                 return False
         else:

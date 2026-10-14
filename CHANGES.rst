@@ -3,6 +3,11 @@ Changelog
 
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
+Unreleased
+^^^^^^^^^^
+
+- Fix SQL injection in ``database_exists``: the database name taken from the URL is now passed as a bound parameter instead of being interpolated into the query. (#760)
+
 0.43.0 (2026-10-09)
 ^^^^^^^^^^^^^^^^^^^
 
