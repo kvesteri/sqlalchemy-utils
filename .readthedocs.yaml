@@ -8,7 +8,9 @@ build:
 python:
   install:
     - requirements: "requirements/docs/requirements.txt"
+    - method: pip
+      path: .
 
 sphinx:
   configuration: "docs/conf.py"
-  fail_on_warning: false
+  fail_on_warning: true
