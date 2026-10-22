@@ -1,7 +1,30 @@
+import functools
+import pathlib
+import zoneinfo
+
 from sqlalchemy import types
 
 from ..exceptions import ImproperlyConfigured
 from .scalar_coercible import ScalarCoercible
+
+
+@functools.cache
+def _available_timezones():
+    return frozenset(zoneinfo.available_timezones())
+
+
+def _dateutil_zone_key(tz):
+    # dateutil sets ``_filename`` to the path of the file the zone was loaded
+    # from, so recover the IANA key from the trailing path components. The
+    # longest matching suffix wins so that e.g. ``Etc/UTC`` is not stored as
+    # ``UTC``.
+    parts = pathlib.PurePath(tz._filename).parts
+    available = _available_timezones()
+    for i in range(len(parts)):
+        key = '/'.join(parts[i:])
+        if key in available:
+            return key
+    raise ValueError('unable to determine time zone key for %r' % (tz,))
 
 
 class TimezoneType(ScalarCoercible, types.TypeDecorator):
@@ -35,12 +58,17 @@ class TimezoneType(ScalarCoercible, types.TypeDecorator):
         self.backend = backend
         if backend == 'dateutil':
             try:
-                from dateutil.tz import tzfile
-                from dateutil.zoneinfo import get_zonefile_instance
+                from dateutil.tz import gettz, tzfile
+
+                def to_dateutil_zone(key):
+                    if key not in _available_timezones():
+                        return None
+                    tz = gettz(key)
+                    return tz if isinstance(tz, tzfile) else None
 
                 self.python_type = tzfile
-                self._to = get_zonefile_instance().zones.get
-                self._from = lambda x: str(x._filename)
+                self._to = to_dateutil_zone
+                self._from = _dateutil_zone_key
 
             except ImportError:
                 raise ImproperlyConfigured(

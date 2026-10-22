@@ -1,7 +1,7 @@
 import pytest
 import pytz
 import sqlalchemy as sa
-from dateutil.zoneinfo import get_zonefile_instance, tzfile
+from dateutil import tz as dateutil_tz
 
 import zoneinfo
 
@@ -86,10 +86,26 @@ def test_can_coerce_string_for_pytz_zone(zone):
     assert tzcol._coerce(zone).zone == zone
 
 
-@pytest.mark.parametrize('zone', get_zonefile_instance().zones.keys())
+@pytest.mark.parametrize('zone', sorted(zoneinfo.available_timezones()))
 def test_can_coerce_string_for_dateutil_zone(zone):
     tzcol = TimezoneType(backend='dateutil')
-    assert isinstance(tzcol._coerce(zone), tzfile)
+    assert isinstance(tzcol._coerce(zone), dateutil_tz.tzfile)
+
+
+@pytest.mark.parametrize('zone', ['America/New_York', 'UTC', 'Etc/UTC'])
+def test_dateutil_bind_param_is_zone_key(zone):
+    tzcol = TimezoneType(backend='dateutil')
+    assert tzcol.process_bind_param(zone, None) == zone
+    assert tzcol.process_bind_param(dateutil_tz.gettz(zone), None) == zone
+
+
+@pytest.mark.parametrize(
+    'value', ['EST+5', '/usr/share/zoneinfo/America/New_York', '../UTC']
+)
+def test_dateutil_rejects_non_iana_keys(value):
+    tzcol = TimezoneType(backend='dateutil')
+    with pytest.raises(ValueError):
+        tzcol._coerce(value)
 
 
 @pytest.mark.parametrize('zone', zoneinfo.available_timezones())
