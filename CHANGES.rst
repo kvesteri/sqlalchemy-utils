@@ -3,6 +3,13 @@ Changelog
 
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
+Unreleased
+^^^^^^^^^^
+
+- Stop using the deprecated ``dateutil.zoneinfo`` module in the ``dateutil`` backend of ``TimezoneType``. Zones are now loaded with ``dateutil.tz.gettz`` and validated against ``zoneinfo.available_timezones()``.
+
+  ``tzfile`` objects created with ``dateutil.tz.gettz`` are now stored by their IANA key rather than by the path of their zone file.
+
 0.43.0 (2026-10-09)
 ^^^^^^^^^^^^^^^^^^^
 
