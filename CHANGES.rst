@@ -3,6 +3,11 @@ Changelog
 
 Here you can see the full list of changes between each SQLAlchemy-Utils release.
 
+Unreleased
+^^^^^^^^^^
+
+- Fix ``observes`` passing a set of integers instead of the value when observing a binary column. (#744)
+
 0.43.0 (2026-10-09)
 ^^^^^^^^^^^^^^^^^^^
 

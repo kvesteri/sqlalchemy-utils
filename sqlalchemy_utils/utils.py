@@ -10,7 +10,9 @@ def str_coercible(cls):
 
 
 def is_sequence(value):
-    return isinstance(value, Iterable) and not isinstance(value, str)
+    return isinstance(value, Iterable) and not isinstance(
+        value, (str, bytes, bytearray, memoryview)
+    )
 
 
 def starts_with(iterable, prefix):

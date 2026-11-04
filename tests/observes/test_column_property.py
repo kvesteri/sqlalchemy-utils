@@ -130,3 +130,67 @@ class TestObservesForMultipleColumnsFiresOnlyOnce:
         order.unit_price = 100
         session.flush()
         assert order.call_count == 2
+
+
+class TestObservesForBinaryColumn:
+
+    @pytest.fixture
+    def Document(self, Base):
+        class Document(Base):
+            __tablename__ = 'document'
+            id = sa.Column(sa.Integer, primary_key=True)
+            content = sa.Column(sa.LargeBinary)
+            seen = None
+
+            @observes('content')
+            def content_observer(self, content):
+                self.seen = content
+        return Document
+
+    @pytest.fixture
+    def init_models(self, Document):
+        pass
+
+    @pytest.mark.parametrize('content', (b'abc', bytearray(b'abc'), memoryview(b'abc')))
+    def test_observer_receives_the_binary_value(self, session, Document, content):
+        document = Document(content=content)
+        session.add(document)
+        session.flush()
+        assert document.seen == b'abc'
+
+
+class TestObservesForBinaryColumnThroughRelationship:
+
+    @pytest.fixture
+    def Attachment(self, Base):
+        class Attachment(Base):
+            __tablename__ = 'attachment'
+            id = sa.Column(sa.Integer, primary_key=True)
+            content = sa.Column(sa.LargeBinary)
+            document_id = sa.Column(sa.Integer, sa.ForeignKey('document.id'))
+        return Attachment
+
+    @pytest.fixture
+    def Document(self, Base, Attachment):
+        class Document(Base):
+            __tablename__ = 'document'
+            id = sa.Column(sa.Integer, primary_key=True)
+            attachments = sa.orm.relationship(Attachment, backref='document')
+            seen = None
+
+            @observes('attachments.content')
+            def content_observer(self, contents):
+                self.seen = contents
+        return Document
+
+    @pytest.fixture
+    def init_models(self, Document):
+        pass
+
+    def test_observer_receives_each_binary_value(self, session, Document, Attachment):
+        document = Document(
+            attachments=[Attachment(content=b'abc'), Attachment(content=b'de')]
+        )
+        session.add(document)
+        session.flush()
+        assert document.seen == {b'abc', b'de'}
